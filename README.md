@@ -1,5 +1,15 @@
 Repository for the intersection component
 
+--------------
+## Methodology
+- weekly planning
+- milestones for long term goals (about two months)
+- demo every 4 weeks
+  - involve reference group from REP
+- possibly split planning of user stories and discuss technical issues in 2 separate meetings
+- daily standups
+
+-------------
 Language: typescript
 
 Strategy: same strategy as Videx used in the VidEx-map repository (TODO: add details)
