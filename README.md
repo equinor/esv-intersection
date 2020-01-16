@@ -8,7 +8,7 @@ Repository for the intersection component
   - involve reference group from REP
 - possibly split planning of user stories and discuss technical issues in 2 separate meetings
 - daily standups
-
+- Milestone in 2nd demo
 -------------
 Language: typescript
 
