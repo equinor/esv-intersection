@@ -1,0 +1,66 @@
+{
+  "name": "@equinor/intersection",
+  "version": "1.0.0",
+  "description": "Intersection component package with testing and automatic documentation.",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "browser": "dist/index.umd.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "rollup -c",
+    "prepub": "npm run build",
+    "pub": "npm publish --access=public",
+    "test": "jest",
+    "test:watch": "jest --watchAll",
+    "predocs": "rimraf docs",
+    "docs": "typedoc --out docs src",
+    "postdocs": "copyfiles images/* docs && copyfiles .nojekyll docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/equinor/intersection.git"
+  },
+  "keywords": [
+    "videx",
+    "heappurple",
+    "intersection",
+    "typescript"
+  ],
+  "contributors": ["Tom Kristian Tjemsland", "Brynjulf Risbakken"],
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/equinor/intersection/issues"
+  },
+  "homepage": "https://github.com/equinor/intersection#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.21",
+    "copyfiles": "^2.1.1",
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "jest": "^24.9.0",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.26.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^5.1.2",
+    "rollup-plugin-typescript2": "^0.24.3",
+    "ts-jest": "^24.1.0",
+    "typedoc": "^0.15.0",
+    "typescript": "^3.6.4"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testRegex": "/test/.*",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
+  }
+}
