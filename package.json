@@ -30,7 +30,10 @@
     "intersection",
     "typescript"
   ],
-  "contributors": ["Tom Kristian Tjemsland", "Brynjulf Risbakken"],
+  "contributors": [
+    "Tom Kristian Tjemsland",
+    "Brynjulf Risbakken"
+  ],
   "license": "",
   "bugs": {
     "url": "https://github.com/equinor/intersection/issues"
