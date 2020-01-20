@@ -34,7 +34,7 @@
     "Tom Kristian Tjemsland",
     "Brynjulf Risbakken"
   ],
-  "license": "",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/equinor/intersection/issues"
   },
