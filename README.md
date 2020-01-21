@@ -1,68 +1,52 @@
 # Intersection component
+A reusable component to create intersection visualizations for wells
 
---------------
-## Methodology
-- weekly planning
-- milestones for long term goals (about two months)
-- demo every 4 weeks
-  - involve reference group from REP
-- possibly split planning of user stories and discuss technical issues in 2 separate meetings
-- daily standups
-- Milestone in 2nd demo
--------------
-Language: typescript
 
-Strategy: same strategy as Videx used in the VidEx-map repository (TODO: add details)
-
-Browser support: Edge, Chrome, Firefox, Safari
-
-Repository: one repo per component, some additional repositories for common utilities
-
-Open source: get in touch with POs
-
-Styling: no real preference, to be defined. Videx map uses SCSS, WellX has to figure out integration with Sencha
-
-Testing:
-  - we want unit tests, with test coverage (treat with care)
-  - snapshot tests nice to have
-  - simulation test: testing basic interaction on all browsers (browser support)
-    - can take quite some efforts, maybe ont highest priority
-    - decide tools and target platforms
-
-Linting: yes, lint in CI, use automatic formatting
-
-Dependencies: _d3_, maybe _emotion_
-  - evaluate if other dependencies might be necessary/interesting
-  - visualization layers can drag in additional dependencies
-  - dependnecies should not be included unless used by some specific layer
-
-Accessibility: try our best to comply with WCAG2.1, possibly automatically check this in the future
-
-CI: let's start with Github actions, evaluate different solutions if issues arise later on
-
-Publishing:
-  - have automatic publishing
-  - connect to tagged versions in the repo
-  - would be good to be able to have a nightly package
-  - details to be figured out
-
-TODO Set up daily standups
-TODO Set up planing meetings with POs
-
------------
-
-Typescript template for npm packages with testing and automatic documentation.
+## Technical choices
 
 - **Compiler**: [Typescript](https://www.npmjs.com/package/typescript)
 - **Module bundler**: [Rollup](https://www.npmjs.com/package/rollup)
 - **Testing**: [Jest](https://www.npmjs.com/package/jest)
 - **Documentation**: [TypeDoc](https://www.npmjs.com/package/typedoc)
 - **Code compressor**: [Terser](https://www.npmjs.com/package/terser)
+- **Miscellaneous**:
+  - Architecture: A container component that holds several layers, specialized for the type of data and visualization they address (analogous to the VidEx-map component https://github.com/equinor/videx-map)
+  - Browser support: Target Edge, Chrome, Firefox, Safari
+  - Styling: To be defined. Possibly SCSS or Emotion
+  - Testing:
+    - linting and unit tests, with test coverage - run automatically on Github Actions
+    - possibly snapshot tests at a later stage
+    - later on simulation tests, depending on resources and requirements
+  - Dependencies: 
+    - _d3_
+    - each layer can include additional dependencies
+  - Accessibility: investigate compliance with WCAG2.1 (poossibly automatically)
+  - Publishing:
+    - automated
+    - both tagged releases (semantic versioning) and nightly
 
-## Repository
 
-- [GitHub](https://github.com/equinor/videx-npm-template)
+## Development methodology
+- The _Product Owners_ of the Intersection component are @farzadfz and @thuve 
+- Development is driven by _user stories_, created and prioritized by developers and POs together
+- User stories can be grouped into _milestones_. A milestone represents what is expected to be achieved in about 2 months of development
+- The development team has _planning meetings_ with the POs once a week
+- The development team has _daily standups_, POs participation is optional but very much encouraged
+- Development relies on a _project board_ hosted on github (https://github.com/equinor/intersection/projects/1)
+- During planning meetings, the `To do` column of the board is populated with user stories and tasks
+- What is placed in the `To do` column is expected to be completed in 1 week of normal work
+- At the developers discretion, a _technical planning meeting_ can be held after the planning
+- During a _technical planning meeting_, current user stories and tasks can be discussed and potentially split into smaller tasks
+- A _demo_ for the stakeholders will be held approximately every 4 weeks
+  - Stakeholders for the _WellX_ and _REP_ projects (including the _REP reference user group_) should be invited to the demo 
 
+
+## Resources
+- **Repository**: [GitHub](https://github.com/equinor/intersection)
+
+
+
+--- The following part comes from the template and needs to be revised further ---
 ## Setup guide
 
 ### Cloning repository
