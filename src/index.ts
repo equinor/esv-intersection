@@ -6,6 +6,6 @@
  * @example
  * hello('npm'); // -> 'Hello npm!'
  */
-export function hello(name: string = 'npm'): string {
+export function hello(name: string = "npm"): string {
   return `Hello ${name}!`;
 }
