@@ -6,7 +6,16 @@ export default {
 
 export const SingleAxis = () => {
   const div = document.createElement("div");
-  const axis = new Axis(0, 2000, 500, Orientation.ONE);
+  const args = {
+    mainGroup: "#mg",
+    x: 100,
+    y: 200,
+    width: 150,
+    height: 250,
+    orientation: Orientation.ONE,
+    showLabels: true
+  };
+  const axis = new Axis({ ...args });
   div.innerHTML = axis.render();
   return div;
 };
