@@ -1,5 +1,4 @@
-// import d3 from 'd3';
-import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent } from '../Interfaces';
+import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 
 abstract class Layer {
