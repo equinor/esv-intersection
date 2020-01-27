@@ -20,7 +20,8 @@
     "docs": "typedoc --out docs src",
     "postdocs": "copyfiles images/* docs && copyfiles .nojekyll docs",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "crlf-fix": "prettier --write --end-of-line=lf **/*.ts "
   },
   "repository": {
     "type": "git",
@@ -59,7 +60,7 @@
     "rollup-plugin-typescript2": "^0.24.3",
     "ts-jest": "^24.1.0",
     "typedoc": "^0.15.0",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.5"
   },
   "jest": {
     "transform": {
@@ -72,5 +73,14 @@
       "js"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/d3": "^5.7.2",
+    "@typescript-eslint/eslint-plugin": "^2.17.0",
+    "@typescript-eslint/parser": "^2.17.0",
+    "d3-axis": "^1.0.12",
+    "d3-scale": "^3.2.1",
+    "d3-selection": "^1.4.1",
+    "eslint-config-airbnb-typescript": "^6.3.1",
+    "prettier": "^1.19.1"
+  }
 }

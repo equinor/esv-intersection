@@ -7,5 +7,5 @@
  * hello('npm'); // -> 'Hello npm!'
  */
 export function hello(name: string = 'npm'): string {
-  return `Hello ${name}!`;
+  return `Hello ${name}!`
 }
