@@ -7,13 +7,16 @@ export default {
 
 export const SingleAxis = () => {
   const div = document.createElement('div')
-  const svg = select(div).append('svg')
+  const svg = select(div)
+    .append('svg')
+    .attr('height', 1000)
+    .attr('width', 500)
   const args = {
     mainGroup: svg,
     x: 100,
     y: 200,
-    width: 150,
-    height: 250,
+    width: 500,
+    height: 1000,
     orientation: Orientation.ONE,
     showLabels: true,
   }

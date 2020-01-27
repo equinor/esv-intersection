@@ -5,6 +5,7 @@ import { BaseType } from 'd3'
 export class Axis {
   labelxx: d3.Selection<BaseType, any, null, undefined>
   yAxiss: d3.Selection<BaseType, any, null, undefined>
+  xAxiss: d3.Selection<BaseType, any, null, undefined>
 
   constructor(
     mainGroup: d3.Selection<SVGElement, any, null, undefined>,
@@ -17,10 +18,14 @@ export class Axis {
   ) {
     const scalex = scaleLinear()
       .domain([x, y])
-      .range([x, y])
+      .range([0, 1000])
+
+    const scaley = scaleLinear()
+      .domain([x, y])
+      .range([0, 500])
 
     const xAxis = axisBottom(scalex)
-    const yAxis = axisRight(scalex)
+    const yAxis = axisRight(scaley)
 
     const gx = this.gx(mainGroup, xAxis, height)
 
@@ -45,6 +50,7 @@ export class Axis {
     const labelx = this.labelx(mainGroup, gx, showLabels, width)
     this.labelxx = labelx
     this.yAxiss = gy
+    this.xAxiss = gx
   }
 
   labelx(
@@ -101,7 +107,7 @@ export class Axis {
     return gx
   }
   render() {
-    return this.yAxiss.html()
+    return `${this.yAxiss.html()}${this.xAxiss.html()}`
   }
 }
 
