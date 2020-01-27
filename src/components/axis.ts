@@ -1,4 +1,5 @@
-import { * as d3axis } from "d3-axis";
+import { axisRight, axisBottom } from "d3-axis";
+import { scaleLinear } from "d3-scale";
 
 export class Axis {
   constructor(
@@ -8,14 +9,18 @@ export class Axis {
     width: number,
     height: number,
     orientation: Orientation,
-    showLabels: boolean = true
+    showLabels = true
   ) {
-    const xAxis = d3.axisBottom(x);
-    const yAxis = d3.axisRight(y);
+    const scalex = scaleLinear()
+      .domain([x, y])
+      .range([x, y]);
 
-    let gx = this.gx(mainGroup, xAxis, height);
+    const xAxis = axisBottom(scalex);
+    const yAxis = axisRight(scalex);
 
-    let gy = this.gy(mainGroup, yAxis, width);
+    const gx = this.gx(mainGroup, xAxis, height);
+
+    const gy = this.gy(mainGroup, yAxis, width);
 
     let labely = gy.select("text.axis-labely");
     if (showLabels) {
@@ -37,7 +42,7 @@ export class Axis {
     } else {
       labely.remove();
     }
-    let labelx = this.labelx(mainGroup, gx, showLabels, width);
+    const labelx = this.labelx(mainGroup, gx, showLabels, width);
   }
 
   labelx(mainGroup: any, gx: any, showLabels: any, width: any) {
