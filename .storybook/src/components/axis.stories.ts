@@ -6,9 +6,10 @@ export default {
 }
 
 export const SingleAxis = () => {
-  const div = document.createElement('svg')
+  const div = document.createElement('div')
+  const svg = select(div).append('svg')
   const args = {
-    mainGroup: select(div),
+    mainGroup: svg,
     x: 100,
     y: 200,
     width: 150,

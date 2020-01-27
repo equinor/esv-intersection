@@ -1,9 +1,13 @@
 import { axisRight, axisBottom } from 'd3-axis'
 import { scaleLinear } from 'd3-scale'
+import { BaseType } from 'd3'
 
 export class Axis {
+  labelxx: d3.Selection<BaseType, any, null, undefined>
+  yAxiss: d3.Selection<BaseType, any, null, undefined>
+
   constructor(
-    mainGroup: any,
+    mainGroup: d3.Selection<SVGElement, any, null, undefined>,
     x: number,
     y: number,
     width: number,
@@ -27,15 +31,11 @@ export class Axis {
       if (labely.empty()) {
         labely = gy
           .append('text')
-          .attrs({
-            class: 'axis-labely',
-            fill: 'rgba(0,0,0,0.3)',
-          })
-          .styles({
-            'text-anchor': 'middle',
-            'font-weight': '800',
-            'font-size': '10px',
-          })
+          .attr('class', 'axis-labely')
+          .attr('fill', 'rgba(0,0,0,0.3)')
+          .style('text-anchor', 'middle')
+          .style('font-weight', '800')
+          .style('font-size', '10px')
           .text('TVD MSL (m)')
       }
       labely.attr('transform', `translate(-10,${height / 2})rotate(90)`)
@@ -43,23 +43,26 @@ export class Axis {
       labely.remove()
     }
     const labelx = this.labelx(mainGroup, gx, showLabels, width)
+    this.labelxx = labelx
+    this.yAxiss = gy
   }
 
-  labelx(mainGroup: any, gx: any, showLabels: any, width: any) {
+  labelx(
+    mainGroup: any,
+    gx: d3.Selection<BaseType, any, null, undefined>,
+    showLabels: any,
+    width: any,
+  ): d3.Selection<BaseType, any, null, undefined> {
     let labelx = gx.select('text.axis-labelx')
     if (showLabels) {
       if (labelx.empty()) {
         labelx = gx
           .append('text')
-          .attrs({
-            class: 'axis-labelx',
-            fill: 'rgba(0,0,0,0.3)',
-          })
-          .styles({
-            'text-anchor': 'middle',
-            'font-weight': '800',
-            'font-size': '10px',
-          })
+          .attr('class', 'axis-labelx')
+          .attr('fill', 'rgba(0,0,0,0.3)')
+          .style('text-anchor', 'middle')
+          .style('font-weight', '800')
+          .style('font-size', '10px')
           .text('Displacement (m)')
       }
     } else {
@@ -69,32 +72,36 @@ export class Axis {
     return labelx
   }
 
-  gy(mainGroup: any, yAxis: any, width: any) {
+  gy(
+    mainGroup: d3.Selection<BaseType, any, null, undefined>,
+    yAxis: any,
+    width: any,
+  ): d3.Selection<BaseType, any, null, undefined> {
     let gy = mainGroup.select('g.y-axis')
     if (gy.empty()) {
-      gy = mainGroup.append('g').attrs({ class: 'y-axis' })
+      gy = mainGroup.append('g').attr('class', 'y-axis')
     }
     gy.call(yAxis)
-    gy.attrs({
-      transform: `translate(${width},0)`,
-    })
+    gy.attr('transform', `translate(${width},0)`)
 
     return gy
   }
 
-  gx(mainGroup: any, xAxis: any, height: any) {
+  gx(
+    mainGroup: d3.Selection<BaseType, any, null, undefined>,
+    xAxis: any,
+    height: any,
+  ): d3.Selection<BaseType, any, null, undefined> {
     let gx = mainGroup.select('g.x-axis')
     if (gx.empty()) {
-      gx = mainGroup.append('g').attrs({ class: 'x-axis' })
+      gx = mainGroup.append('g').attr('class', 'x-axis')
     }
-    gx.attrs({
-      transform: `translate(0, ${height})`,
-    })
+    gx.attr('transform', `translate(0, ${height})`)
     gx.call(xAxis)
     return gx
   }
   render() {
-    return '<h1>hei</h1>'
+    return this.yAxiss.html()
   }
 }
 
