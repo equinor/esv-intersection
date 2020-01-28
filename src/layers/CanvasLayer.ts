@@ -12,8 +12,12 @@ abstract class CanvasLayer extends Layer {
   onMount(event: OnMountEvent) {
     super.onMount(event);
     this.elm = event.elm;
-    const canvas = d3.select(event.elm).append('canvas').style('position', 'absolute');
+
+    const canvas = d3.select(event.elm).append('canvas')
+      .style('position', 'absolute');
     this.ctx = canvas.node().getContext('2d');
+    // hack to avoid blurry canvas
+    this.ctx.translate(0.5, 0.5);
   }
 
   onUpdate(event: OnUpdateEvent) {
@@ -24,10 +28,8 @@ abstract class CanvasLayer extends Layer {
     } = this;
 
     d3.select(ctx.canvas)
-      .style('width', `${elm.clientWidth}px`)
-      .style('height', `${elm.clientHeight}px`)
-      .attr('width', ctx.canvas.clientWidth)
-      .attr('height', ctx.canvas.clientHeight);
+      .style('width', `${elm.getAttribute('width')}px`)
+      .style('height', `${elm.getAttribute('height')}px`);
   }
 }
 
