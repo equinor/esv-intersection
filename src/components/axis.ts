@@ -1,63 +1,36 @@
 import { axisRight, axisBottom } from 'd3-axis'
-import { scaleLinear } from 'd3-scale'
+import { ScaleLinear } from 'd3-scale'
 import { BaseType } from 'd3'
 
 export class Axis {
-  labelxx: d3.Selection<BaseType, any, null, undefined>
-  yAxiss: d3.Selection<BaseType, any, null, undefined>
-  xAxiss: d3.Selection<BaseType, any, null, undefined>
+  mainGroup: d3.Selection<SVGElement, any, null, undefined>
+  scaleX: ScaleLinear<number, number>
+  scaleY: ScaleLinear<number, number>
+  showLabels = true
+  labelYDesc: string
+  labelXDesc: string
+  measurement: string
 
   constructor(
     mainGroup: d3.Selection<SVGElement, any, null, undefined>,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    orientation: Orientation,
+    scaleX: ScaleLinear<number, number>,
+    scaleY: ScaleLinear<number, number>,
     showLabels = true,
   ) {
-    const scalex = scaleLinear()
-      .domain([x, y])
-      .range([0, 1000])
-
-    const scaley = scaleLinear()
-      .domain([x, y])
-      .range([0, 500])
-
-    const xAxis = axisBottom(scalex)
-    const yAxis = axisRight(scaley)
-
-    const gx = this.gx(mainGroup, xAxis, height)
-
-    const gy = this.gy(mainGroup, yAxis, width)
-
-    let labely = gy.select('text.axis-labely')
-    if (showLabels) {
-      if (labely.empty()) {
-        labely = gy
-          .append('text')
-          .attr('class', 'axis-labely')
-          .attr('fill', 'rgba(0,0,0,0.3)')
-          .style('text-anchor', 'middle')
-          .style('font-weight', '800')
-          .style('font-size', '10px')
-          .text('TVD MSL (m)')
-      }
-      labely.attr('transform', `translate(-10,${height / 2})rotate(90)`)
-    } else {
-      labely.remove()
-    }
-    const labelx = this.labelx(mainGroup, gx, showLabels, width)
-    this.labelxx = labelx
-    this.yAxiss = gy
-    this.xAxiss = gx
+    this.mainGroup = mainGroup
+    this.scaleX = scaleX
+    this.scaleY = scaleY
+    this.showLabels = showLabels
+    this.labelYDesc = 'Displacement'
+    this.labelXDesc = 'TVD MSL'
+    this.measurement = 'm'
   }
 
   labelx(
-    mainGroup: any,
     gx: d3.Selection<BaseType, any, null, undefined>,
     showLabels: any,
     width: any,
+    label: string,
   ): d3.Selection<BaseType, any, null, undefined> {
     let labelx = gx.select('text.axis-labelx')
     if (showLabels) {
@@ -69,7 +42,7 @@ export class Axis {
           .style('text-anchor', 'middle')
           .style('font-weight', '800')
           .style('font-size', '10px')
-          .text('Displacement (m)')
+          .text(label)
       }
     } else {
       labelx.remove()
@@ -78,15 +51,37 @@ export class Axis {
     return labelx
   }
 
+  labely(
+    gy: d3.Selection<BaseType, any, null, undefined>,
+    showLabels: any,
+    height: any,
+    label: string,
+  ): d3.Selection<BaseType, any, null, undefined> {
+    let labely = gy.select('text.axis-labely')
+    if (showLabels) {
+      if (labely.empty()) {
+        labely = gy
+          .append('text')
+          .attr('class', 'axis-labely')
+          .attr('fill', 'rgba(0,0,0,0.3)')
+          .style('text-anchor', 'middle')
+          .style('font-weight', '800')
+          .style('font-size', '10px')
+          .text(label)
+      }
+      labely.attr('transform', `translate(-10,${height / 2})rotate(90)`)
+    } else {
+      labely.remove()
+    }
+    return labely
+  }
+
   gy(
     mainGroup: d3.Selection<BaseType, any, null, undefined>,
     yAxis: any,
     width: any,
   ): d3.Selection<BaseType, any, null, undefined> {
-    let gy = mainGroup.select('g.y-axis')
-    if (gy.empty()) {
-      gy = mainGroup.append('g').attr('class', 'y-axis')
-    }
+    const gy = this.createOrGet(mainGroup, 'y-axis')
     gy.call(yAxis)
     gy.attr('transform', `translate(${width},0)`)
 
@@ -98,20 +93,46 @@ export class Axis {
     xAxis: any,
     height: any,
   ): d3.Selection<BaseType, any, null, undefined> {
-    let gx = mainGroup.select('g.x-axis')
-    if (gx.empty()) {
-      gx = mainGroup.append('g').attr('class', 'x-axis')
-    }
-    gx.attr('transform', `translate(0, ${height})`)
+    const gx = this.createOrGet(mainGroup, 'x-axis')
+    gx.attr('transform', `translate(0 ${height})`)
     gx.call(xAxis)
     return gx
   }
-  render() {
-    return `${this.yAxiss.html()}${this.xAxiss.html()}`
-  }
-}
 
-export enum Orientation {
-  ONE,
-  TWO,
+  createOrGet = (
+    mainGroup: d3.Selection<BaseType, any, null, undefined>,
+    name: string,
+  ) => {
+    let res = mainGroup.select(`g.${name}`)
+    if (res.empty()) {
+      res = mainGroup.append('g').attr('class', name)
+    }
+    return res
+  }
+
+  render() {
+    const xAxis = axisBottom(this.scaleX)
+    const yAxis = axisRight(this.scaleY)
+
+    const [, height] = this.scaleY.range()
+    const [, width] = this.scaleX.range()
+
+    const gx = this.gx(this.mainGroup, xAxis, height)
+    const gy = this.gy(this.mainGroup, yAxis, width)
+
+    const labely = this.labely(
+      gy,
+      this.showLabels,
+      height,
+      `${this.labelYDesc} (${this.measurement})`,
+    )
+    const labelx = this.labelx(
+      gx,
+      this.showLabels,
+      width,
+      `${this.labelXDesc} (${this.measurement})`,
+    )
+
+    return `${labelx.html()}${gx.html()}${labely.html()}${gy.html()}`
+  }
 }
