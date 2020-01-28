@@ -1,5 +1,6 @@
-import { Axis, Orientation } from '../../../src/components/axis'
+import { Axis } from '../../../src/components/axis'
 import { select } from 'd3-selection'
+import { scaleLinear } from 'd3-scale'
 
 export default {
   title: 'Axis',
@@ -7,28 +8,43 @@ export default {
 
 export const SingleAxis = () => {
   const div = document.createElement('div')
+
   const svg = select(div)
     .append('svg')
-    .attr('height', 1000)
-    .attr('width', 500)
-  const args = {
-    mainGroup: svg,
-    x: 100,
-    y: 200,
-    width: 500,
-    height: 1000,
-    orientation: Orientation.ONE,
-    showLabels: true,
+    .attr('height', '1000px')
+    .attr('width', '1000px')
+
+  const createScale = (
+    xMin: number,
+    xMax: number,
+    yMin: number,
+    yMax: number,
+    height: number,
+    width: number,
+  ) => {
+    return [
+      scaleLinear()
+        .domain([xMin, xMax])
+        .range([0, width]),
+      scaleLinear()
+        .domain([yMin, yMax])
+        .range([0, height]),
+    ]
   }
+
+  const [scaleX, scaleY] = createScale(0, 250, 0, 300, 500, 600)
+  const mainGroup = svg
+  const showLabels = true
+
   const axis = new Axis(
-    args.mainGroup,
-    args.x,
-    args.y,
-    args.width,
-    args.height,
-    args.orientation,
-    args.showLabels,
+    mainGroup,
+    scaleX,
+    scaleY,
+    showLabels,
+    'Displacement',
+    'TVD MSL',
+    'm',
   )
-  div.innerHTML = axis.render()
+  axis.render()
   return div
 }
