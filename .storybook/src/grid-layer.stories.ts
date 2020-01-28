@@ -25,12 +25,16 @@ export const Grid = () => {
   root.setAttribute('width', `${width}`);
 
   gridLayer.onMount({ elm : root });
-  gridLayer.render(createEventObj());
-  gridLayer.onRescale(createEventObj());
+
+  /**
+   * .onUpdate(...) sets width and height of the canvas, currently .render() uses default dimensions (150, 300)
+   */
+  gridLayer.onUpdate(createEventObj());
 
   return root;
 };
 
+//
 const createEventObj = () => {
   const xscale = d3.scaleLinear().domain(xbounds).range([0, 500]);
   const yscale = d3.scaleLinear().domain(ybounds).range([0, 500]);
