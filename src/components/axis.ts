@@ -16,17 +16,20 @@ export class Axis {
     scaleX: ScaleLinear<number, number>,
     scaleY: ScaleLinear<number, number>,
     showLabels = true,
+    labelYDesc: string,
+    labelXDesc: string,
+    measurement: string,
   ) {
     this.mainGroup = mainGroup
     this.scaleX = scaleX
     this.scaleY = scaleY
     this.showLabels = showLabels
-    this.labelYDesc = 'Displacement'
-    this.labelXDesc = 'TVD MSL'
-    this.measurement = 'm'
+    this.labelYDesc = labelYDesc
+    this.labelXDesc = labelXDesc
+    this.measurement = measurement
   }
 
-  labelx(
+  renderLabelx(
     gx: d3.Selection<BaseType, any, null, undefined>,
     showLabels: any,
     width: any,
@@ -51,7 +54,7 @@ export class Axis {
     return labelx
   }
 
-  labely(
+  renderLabely(
     gy: d3.Selection<BaseType, any, null, undefined>,
     showLabels: any,
     height: any,
@@ -76,7 +79,7 @@ export class Axis {
     return labely
   }
 
-  gy(
+  renderGy(
     mainGroup: d3.Selection<BaseType, any, null, undefined>,
     yAxis: any,
     width: any,
@@ -88,7 +91,7 @@ export class Axis {
     return gy
   }
 
-  gx(
+  renderGx(
     mainGroup: d3.Selection<BaseType, any, null, undefined>,
     xAxis: any,
     height: any,
@@ -117,22 +120,20 @@ export class Axis {
     const [, height] = this.scaleY.range()
     const [, width] = this.scaleX.range()
 
-    const gx = this.gx(this.mainGroup, xAxis, height)
-    const gy = this.gy(this.mainGroup, yAxis, width)
+    const gx = this.renderGx(this.mainGroup, xAxis, height)
+    const gy = this.renderGy(this.mainGroup, yAxis, width)
 
-    const labely = this.labely(
+    this.renderLabely(
       gy,
       this.showLabels,
       height,
       `${this.labelYDesc} (${this.measurement})`,
     )
-    const labelx = this.labelx(
+    this.renderLabelx(
       gx,
       this.showLabels,
       width,
       `${this.labelXDesc} (${this.measurement})`,
     )
-
-    return `${labelx.html()}${gx.html()}${labely.html()}${gy.html()}`
   }
 }

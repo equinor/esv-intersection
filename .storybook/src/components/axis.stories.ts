@@ -36,7 +36,15 @@ export const SingleAxis = () => {
   const mainGroup = svg
   const showLabels = true
 
-  const axis = new Axis(mainGroup, scaleX, scaleY, showLabels)
-  svg.html(axis.render())
+  const axis = new Axis(
+    mainGroup,
+    scaleX,
+    scaleY,
+    showLabels,
+    'Displacement',
+    'TVD MSL',
+    'm',
+  )
+  axis.render()
   return div
 }
