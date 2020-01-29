@@ -1,12 +1,13 @@
 import { scaleLinear } from 'd3-scale';
 import GridLayer from '../../src/layers/GridLayer';
 
-const width = 400;
-const height = 500;
-
 export default {
   title: 'Canvas',
 };
+
+const width = 400;
+const height = 500;
+
 const xbounds = [0, 1000];
 const ybounds = [0, 1000];
 
@@ -34,7 +35,6 @@ export const Grid = () => {
   return root;
 };
 
-//
 const createEventObj = () => {
   const xscale = scaleLinear().domain(xbounds).range([0, 500]);
   const yscale = scaleLinear().domain(ybounds).range([0, 500]);
