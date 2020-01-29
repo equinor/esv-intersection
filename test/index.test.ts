@@ -1,7 +1,16 @@
-/* eslint-disable no-undef */
-import { hello } from '../src/index'
+import {
+  GridLayer,
+} from '../src/index';
 
-test('hello', () => {
-  expect(hello('npm')).toBe('Hello npm!')
-  expect(hello('world')).toBe('Hello world!')
-})
+describe('Layer', () => {
+  describe('Grid', () => {
+    it('should have a default opacity of 1 if no option is set', () => {
+      const layer = new GridLayer('grid');
+      expect(layer.opacity).toEqual(1);
+    });
+    it('should overwrite default opacity of 1 with 0.5', () => {
+      const layer = new GridLayer('grid', { layerOpacity: 0.5 });
+      expect(layer.opacity).toEqual(0.5);
+    });
+  });
+});
