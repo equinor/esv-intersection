@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import { scaleLinear } from 'd3-scale';
 import GridLayer from '../../src/layers/GridLayer';
 
 const width = 400;
@@ -36,8 +36,8 @@ export const Grid = () => {
 
 //
 const createEventObj = () => {
-  const xscale = d3.scaleLinear().domain(xbounds).range([0, 500]);
-  const yscale = d3.scaleLinear().domain(ybounds).range([0, 500]);
+  const xscale = scaleLinear().domain(xbounds).range([0, 500]);
+  const yscale = scaleLinear().domain(ybounds).range([0, 500]);
 
   return {
     xscale: xscale.copy(),

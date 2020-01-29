@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import { select } from 'd3-selection';
 import Layer from './Layer';
 import {
   OnMountEvent,
@@ -13,7 +13,7 @@ abstract class CanvasLayer extends Layer {
     super.onMount(event);
     this.elm = event.elm;
 
-    const canvas = d3.select(event.elm).append('canvas')
+    const canvas = select(event.elm).append('canvas')
       .style('position', 'absolute');
     this.ctx = canvas.node().getContext('2d');
     // hack to avoid blurry canvas
@@ -27,7 +27,7 @@ abstract class CanvasLayer extends Layer {
       elm,
     } = this;
 
-    d3.select(ctx.canvas)
+    select(ctx.canvas)
       .style('width', `${elm.getAttribute('width')}px`)
       .style('height', `${elm.getAttribute('height')}px`);
   }
