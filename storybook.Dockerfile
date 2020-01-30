@@ -8,12 +8,12 @@ COPY . /project
 
 RUN npm i
 RUN npm run build
+RUN npm run build-storybook
 
+#NGINX
 FROM nginx:1-alpine
 WORKDIR /app
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /project/ /app/storybook
+COPY --from=build /project/storybook-static/ /app/storybook
 
-EXPOSE 6006:80
-
-CMD ["npm", "run", "storybook"]
+EXPOSE 80
