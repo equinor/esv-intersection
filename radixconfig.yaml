@@ -13,6 +13,7 @@ spec:
       ports:
         - name: nginx
           port: 80
+      publicPort: nginx
       environmentConfig:
         - environment: prod
           variables:
