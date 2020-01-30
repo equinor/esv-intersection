@@ -16,4 +16,7 @@ spec:
       environmentConfig:
         - environment: prod
           variables:
-            NODE_ENV: "production"
+            NODE_ENV: 'production'
+  dnsAppAlias:
+    environment: prod
+    component: storybook
