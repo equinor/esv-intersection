@@ -21,26 +21,34 @@ export const Grid = () => {
 
   const root = document.createElement('div');
   root.className = 'grid-container';
-  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
+  root.setAttribute(
+    'style',
+    `height: ${height}px; width: ${width}px;background-color: #eee;`,
+  );
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 
-  gridLayer.onMount({ elm : root });
+  gridLayer.onMount({ elm: root });
 
   /**
    * .onUpdate(...) sets width and height of the canvas, currently .render() uses default dimensions (150, 300)
    */
-  gridLayer.onUpdate(createEventObj());
+  gridLayer.onUpdate(createEventObj(root));
 
   return root;
 };
 
-const createEventObj = () => {
-  const xscale = scaleLinear().domain(xbounds).range([0, 500]);
-  const yscale = scaleLinear().domain(ybounds).range([0, 500]);
+const createEventObj = (elm: any) => {
+  const xscale = scaleLinear()
+    .domain(xbounds)
+    .range([0, 500]);
+  const yscale = scaleLinear()
+    .domain(ybounds)
+    .range([0, 500]);
 
   return {
     xscale: xscale.copy(),
     yscale: yscale.copy(),
+    elm,
   };
-}
+};
