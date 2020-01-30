@@ -9,7 +9,6 @@ COPY . /project
 RUN npm i
 RUN npm run build
 
-#NGINX
 FROM nginx:1-alpine
 WORKDIR /app
 COPY nginx.conf /etc/nginx/conf.d/default.conf
