@@ -20,9 +20,9 @@ export abstract class SVGLayer extends Layer {
   onUpdate(event: OnUpdateEvent) {
     super.onUpdate(event);
     const { elm } = this;
-    const { xscale, yscale } = event;
-    const [, width] = xscale.range();
-    const [, height] = yscale.range();
+    const { xScale, yScale } = event;
+    const [, width] = xScale.range();
+    const [, height] = yScale.range();
 
     elm.attr('height', height).attr('width', width).attr('style', 'position:absolute');
   }

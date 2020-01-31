@@ -90,8 +90,8 @@ const createEventObj = (elm: any) => {
     .range([0, 500]);
 
   return {
-    xscale: xscale.copy(),
-    yscale: yscale.copy(),
+    xScale: xscale.copy(),
+    yScale: yscale.copy(),
     elm,
   };
 };

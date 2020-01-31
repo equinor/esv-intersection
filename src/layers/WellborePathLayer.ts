@@ -29,11 +29,11 @@ export class WellborepathLayer extends SVGLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent) {
-    const { xscale, yscale, data } = event;
-    const [, width] = xscale.range();
-    const [, height] = yscale.range();
+    const { xScale, yScale, data } = event;
+    const [, width] = xScale.range();
+    const [, height] = yScale.range();
 
-    const scaledData = this.generateScaledData(data, xscale, yscale);
+    const scaledData = this.generateScaledData(data, xScale, yScale);
 
     this.elm
       .append('g')
