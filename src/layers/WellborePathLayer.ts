@@ -1,8 +1,9 @@
-import CanvasLayer from './CanvasLayer';
+import SVGLayer from './SVGLayer';
 import { GridLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { ScaleLinear } from 'd3-scale';
+import { line, curveCatmullRom } from 'd3-shape';
 
-class WellborepathLayer extends CanvasLayer {
+class WellborepathLayer extends SVGLayer {
   options: GridLayerOptions;
 
   constructor(id: String, options: GridLayerOptions = {}) {
@@ -24,51 +25,33 @@ class WellborepathLayer extends CanvasLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent) {
-    const { ctx, options } = this;
-
-    if (!ctx) {
-      return;
-    }
-
     const { xscale, yscale } = event;
+    const [, width] = xscale.range();
+    const [, height] = yscale.range();
 
-    ctx.save();
-    ctx.clearRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight);
+    const scaledData = this.generateScaledData(event.data, xscale, yscale);
 
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'black';
-    const data = [
-      [50, 0],
-      [50, 10],
-      [50, 20],
-      [50, 30],
-      [50, 40],
-      [50, 50],
-    ];
-    const renderData = this.generateScaleData(data, xscale, yscale);
-    this.renderWellborePath(renderData);
-    ctx.restore();
+    this.elm
+      .attr('height', height)
+      .attr('width', width)
+      .append('g')
+      .attr('class', 'well-path')
+      .append('path')
+      .attr('d', this.renderWellborePath(scaledData))
+      .attr('stroke-width', '5px')
+      .attr('stroke', '#000')
+      .attr('fill', 'none');
   }
-  generateScaleData(
+
+  generateScaledData = (
     data: number[][],
     xscale: ScaleLinear<number, number>,
     yscale: ScaleLinear<number, number>,
-  ): number[][] {
-    const translatedData: number[][] = [];
-    data.forEach((point: number[]) => {
-      translatedData.push([xscale.invert(point[0]), yscale.invert(point[1])]);
-    });
-    return translatedData;
-  }
+  ): [number, number][] =>
+    data.map((point: number[]) => [xscale(point[0]), yscale(point[1])]);
 
-  private renderWellborePath(data: number[][]) {
-    this.ctx.moveTo(data[0][0], data[0][1]);
-    data.forEach((point: any) => {
-      this.ctx.beginPath();
-      this.ctx.lineTo(point[0], point[1]);
-      this.ctx.stroke();
-    });
-  }
+  private renderWellborePath = (data: [number, number][]): string =>
+    line().curve(curveCatmullRom)(data);
 }
 
 export default WellborepathLayer;

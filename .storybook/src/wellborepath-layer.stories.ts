@@ -8,8 +8,8 @@ export default {
 const width = 400;
 const height = 500;
 
-const xbounds = [0, 1000];
-const ybounds = [0, 1000];
+const xbounds = [0, 200];
+const ybounds = [0, 200];
 
 export const Wellborepath = () => {
   const layer = new WellborepathLayer('wellborepath', {});
@@ -36,14 +36,32 @@ export const Wellborepath = () => {
 const createEventObj = (elm: any) => {
   const xscale = scaleLinear()
     .domain(xbounds)
-    .range([0, 500]);
+    .range([0, width]);
   const yscale = scaleLinear()
     .domain(ybounds)
-    .range([0, 500]);
+    .range([0, height]);
 
+  const data = [
+    [50, 0],
+    [50, 10],
+    [50, 20],
+    [50, 30],
+    [50, 40],
+    [50, 50],
+    [55, 60],
+    [60, 70],
+    [65, 80],
+    [65, 90],
+    [85, 100],
+    [95, 110],
+    [115, 110],
+    [115, 110],
+    [120, 110],
+  ];
   return {
     xscale: xscale.copy(),
     yscale: yscale.copy(),
     elm,
+    data,
   };
 };
