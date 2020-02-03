@@ -82,6 +82,7 @@
     "d3-scale": "^3.2.1",
     "d3-selection": "^1.4.1",
     "eslint-config-airbnb-typescript": "^6.3.1",
+    "pixi.js": "^5.2.1",
     "prettier": "^1.19.1"
   }
 }
