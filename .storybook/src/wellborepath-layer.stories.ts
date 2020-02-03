@@ -1,5 +1,6 @@
 import { scaleLinear } from 'd3-scale';
 import WellborepathLayer from '../../src/layers/WellborePathLayer';
+import { WellborepathLayerOptions } from '../../src/interfaces';
 
 export default {
   title: 'Wellborepath layer',
@@ -7,13 +8,25 @@ export default {
 
 const width = 400;
 const height = 500;
-
 const xbounds = [0, 200];
 const ybounds = [0, 200];
 
 export const Wellborepath = () => {
-  const layer = new WellborepathLayer('wellborepath', {});
+  const options: WellborepathLayerOptions = {
+    strokeWidth: '5px',
+    stroke: 'black',
+  };
+  const layer = new WellborepathLayer('wellborepath', options);
 
+  const root = createRootDiv();
+
+  layer.onMount({ elm: root });
+  layer.onUpdate(createEventObj(root));
+
+  return root;
+};
+
+const createRootDiv = () => {
   const root = document.createElement('div');
   root.className = 'grid-container';
   root.setAttribute(
@@ -22,14 +35,6 @@ export const Wellborepath = () => {
   );
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
-
-  layer.onMount({ elm: root });
-
-  /**
-   * .onUpdate(...) sets width and height of the canvas, currently .render() uses default dimensions (150, 300)
-   */
-  layer.onUpdate(createEventObj(root));
-
   return root;
 };
 
@@ -40,7 +45,6 @@ const createEventObj = (elm: any) => {
   const yscale = scaleLinear()
     .domain(ybounds)
     .range([0, height]);
-
   const data = [
     [50, 0],
     [50, 10],
@@ -58,6 +62,7 @@ const createEventObj = (elm: any) => {
     [115, 110],
     [120, 110],
   ];
+
   return {
     xscale: xscale.copy(),
     yscale: yscale.copy(),

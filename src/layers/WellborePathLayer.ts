@@ -1,12 +1,16 @@
 import SVGLayer from './SVGLayer';
-import { GridLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
+import {
+  WellborepathLayerOptions,
+  OnUpdateEvent,
+  OnRescaleEvent,
+} from '../interfaces';
 import { ScaleLinear } from 'd3-scale';
 import { line, curveCatmullRom } from 'd3-shape';
 
 class WellborepathLayer extends SVGLayer {
-  options: GridLayerOptions;
+  options: WellborepathLayerOptions;
 
-  constructor(id: String, options: GridLayerOptions = {}) {
+  constructor(id: String, options: WellborepathLayerOptions) {
     super(id, options);
     this.options = {
       ...options,
@@ -38,8 +42,8 @@ class WellborepathLayer extends SVGLayer {
       .attr('class', 'well-path')
       .append('path')
       .attr('d', this.renderWellborePath(scaledData))
-      .attr('stroke-width', '5px')
-      .attr('stroke', '#000')
+      .attr('stroke-width', this.options.strokeWidth)
+      .attr('stroke', this.options.stroke)
       .attr('fill', 'none');
   }
 
