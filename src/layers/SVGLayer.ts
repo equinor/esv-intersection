@@ -13,6 +13,11 @@ abstract class SVGLayer extends Layer {
   onUpdate(event: OnUpdateEvent) {
     super.onUpdate(event);
     const { elm } = this;
+    const { xscale, yscale } = event;
+    const [, width] = xscale.range();
+    const [, height] = yscale.range();
+
+    elm.attr('height', height).attr('width', width);
   }
 }
 
