@@ -41,3 +41,10 @@ export interface WellborepathLayerOptions extends LayerOptions {
 }
 
 export interface GeomodelLayerOptions extends LayerOptions {}
+
+export interface GeoModelData {
+  name: string;
+  color: number;
+  md: number[];
+  pos: [number, number][];
+}

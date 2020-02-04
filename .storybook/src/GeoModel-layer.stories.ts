@@ -1,4 +1,4 @@
-import WebGlLayer from '../../src/layers/WebGLLayer';
+import GeoModelLayer from '../../src/layers/GeoModelLayer';
 import { scaleLinear } from 'd3-scale';
 
 export default {
@@ -12,7 +12,7 @@ const xbounds = [0, 1000];
 const ybounds = [0, 1000];
 
 export const Grid = () => {
-  const gridLayer = new WebGlLayer('webgl', {});
+  const geoModelLayer = new GeoModelLayer('webgl', {});
 
   const root = document.createElement('div');
   root.className = 'grid-container';
@@ -23,12 +23,12 @@ export const Grid = () => {
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 
-  gridLayer.onMount({ elm: root });
+  geoModelLayer.onMount({ elm: root });
 
   /**
    * .onUpdate(...) sets width and height of the canvas, currently .render() uses default dimensions (150, 300)
    */
-  gridLayer.onUpdate(createEventObj(root));
+  geoModelLayer.onUpdate(createEventObj(root));
 
   return root;
 };
