@@ -12,14 +12,18 @@ abstract class CanvasLayer extends Layer {
   onMount(event: OnMountEvent) {
     super.onMount(event);
     this.elm = event.elm;
-    const canvas = document.createElement('canvas');
-    this.canvas = canvas;
-    event.elm.appendChild(canvas).setAttribute('position', 'absolute');
-    this.ctx = canvas.getContext('2d');
+    let canvas;
+    if (!this.canvas) {
+      canvas = document.createElement('canvas');
+      this.canvas = canvas;
+      event.elm.appendChild(canvas)
+    }
+    this.canvas.setAttribute('style', `position:absolute`);
+    this.ctx = this.canvas.getContext('2d');
   }
 
   onUnmount() {
-    super.onUnmount(event);
+    super.onUnmount();
     this.canvas.setAttribute('style', 'display:none;')
   }
 
