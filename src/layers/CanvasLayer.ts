@@ -7,13 +7,20 @@ import {
 abstract class CanvasLayer extends Layer {
   ctx: CanvasRenderingContext2D;
   elm: HTMLElement;
+  canvas: HTMLCanvasElement;
 
   onMount(event: OnMountEvent) {
     super.onMount(event);
     this.elm = event.elm;
     const canvas = document.createElement('canvas');
+    this.canvas = canvas;
     event.elm.appendChild(canvas).setAttribute('position', 'absolute');
     this.ctx = canvas.getContext('2d');
+  }
+
+  onUnmount() {
+    super.onUnmount(event);
+    this.canvas.setAttribute('style', 'display:none;')
   }
 
   onUpdate(event: OnUpdateEvent) {
