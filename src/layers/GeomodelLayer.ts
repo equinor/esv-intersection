@@ -7,7 +7,7 @@ import {
 } from '../interfaces';
 import { ScaleLinear } from 'd3-scale';
 import { Graphics } from 'pixi.js';
-import { default as c } from 'cat-rom-spline';
+import { default as curveCatmullRom } from 'cat-rom-spline';
 
 class GeomodelLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
@@ -41,13 +41,13 @@ class GeomodelLayer extends WebGLLayer {
         color: 0xff000,
         md: [70, 90, 100, 110, 100, 100],
         pos: [
-          [0 * 2, 99],
-          [50 * 2, 99],
-          [100 * 2, 99],
-          [200 * 2, 99],
-          [250 * 2, 99],
-          [300 * 2, 99],
-          [500 * 2, 99],
+          [0 * 4, 99],
+          [50 * 4, 99],
+          [100 * 4, 99],
+          [200 * 4, 99],
+          [250 * 4, 99],
+          [300 * 4, 99],
+          [500 * 4, 99],
         ],
       },
       {
@@ -55,13 +55,13 @@ class GeomodelLayer extends WebGLLayer {
         color: 0xffff0,
         md: [100 + 50, 120 + 50, 100 + 50, 140 + 50, 100 + 50, 120 + 50],
         pos: [
-          [0 * 2, 99],
-          [70 * 2, 99],
-          [140 * 2, 99],
-          [200 * 2, 99],
-          [300 * 2, 99],
-          [350 * 2, 99],
-          [500 * 2, 99],
+          [0 * 4, 99],
+          [70 * 4, 99],
+          [140 * 4, 99],
+          [200 * 4, 99],
+          [300 * 4, 99],
+          [350 * 4, 99],
+          [500 * 4, 99],
         ],
       },
       {
@@ -69,47 +69,33 @@ class GeomodelLayer extends WebGLLayer {
         color: 0xffffff,
         md: [100 + 150, 120 + 120, 100 + 170, 140 + 150, 100 + 150, 177 + 150],
         pos: [
-          [0 * 2, 99],
-          [70 * 2, 99],
-          [190 * 2, 99],
-          [200 * 2, 99],
-          [320 * 2, 99],
-          [350 * 2, 99],
-          [500 * 2, 99],
+          [0 * 4, 99],
+          [70 * 4, 99],
+          [190 * 4, 99],
+          [200 * 4, 99],
+          [320 * 4, 99],
+          [350 * 4, 99],
+          [500 * 4, 99],
         ],
       },
     ];
 
     const scaledData = this.generateScaledData(data, xscale, yscale);
 
-    // input
-    // fields[] {
-    // name
-    // md[]
-    // xy[]
-    // color
-    // }
     // for each layer
     // paint from bottom up, with color
     // missing data is 0, dont color
 
-    //     const stratElm = this.elm
-    //       .append('g')
-    //       .attr('class', 'stratigraphy')
-
-    // data.forEach ( (s, index) =>
-    //   stratElm
-    //       .append('path')
-    //       .attr('d', this.renderAreaTopLine(scaledData[index]))
-    //       .attr('stroke-width', '5px')
-    //       .attr('stroke', s.color)
-    //       .attr('fill', s.color)
-
     data.forEach((s, index) => {
       let line = new Graphics();
       line.lineStyle(4, s.color, 1);
-      line.moveTo(scaledData[0][0][0], scaledData[0][0][1]);
-      this.renderAreaTopLine(line, scaledData[index]);
+      line.beginFill(s.color);
+      line.moveTo(scaledData[index][0][0], scaledData[index][0][1]);
+      this.renderAreaTopLine(line, [
+        [xscale.range()[0], yscale.range()[1]],
+        ...scaledData[index],
+        [xscale.range()[1], yscale.range()[1]],
+      ]);
       this.ctx.stage.addChild(line);
     });
   }
@@ -134,15 +120,14 @@ class GeomodelLayer extends WebGLLayer {
     ]);
 
   private renderAreaTopLine = (line: any, data: [number, number][]): void => {
-    //line().curve(curveCatmullRom)(data); // pixi line
     const points = data;
     const options = { samples: 50, knot: 0.5 };
 
-    const interpolatedPOints = c(points, options);
-
-    console.log(interpolatedPOints);
-
-    interpolatedPOints.forEach((p: any) => line.lineTo(p[0], p[1]));
+    const interpolatedPOints = curveCatmullRom(points, options).filter(
+      (x: [number, number]) => !isNaN(x[0]) && !isNaN(x[1]),
+    );
+    console.log('interpolatedPOints', data, interpolatedPOints);
+    line.drawPolygon([500, 500, ...interpolatedPOints.flat(), 500, 500]);
   };
 }
 
