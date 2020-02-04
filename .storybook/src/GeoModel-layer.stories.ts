@@ -11,7 +11,7 @@ const height = 500;
 const xbounds = [0, 1000];
 const ybounds = [0, 1000];
 
-export const Grid = () => {
+export const GeoModel = () => {
   const geoModelLayer = new GeoModelLayer('webgl', {});
 
   const root = document.createElement('div');
@@ -36,10 +36,10 @@ export const Grid = () => {
 const createEventObj = (elm: any) => {
   const xscale = scaleLinear()
     .domain(xbounds)
-    .range([0, 500]);
+    .range([0, width]);
   const yscale = scaleLinear()
     .domain(ybounds)
-    .range([0, 500]);
+    .range([0, height]);
 
   return {
     xscale: xscale.copy(),

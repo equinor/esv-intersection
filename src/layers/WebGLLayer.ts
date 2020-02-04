@@ -9,7 +9,7 @@ abstract class WebGLLayer extends Layer {
   onMount(event: OnMountEvent) {
     super.onMount(event);
     this.elm = event.elm;
-    this.ctx = new Application({ width: 800, height: 600, antialias: true });
+    this.ctx = new Application({ width: 500, height: 500, antialias: true });
 
     let type = 'WebGL';
     if (!utils.isWebGLSupported()) {
@@ -17,15 +17,15 @@ abstract class WebGLLayer extends Layer {
     }
 
     this.elm.appendChild(this.ctx.view);
-    utils.sayHello(type);
   }
 
   onUpdate(event: OnUpdateEvent) {
     super.onUpdate(event);
     const { elm, ctx } = this;
-    // const [, height] = event.yscale.range();
-    // const [, width] = event.xscale.range();
-    // this.ctx.resizeTo(height, width);
+    const [, height] = event.yscale.range();
+    const [, width] = event.xscale.range();
+    this.ctx.view.style.height = height;
+    this.ctx.view.style.width = width;
   }
 }
 
