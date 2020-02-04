@@ -35,19 +35,20 @@ class GeomodelLayer extends WebGLLayer {
     const [, width] = xscale.range();
     const [, height] = yscale.range();
 
+    console.log(xscale.domain());
+
     const data: GeoModelData[] = [
       {
         name: 'strat 1',
         color: 0xff000,
         md: [70, 90, 100, 110, 100, 100],
         pos: [
-          [0 * 4, 99],
-          [50 * 4, 99],
-          [100 * 4, 99],
-          [200 * 4, 99],
-          [250 * 4, 99],
-          [300 * 4, 99],
-          [500 * 4, 99],
+          [0, 99],
+          [100, 99],
+          [200, 99],
+          [450, 99],
+          [600, 99],
+          [1000, 99],
         ],
       },
       {
@@ -55,13 +56,12 @@ class GeomodelLayer extends WebGLLayer {
         color: 0xffff0,
         md: [100 + 50, 120 + 50, 100 + 50, 140 + 50, 100 + 50, 120 + 50],
         pos: [
-          [0 * 4, 99],
-          [70 * 4, 99],
-          [140 * 4, 99],
-          [200 * 4, 99],
-          [300 * 4, 99],
-          [350 * 4, 99],
-          [500 * 4, 99],
+          [0, 99],
+          [140, 99],
+          [200, 99],
+          [400, 99],
+          [750, 99],
+          [1000, 99],
         ],
       },
       {
@@ -69,27 +69,25 @@ class GeomodelLayer extends WebGLLayer {
         color: 0xff00ff,
         md: [100 + 150, 120 + 120, 100 + 170, 140 + 150, 100 + 150, 177 + 150],
         pos: [
-          [0 * 4, 99],
-          [70 * 4, 99],
-          [190 * 4, 99],
-          [200 * 4, 99],
-          [320 * 4, 99],
-          [350 * 4, 99],
-          [500 * 4, 99],
+          [0, 99],
+          [190, 99],
+          [200, 99],
+          [520, 99],
+          [850, 99],
+          [1000, 99],
         ],
       },
       {
         name: 'strat 4',
         color: 0x0330ff,
-        md: [100 + 250, 120 + 220, 100 + 270, 140 + 250, 100 + 250, 177 + 250],
+        md: [100 + 250, 120 + 220, 100 + 270, 100 + 250, 140 + 250, 177 + 250],
         pos: [
-          [0 * 4, 99],
-          [50 * 4, 99],
-          [200 * 4, 99],
-          [210 * 4, 99],
-          [300 * 4, 99],
-          [350 * 4, 99],
-          [500, 99],
+          [0, 99],
+          [200, 99],
+          [210, 99],
+          [300, 99],
+          [750, 99],
+          [1000, 99],
         ],
       },
     ];
@@ -97,16 +95,16 @@ class GeomodelLayer extends WebGLLayer {
     const scaledData = this.generateScaledData(data, xscale, yscale);
 
     // for each layer
-    // paint from bottom up, with color
+    // paint from top down, with color
     // missing data is 0, dont color
 
     data.forEach((s, index) => {
-      let line = new Graphics();
-      line.lineStyle(4, s.color, 1);
-      line.beginFill(s.color);
-      // line.moveTo(scaledData[index][0][0], scaledData[index][0][1]);
-      this.renderAreaTopLine(line, scaledData[index], xscale, yscale);
-      this.ctx.stage.addChild(line);
+      const area = new Graphics();
+      area.lineStyle(4, s.color, 1);
+      area.beginFill(s.color);
+      this.renderAreaTopLine(area, scaledData[index], xscale, yscale);
+      area.endFill();
+      this.ctx.stage.addChild(area);
     });
   }
 
@@ -130,7 +128,7 @@ class GeomodelLayer extends WebGLLayer {
     ]);
 
   private renderAreaTopLine = (
-    line: any,
+    area: Graphics,
     data: [number, number][],
     xscale: ScaleLinear<number, number>,
     yscale: ScaleLinear<number, number>,
@@ -138,18 +136,25 @@ class GeomodelLayer extends WebGLLayer {
     const points = data;
     const options = { samples: 50, knot: 0.5 };
 
-    const interpolatedPoints = curveCatmullRom(points, options).filter(
-      (x: [number, number]) => !isNaN(x[0]) && !isNaN(x[1]),
-    );
-    console.log('interpolatedPoints', data, interpolatedPoints);
-    line.drawPolygon([
-      xscale.range()[0],
-      yscale.range()[1],
-      points[0][0],
-      points[0][1],
-      ...interpolatedPoints.flat(),
-      xscale.range()[1],
-      yscale.range()[1],
+    const interpolatedPoints = curveCatmullRom(points, options);
+    // .filter(
+    //   (x: [number, number]) => !isNaN(x[0]) && !isNaN(x[1]),
+    // );
+
+    const [leftMostX, rightMostX] = xscale.range();
+    const [, bottom] = yscale.range();
+
+    console.log('interpolatedPoints', points);
+    area.drawPolygon([
+      leftMostX,
+      bottom,
+      leftMostX,
+      points[0][1], // top left point
+      ...interpolatedPoints.flat(), // actual points
+      rightMostX,
+      points[points.length - 1][1], // top right point
+      rightMostX,
+      bottom,
     ]);
   };
 }
