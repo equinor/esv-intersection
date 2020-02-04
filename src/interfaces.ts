@@ -1,7 +1,7 @@
 import Layer from './layers/Layer';
 
 interface LayerEvent {
-  [propType: string]: any,
+  [propType: string]: any;
 }
 
 export interface OnMountEvent extends LayerEvent {
@@ -16,17 +16,16 @@ export interface OnUpdateEvent extends LayerEvent {
   elm: HTMLElement;
 }
 
-export interface OnRescaleEvent extends LayerEvent {
-}
+export interface OnRescaleEvent extends LayerEvent {}
 
 export interface LayerOptions {
   layerOpacity?: Number;
 
-  onMount?(event: OnMountEvent, layer: Layer) : void;
-  onUnmount?(event: OnUnmountEvent, layer: Layer) : void;
-  onUpdate?(event: OnUpdateEvent, layer: Layer) : void;
-  onRescale?(event: OnRescaleEvent, layer: Layer) : void;
-};
+  onMount?(event: OnMountEvent, layer: Layer): void;
+  onUnmount?(event: OnUnmountEvent, layer: Layer): void;
+  onUpdate?(event: OnUpdateEvent, layer: Layer): void;
+  onRescale?(event: OnRescaleEvent, layer: Layer): void;
+}
 
 export interface GridLayerOptions extends LayerOptions {
   majorWidth?: number;
@@ -34,4 +33,9 @@ export interface GridLayerOptions extends LayerOptions {
 
   minorWidth?: number;
   minorColor?: string;
+}
+
+export interface WellborepathLayerOptions extends LayerOptions {
+  stroke: string;
+  strokeWidth: string;
 }
