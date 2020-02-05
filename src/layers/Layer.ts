@@ -30,7 +30,7 @@ abstract class Layer {
     }
   }
 
-  onUnmount(event: OnUnmountEvent) : void {
+  onUnmount(event?: OnUnmountEvent) : void {
     if (this.options.onUnmount) {
       this.options.onUnmount(event, this);
     }
