@@ -1,5 +1,10 @@
-import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
-
+import {
+  LayerOptions,
+  OnMountEvent,
+  OnUnmountEvent,
+  OnUpdateEvent,
+  OnRescaleEvent,
+} from '../interfaces';
 
 abstract class Layer {
   id: String;
@@ -23,21 +28,21 @@ abstract class Layer {
     this.onRescale = this.onRescale.bind(this);
   }
 
-  onMount(event: OnMountEvent) : void {
+  onMount(event: OnMountEvent): void {
     this.element = event.elm;
     if (this.options.onMount) {
       this.options.onMount(event, this);
     }
   }
 
-  onUnmount(event?: OnUnmountEvent) : void {
+  onUnmount(event?: OnUnmountEvent): void {
     if (this.options.onUnmount) {
       this.options.onUnmount(event, this);
     }
   }
 
-  onUpdate(event: OnUpdateEvent) : void {
-    if(this.options.onUpdate) {
+  onUpdate(event: OnUpdateEvent): void {
+    if (this.options.onUpdate) {
       this.options.onUpdate(event, this);
     }
   }
@@ -51,9 +56,8 @@ abstract class Layer {
   set isLoading(loading: boolean) {
     // TODO: update d3 element
     this.loading = loading;
-
   }
-  get isLoading() : boolean {
+  get isLoading(): boolean {
     return this.loading;
   }
 
@@ -61,7 +65,7 @@ abstract class Layer {
     this._opacity = opacity;
   }
 
-  get opacity() : Number {
+  get opacity(): Number {
     return this._opacity;
   }
 }

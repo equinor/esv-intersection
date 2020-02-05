@@ -1,8 +1,5 @@
 import Layer from './Layer';
-import {
-  OnMountEvent,
-  OnUpdateEvent,
-} from '../interfaces';
+import { OnMountEvent, OnUpdateEvent } from '../interfaces';
 
 abstract class CanvasLayer extends Layer {
   ctx: CanvasRenderingContext2D;
@@ -16,25 +13,22 @@ abstract class CanvasLayer extends Layer {
     if (!this.canvas) {
       canvas = document.createElement('canvas');
       this.canvas = canvas;
-      event.elm.appendChild(canvas)
+      event.elm.appendChild(canvas);
     }
     this.canvas.setAttribute('style', `position:absolute`);
     this.ctx = this.canvas.getContext('2d');
   }
 
-  onUnmount() {
+  onUnmount() {
     super.onUnmount();
-    this.canvas.setAttribute('style', 'display:none;')
+    this.canvas.setAttribute('style', 'display:none;');
   }
 
   onUpdate(event: OnUpdateEvent) {
     super.onUpdate(event);
-    const {
-      ctx,
-      elm,
-    } = this;
+    const { ctx, elm } = this;
 
-    ctx.canvas.setAttribute('width', `${elm.getAttribute('width')}px`)
+    ctx.canvas.setAttribute('width', `${elm.getAttribute('width')}px`);
     ctx.canvas.setAttribute('height', `${elm.getAttribute('height')}px`);
   }
 }

@@ -1,3 +1,6 @@
+import curveCatmullRom from 'cat-rom-spline';
+import { ScaleLinear } from 'd3-scale';
+import { Graphics } from 'pixi.js';
 import WebGLLayer from './WebGLLayer';
 import {
   GeoModelData,
@@ -5,15 +8,13 @@ import {
   OnUpdateEvent,
   OnRescaleEvent,
 } from '../interfaces';
-import { ScaleLinear } from 'd3-scale';
-import { Graphics } from 'pixi.js';
-import { default as curveCatmullRom } from 'cat-rom-spline';
 
 class GeomodelLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
+
   curveOptions = { samples: 50, knot: 0.5 };
 
-  constructor(id: String, options: GeomodelLayerOptions) {
+  constructor(id: string, options: GeomodelLayerOptions) {
     super(id, options);
     this.options = {
       ...options,

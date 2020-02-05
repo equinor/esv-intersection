@@ -1,6 +1,4 @@
-import {
-  GridLayer,
-} from '../src/index';
+import { GridLayer } from '../src/index';
 
 describe('Layer', () => {
   describe('Grid', () => {
