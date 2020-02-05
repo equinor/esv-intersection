@@ -10,6 +10,11 @@ abstract class SVGLayer extends Layer {
     this.elm = select(event.elm).append('svg');
   }
 
+  onUnmount() {
+    super.onUnmount();
+    this.elm.remove();
+  }
+
   onUpdate(event: OnUpdateEvent) {
     super.onUpdate(event);
     const { elm } = this;
