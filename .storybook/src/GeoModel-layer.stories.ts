@@ -24,7 +24,7 @@ export const GeoModel = () => {
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 
-  geoModelLayer.onMount({ elm: root });
+  geoModelLayer.onMount({ elm: root, height, width });
   geoModelLayer.onUpdate(createEventObj(root));
 
   return root;

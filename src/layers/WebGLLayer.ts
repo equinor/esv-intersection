@@ -8,20 +8,21 @@ abstract class WebGLLayer extends Layer {
 
   onMount(event: OnMountEvent) {
     super.onMount(event);
-    this.elm = event.elm;
-    this.ctx = new Application({ width: 500, height: 500, antialias: true });
+    const { elm, height, width } = event;
+    this.elm = elm;
+    const pixiOptions = {
+      width,
+      height,
+      antialias: true,
+    };
 
-    let type = 'WebGL';
-    if (!utils.isWebGLSupported()) {
-      type = 'canvas';
-    }
+    this.ctx = new Application(pixiOptions);
 
     this.elm.appendChild(this.ctx.view);
   }
 
   onUpdate(event: OnUpdateEvent) {
     super.onUpdate(event);
-    const { elm, ctx } = this;
     const [, height] = event.yscale.range();
     const [, width] = event.xscale.range();
     this.ctx.view.style.height = height;
