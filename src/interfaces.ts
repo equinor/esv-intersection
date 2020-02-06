@@ -1,4 +1,4 @@
-import Layer from './layers/Layer';
+import { Layer } from './layers/Layer';
 
 interface LayerEvent {
   [propType: string]: any;

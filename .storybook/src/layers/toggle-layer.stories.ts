@@ -1,8 +1,10 @@
 import { scaleLinear } from 'd3-scale';
-import GridLayer from '../../../src/layers/GridLayer';
-import Layer from '../../../src/layers/Layer';
+import {
+  Layer,
+  GridLayer,
+  WellborepathLayer,
+ } from '../../../src/layers';
 import { OnUpdateEvent, WellborepathLayerOptions } from '../../../src/interfaces';
-import WellborepathLayer from '../../../src/layers/WellborePathLayer';
 
 const width = 400;
 const height = 500;

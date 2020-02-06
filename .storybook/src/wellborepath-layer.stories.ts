@@ -1,5 +1,5 @@
 import { scaleLinear } from 'd3-scale';
-import WellborepathLayer from '../../src/layers/WellborePathLayer';
+import { WellborepathLayer } from '../../src/layers';
 import { WellborepathLayerOptions } from '../../src/interfaces';
 
 export default {

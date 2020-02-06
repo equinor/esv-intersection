@@ -1,7 +1,7 @@
 import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 
-abstract class Layer {
+export abstract class Layer {
   id: String;
   _order: Number;
   options: LayerOptions;
@@ -75,5 +75,3 @@ abstract class Layer {
     this._order = order;
   }
 }
-
-export default Layer;

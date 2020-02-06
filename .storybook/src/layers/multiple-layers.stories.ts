@@ -1,6 +1,5 @@
 import { scaleLinear } from 'd3-scale';
-import GridLayer from '../../../src/layers/GridLayer';
-import CanvasLayer from '../../../src/layers/CanvasLayer';
+import { GridLayer, CanvasLayer } from '../../../src/layers';
 import { OnUpdateEvent, OnMountEvent } from '../../../src/interfaces';
 
 const tshirtImg = require('../resources/tshirt.png');
