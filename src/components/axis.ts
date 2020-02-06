@@ -2,7 +2,7 @@ import { axisRight, axisBottom } from 'd3-axis'
 import { ScaleLinear } from 'd3-scale'
 import { BaseType } from 'd3'
 
-export default class Axis {
+export class Axis {
   mainGroup: d3.Selection<SVGElement, any, null, undefined>
   scaleX: ScaleLinear<number, number>
   scaleY: ScaleLinear<number, number>
