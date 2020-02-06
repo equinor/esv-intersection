@@ -67,6 +67,7 @@
     "rollup-plugin-terser": "^5.2.0",
     "rollup-plugin-typescript2": "^0.25.3",
     "ts-jest": "^25.2.0",
+    "storybook-dark-mode": "^0.2.0",
     "typedoc": "^0.16.9",
     "typescript": "^3.7.5"
   },

@@ -1,4 +1,4 @@
-import { Axis } from '../../../src/components/axis';
+import { Axis } from '../../../src/components';
 import { select } from 'd3-selection';
 import { scaleLinear } from 'd3-scale';
 
@@ -8,6 +8,7 @@ export default {
 
 export const SingleAxis = () => {
   const div = document.createElement('div');
+  div.setAttribute('style', 'background-color: white; width: 1000px;');
 
   const svg = select(div)
     .append('svg')
