@@ -24,7 +24,8 @@ export abstract class CanvasLayer extends Layer {
 
   onUnmount() {
     super.onUnmount();
-    this.canvas.setAttribute('style', 'display:none;')
+    this.canvas.remove();
+    this.canvas = null;
   }
 
   onUpdate(event: OnUpdateEvent) {
