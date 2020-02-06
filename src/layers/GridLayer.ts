@@ -1,4 +1,4 @@
-import CanvasLayer from './CanvasLayer';
+import { CanvasLayer } from './CanvasLayer';
 import { GridLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 // constants
@@ -7,7 +7,7 @@ const MAJORCOLOR: string = 'gray';
 const MINORWIDTH: number = 0.25;
 const MAJORWIDTH: number = 0.75;
 
-class GridLayer extends CanvasLayer {
+export class GridLayer extends CanvasLayer {
   options: GridLayerOptions;
 
   constructor(id: String, options: GridLayerOptions = { order: 1 }) {
@@ -95,5 +95,3 @@ class GridLayer extends CanvasLayer {
     return xminticks;
   }
 }
-
-export default GridLayer;

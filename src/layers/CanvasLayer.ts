@@ -1,10 +1,10 @@
-import Layer from './Layer';
+import { Layer } from './Layer';
 import {
   OnMountEvent,
   OnUpdateEvent,
 } from '../interfaces';
 
-abstract class CanvasLayer extends Layer {
+export abstract class CanvasLayer extends Layer {
   ctx: CanvasRenderingContext2D;
   elm: HTMLElement;
   canvas: HTMLCanvasElement;
@@ -39,5 +39,3 @@ abstract class CanvasLayer extends Layer {
     ctx.canvas.setAttribute('height', `${elm.getAttribute('height')}px`);
   }
 }
-
-export default CanvasLayer;

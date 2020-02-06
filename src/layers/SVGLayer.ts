@@ -1,14 +1,14 @@
 import { select } from 'd3-selection';
-import Layer from './Layer';
+import { Layer } from './Layer';
 import { OnMountEvent, OnUpdateEvent } from '../interfaces';
 
-abstract class SVGLayer extends Layer {
+export abstract class SVGLayer extends Layer {
   elm: d3.Selection<SVGElement, any, null, undefined>;
 
   onMount(event: OnMountEvent) {
     super.onMount(event);
-    this.elm = select(event.elm).append('svg');
-  }
+      this.elm = select(event.elm).append('svg');
+    }
 
   onUnmount() {
     super.onUnmount();
@@ -25,5 +25,3 @@ abstract class SVGLayer extends Layer {
     elm.attr('height', height).attr('width', width);
   }
 }
-
-export default SVGLayer;
