@@ -18,7 +18,7 @@ abstract class CanvasLayer extends Layer {
       this.canvas = canvas;
       event.elm.appendChild(canvas)
     }
-    this.canvas.setAttribute('style', `position:absolute`);
+    this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
     this.ctx = this.canvas.getContext('2d');
   }
 
@@ -34,6 +34,7 @@ abstract class CanvasLayer extends Layer {
       elm,
     } = this;
 
+    ctx.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
     ctx.canvas.setAttribute('width', `${elm.getAttribute('width')}px`)
     ctx.canvas.setAttribute('height', `${elm.getAttribute('height')}px`);
   }

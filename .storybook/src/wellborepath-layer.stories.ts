@@ -13,6 +13,7 @@ const ybounds = [0, 200];
 
 export const Wellborepath = () => {
   const options: WellborepathLayerOptions = {
+    order: 1,
     strokeWidth: '5px',
     stroke: 'black',
   };

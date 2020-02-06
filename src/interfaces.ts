@@ -19,6 +19,7 @@ export interface OnUpdateEvent extends LayerEvent {
 export interface OnRescaleEvent extends LayerEvent {}
 
 export interface LayerOptions {
+  order: Number;
   layerOpacity?: Number;
 
   onMount?(event: OnMountEvent, layer: Layer): void;

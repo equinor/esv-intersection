@@ -10,7 +10,7 @@ const MAJORWIDTH: number = 0.75;
 class GridLayer extends CanvasLayer {
   options: GridLayerOptions;
 
-  constructor(id: String, options: GridLayerOptions = {}) {
+  constructor(id: String, options: GridLayerOptions = { order: 1 }) {
     super(id, options);
     this.options = {
       ...options,
