@@ -38,7 +38,7 @@ class GeomodelLayer extends WebGLLayer {
 
     // for each layer
     // paint from top down, with color
-    // missing data is null, dont color
+    // if missing bottom data is null, use next area top line as bottom
 
     data.forEach((s: GeoModelData, index: number) =>
       this.drawArea(s, index, scaledData[index]),
@@ -63,19 +63,41 @@ class GeomodelLayer extends WebGLLayer {
     xscale: ScaleLinear<number, number>,
     yscale: ScaleLinear<number, number>,
   ): { top: [number, number][]; bottom: [number, number][] }[] => {
-    return data.map((stratLayer) => {
+    return data.map((stratLayer: GeoModelData, index: number) => {
       const top = this.generateScaledLayer(
         stratLayer.pos,
         stratLayer.md,
         xscale,
         yscale,
       );
-      const bottom = this.generateScaledLayer(
-        stratLayer.bottomPos,
-        stratLayer.bottomMd,
-        xscale,
-        yscale,
-      );
+      let bottom: [number, number][] = null;
+      if (stratLayer.bottomPos == null || stratLayer.bottomMd == null) {
+        // last layer, draw to yscale bottom
+        if (index >= data.length - 1) {
+          bottom = [
+            [xscale.range()[0], yscale.range()[1]],
+            [xscale.range()[0], yscale.range()[1]],
+            [xscale.range()[1], yscale.range()[1]],
+            [xscale.range()[1], yscale.range()[1]],
+          ];
+        } else {
+          // use next area top line as bottom
+          bottom = this.generateScaledLayer(
+            data[index + 1].pos,
+            data[index + 1].md,
+            xscale,
+            yscale,
+          );
+        }
+      } else {
+        // use provided bottom data
+        bottom = this.generateScaledLayer(
+          stratLayer.bottomPos,
+          stratLayer.bottomMd,
+          xscale,
+          yscale,
+        );
+      }
       return { top, bottom };
     });
   };
@@ -86,14 +108,6 @@ class GeomodelLayer extends WebGLLayer {
     xscale: ScaleLinear<number, number>,
     yscale: ScaleLinear<number, number>,
   ): [number, number][] => {
-    if (pos == null || md == null) {
-      return [
-        [xscale.range()[0], yscale.range()[1]],
-        [xscale.range()[0], yscale.range()[1]],
-        [xscale.range()[1], yscale.range()[1]],
-        [xscale.range()[1], yscale.range()[1]],
-      ];
-    }
     return pos.map((posPoint: [number, number], index) => [
       xscale(posPoint[0]),
       yscale(md[index]),
