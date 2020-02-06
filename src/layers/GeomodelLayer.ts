@@ -38,24 +38,22 @@ class GeomodelLayer extends WebGLLayer {
 
     // for each layer
     // paint from top down, with color
-    // missing data is 0, dont color
+    // missing data is null, dont color
 
     data.forEach((s: GeoModelData, index: number) =>
-      this.drawArea(s, index, scaledData, xscale, yscale),
+      this.drawArea(s, index, scaledData[index]),
     );
   }
 
   drawArea = (
     s: GeoModelData,
     index: number,
-    scaledData: [number, number][][],
-    xscale: ScaleLinear<number, number>,
-    yscale: ScaleLinear<number, number>,
-  ) => {
+    scaledData: { top: [number, number][]; bottom: [number, number][] },
+  ): void => {
     const area = new Graphics();
     area.lineStyle(4, s.color, 1);
     area.beginFill(s.color);
-    this.renderAreaTopLine(area, scaledData[index], xscale, yscale);
+    this.renderAreaTopLine(area, scaledData.top, scaledData.bottom);
     area.endFill();
     this.ctx.stage.addChild(area);
   };
@@ -64,44 +62,70 @@ class GeomodelLayer extends WebGLLayer {
     data: GeoModelData[],
     xscale: ScaleLinear<number, number>,
     yscale: ScaleLinear<number, number>,
-  ): [number, number][][] =>
-    data.map((stratLayer) =>
-      this.generateScaledLayer(stratLayer, xscale, yscale),
-    );
+  ): { top: [number, number][]; bottom: [number, number][] }[] => {
+    return data.map((stratLayer) => {
+      const top = this.generateScaledLayer(
+        stratLayer.pos,
+        stratLayer.md,
+        xscale,
+        yscale,
+      );
+      const bottom = this.generateScaledLayer(
+        stratLayer.bottomPos,
+        stratLayer.bottomMd,
+        xscale,
+        yscale,
+      );
+      return { top, bottom };
+    });
+  };
 
   generateScaledLayer = (
-    stratLayer: GeoModelData,
+    pos: [number, number][],
+    md: number[],
     xscale: ScaleLinear<number, number>,
     yscale: ScaleLinear<number, number>,
-  ): [number, number][] =>
-    stratLayer.pos.map((posPoint: [number, number], index) => [
+  ): [number, number][] => {
+    if (pos == null || md == null) {
+      return [
+        [xscale.range()[0], yscale.range()[1]],
+        [xscale.range()[0], yscale.range()[1]],
+        [xscale.range()[1], yscale.range()[1]],
+        [xscale.range()[1], yscale.range()[1]],
+      ];
+    }
+    return pos.map((posPoint: [number, number], index) => [
       xscale(posPoint[0]),
-      yscale(stratLayer.md[index]),
+      yscale(md[index]),
     ]);
+  };
 
   private renderAreaTopLine = (
     area: Graphics,
-    data: [number, number][],
-    xscale: ScaleLinear<number, number>,
-    yscale: ScaleLinear<number, number>,
+    dataTop: [number, number][],
+    dataBottom: [number, number][],
   ): void => {
-    const interpolatedPoints = curveCatmullRom(data, this.curveOptions);
-    const [leftMostX, rightMostX] = xscale.range();
-    const [, bottom] = yscale.range();
-    const topRightPoint = data[data.length - 1][1];
-    const topLeftPoint = data[0][1];
+    const interpolatedPointsTop = curveCatmullRom(dataTop, this.curveOptions);
+    const interpolatedPointsBottom = curveCatmullRom(
+      dataBottom,
+      this.curveOptions,
+    );
+
+    const topRightPoint = dataTop[dataTop.length - 1];
+    const topLeftPoint = dataTop[0];
+    const bottomLeftPoint = dataBottom[0];
+    const bottomRightPoint = dataBottom[dataBottom.length - 1];
+
     const points = [
-      leftMostX,
-      bottom,
-      leftMostX,
       topLeftPoint,
-      ...interpolatedPoints.flat(),
-      rightMostX,
+      interpolatedPointsTop.flat(),
       topRightPoint,
-      rightMostX,
-      bottom,
+      bottomRightPoint,
+      interpolatedPointsBottom.reverse().flat(),
+      bottomLeftPoint,
     ];
-    area.drawPolygon(points);
+
+    area.drawPolygon([].concat(...points));
   };
 }
 

@@ -39,6 +39,7 @@ export interface WellborepathLayerOptions extends LayerOptions {
   stroke: string;
   strokeWidth: string;
 }
+
 export interface GeomodelLayerOptions extends LayerOptions {}
 
 export interface GeoModelData {
@@ -46,4 +47,6 @@ export interface GeoModelData {
   color: number;
   md: number[];
   pos: [number, number][];
+  bottomMd: number[];
+  bottomPos: [number, number][];
 }
