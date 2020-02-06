@@ -3,14 +3,14 @@ import GridLayer from '../../../src/layers/GridLayer';
 import CanvasLayer from '../../../src/layers/CanvasLayer';
 import { OnUpdateEvent, OnMountEvent } from '../../../src/interfaces';
 
+const tshirtImg = require('../resources/tshirt.png');
+const sweaterImg = require('../resources/sweater.png');
+
 const width = 400;
 const height = 500;
 
 const xbounds = [0, 500];
 const ybounds = [0, 500];
-
-const tshirtUrl = 'https://i.ya-webdesign.com/images/t-shirt-png-transparent-3.png';
-const jacketUrl = 'https://blackberryvine.co/wp-content/uploads/2019/11/NegusGreyCrewNeck-400x500.png';
 
 export const MultipleCanvasLayers = () => {
   const root = createRootContainer();
@@ -33,8 +33,8 @@ export const MultipleCanvasLayers = () => {
   const ev = { elm: container };
 
   gridLayer.onMount(ev);
-  tShirtLayer.onMount({ ...ev, url: tshirtUrl });
-  jacketLayer.onMount({ ...ev, url: jacketUrl });
+  tShirtLayer.onMount({ ...ev, url: tshirtImg });
+  jacketLayer.onMount({ ...ev, url: sweaterImg });
 
   gridLayer.onUpdate(createEventObj(container));
   tShirtLayer.onUpdate(ev);
