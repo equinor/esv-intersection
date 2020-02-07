@@ -37,12 +37,12 @@ export class GridLayer extends CanvasLayer {
     if (!ctx) { return; }
 
     const {
-      xscale,
-      yscale,
+      xScale,
+      yScale,
     } = event;
 
-    const [rx1, rx2] = xscale.range();
-    const [ry1, ry2] = yscale.range();
+    const [rx1, rx2] = xScale.range();
+    const [ry1, ry2] = yScale.range();
 
     ctx.save();
     ctx.clearRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight);
@@ -52,17 +52,17 @@ export class GridLayer extends CanvasLayer {
 
 
     // minor grid lines
-    let xminticks = this.mapMinorTicks(xscale.ticks());
-    let yminticks = this.mapMinorTicks(yscale.ticks());
-    this.renderTicksX(xscale, xminticks, ry1, ry2);
-    this.renderTicksY(yscale, yminticks, rx1, rx2);
+    let xminticks = this.mapMinorTicks(xScale.ticks());
+    let yminticks = this.mapMinorTicks(yScale.ticks());
+    this.renderTicksX(xScale, xminticks, ry1, ry2);
+    this.renderTicksY(yScale, yminticks, rx1, rx2);
 
     ctx.lineWidth = options.majorWidth || MAJORWIDTH;
     ctx.strokeStyle = options.majorColor || MAJORCOLOR;
 
     // major grid lines
-    this.renderTicksX(xscale, xscale.ticks(), ry1, ry2);
-    this.renderTicksY(yscale, yscale.ticks(), rx1, rx2);
+    this.renderTicksX(xScale, xScale.ticks(), ry1, ry2);
+    this.renderTicksY(yScale, yScale.ticks(), rx1, rx2);
     ctx.restore();
   }
 
