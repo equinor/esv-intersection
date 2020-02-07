@@ -15,6 +15,7 @@ export abstract class SVGLayer extends Layer {
   onUnmount() {
     super.onUnmount();
     this.elm.remove();
+    this.elm = null;
   }
 
   onUpdate(event: OnUpdateEvent) {
