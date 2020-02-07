@@ -7,8 +7,10 @@ export abstract class SVGLayer extends Layer {
 
   onMount(event: OnMountEvent) {
     super.onMount(event);
+    if (!this.elm) {
       this.elm = select(event.elm).append('svg');
     }
+  }
 
   onUnmount() {
     super.onUnmount();
@@ -22,6 +24,6 @@ export abstract class SVGLayer extends Layer {
     const [, width] = xscale.range();
     const [, height] = yscale.range();
 
-    elm.attr('height', height).attr('width', width);
+    elm.attr('height', height).attr('width', width).attr('style', 'position:absolute');
   }
 }
