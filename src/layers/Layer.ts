@@ -6,8 +6,9 @@ import {
   OnRescaleEvent,
 } from '../interfaces';
 
-abstract class Layer {
+export abstract class Layer {
   id: String;
+  _order: Number;
   options: LayerOptions;
   loading: boolean;
   element?: HTMLElement;
@@ -15,6 +16,7 @@ abstract class Layer {
 
   constructor(id: String, options: LayerOptions) {
     this.id = id;
+    this._order = options.order;
     this.options = {
       ...options,
     };
@@ -68,6 +70,12 @@ abstract class Layer {
   get opacity(): Number {
     return this._opacity;
   }
-}
 
-export default Layer;
+  get order() : Number {
+    return this._order;
+  }
+
+  set order(order: Number) {
+    this._order = order;
+  }
+}

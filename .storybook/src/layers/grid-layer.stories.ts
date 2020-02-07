@@ -1,5 +1,5 @@
 import { scaleLinear } from 'd3-scale';
-import GridLayer from '../../../src/layers/GridLayer';
+import { GridLayer } from '../../../src/layers';
 
 const width = 400;
 const height = 500;

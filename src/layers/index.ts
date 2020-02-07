@@ -1,3 +1,5 @@
-export { default as Layer } from './Layer';
-export { default as CanvasLayer } from './CanvasLayer';
-export { default as GridLayer } from './GridLayer';
+export * from './Layer';
+export * from './CanvasLayer';
+export * from './GridLayer';
+export * from './SVGLayer';
+export * from './WellborePathLayer';

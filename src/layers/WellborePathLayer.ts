@@ -1,4 +1,4 @@
-import SVGLayer from './SVGLayer';
+import { SVGLayer } from './SVGLayer';
 import {
   WellborepathLayerOptions,
   OnUpdateEvent,
@@ -7,7 +7,7 @@ import {
 import { ScaleLinear } from 'd3-scale';
 import { line, curveCatmullRom } from 'd3-shape';
 
-class WellborepathLayer extends SVGLayer {
+export class WellborepathLayer extends SVGLayer {
   options: WellborepathLayerOptions;
 
   constructor(id: String, options: WellborepathLayerOptions) {
@@ -55,5 +55,3 @@ class WellborepathLayer extends SVGLayer {
   private renderWellborePath = (data: [number, number][]): string =>
     line().curve(curveCatmullRom)(data);
 }
-
-export default WellborepathLayer;

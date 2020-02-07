@@ -61,6 +61,7 @@
     "@typescript-eslint/eslint-plugin": "^2.19.0",
     "@typescript-eslint/parser": "^2.19.0",
     "jest": "^25.1.0",
+    "jest-canvas-mock": "^2.2.0",
     "rimraf": "^3.0.1",
     "rollup": "^1.31.0",
     "rollup-plugin-node-resolve": "^5.2.0",
@@ -75,6 +76,9 @@
     "transform": {
       ".(ts|tsx)": "ts-jest"
     },
+    "setupFiles": [
+      "jest-canvas-mock"
+    ],
     "testRegex": "/test/.*",
     "moduleFileExtensions": [
       "ts",

@@ -1,5 +1,5 @@
 import { scaleLinear } from 'd3-scale';
-import WellborepathLayer from '../../src/layers/WellborePathLayer';
+import { WellborepathLayer } from '../../src/layers';
 import { WellborepathLayerOptions } from '../../src/interfaces';
 
 export default {
@@ -13,6 +13,7 @@ const ybounds = [0, 200];
 
 export const Wellborepath = () => {
   const options: WellborepathLayerOptions = {
+    order: 1,
     strokeWidth: '5px',
     stroke: 'black',
   };
