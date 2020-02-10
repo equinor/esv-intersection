@@ -1,14 +1,15 @@
 import { Layer } from './Layer';
 import { OnMountEvent, OnUpdateEvent } from '../interfaces';
-import { Application, utils } from 'pixi.js';
+import { Application, utils, Transform } from 'pixi.js';
 
 export abstract class WebGLLayer extends Layer {
   elm: HTMLElement;
-  ctx: PIXI.Application;
+  ctx: Application;
+  transform: Transform;
 
   onMount(event: OnMountEvent) {
     super.onMount(event);
-    const { elm, height, width } = event;
+    const { elm, height, width, xScale, yScale } = event;
     this.elm = elm;
     const pixiOptions = {
       width,
@@ -17,7 +18,6 @@ export abstract class WebGLLayer extends Layer {
     };
 
     this.ctx = new Application(pixiOptions);
-
     this.elm.appendChild(this.ctx.view);
   }
 
@@ -27,5 +27,17 @@ export abstract class WebGLLayer extends Layer {
     const [, width] = event.xScale.range();
     this.ctx.view.style.height = `height`;
     this.ctx.view.style.width = `width`;
+
+    this.transform = new Transform();
+    this.transform.scale.x =
+      width / (event.xScale.domain()[1] - event.xScale.domain()[0]);
+    this.transform.scale.y =
+      height / (event.yScale.domain()[1] - event.yScale.domain()[0]);
+
+    console.log(
+      'transform',
+      this.transform.scale.x,
+      (event.xScale.domain()[1] - event.xScale.domain()[0]) / width,
+    );
   }
 }

@@ -109,8 +109,8 @@ export class GeomodelLayer extends WebGLLayer {
     yScale: ScaleLinear<number, number>,
   ): [number, number][] => {
     return pos.map((posPoint: [number, number], index) => [
-      xScale(posPoint[0]),
-      yScale(md[index]),
+      posPoint[0],
+      md[index],
     ]);
   };
 
@@ -138,7 +138,7 @@ export class GeomodelLayer extends WebGLLayer {
       interpolatedPointsBottom.reverse().flat(),
       bottomLeftPoint,
     ];
-
+    area.transform = this.transform;
     area.drawPolygon([].concat(...points));
   };
 }
