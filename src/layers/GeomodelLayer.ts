@@ -1,7 +1,7 @@
 import curveCatmullRom from 'cat-rom-spline';
 import { ScaleLinear } from 'd3-scale';
 import { Graphics } from 'pixi.js';
-import WebGLLayer from './WebGLLayer';
+import { WebGLLayer } from './WebGLLayer';
 import {
   GeoModelData,
   GeomodelLayerOptions,
@@ -33,8 +33,8 @@ export class GeomodelLayer extends WebGLLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent) {
-    const { xscale, yscale, data } = event;
-    const scaledData = this.generateScaledData(data, xscale, yscale);
+    const { xScale, yScale, data } = event;
+    const scaledData = this.generateScaledData(data, xScale, yScale);
 
     // for each layer
     // paint from top down, with color
@@ -60,33 +60,33 @@ export class GeomodelLayer extends WebGLLayer {
 
   generateScaledData = (
     data: GeoModelData[],
-    xscale: ScaleLinear<number, number>,
-    yscale: ScaleLinear<number, number>,
+    xScale: ScaleLinear<number, number>,
+    yScale: ScaleLinear<number, number>,
   ): { top: [number, number][]; bottom: [number, number][] }[] => {
     return data.map((stratLayer: GeoModelData, index: number) => {
       const top = this.generateScaledLayer(
         stratLayer.pos,
         stratLayer.md,
-        xscale,
-        yscale,
+        xScale,
+        yScale,
       );
       let bottom: [number, number][] = null;
       if (stratLayer.bottomPos == null || stratLayer.bottomMd == null) {
-        // last layer, draw to yscale bottom
+        // last layer, draw to yScale bottom
         if (index >= data.length - 1) {
           bottom = [
-            [xscale.range()[0], yscale.range()[1]],
-            [xscale.range()[0], yscale.range()[1]],
-            [xscale.range()[1], yscale.range()[1]],
-            [xscale.range()[1], yscale.range()[1]],
+            [xScale.range()[0], yScale.range()[1]],
+            [xScale.range()[0], yScale.range()[1]],
+            [xScale.range()[1], yScale.range()[1]],
+            [xScale.range()[1], yScale.range()[1]],
           ];
         } else {
           // use next area top line as bottom
           bottom = this.generateScaledLayer(
             data[index + 1].pos,
             data[index + 1].md,
-            xscale,
-            yscale,
+            xScale,
+            yScale,
           );
         }
       } else {
@@ -94,8 +94,8 @@ export class GeomodelLayer extends WebGLLayer {
         bottom = this.generateScaledLayer(
           stratLayer.bottomPos,
           stratLayer.bottomMd,
-          xscale,
-          yscale,
+          xScale,
+          yScale,
         );
       }
       return { top, bottom };
@@ -105,12 +105,12 @@ export class GeomodelLayer extends WebGLLayer {
   generateScaledLayer = (
     pos: [number, number][],
     md: number[],
-    xscale: ScaleLinear<number, number>,
-    yscale: ScaleLinear<number, number>,
+    xScale: ScaleLinear<number, number>,
+    yScale: ScaleLinear<number, number>,
   ): [number, number][] => {
     return pos.map((posPoint: [number, number], index) => [
-      xscale(posPoint[0]),
-      yscale(md[index]),
+      xScale(posPoint[0]),
+      yScale(md[index]),
     ]);
   };
 

@@ -2,7 +2,7 @@ import { Layer } from './Layer';
 import { OnMountEvent, OnUpdateEvent } from '../interfaces';
 import { Application, utils } from 'pixi.js';
 
-abstract class WebGLLayer extends Layer {
+export abstract class WebGLLayer extends Layer {
   elm: HTMLElement;
   ctx: PIXI.Application;
 
@@ -23,11 +23,9 @@ abstract class WebGLLayer extends Layer {
 
   onUpdate(event: OnUpdateEvent) {
     super.onUpdate(event);
-    const [, height] = event.yscale.range();
-    const [, width] = event.xscale.range();
-    this.ctx.view.style.height = height;
-    this.ctx.view.style.width = width;
+    const [, height] = event.yScale.range();
+    const [, width] = event.xScale.range();
+    this.ctx.view.style.height = `height`;
+    this.ctx.view.style.width = `width`;
   }
 }
-
-export default WebGLLayer;

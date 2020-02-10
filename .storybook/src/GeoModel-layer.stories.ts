@@ -1,6 +1,6 @@
-import GeoModelLayer from '../../src/layers/GeoModelLayer';
+import { GeomodelLayer } from '../../src/layers/GeoModelLayer';
 import { scaleLinear } from 'd3-scale';
-import { GeoModelData } from '../../src/interfaces';
+import { GeoModelData, GeomodelLayerOptions } from '../../src/interfaces';
 
 export default {
   title: 'PIXI JS WebGL Layer',
@@ -13,7 +13,8 @@ const xbounds = [0, 1000];
 const ybounds = [0, 1000];
 
 export const GeoModel = () => {
-  const geoModelLayer = new GeoModelLayer('webgl', {});
+  const options: GeomodelLayerOptions = { order: 1 };
+  const geoModelLayer = new GeomodelLayer('webgl', options);
 
   const root = document.createElement('div');
   root.className = 'grid-container';
@@ -31,10 +32,10 @@ export const GeoModel = () => {
 };
 
 const createEventObj = (elm: any) => {
-  const xscale = scaleLinear()
+  const xScale = scaleLinear()
     .domain(xbounds)
     .range([0, width]);
-  const yscale = scaleLinear()
+  const yScale = scaleLinear()
     .domain(ybounds)
     .range([0, height]);
   const data: GeoModelData[] = [
@@ -171,8 +172,8 @@ const createEventObj = (elm: any) => {
     },
   ];
   return {
-    xscale: xscale.copy(),
-    yscale: yscale.copy(),
+    xScale: xScale.copy(),
+    yScale: yScale.copy(),
     elm,
     data,
   };
