@@ -9,7 +9,7 @@ import {
   OnRescaleEvent,
 } from '../interfaces';
 
-class GeomodelLayer extends WebGLLayer {
+export class GeomodelLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
 
   curveOptions = { samples: 50, knot: 0.5 };
@@ -142,5 +142,3 @@ class GeomodelLayer extends WebGLLayer {
     area.drawPolygon([].concat(...points));
   };
 }
-
-export default GeomodelLayer;

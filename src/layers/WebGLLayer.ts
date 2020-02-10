@@ -1,4 +1,4 @@
-import Layer from './Layer';
+import { Layer } from './Layer';
 import { OnMountEvent, OnUpdateEvent } from '../interfaces';
 import { Application, utils } from 'pixi.js';
 
