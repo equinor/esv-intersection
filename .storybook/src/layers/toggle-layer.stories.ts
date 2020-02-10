@@ -87,8 +87,8 @@ const createEventObj = (elm: any) => {
   ];
 
   return {
-    xscale: xscale.copy(),
-    yscale: yscale.copy(),
+    xScale: xscale.copy(),
+    yScale: yscale.copy(),
     elm,
     data,
   };
