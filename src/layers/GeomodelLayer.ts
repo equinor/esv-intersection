@@ -1,6 +1,6 @@
 import curveCatmullRom from 'cat-rom-spline';
 import { ScaleLinear } from 'd3-scale';
-import { Graphics } from 'pixi.js';
+import { Graphics } from 'pixi.js-legacy';
 import { WebGLLayer } from './WebGLLayer';
 import {
   GeoModelData,
@@ -33,16 +33,24 @@ export class GeomodelLayer extends WebGLLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent) {
-    const { xScale, yScale, data } = event;
-    const scaledData = this.generateScaledData(data, xScale, yScale);
+    let total = 0;
+    const times = 1;
+    for (let i = 0; i < times; i++) {
+      const start = performance.now();
+      const { xScale, yScale, data } = event;
+      const scaledData = this.generateScaledData(data, xScale, yScale);
 
-    // for each layer
-    // paint from top down, with color
-    // if missing bottom data is null, use next area top line as bottom
+      // for each layer
+      // paint from top down, with color
+      // if missing bottom data is null, use next area top line as bottom
 
-    data.forEach((s: GeoModelData, index: number) =>
-      this.drawArea(s, index, scaledData[index]),
-    );
+      data.forEach((s: GeoModelData, index: number) =>
+        this.drawArea(s, index, scaledData[index]),
+      );
+      const end = performance.now();
+      total += end - start;
+    }
+    console.log('kjhdsfs', total / times);
   }
 
   drawArea = (
@@ -53,7 +61,7 @@ export class GeomodelLayer extends WebGLLayer {
     const area = new Graphics();
     area.lineStyle(4, s.color, 1);
     area.beginFill(s.color);
-    this.renderAreaTopLine(area, scaledData.top, scaledData.bottom);
+    this.renderArea(area, scaledData.top, scaledData.bottom);
     area.endFill();
     this.ctx.stage.addChild(area);
   };
@@ -114,7 +122,7 @@ export class GeomodelLayer extends WebGLLayer {
     ]);
   };
 
-  private renderAreaTopLine = (
+  private renderArea = (
     area: Graphics,
     dataTop: [number, number][],
     dataBottom: [number, number][],

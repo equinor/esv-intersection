@@ -17,7 +17,8 @@
   },
   "parserOptions": {
     "ecmaVersion": 2018,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./.eslintrc.json"
   },
   "rules": {
     "no-continue": "off",

@@ -26,7 +26,7 @@ describe('Layer', () => {
 
       elm = root;
     });
-    it('should have a default opacity of 1 if no option is set', () => {
+    it('performance on small dataset input', () => {
       // Arrange
       const options: GeomodelLayerOptions = { order: 1 };
       const smallData: GeoModelData[] = [
@@ -170,16 +170,16 @@ describe('Layer', () => {
         },
       ];
 
-      const xscale = scaleLinear()
+      const xScale = scaleLinear()
         .domain([0, 500])
         .range([0, 500]);
-      const yscale = scaleLinear()
+      const yScale = scaleLinear()
         .domain([0, 500])
         .range([0, 500]);
 
       geoModelLayer.onUpdate({
-        xscale,
-        yscale,
+        xScale,
+        yScale,
         elm,
         data: smallData,
       });
