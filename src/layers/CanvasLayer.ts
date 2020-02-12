@@ -18,6 +18,7 @@ export abstract class CanvasLayer extends Layer {
       this.canvas = canvas;
       event.elm.appendChild(canvas)
     }
+    this.canvas.setAttribute('id', this.id.toString());
     this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
     this.ctx = this.canvas.getContext('2d');
   }
@@ -34,9 +35,13 @@ export abstract class CanvasLayer extends Layer {
       ctx,
       elm,
     } = this;
+    const {
+      xScale,
+      yScale,
+    } = event;
 
     ctx.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
-    ctx.canvas.setAttribute('width', `${elm.getAttribute('width')}px`)
-    ctx.canvas.setAttribute('height', `${elm.getAttribute('height')}px`);
+    ctx.canvas.setAttribute('width', `${xScale.range()[1]}px`)
+    ctx.canvas.setAttribute('height', `${yScale.range()[1]}px`);
   }
 }
