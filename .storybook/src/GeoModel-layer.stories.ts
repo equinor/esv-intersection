@@ -1,4 +1,4 @@
-import { GeomodelLayer } from '../../src/layers/GeoModelLayer';
+import { GeomodelLayer } from '../../src/layers/GeomodelLayer';
 import { scaleLinear } from 'd3-scale';
 import { GeoModelData, GeomodelLayerOptions } from '../../src/interfaces';
 import { SurfaceGenerator } from '../src/utils/surfaceGenerator';
