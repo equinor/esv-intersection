@@ -29,6 +29,11 @@ describe('Layer', () => {
       layer.onMount({ elm });
       expect(elm.children.length).toEqual(1);
       layer.onUnmount();
+      // run onmount/unmount several times to make sure element and its reference is properly handled
+      expect(elm.children.length).toEqual(0);
+      layer.onMount({ elm });
+      expect(elm.children.length).toEqual(1);
+      layer.onUnmount();
       expect(elm.children.length).toEqual(0);
     });
   });
