@@ -3,6 +3,7 @@ export * from './toggle-layer.stories';
 export * from './multiple-layers.stories';
 export * from '../wellborepath-layer.stories';
 export * from './callout-canvas.layer.stories';
+export * from './intersection.stories';
 
 export default {
   title: 'Layers',
