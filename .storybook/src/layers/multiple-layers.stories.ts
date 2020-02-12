@@ -36,11 +36,11 @@ export const MultipleCanvasLayers = () => {
   jacketLayer.onMount({ ...ev, url: sweaterImg });
 
   gridLayer.onUpdate(createEventObj(container));
-  tShirtLayer.onUpdate(ev);
-  jacketLayer.onUpdate(ev);
+  tShirtLayer.onUpdate(createEventObj(container));
+  jacketLayer.onUpdate(createEventObj(container));
 
-  const tShirtSlider = createSlider(tShirtLayer, ev);
-  const jacketSlider = createSlider(jacketLayer, ev);
+  const tShirtSlider = createSlider(tShirtLayer, createEventObj(container));
+  const jacketSlider = createSlider(jacketLayer, createEventObj(container));
 
   root.appendChild(container);
   root.appendChild(createHelpText());
