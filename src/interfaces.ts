@@ -55,10 +55,7 @@ export interface GeomodelLayerOptions extends LayerOptions {}
 export interface GeoModelData {
   name: string;
   color: number;
-  md: number[];
-  pos: [number, number][];
-  bottomMd: number[];
-  bottomPos: [number, number][];
+  data: [number[], number[], number[]];
 }
 
 export interface ZoomAndPanOptions {

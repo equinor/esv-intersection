@@ -1,6 +1,7 @@
 import { GeomodelLayer } from '../../src/layers/GeoModelLayer';
 import { scaleLinear } from 'd3-scale';
 import { GeoModelData, GeomodelLayerOptions } from '../../src/interfaces';
+import { SurfaceGenerator } from '../src/utils/surfaceGenerator';
 
 export default {
   title: 'PIXI JS WebGL Layer',
@@ -26,12 +27,20 @@ export const GeoModel = () => {
   root.setAttribute('width', `${width}`);
 
   geoModelLayer.onMount({ elm: root, height, width });
-  geoModelLayer.onUpdate(createEventObj(root));
+  const strat1: [number[], number[]] = [[0], [1]];
+  const data: [
+    number[],
+    number[],
+    number[],
+  ][] = new SurfaceGenerator().generateData();
+
+  geoModelLayer.onUpdate(createEventObj(root, data));
 
   return root;
 };
 
-const createEventObj = (elm: any) => {
+const createEventObj = (elm: any, inputData: any) => {
+  console.log('inputData', inputData);
   const xScale = scaleLinear()
     .domain(xbounds)
     .range([0, width]);
@@ -42,133 +51,32 @@ const createEventObj = (elm: any) => {
     {
       name: 'strat 1',
       color: 0xff000,
-      md: [70, 90, 100, 110, 100, 100],
-      bottomMd: [100 + 50, 120 + 50, 100 + 50, 140 + 50, 100 + 50, 120 + 50],
-      pos: [
-        [0, 99],
-        [100, 99],
-        [200, 99],
-        [450, 99],
-        [600, 99],
-        [1000, 99],
-      ],
-      bottomPos: [
-        [0, 99],
-        [140, 99],
-        [200, 99],
-        [400, 99],
-        [750, 99],
-        [1000, 99],
-      ],
+      data: inputData[1],
     },
     {
       name: 'strat 2',
       color: 0xffff0,
-      md: [100 + 50, 120 + 50, 100 + 50, 140 + 50, 100 + 50, 120 + 50],
-      bottomMd: null, // [
-      //   100 + 150,
-      //   120 + 120,
-      //   100 + 170,
-      //   140 + 150,
-      //   100 + 150,
-      //   177 + 150,
-      // ],
-      pos: [
-        [0, 99],
-        [140, 99],
-        [200, 99],
-        [400, 99],
-        [750, 99],
-        [1000, 99],
-      ],
-      bottomPos: null, // [
-      //   [0, 99],
-      //   [190, 99],
-      //   [200, 99],
-      //   [520, 99],
-      //   [850, 99],
-      //   [1000, 99],
-      // ],
+      data: inputData[2],
     },
     {
       name: 'strat 3',
       color: 0xff00ff,
-      md: [100 + 150, 120 + 120, 100 + 170, 140 + 150, 100 + 150, 177 + 150],
-      bottomMd: [
-        100 + 250,
-        120 + 220,
-        100 + 270,
-        100 + 250,
-        140 + 250,
-        177 + 250,
-      ],
-      pos: [
-        [0, 99],
-        [190, 99],
-        [200, 99],
-        [520, 99],
-        [850, 99],
-        [1000, 99],
-      ],
-      bottomPos: [
-        [0, 99],
-        [200, 99],
-        [210, 99],
-        [300, 99],
-        [750, 99],
-        [1000, 99],
-      ],
+      data: inputData[3],
     },
     {
       name: 'strat 4',
       color: 0x0330ff,
-      md: [100 + 250, 120 + 220, 100 + 270, 100 + 250, 140 + 250, 177 + 250],
-      bottomMd: [
-        100 + 250 + 50,
-        120 + 220 + 50,
-        100 + 270 + 50,
-        100 + 250 + 50,
-        140 + 250 + 50,
-        177 + 250 + 40,
-      ],
-      pos: [
-        [0, 99],
-        [200, 99],
-        [210, 99],
-        [300, 99],
-        [750, 99],
-        [1000, 99],
-      ],
-      bottomPos: [
-        [0, 99],
-        [250, 99],
-        [270, 99],
-        [400, 99],
-        [750, 99],
-        [1000, 99],
-      ],
+      data: inputData[3],
     },
     {
       name: 'strat 5',
       color: 0x113322,
-      md: [
-        100 + 250 + 50,
-        120 + 220 + 50,
-        190 + 270 + 50,
-        100 + 250 + 50,
-        170 + 250 + 50,
-        177 + 250 + 40,
-      ],
-      pos: [
-        [0, 99],
-        [200, 99],
-        [210, 99],
-        [300, 99],
-        [750, 99],
-        [1000, 99],
-      ],
-      bottomMd: null,
-      bottomPos: null,
+      data: inputData[4],
+    },
+    {
+      name: 'strat 6',
+      color: 0x155512,
+      data: inputData[5],
     },
   ];
   return {
