@@ -29,21 +29,13 @@ export class GeomodelLayer extends WebGLLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent) {
-    let total = 0;
-    const times = 1;
-    for (let i = 0; i < times; i++) {
-      const start = performance.now();
-      const { data } = event;
+    const { data } = event;
 
-      // for each layer
-      // paint from top down, with color
-      // if missing bottom data is null, use next area top line as bottom
+    // for each layer
+    // paint from top down, with color
+    // if missing bottom data is null, use next area top line as bottom
 
-      data.forEach((s: GeoModelData, index: number) => this.drawAreaPolygon(s));
-      const end = performance.now();
-      total += end - start;
-    }
-    console.log('Performance avg ms', total / times);
+    data.forEach((s: GeoModelData, index: number) => this.drawAreaPolygon(s));
   }
 
   createPolygon = (data: any): number[] => {

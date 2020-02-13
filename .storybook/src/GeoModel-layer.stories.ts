@@ -40,7 +40,6 @@ export const GeoModel = () => {
 };
 
 const createEventObj = (elm: any, inputData: any) => {
-  console.log('inputData', inputData);
   const xScale = scaleLinear()
     .domain(xbounds)
     .range([0, width]);
