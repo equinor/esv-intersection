@@ -37,7 +37,7 @@ export class ImageLayer extends CanvasLayer {
         this.ctx.drawImage(this.img, xScale(x || 0), yScale(y || 0), calcWidth, calcHeight);
       }
     } else {
-      this.ctx.drawImage(this.img, xScale(x), yScale(y), calcWidth, calcHeight);
+      this.ctx.drawImage(this.img, xScale(x || 0), yScale(y || 0), calcWidth, calcHeight);
     }
   }
 }

@@ -7,15 +7,15 @@ import {
   OnUpdateEvent,
   WellborepathLayerOptions,
   Annotation,
-} from '../../../src/interfaces';
-import { Axis } from '../../../src/components'
-import { ZoomPanHandler } from '../../../src/control/ZoomPanHandler';
+} from '../../src/interfaces';
+import { Axis } from '../../src/components'
+import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
 import {
   GridLayer,
   WellborepathLayer,
   CalloutCanvasLayer,
   ImageLayer,
-} from '../../../src/layers';
+} from '../../src/layers';
 
 import {
   createButton,
@@ -23,10 +23,14 @@ import {
   createFPSLabel,
   createLayerContainer,
   createRootContainer,
-} from '../utils';
+} from './utils';
 
-const bg1Img = require('../resources/bg1.jpeg');
-const bg2Img = require('../resources/bg2.jpg');
+export default {
+  title: 'Intersection',
+};
+
+const bg1Img = require('./resources/bg1.jpeg');
+const bg2Img = require('./resources/bg2.jpg');
 
 const annotations : Annotation[] = [
   {
@@ -195,29 +199,20 @@ export const intersection = () => {
 
   const FPSLabel = createFPSLabel();
 
-  const calloutOnMount = {
+  const onMountEvent = {
     elm: container,
-    annotations,
-    isLeftToRight: true,
+  };
+  const imgParams = {
     margin,
     scale: 0,
-    url: bg1Img,
+    x: -50,
+    y: -150,
   };
 
-  const onUpdate = {
-    elm: container,
-    xScale: zoomHandler.scaleX,
-    yScale: zoomHandler.scaleY,
-    xRatio: zoomHandler.xRatio,
-    yRatio: zoomHandler.yRatio,
-    margin,
-    scale: 0,
-  };
-
-  const btnCallout = createButton(calloutLayer, calloutOnMount, { ...onUpdate, data: annotations }, 'Callout');
-  const btnWellbore = createButton(wellboreLayer, calloutOnMount, { ...onUpdate, data: wellborePath}, 'Wellbore');
-  const btnImage1 = createButton(image1Layer, { ...calloutOnMount, url: bg1Img }, { ...onUpdate, x: -50, y: -150 }, 'Image 1');
-  const btnImage2 = createButton(image2Layer, { ...calloutOnMount, url: bg2Img }, { ...onUpdate, x: -50, y: -150 }, 'Image 2');
+  const btnCallout = createButton(calloutLayer, zoomHandler, 'Callout', { annotations }, onMountEvent);
+  const btnWellbore = createButton(wellboreLayer, zoomHandler,  'Wellbore', { data: wellborePath }, onMountEvent);
+  const btnImage1 = createButton(image1Layer, zoomHandler, 'Image 1', { ...imgParams, url: bg1Img }, onMountEvent);
+  const btnImage2 = createButton(image2Layer, zoomHandler, 'Image 2', { ...imgParams, url: bg2Img }, onMountEvent);
 
   btnContainer.appendChild(btnCallout);
   btnContainer.appendChild(btnWellbore);
