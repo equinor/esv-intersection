@@ -1,9 +1,10 @@
 import { axisRight, axisBottom } from 'd3-axis';
+import { Selection } from 'd3-selection';
 import { ScaleLinear } from 'd3-scale';
 import { BaseType } from 'd3';
 
 export class Axis {
-  mainGroup: d3.Selection<SVGElement, any, null, undefined>;
+  mainGroup: Selection<SVGElement, any, null, undefined>;
   scaleX: ScaleLinear<number, number>;
   scaleY: ScaleLinear<number, number>;
   showLabels = true;
@@ -12,7 +13,7 @@ export class Axis {
   measurement: string;
 
   constructor(
-    mainGroup: d3.Selection<SVGElement, any, null, undefined>,
+    mainGroup: Selection<SVGElement, any, null, undefined>,
     scaleX: ScaleLinear<number, number>,
     scaleY: ScaleLinear<number, number>,
     showLabels = true,
@@ -30,11 +31,11 @@ export class Axis {
   }
 
   renderLabelx(
-    gx: d3.Selection<BaseType, any, null, undefined>,
+    gx: Selection<BaseType, any, null, undefined>,
     showLabels: any,
     width: any,
     label: string,
-  ): d3.Selection<BaseType, any, null, undefined> {
+  ): Selection<BaseType, any, null, undefined> {
     let labelx = gx.select('text.axis-labelx');
     if (showLabels) {
       if (labelx.empty()) {
@@ -55,11 +56,11 @@ export class Axis {
   }
 
   renderLabely(
-    gy: d3.Selection<BaseType, any, null, undefined>,
+    gy: Selection<BaseType, any, null, undefined>,
     showLabels: any,
     height: any,
     label: string,
-  ): d3.Selection<BaseType, any, null, undefined> {
+  ): Selection<BaseType, any, null, undefined> {
     let labely = gy.select('text.axis-labely');
     if (showLabels) {
       if (labely.empty()) {
@@ -80,10 +81,10 @@ export class Axis {
   }
 
   renderGy(
-    mainGroup: d3.Selection<BaseType, any, null, undefined>,
+    mainGroup: Selection<BaseType, any, null, undefined>,
     yAxis: any,
     width: any,
-  ): d3.Selection<BaseType, any, null, undefined> {
+  ): Selection<BaseType, any, null, undefined> {
     const gy = this.createOrGet(mainGroup, 'y-axis');
     gy.call(yAxis);
     gy.attr('transform', `translate(${width},0)`);
@@ -92,10 +93,10 @@ export class Axis {
   }
 
   renderGx(
-    mainGroup: d3.Selection<BaseType, any, null, undefined>,
+    mainGroup: Selection<BaseType, any, null, undefined>,
     xAxis: any,
     height: any,
-  ): d3.Selection<BaseType, any, null, undefined> {
+  ): Selection<BaseType, any, null, undefined> {
     const gx = this.createOrGet(mainGroup, 'x-axis');
     gx.attr('transform', `translate(0 ${height})`);
     gx.call(xAxis);
@@ -103,7 +104,7 @@ export class Axis {
   }
 
   createOrGet = (
-    mainGroup: d3.Selection<BaseType, any, null, undefined>,
+    mainGroup: Selection<BaseType, any, null, undefined>,
     name: string,
   ) => {
     let res = mainGroup.select(`g.${name}`);
@@ -135,5 +136,11 @@ export class Axis {
       width,
       `${this.labelXDesc} (${this.measurement})`,
     );
+  }
+
+  onRescale(event: any) {
+    this.scaleX = event.xScale;
+    this.scaleY = event.yScale;
+    this.render();
   }
 }

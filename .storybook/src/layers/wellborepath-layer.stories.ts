@@ -1,10 +1,6 @@
 import { scaleLinear } from 'd3-scale';
-import { WellborepathLayer } from '../../src/layers';
-import { WellborepathLayerOptions } from '../../src/interfaces';
-
-export default {
-  title: 'Wellborepath layer',
-};
+import { WellborepathLayer } from '../../../src/layers';
+import { WellborepathLayerOptions } from '../../../src/interfaces';
 
 const width = 400;
 const height = 500;

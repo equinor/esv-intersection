@@ -1,14 +1,14 @@
 import { scaleLinear } from 'd3-scale';
-import { GridLayer, CanvasLayer } from '../../../src/layers';
-import { OnUpdateEvent, OnMountEvent } from '../../../src/interfaces';
+import { GridLayer, ImageLayer } from '../../../src/layers';
+import { OnUpdateEvent } from '../../../src/interfaces';
 
-const tshirtImg = require('../resources/tshirt.png');
-const sweaterImg = require('../resources/sweater.png');
+const bgImg1 = require('../resources/bg1.jpeg');
+const bgImg2 = require('../resources/bg2.jpg');
 
 const width = 400;
 const height = 500;
 
-const xbounds = [0, 500];
+const xbounds = [0, 400];
 const ybounds = [0, 500];
 
 export const MultipleCanvasLayers = () => {
@@ -21,31 +21,31 @@ export const MultipleCanvasLayers = () => {
     majorColor: 'black',
     majorWidth: 2,
   });
-  const tShirtLayer = new ImageLayer('tshirtimg', {
+  const backgroundLayer1 = new ImageLayer('bgimg1', {
     order: 2,
     layerOpacity: 1,
   });
-  const jacketLayer = new ImageLayer('jacketimg', {
+  const backgroundLayer2 = new ImageLayer('bgimg2', {
     order: 3,
     layerOpacity: 1,
   });
   const ev = { elm: container };
 
   gridLayer.onMount(ev);
-  tShirtLayer.onMount({ ...ev, url: tshirtImg });
-  jacketLayer.onMount({ ...ev, url: sweaterImg });
+  backgroundLayer1.onMount({ ...ev, url: bgImg1 });
+  backgroundLayer2.onMount({ ...ev, url: bgImg2 });
 
   gridLayer.onUpdate(createEventObj(container));
-  tShirtLayer.onUpdate(createEventObj(container));
-  jacketLayer.onUpdate(createEventObj(container));
+  backgroundLayer1.onUpdate(createEventObj(container));
+  backgroundLayer2.onUpdate(createEventObj(container));
 
-  const tShirtSlider = createSlider(tShirtLayer, createEventObj(container));
-  const jacketSlider = createSlider(jacketLayer, createEventObj(container));
+  const bg1Slider = createSlider(backgroundLayer1, createEventObj(container));
+  const bg2Slider = createSlider(backgroundLayer2, createEventObj(container));
 
   root.appendChild(container);
   root.appendChild(createHelpText());
-  root.appendChild(tShirtSlider);
-  root.appendChild(jacketSlider);
+  root.appendChild(bg1Slider);
+  root.appendChild(bg2Slider);
 
   return root;
 };
@@ -84,7 +84,7 @@ const createHelpText = () => {
 const createEventObj = (elm: any) => {
   const xscale = scaleLinear()
     .domain(xbounds)
-    .range([0, 500]);
+    .range([0, 400]);
   const yscale = scaleLinear()
     .domain(ybounds)
     .range([0, 500]);
@@ -99,7 +99,7 @@ const createEventObj = (elm: any) => {
 const createSlider = (layer: ImageLayer, event: OnUpdateEvent) => {
   const slider = document.createElement('input');
   slider.type = 'range';
-  slider.value = `${(layer.opacity as number) * 10}`;
+  slider.value = `${layer.opacity.valueOf() * 10}`;
   slider.min = '0';
   slider.max = '10';
   slider.setAttribute('style', `width:${width}px`);
@@ -108,34 +108,4 @@ const createSlider = (layer: ImageLayer, event: OnUpdateEvent) => {
     layer.onUpdate(event);
   }
   return slider;
-}
-
-/**
- * Example of a custom layer
- */
-class ImageLayer extends CanvasLayer {
-  img: HTMLImageElement;
-
-  onMount(event: OnMountEvent) {
-    super.onMount(event);
-    const img = document.createElement('img');
-    img.src = event.url;
-    this.img = img;
-    this.isLoading = true;
-  }
-
-  onUpdate(event: OnUpdateEvent) {
-    super.onUpdate(event);
-    this.render();
-  }
-  render() {
-    if (this.isLoading) {
-      this.img.onload = () => {
-        this.isLoading = false;
-        this.ctx.drawImage(this.img, 10, 10, width, height);
-      }
-    } else {
-      this.ctx.drawImage(this.img, 10, 10, width, height);
-    }
-  }
 }

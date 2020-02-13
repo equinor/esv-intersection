@@ -1,9 +1,9 @@
-import { select } from 'd3-selection';
+import { select, Selection } from 'd3-selection';
 import { Layer } from './Layer';
 import { OnMountEvent, OnUpdateEvent } from '../interfaces';
 
 export abstract class SVGLayer extends Layer {
-  elm: d3.Selection<SVGElement, any, null, undefined>;
+  elm: Selection<SVGElement, any, null, undefined>;
 
   onMount(event: OnMountEvent) {
     super.onMount(event);
@@ -19,12 +19,15 @@ export abstract class SVGLayer extends Layer {
   }
 
   onUpdate(event: OnUpdateEvent) {
+    if (!this.elm) {
+      return;
+    }
     super.onUpdate(event);
     const { elm } = this;
     const { xScale, yScale } = event;
     const [, width] = xScale.range();
     const [, height] = yScale.range();
 
-    elm.attr('height', height).attr('width', width).attr('style', 'position:absolute');
+    elm.attr('height', height).attr('width', width).attr('style', `position:absolute; opacity: ${this.opacity};z-index:${this.order}`);
   }
 }
