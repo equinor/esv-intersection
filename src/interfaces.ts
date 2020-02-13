@@ -1,3 +1,5 @@
+import { ScaleLinear } from 'd3-scale';
+import { ZoomTransform } from 'd3-zoom';
 import { Layer } from './layers/Layer';
 
 interface LayerEvent {
@@ -13,8 +15,8 @@ export interface OnUnmountEvent extends LayerEvent {
 }
 
 export interface OnRescaleEvent extends LayerEvent {
-  xScale: d3.ScaleLinear<number, number>,
-  yScale: d3.ScaleLinear<number, number>,
+  xScale: ScaleLinear<number, number>,
+  yScale: ScaleLinear<number, number>,
   xBounds?: [number, number],
   yBounds?: [number, number],
   zFactor?: number,
@@ -23,10 +25,12 @@ export interface OnRescaleEvent extends LayerEvent {
   height?: number;
   xRatio?: number;
   yRatio?: number;
-  transform?: d3.ZoomTransform,
+  transform?: ZoomTransform,
 }
 
 export interface OnUpdateEvent extends OnRescaleEvent {
+  xScale: ScaleLinear<number, number>,
+  yScale: ScaleLinear<number, number>,
 }
 
 export interface LayerOptions {
@@ -54,4 +58,20 @@ export interface WellborepathLayerOptions extends LayerOptions {
 
 export interface ZoomAndPanOptions {
   maxZoomLevel: number,
+}
+
+export interface Connector {
+  end: string,
+  endScale: number,
+}
+
+export interface Annotation {
+  title: string,
+  md: number,
+  tvd: number,
+  mdUnit: string,
+  depthReferencePoint: string,
+  data: number[],
+  connector?: Connector,
+  group: string,
 }

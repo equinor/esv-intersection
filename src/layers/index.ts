@@ -3,3 +3,4 @@ export * from './CanvasLayer';
 export * from './GridLayer';
 export * from './SVGLayer';
 export * from './WellborePathLayer';
+export * from './CalloutCanvasLayer';
