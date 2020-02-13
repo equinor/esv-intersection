@@ -1,10 +1,9 @@
 import { scaleLinear } from 'd3-scale';
+import { Layer, GridLayer, WellborepathLayer } from '../../../src/layers';
 import {
-  Layer,
-  GridLayer,
-  WellborepathLayer,
- } from '../../../src/layers';
-import { OnUpdateEvent, WellborepathLayerOptions } from '../../../src/interfaces';
+  OnUpdateEvent,
+  WellborepathLayerOptions,
+} from '../../../src/interfaces';
 
 const width = 400;
 const height = 500;
@@ -12,12 +11,11 @@ const height = 500;
 const xbounds = [0, 1000];
 const ybounds = [0, 1000];
 
-
 const createRootDiv = () => {
   const root = document.createElement('div');
   root.setAttribute('height', '700px');
   return root;
-}
+};
 
 const createGridContainer = () => {
   const root = document.createElement('div');
@@ -29,7 +27,7 @@ const createGridContainer = () => {
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
   return root;
-}
+};
 
 /**
  * helper function to create a button that toggles a layer on and off
@@ -37,10 +35,15 @@ const createGridContainer = () => {
  * @param root
  * @param event
  */
-const createButton = (layer : Layer, root : HTMLElement, event : OnUpdateEvent, title: string) => {
+const createButton = (
+  layer: Layer,
+  root: HTMLElement,
+  event: OnUpdateEvent,
+  title: string,
+) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
-  btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;')
+  btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;');
   let show = false;
   btn.onclick = () => {
     if (show) {
@@ -50,9 +53,9 @@ const createButton = (layer : Layer, root : HTMLElement, event : OnUpdateEvent, 
       layer.onUnmount();
     }
     show = !show;
-  }
+  };
   return btn;
-}
+};
 
 /**
  * Creates an event object that contains the element and x- and y-scale
@@ -91,7 +94,6 @@ const createEventObj = (elm: any) => {
   };
 };
 
-
 export const ToggleCanvasLayer = () => {
   const root = createRootDiv();
   const container = createGridContainer();
@@ -112,7 +114,6 @@ export const ToggleCanvasLayer = () => {
 
   const wellborePathLayer = new WellborepathLayer('wellborepath', options);
 
-
   gridLayer.onMount({ elm: container });
   wellborePathLayer.onMount({ elm: container });
 
@@ -122,8 +123,18 @@ export const ToggleCanvasLayer = () => {
   gridLayer.onUpdate(createEventObj(container));
   wellborePathLayer.onUpdate(createEventObj(container));
 
-  const canvasBtn = createButton(gridLayer, container, createEventObj(container), 'Canvas');
-  const svgBtn = createButton(wellborePathLayer, container, createEventObj(container), 'SVG');
+  const canvasBtn = createButton(
+    gridLayer,
+    container,
+    createEventObj(container),
+    'Canvas',
+  );
+  const svgBtn = createButton(
+    wellborePathLayer,
+    container,
+    createEventObj(container),
+    'SVG',
+  );
 
   root.appendChild(container);
   root.appendChild(canvasBtn);

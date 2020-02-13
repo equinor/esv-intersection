@@ -29,17 +29,13 @@ export class GridLayer extends CanvasLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent) {
-    const {
-      ctx,
-      options,
-    } = this;
+    const { ctx, options } = this;
 
-    if (!ctx) { return; }
+    if (!ctx) {
+      return;
+    }
 
-    const {
-      xScale,
-      yScale,
-    } = event;
+    const { xScale, yScale } = event;
 
     const [rx1, rx2] = xScale.range();
     const [ry1, ry2] = yScale.range();
@@ -49,7 +45,6 @@ export class GridLayer extends CanvasLayer {
 
     ctx.lineWidth = options.minorWidth || MINORWIDTH;
     ctx.strokeStyle = options.minorColor || MINORCOLOR;
-
 
     // minor grid lines
     let xminticks = this.mapMinorTicks(xScale.ticks());
@@ -66,8 +61,8 @@ export class GridLayer extends CanvasLayer {
     ctx.restore();
   }
 
-  private renderTicksX(xscale : any, xticks : any, ry1 : any, ry2 : any) {
-    xticks.forEach((tx : any) => {
+  private renderTicksX(xscale: any, xticks: any, ry1: any, ry2: any) {
+    xticks.forEach((tx: any) => {
       const x = xscale(tx);
       this.ctx.beginPath();
       this.ctx.moveTo(x, ry1);
@@ -76,8 +71,8 @@ export class GridLayer extends CanvasLayer {
     });
   }
 
-  private renderTicksY(yscale : any, yticks : any, rx1 : any, rx2 : any) {
-    yticks.forEach((ty : any) => {
+  private renderTicksY(yscale: any, yticks: any, rx1: any, rx2: any) {
+    yticks.forEach((ty: any) => {
       const y = yscale(ty);
       this.ctx.beginPath();
       this.ctx.moveTo(rx1, y);
@@ -89,7 +84,7 @@ export class GridLayer extends CanvasLayer {
   private mapMinorTicks(ticks: any) {
     let xminticks = [];
     if (ticks.length >= 2) {
-      xminticks = ticks.map((v : any) => v + (ticks[1] - ticks[0]) / 2);
+      xminticks = ticks.map((v: any) => v + (ticks[1] - ticks[0]) / 2);
       xminticks.pop();
     }
     return xminticks;

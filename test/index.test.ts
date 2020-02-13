@@ -1,10 +1,7 @@
-import {
-  GridLayer,
-  WellborepathLayer,
-} from '../src/index';
+import { GridLayer, WellborepathLayer } from '../src/index';
 
 describe('Layer', () => {
-  let elm : HTMLElement;
+  let elm: HTMLElement;
   beforeEach(() => {
     elm = document.createElement('div');
   });
@@ -13,8 +10,7 @@ describe('Layer', () => {
   });
   describe('SVG', () => {
     it('should not remount new elements on same layer', () => {
-      const layer = new WellborepathLayer('well',
-      {
+      const layer = new WellborepathLayer('well', {
         order: 1,
         stroke: 'black',
         strokeWidth: '1',
@@ -24,8 +20,7 @@ describe('Layer', () => {
       expect(elm.children.length).toEqual(1);
     });
     it('should add and remove element on mount/unmount', () => {
-      const layer = new WellborepathLayer('well',
-      {
+      const layer = new WellborepathLayer('well', {
         order: 1,
         stroke: 'black',
         strokeWidth: '1',

@@ -11,26 +11,25 @@ export interface OnMountEvent extends LayerEvent {
   elm: HTMLElement;
 }
 
-export interface OnUnmountEvent extends LayerEvent {
-}
+export interface OnUnmountEvent extends LayerEvent {}
 
 export interface OnRescaleEvent extends LayerEvent {
-  xScale: ScaleLinear<number, number>,
-  yScale: ScaleLinear<number, number>,
-  xBounds?: [number, number],
-  yBounds?: [number, number],
-  zFactor?: number,
-  viewportRatio?: number,
+  xScale: ScaleLinear<number, number>;
+  yScale: ScaleLinear<number, number>;
+  xBounds?: [number, number];
+  yBounds?: [number, number];
+  zFactor?: number;
+  viewportRatio?: number;
   width?: number;
   height?: number;
   xRatio?: number;
   yRatio?: number;
-  transform?: ZoomTransform,
+  transform?: ZoomTransform;
 }
 
 export interface OnUpdateEvent extends OnRescaleEvent {
-  xScale: ScaleLinear<number, number>,
-  yScale: ScaleLinear<number, number>,
+  xScale: ScaleLinear<number, number>;
+  yScale: ScaleLinear<number, number>;
 }
 
 export interface LayerOptions {
@@ -56,22 +55,30 @@ export interface WellborepathLayerOptions extends LayerOptions {
   strokeWidth: string;
 }
 
+export interface GeomodelLayerOptions extends LayerOptions {}
+
+export interface GeoModelData {
+  name: string;
+  color: number;
+  data: [number[], number[], number[]];
+}
+
 export interface ZoomAndPanOptions {
-  maxZoomLevel: number,
+  maxZoomLevel: number;
 }
 
 export interface Connector {
-  end: string,
-  endScale: number,
+  end: string;
+  endScale: number;
 }
 
 export interface Annotation {
-  title: string,
-  md: number,
-  tvd: number,
-  mdUnit: string,
-  depthReferencePoint: string,
-  data: number[],
-  connector?: Connector,
-  group: string,
+  title: string;
+  md: number;
+  tvd: number;
+  mdUnit: string;
+  depthReferencePoint: string;
+  data: number[];
+  connector?: Connector;
+  group: string;
 }

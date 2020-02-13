@@ -1,6 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "prettier"],
   "env": {
     "es6": true,
     "node": true
@@ -17,12 +17,14 @@
   },
   "parserOptions": {
     "ecmaVersion": 2018,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./.eslintrc.json"
   },
   "rules": {
     "no-continue": "off",
     "no-plusplus": "off",
     "no-param-reassign": "off",
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "import/prefer-default-export": "off"
   }
 }
