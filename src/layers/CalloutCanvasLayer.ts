@@ -1,8 +1,10 @@
+import { ScaleLinear } from 'd3-scale';
 import { CanvasLayer } from './CanvasLayer';
 import { OnUpdateEvent, OnMountEvent, Annotation } from '../interfaces';
 
 import { calcTextSize } from '../utils';
-import { ScaleLinear } from 'd3';
+
+const OFFSET : number = -20;
 
 export class CalloutCanvasLayer extends CanvasLayer {
   data : Annotation[] = [];
@@ -16,7 +18,6 @@ export class CalloutCanvasLayer extends CanvasLayer {
     this.render(event);
   }
   render(event: OnUpdateEvent) {
-    const offset = -20;
     for (var i = 0; i < this.data.length; i++) {
       const {
         data,
@@ -29,15 +30,15 @@ export class CalloutCanvasLayer extends CanvasLayer {
       const x = xScale(data[0]);
       const y = yScale(data[1]);
 
-      this.renderText(xScale, x, y, offset, title);
+      this.renderText(xScale, x, y, title);
       this.renderPoint(x, y);
-      this.renderLines(x, y, offset, title)
+      this.renderLines(x, y, title)
     }
   }
 
-  private renderText(xScale : ScaleLinear<number, number>, x : number, y : number, offset : number, title : string) {
+  private renderText(xScale : ScaleLinear<number, number>, x : number, y : number, title : string) {
     this.ctx.font =  `${calcTextSize(12, 7, 12, xScale)}px Arial`;
-    this.ctx.fillText(title, x - offset, y + offset);
+    this.ctx.fillText(title, x - OFFSET, y + OFFSET);
   }
 
   private renderPoint(x : number, y : number) {
@@ -46,11 +47,11 @@ export class CalloutCanvasLayer extends CanvasLayer {
     this.ctx.fill();
   }
 
-  private renderLines(x : number, y : number, offset : number, title : string) {
+  private renderLines(x : number, y : number, title : string) {
     this.ctx.moveTo(x, y);
-    this.ctx.lineTo(x - offset, y + offset + 2);
-    this.ctx.moveTo(x - offset, y + offset + 2)
-    this.ctx.lineTo(x - offset + this.ctx.measureText(title).width, y + offset + 2);
+    this.ctx.lineTo(x - OFFSET, y + OFFSET + 2);
+    this.ctx.moveTo(x - OFFSET, y + OFFSET + 2)
+    this.ctx.lineTo(x - OFFSET + this.ctx.measureText(title).width, y + OFFSET + 2);
     this.ctx.lineWidth = 1;
     this.ctx.stroke();
   }
