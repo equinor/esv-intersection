@@ -88,6 +88,7 @@
     ]
   },
   "dependencies": {
+    "@equinor/videx-math": "^1.0.12",
     "@types/d3": "^5.7.2",
     "@types/pixi.js": "^5.0.0",
     "cat-rom-spline": "^1.0.0",
