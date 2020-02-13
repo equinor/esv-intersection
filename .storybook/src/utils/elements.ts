@@ -1,10 +1,9 @@
 import {
-  OnUpdateEvent,
-  OnMountEvent,
-} from '../../../src/interfaces';
-import {
   Layer,
 } from '../../../src/layers';
+import {
+  ZoomPanHandler,
+} from '../../../src/control/ZoomPanHandler';
 
 export const createRootContainer = (width : number) => {
   const root = document.createElement('div');
@@ -39,15 +38,21 @@ export const createButtonContainer = (width: number) => {
 }
 
 
-export const createButton = (layer : Layer, onMount: OnMountEvent, onUpdate: OnUpdateEvent, title: string) => {
+export const createButton = (layer : Layer, zoomHandler: ZoomPanHandler, title: string, additionalEventParams: any, onMount: any) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
   btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;')
   let show = false;
   btn.onclick = () => {
     if (show) {
-      layer.onMount(onMount);
-      layer.onUpdate(onUpdate);
+      layer.onMount({
+        ...onMount,
+        ...additionalEventParams,
+      });
+      layer.onUpdate({
+        ...additionalEventParams,
+        ...zoomHandler.createEventObject(),
+      });
     } else {
       layer.onUnmount();
     }
