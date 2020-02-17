@@ -78,14 +78,15 @@ export class HoleSizeLayer extends WebGLLayer {
 
   createTexture = (): Texture => {
     var canvas = document.createElement('canvas');
-    canvas.width = 300;
-    canvas.height = 100;
-    var ctx = canvas.getContext('2d');
-    var gradient = ctx.createLinearGradient(0, 0, 0, 500);
-    gradient.addColorStop(0, '#D3872A');
-    gradient.addColorStop(1, '#CFB732');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 200, 600);
+    canvas.width = 150;
+    canvas.height = 150;
+    var canvasCtx = canvas.getContext('2d');
+    var gradient = canvasCtx.createLinearGradient(0, 0, 150, 0);
+    gradient.addColorStop(0, 'rgb(163, 102, 42)');
+    gradient.addColorStop(0.5, 'rgb(255, 255, 255)');
+    gradient.addColorStop(1, 'rgb(163, 102, 42)');
+    canvasCtx.fillStyle = gradient;
+    canvasCtx.fillRect(0, 0, 150, 150);
     return Texture.from(canvas);
   };
 
@@ -96,7 +97,8 @@ export class HoleSizeLayer extends WebGLLayer {
   drawHoleSize = (s: any, texture: any): void => {
     const area = new Graphics();
     area.lineStyle(1, s.color, 1);
-    //area.beginFill(texture);
+    area.beginFill(0x232390);
+    area.beginTextureFill(texture);
     area.transform = this.transform;
     const coords: Point[] = this.createCurvedRect(s.data);
     console.log(coords);
