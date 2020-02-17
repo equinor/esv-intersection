@@ -5,10 +5,12 @@ import {
   GeomodelLayerOptions,
   OnUpdateEvent,
   OnRescaleEvent,
+  OnMountEvent,
 } from '../interfaces';
 
 export class GeomodelLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
+  graphics: Graphics;
 
   constructor(id: string, options: GeomodelLayerOptions) {
     super(id, options);
@@ -18,6 +20,12 @@ export class GeomodelLayer extends WebGLLayer {
     this.render = this.render.bind(this);
   }
 
+  onMount(event: OnMountEvent){
+    super.onMount(event);
+    this.graphics = new Graphics();
+    this.ctx.stage.addChild(this.graphics);
+  }
+
   onUpdate(event: OnUpdateEvent) {
     super.onUpdate(event);
     this.render(event);
@@ -25,40 +33,85 @@ export class GeomodelLayer extends WebGLLayer {
 
   onRescale(event: OnRescaleEvent) {
     super.onRescale(event);
-    this.render(event);
+    this.graphics.position.set(event.transform.x, event.transform.y);
+    this.graphics.scale.set(event.xRatio, event.yRatio);
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent) {
     const { data } = event;
 
+    this.graphics.clear();
+
     // for each layer
     // paint from top down, with color
     // if missing bottom data is null, use next area top line as bottom
+    data.areas.forEach((s: GeoModelData) => this.drawAreaPolygon(s));
 
-    data.forEach((s: GeoModelData, index: number) => this.drawAreaPolygon(s));
+    // for each layer
+    // paint from top down, with color
+    // if missing bottom data is null, use next area top line as bottom
+    data.lines.forEach((s: any) => this.drawSurfaceLine(s));
   }
 
-  createPolygon = (data: any): number[] => {
-    const fixed = [];
-    for (let i = 0; i < data[0].length; i++) {
-      fixed.push(data[0][i]);
-      fixed.push(data[1][i]);
-    }
-    for (let i = 0; i < data[0].length; i++) {
-      fixed.push(data[0][data[0].length - i - 1]);
-      fixed.push(data[2][data[2].length - i - 1]);
+  createPolygon = (data: any): number[][] => {
+    let polygons: number[][] = [];
+    let polygon: number[] = null;
+
+    //Start generating polygons
+    for (let i: number = 0; i < data.length; i++) {
+
+      //Generate top of polygon as long as we have valid values
+      if(data[i][1]){
+        if(polygon === null){
+          polygon = [];
+        }
+        polygon.push(data[i][0]);
+        polygon.push(data[i][1]);
+      }
+
+      //If invalid top value or end is reached
+      if(!data[i][1] || i === data.length - 1){
+        if(polygon){
+          //Generate bottom of polygon
+          for (let j: number = i-1; j >= 0; j--) {
+            if(!data[j][1])break;
+            polygon.push(data[j][0]);
+            polygon.push(data[j][2] || 10000);
+          }
+          polygons.push(polygon);
+          polygon = null;
+        }
+      }
     }
 
-    return fixed;
+    return polygons;
   };
 
   drawAreaPolygon = (s: GeoModelData): void => {
-    const area = new Graphics();
-    area.lineStyle(4, s.color, 1);
-    area.beginFill(s.color);
-    area.transform = this.transform;
-    area.drawPolygon(this.createPolygon(s.data));
-    area.endFill();
-    this.ctx.stage.addChild(area);
+    const { graphics: g } = this;
+    g.lineStyle(1, s.color, 1)
+    g.beginFill(s.color);
+    const polygons = this.createPolygon(s.data);
+    polygons.forEach((polygon) => g.drawPolygon(polygon));
+    g.endFill();
+  };
+
+  drawSurfaceLine = (s: any): void => {
+    const { graphics: g } = this;
+    const { data: d } = s;
+    g.lineStyle(s.width, s.color, 1);
+    let penDown: boolean = false;
+    for(let i: number = 0; i < d.length; i++){
+      if(d[i][1]){
+        if(penDown){
+          g.lineTo(d[i][0], d[i][1]);
+        }else{
+          g.moveTo(d[i][0], d[i][1]);
+          penDown = true;
+        }
+      }else{
+        penDown = false;
+      }
+    }
   };
 }
