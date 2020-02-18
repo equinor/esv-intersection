@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js-legacy';
+import { Graphics } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
 import {
   GeoModelData,

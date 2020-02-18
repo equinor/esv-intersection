@@ -1,12 +1,6 @@
 import { Layer } from './Layer';
 import { OnMountEvent, OnUpdateEvent } from '../interfaces';
-import {
-  Application,
-  utils,
-  Transform,
-  settings,
-  Ticker,
-} from 'pixi.js-legacy'; // because of canvas fallback
+import { Application, utils, Transform, settings, Ticker } from 'pixi.js';
 
 export abstract class WebGLLayer extends Layer {
   elm: HTMLElement;

@@ -1,12 +1,13 @@
-import { Graphics, Texture, Point } from 'pixi.js-legacy';
+import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
 import {
   GeoModelData,
   GeomodelLayerOptions,
   OnUpdateEvent,
   OnRescaleEvent,
-  WellborepathLayerOptions,
 } from '../interfaces';
+
+import { CurveInterpolator } from 'curve-interpolator';
 
 interface HoleSize {
   diameter: number;
@@ -38,11 +39,18 @@ export class HoleSizeLayer extends WebGLLayer {
   render(event: OnRescaleEvent | OnUpdateEvent) {
     // const { data } = event;
     const data: HoleSize[] = [
-      { diameter: 10, start: 0, length: 50 },
-      { diameter: 15, start: 70, length: 150 },
+      { diameter: 30, start: 0, length: 50 },
+      { diameter: 20, start: 50, length: 70 },
+      { diameter: 45, start: 120, length: 150 },
+      { diameter: 55, start: 150, length: 150 },
     ];
-    const wbp = [50, 50, 100, 800];
-    console.log('df');
+
+    const wbp = [
+      [50, 50],
+      [50, 100],
+      [100, 150],
+      [100, 400],
+    ];
     // // IF NOT SINGLE POINT
     // const line = new WellboreMesh(interp, 0.15);
     // const { vertices, triangles, vertexData, extraData } = line.generate(
@@ -68,41 +76,89 @@ export class HoleSizeLayer extends WebGLLayer {
     //   uniforms,
     // );
 
-    const texture = this.createTexture();
-    console.log('sdfsdf', texture);
+    const texture = this.createTexture(30);
 
     const sizes = data.map((d) => this.generateHoleSizeData(wbp, d));
-    console.log(sizes);
-    sizes.map((s) => this.drawHoleSize(s, texture));
+    console.log('s', sizes);
+    sizes
+      .sort((a: any, b: any) => (a.data.diameter >= b.data.diameter ? 1 : -1))
+      .map((s: any) => this.drawHoleSizeRope(s, this.createTexture));
+    // sizes.map((s) => this.drawHoleSize(s, texture));
   }
 
-  createTexture = (): Texture => {
+  createTexture = (height: number): Texture => {
     var canvas = document.createElement('canvas');
     canvas.width = 150;
-    canvas.height = 150;
+    canvas.height = height;
     var canvasCtx = canvas.getContext('2d');
-    var gradient = canvasCtx.createLinearGradient(0, 0, 150, 0);
+    var gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, 'rgb(163, 102, 42)');
     gradient.addColorStop(0.5, 'rgb(255, 255, 255)');
     gradient.addColorStop(1, 'rgb(163, 102, 42)');
     canvasCtx.fillStyle = gradient;
-    canvasCtx.fillRect(0, 0, 150, 150);
+    canvasCtx.fillRect(0, 0, 150, canvas.height);
     return Texture.from(canvas);
   };
 
-  generateHoleSizeData = (s: any, data: any) => {
-    return { color: 'black', data };
+  calcDist = (prev: number[], point: number[]) => {
+    var a = prev[0] - point[0];
+    var b = prev[1] - point[1];
+
+    return Math.sqrt(a * a + b * b);
+  };
+
+  generateHoleSizeData = (wbp: any, data: any) => {
+    const tension = 0.2;
+    const interp = new CurveInterpolator(wbp, tension);
+    // const start = interp.getPointAt(data.start / Math.max(wbp.map(z=>z[0])))
+
+    let points = interp.getPoints(99);
+
+    let md = 0;
+    let prev = points[0];
+    points = points.map((p: number[]) => {
+      md += this.calcDist(prev, p);
+      prev = p;
+      return {
+        point: new Point(p[0], p[1]),
+        md,
+      };
+    });
+
+    return { color: 'black', data, points };
+  };
+
+  drawHoleSizeRope = (s: any, texture: any): void => {
+    const a = s.points.filter(
+      (p: any) =>
+        p.md > s.data.start - 10 && p.md < s.data.start + s.data.length + 10,
+    );
+    console.log('a', a);
+    const rope = new SimpleRope(
+      texture(s.data.diameter),
+      a.map((b: any) => b.point),
+    );
+    // rope.transform = this.transform;
+    this.ctx.stage.addChild(rope);
   };
 
   drawHoleSize = (s: any, texture: any): void => {
+    const coords = [
+      [100, 150],
+      [100, 200],
+      [140, 220],
+    ];
+    const tension = 0.2;
+    const interp = new CurveInterpolator(coords, tension);
+    const pts = interp.getPoints(99);
+
     const area = new Graphics();
     area.lineStyle(1, s.color, 1);
     area.beginFill(0x232390);
     area.beginTextureFill(texture);
     area.transform = this.transform;
-    const coords: Point[] = this.createCurvedRect(s.data);
-    console.log(coords);
-    area.drawPolygon(coords);
+    // const coords: Point[] = this.createCurvedRect(s.data);
+    area.drawPolygon([].concat(...pts));
     area.endFill();
     this.ctx.stage.addChild(area);
   };
@@ -111,7 +167,6 @@ export class HoleSizeLayer extends WebGLLayer {
       const squigglyOffset = [5, 6, 5, 7, 7, 5, 3, 2, 6, 3, 2, 1, 4];
       return squigglyOffset[(index - (index % 3)) % squigglyOffset.length];
     };
-    console.log(s);
     const { length, start, diameter: diameterInInches } = s;
     const diameter = diameterInInches * 10;
     const points: Point[] = [];
@@ -121,10 +176,8 @@ export class HoleSizeLayer extends WebGLLayer {
       p = p.clone();
       p.x = 100 + squiggly(a) - diameter / 2;
       p.y = a + start;
-      a == 0 ? console.log('tl', p) : '';
       points.push(p);
     }
-    console.log('bl', points[points.length - 1]);
 
     // points.push(
     //   new Point(
@@ -132,7 +185,6 @@ export class HoleSizeLayer extends WebGLLayer {
     //     points[points.length - 1].y,
     //   ),
     // );
-    // console.log('br', points[points.length - 1]);
     let upPoints: Point[] = [];
     upPoints = points.map(
       (p): Point => {
@@ -142,10 +194,8 @@ export class HoleSizeLayer extends WebGLLayer {
       },
     );
     points.push(...upPoints.reverse());
-    console.log('tr', points[points.length - 1]);
 
     points.push(new Point(points[0].x, points[0].y));
-    console.log('tl', points[points.length - 1]);
 
     return points;
   };
