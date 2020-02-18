@@ -6,10 +6,10 @@ export default {
 };
 
 const width = 400;
-const height = 300;
+const height = 800;
 
 const xbounds = [0, 200];
-const ybounds = [0, 300];
+const ybounds = [0, 800];
 
 export const HoleSize = () => {
   const options = { order: 1 };
