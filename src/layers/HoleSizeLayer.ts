@@ -1,4 +1,14 @@
-import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
+import {
+  Graphics,
+  Texture,
+  Point,
+  SimpleRope,
+  Rectangle,
+  BaseTexture,
+  Polygon,
+  Sprite,
+  TilingSprite,
+} from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
 import {
   GeoModelData,
@@ -89,24 +99,27 @@ export class HoleSizeLayer extends WebGLLayer {
     const texture = this.createTexture(30);
 
     const sizes = data.map((d) => this.generateHoleSizeData(wbp, d));
-    console.log('s', sizes);
+    // this.drawHoleSizeRope(sizes[0], this.createTexture);
     sizes
       .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1))
       .map((s: any) => this.drawHoleSizeRope(s, this.createTexture));
-    // sizes.map((s) => this.drawHoleSize(s, texture));
+
+    // sizes.map((s) => this.drawHoleSize(s));
+    this.drawHoleSize(sizes[0]);
   }
 
   createTexture = (height: number): Texture => {
     var canvas = document.createElement('canvas');
     canvas.width = 150;
+    height = 100; // full width
     canvas.height = height;
     var canvasCtx = canvas.getContext('2d');
-    var gradient = canvasCtx.createLinearGradient(0, 0, 0, height);
+    var gradient = canvasCtx.createLinearGradient(0, 0, 0, 150);
     gradient.addColorStop(0, 'rgb(163, 102, 42)');
     gradient.addColorStop(0.5, 'rgb(255, 255, 255)');
     gradient.addColorStop(1, 'rgb(163, 102, 42)');
     canvasCtx.fillStyle = gradient;
-    canvasCtx.fillRect(0, 0, 150, height);
+    canvasCtx.fillRect(0, 0, 150, 150);
     return Texture.from(canvas);
   };
 
@@ -120,12 +133,12 @@ export class HoleSizeLayer extends WebGLLayer {
   generateHoleSizeData = (wbp: any, data: any) => {
     const tension = 0.2;
     const interp = new CurveInterpolator(wbp, tension);
-    // const start = interp.getPointAt(data.start / Math.max(wbp.map(z=>z[0])))
-
     let points = interp.getPoints(999);
 
     let md = 0;
     let prev = points[0];
+
+    // Add distance to points
     points = points.map((p: number[]) => {
       md += this.calcDist(prev, p);
       prev = p;
@@ -138,7 +151,7 @@ export class HoleSizeLayer extends WebGLLayer {
     return { color: 'black', data, points };
   };
 
-  drawHoleSizeRope = (s: any, texture: any): void => {
+  actualPoints = (s: any) => {
     let start = new Point();
     let stop = new Point();
     let startIndex = 0;
@@ -154,55 +167,77 @@ export class HoleSizeLayer extends WebGLLayer {
     });
     startIndex -= 1;
     stopIndex += 0;
-    console.log(startIndex, stopIndex);
     start = s.points[startIndex >= 0 ? startIndex : 0].point;
     stop =
       s.points[stopIndex <= s.points.length ? stopIndex : s.points.length - 1]
         .point;
-    console.log('a', start, stop);
-    const rope = new SimpleRope(texture(s.data.diameter), [
-      start,
-      ...a.map((b: any) => b.point),
-      stop,
-    ]);
-    // rope.transform = this.transform;
-    this.ctx.stage.addChild(rope);
+    return [start, ...a.map((b: any) => b.point), stop];
   };
 
-  drawHoleSize = (s: any, texture: any): void => {
-    const coords = [
-      [100, 150],
-      [100, 200],
-      [140, 220],
-    ];
-    const tension = 0.2;
-    const interp = new CurveInterpolator(coords, tension);
-    const pts = interp.getPoints(999);
+  drawHoleSizeRope = (s: any, texture: any): void => {
+    const actualPoints: Point[] = this.actualPoints(s);
+    const tex: Texture = texture(s.data.diameter);
 
+    const actualPointss = this.createCurvedRect(
+      actualPoints,
+      s.data.diameter * 2,
+    );
     const area = new Graphics();
     area.lineStyle(1, s.color, 1);
-    area.beginFill(0x232390);
-    area.beginTextureFill(texture);
+    area.beginFill(0);
     area.transform = this.transform;
-    // const coords: Point[] = this.createCurvedRect(s.data);
-    area.drawPolygon([].concat(...pts));
+    area.drawPolygon(actualPointss);
     area.endFill();
     this.ctx.stage.addChild(area);
+
+    const rope = new SimpleRope(tex, actualPoints);
+    rope.transform = this.transform;
+    this.ctx.stage.addChild(rope);
+    rope.mask = area;
+
+    // rope.anchor.set(0.5);
   };
-  createCurvedRect = (s: any): Point[] => {
+
+  drawHoleSize = (s: any): void => {
+    const actualPointsPath = this.actualPoints(s).filter(
+      (d: any, i: number) => i % 9,
+    );
+    const a: Point[] = [];
+    for (let i = 0; i < actualPointsPath.length; i++) {
+      a.push(actualPointsPath[i].clone());
+    }
+
+    const actualPoints = this.createCurvedRect(a, s.data.diameter);
+    const area = new Graphics();
+    area.lineStyle(1, s.color, 1);
+    // area.beginFill(0x232390);
+    // area.beginTextureFill(texture);
+    area.transform = this.transform;
+    // const coords: Point[] = this.createCurvedRect(s.data);
+    area.drawPolygon(actualPoints);
+    // area.endFill();
+    this.ctx.stage.addChild(area);
+  };
+
+  normal = (p1: Point, p2: Point) => {
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    return new Point(-dy, dx);
+  };
+
+  createCurvedRect = (pathPoints: Point[], diameter: number): Point[] => {
     const squiggly = (index: number) => {
       const squigglyOffset = [5, 6, 5, 7, 7, 5, 3, 2, 6, 3, 2, 1, 4];
       return squigglyOffset[(index - (index % 3)) % squigglyOffset.length];
     };
-    const { length, start, diameter: diameterInInches } = s;
-    const diameter = diameterInInches * 10;
-    const points: Point[] = [];
-    let p: Point = new Point(100, start);
 
-    for (let a = 0; a < length; a += 4) {
-      p = p.clone();
-      p.x = 100 + squiggly(a) - diameter / 2;
-      p.y = a + start;
+    const points: Point[] = [];
+    let p: Point = pathPoints[0];
+    for (let a = 0; a < pathPoints.length; a += 4) {
+      const normal = this.normal(pathPoints[a], pathPoints[a + 1]);
+      p = pathPoints[a].clone();
+      p.x += normal.x + squiggly(a) - diameter / 2;
+      p.y += normal.y;
       points.push(p);
     }
 
@@ -214,9 +249,10 @@ export class HoleSizeLayer extends WebGLLayer {
     // );
     let upPoints: Point[] = [];
     upPoints = points.map(
-      (p): Point => {
+      (p: Point, i: number): Point => {
+        // const normal = this.normal(pathPoints[i], pathPoints[i + 1]);
         const a = p.clone();
-        a.x += diameter / 2;
+        p.x += squiggly(i) + diameter / 2;
         return a;
       },
     );
