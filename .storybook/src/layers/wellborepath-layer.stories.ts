@@ -1,6 +1,10 @@
 import { scaleLinear } from 'd3-scale';
 import { WellborepathLayer } from '../../../src/layers';
-import { WellborepathLayerOptions } from '../../../src/interfaces';
+import { WellborepathLayerOptions, OnUpdateEvent } from '../../../src/interfaces';
+import { generateProjectedWellborePath } from '../../../src/datautils/trajectory';
+import { ZoomPanHandler } from '../../../src/control/ZoomPanHandler';
+
+import poslog from '../exampledata/polog.json';
 
 const width = 400;
 const height = 500;
@@ -66,4 +70,31 @@ const createEventObj = (elm: any) => {
     elm,
     data,
   };
+};
+
+
+export const WellborepathWithSampleData = () => {
+  const root = createRootDiv();
+  const wellborePath = generateProjectedWellborePath(poslog);
+
+  const options: WellborepathLayerOptions = {
+    order: 1,
+    strokeWidth: '5px',
+    stroke: 'black',
+  };
+  const wellborePathLayer = new WellborepathLayer('wellborepath', options);
+  wellborePathLayer.onMount({ elm: root });
+  wellborePathLayer.onUpdate({ ...createEventObj(root), data: wellborePath });
+
+  const zoomHandler = new ZoomPanHandler(root, (event: OnUpdateEvent) => {
+    wellborePathLayer.onRescale({ ...event, data: wellborePath });
+  });
+  zoomHandler.setBounds([0, 1000], [0, 1000]);
+  zoomHandler.adjustToSize(width, height);
+  zoomHandler.zFactor = 1;
+  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+  zoomHandler.enableTranslateExtent = false;
+  zoomHandler.setViewport(1000,1000, 5000);
+
+  return root;
 };

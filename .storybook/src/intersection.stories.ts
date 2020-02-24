@@ -165,14 +165,17 @@ export const intersection = () => {
   const image1Layer = createImageLayer(container, 'bg1Img', bg1Img, 1);
   const image2Layer = createImageLayer(container, 'bg2Img', bg2Img, 2);
 
+  wellboreLayer.onUpdate({
+    xScale: scaleX,
+    yScale: scaleY,
+    data: wellborePath,
+  });
+
   const zoomHandler = new ZoomPanHandler(container, (event: OnUpdateEvent) => {
     axis.onRescale(event);
 
     gridLayer.onUpdate(event);
-    wellboreLayer.onUpdate({
-      ...event,
-      data: wellborePath,
-    });
+    wellboreLayer.onRescale(event);
     calloutLayer.onUpdate({
         ...event,
         data: annotations,
