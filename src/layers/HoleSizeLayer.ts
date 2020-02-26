@@ -1,3 +1,4 @@
+import { CurveInterpolator } from 'curve-interpolator';
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
 import {
@@ -5,8 +6,6 @@ import {
   OnUpdateEvent,
   OnRescaleEvent,
 } from '../interfaces';
-
-import { CurveInterpolator } from 'curve-interpolator';
 
 interface HoleSize {
   diameter: number;
@@ -25,17 +24,17 @@ export class HoleSizeLayer extends WebGLLayer {
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent) {
+  onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.render(event);
   }
 
-  onRescale(event: OnRescaleEvent) {
+  onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     this.render(event);
   }
 
-  render(event: OnRescaleEvent | OnUpdateEvent) {
+  render(event: OnRescaleEvent | OnUpdateEvent): void {
     // const { data } = event;
     const data: HoleSize[] = [
       { diameter: 30 + 0, start: 0, length: 50 },
@@ -68,7 +67,7 @@ export class HoleSizeLayer extends WebGLLayer {
       .map((s: any) => this.drawHoleSize(s, texture));
   }
 
-  drawHoleSize = (s: any, texture: any) => {
+  drawHoleSize = (s: any, texture: any): void => {
     const lineCoords = this.actualPoints(s);
     const normalVertexes = this.createNormal(lineCoords, s.data.diameter);
     const normalVertexes2 = this.createNormal(lineCoords, -s.data.diameter);
@@ -81,10 +80,14 @@ export class HoleSizeLayer extends WebGLLayer {
       normalVertexes,
       normalVertexes2,
     );
-    const rope = this.createRopeTextureBackground(lineCoords, texture, mask);
+    this.createRopeTextureBackground(lineCoords, texture, mask);
   };
 
-  drawBigPolygon = (middleCoords: any, upCoords: any, downCoords: any) => {
+  drawBigPolygon = (
+    middleCoords: Point[],
+    upCoords: Point[],
+    downCoords: Point[],
+  ): Graphics => {
     const coords = [...upCoords, ...downCoords.reverse()];
 
     const polygon = new Graphics();
@@ -96,21 +99,21 @@ export class HoleSizeLayer extends WebGLLayer {
     return polygon;
   };
 
-  createRopeTextureBackground = (coods: any, texture: any, mask: any) => {
+  createRopeTextureBackground = (
+    coods: Point[],
+    texture: Texture,
+    mask: Graphics,
+  ): SimpleRope => {
     const rope: SimpleRope = new SimpleRope(texture, coods);
-
     rope.mask = mask;
     this.ctx.stage.addChild(rope);
 
     return rope;
   };
 
-  drawPolygon = (coordsMiddle: any, coordsOffset: any, texture: any) => {
-    for (
-      let i = 0;
-      i < Math.min(coordsMiddle.length, coordsOffset.length) - 2;
-      i++
-    ) {
+  drawPolygon = (coordsMiddle: Point[], coordsOffset: Point[]): void => {
+    const max = Math.min(coordsMiddle.length, coordsOffset.length) - 2;
+    for (let i = 0; i < max; i++) {
       const pts = [
         coordsMiddle[i],
         coordsOffset[i],
@@ -120,20 +123,15 @@ export class HoleSizeLayer extends WebGLLayer {
       ];
 
       const graphic = new Graphics();
-
-      // graphic.beginTextureFill({ texture });
       graphic.beginFill(0);
-
       graphic.drawPolygon(pts);
-
       graphic.endFill();
-
       this.ctx.stage.addChild(graphic);
     }
   };
 
-  createNormal = (coords: Point[], offset: number) => {
-    const newPoints: any = [];
+  createNormal = (coords: Point[], offset: number): Point[] => {
+    const newPoints: Point[] = [];
     const lastPointIndex = 2;
     for (let i = 1; i < coords.length - lastPointIndex; i++) {
       const normal = this.normal(coords[i], coords[i + 1]);
@@ -142,6 +140,7 @@ export class HoleSizeLayer extends WebGLLayer {
       newPoint.y += normal.y * offset;
       newPoints.push(newPoint);
     }
+
     // Last point
     const normal = this.normal(
       coords[coords.length - lastPointIndex - 1],
@@ -156,7 +155,7 @@ export class HoleSizeLayer extends WebGLLayer {
     return newPoints;
   };
 
-  drawLine = (coords: Point[]) => {
+  drawLine = (coords: Point[]): void => {
     const startPoint = coords[0];
 
     const line = new Graphics();
@@ -167,12 +166,13 @@ export class HoleSizeLayer extends WebGLLayer {
 
     this.ctx.stage.addChild(line);
   };
-  createTexure = (maxWidth: number = 150) => {
-    var canvas = document.createElement('canvas');
+
+  createTexure = (maxWidth = 150): Texture => {
+    const canvas = document.createElement('canvas');
     canvas.width = 150;
     canvas.height = maxWidth;
-    var canvasCtx = canvas.getContext('2d');
-    var gradient = canvasCtx.createLinearGradient(0, 0, 0, maxWidth);
+    const canvasCtx = canvas.getContext('2d');
+    const gradient = canvasCtx.createLinearGradient(0, 0, 0, maxWidth);
     gradient.addColorStop(0, 'rgb(163, 102, 42)');
     gradient.addColorStop(0.5, 'rgb(255, 255, 255)');
     gradient.addColorStop(1, 'rgb(163, 102, 42)');
@@ -180,7 +180,8 @@ export class HoleSizeLayer extends WebGLLayer {
     canvasCtx.fillRect(0, 0, 150, maxWidth);
     return Texture.from(canvas);
   };
-  generateHoleSizeData = (wbp: any, data: any) => {
+
+  generateHoleSizeData = (wbp: number[][], data: any): any => {
     const tension = 0.2;
     const interp = new CurveInterpolator(wbp, tension);
     let points = interp.getPoints(999);
@@ -201,7 +202,7 @@ export class HoleSizeLayer extends WebGLLayer {
     return { color: 'black', data, points };
   };
 
-  actualPoints = (s: any) => {
+  actualPoints = (s: any): Point[] => {
     let start = new Point();
     let stop = new Point();
     let startIndex = 0;
@@ -225,17 +226,18 @@ export class HoleSizeLayer extends WebGLLayer {
   };
 
   // utils
-  calcDistPoint = (prev: Point, point: Point) => {
+  calcDistPoint = (prev: Point, point: Point): number => {
     return this.calcDist([prev.x, prev.y], [point.x, point.y]);
   };
 
-  calcDist = (prev: number[], point: number[]) => {
-    var a = prev[0] - point[0];
-    var b = prev[1] - point[1];
+  calcDist = (prev: number[], point: number[]): number => {
+    const a = prev[0] - point[0];
+    const b = prev[1] - point[1];
 
     return Math.sqrt(a * a + b * b);
   };
-  normal = (p1: Point, p2: Point) => {
+
+  normal = (p1: Point, p2: Point): Point => {
     const dx = p2.x - p1.x;
     const dy = p2.y - p1.y;
     return new Point(-dy, dx);

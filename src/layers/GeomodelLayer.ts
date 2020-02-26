@@ -18,27 +18,27 @@ export class GeomodelLayer extends WebGLLayer {
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent) {
+  onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.render(event);
   }
 
-  onRescale(event: OnRescaleEvent) {
+  onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     this.render(event);
   }
 
-  render(event: OnRescaleEvent | OnUpdateEvent) {
+  render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { data } = event;
 
     // for each layer
     // paint from top down, with color
     // if missing bottom data is null, use next area top line as bottom
 
-    data.forEach((s: GeoModelData, index: number) => this.drawAreaPolygon(s));
+    data.forEach((s: GeoModelData) => this.drawAreaPolygon(s));
   }
 
-  createPolygon = (data: any): number[] => {
+  createPolygon = (data: number[][]): number[] => {
     const fixed = [];
     for (let i = 0; i < data[0].length; i++) {
       fixed.push(data[0][i]);

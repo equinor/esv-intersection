@@ -1,16 +1,16 @@
+import { line, curveCatmullRom } from 'd3-shape';
+import { ScaleLinear } from 'd3-scale';
 import { SVGLayer } from './SVGLayer';
 import {
   WellborepathLayerOptions,
   OnUpdateEvent,
   OnRescaleEvent,
 } from '../interfaces';
-import { ScaleLinear } from 'd3-scale';
-import { line, curveCatmullRom } from 'd3-shape';
 
 export class WellborepathLayer extends SVGLayer {
   options: WellborepathLayerOptions;
 
-  constructor(id: String, options: WellborepathLayerOptions) {
+  constructor(id: string, options: WellborepathLayerOptions) {
     super(id, options);
     this.options = {
       ...options,
@@ -18,17 +18,17 @@ export class WellborepathLayer extends SVGLayer {
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent) {
+  onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.render(event);
   }
 
-  onRescale(event: OnRescaleEvent) {
+  onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     this.render(event);
   }
 
-  render(event: OnRescaleEvent | OnUpdateEvent) {
+  render(event: OnRescaleEvent | OnUpdateEvent): void {
     if (!this.elm) {
       return;
     }
@@ -54,8 +54,9 @@ export class WellborepathLayer extends SVGLayer {
     data: number[][],
     xscale: ScaleLinear<number, number>,
     yscale: ScaleLinear<number, number>,
-  ): [number, number][] =>
-    data.map((point: number[]) => [xscale(point[0]), yscale(point[1])]);
+  ): [number, number][] => {
+    return data.map((point: number[]) => [xscale(point[0]), yscale(point[1])]);
+  };
 
   private renderWellborePath = (data: [number, number][]): string =>
     line().curve(curveCatmullRom)(data);
