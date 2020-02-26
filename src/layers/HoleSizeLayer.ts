@@ -85,9 +85,40 @@ export class HoleSizeLayer extends WebGLLayer {
     this.drawLine(normalVertexes);
     this.drawLine(normalVertexes2);
 
-    this.drawPolygon(lineCoords, normalVertexes, oneWayTextureGradient);
-    this.drawPolygon(lineCoords, normalVertexes2, otherWayTextureGradient);
+    // this.drawPolygon(lineCoords, normalVertexes, oneWayTextureGradient);
+    // this.drawPolygon(lineCoords, normalVertexes2, otherWayTextureGradient);
+    const rope = this.createRopeTextureBackground(lineCoords, this.createBothTexure())
+    const mask = this.drawBigPolygon(lineCoords, normalVertexes, normalVertexes2)
+    rope.mask = mask
+
   };
+
+  drawBigPolygon = (middleCoords:any, upCoords: any, downCoords: any ) => {
+
+const coords = [...upCoords, ...downCoords.reverse()]
+
+    const polygon = new Graphics()
+    polygon.beginFill(0)
+    polygon.drawPolygon(coords)
+    polygon.endFill()
+    this.ctx.stage.addChild(polygon)
+
+    return polygon
+  }
+
+createRopeTextureBackground = (coods: any, texture: any ) => {
+
+  const rope : SimpleRope = new SimpleRope(texture, coods)
+  
+const a = rope.geometry
+console.log(a)
+  this.ctx.stage.addChild(rope)
+
+  return rope
+
+
+}
+
 
   drawPolygon = (coordsMiddle: any, coordsOffset: any, texture: any) => {
     for (
@@ -105,7 +136,8 @@ export class HoleSizeLayer extends WebGLLayer {
 
       const graphic = new Graphics();
 
-      graphic.beginTextureFill({ texture });
+      // graphic.beginTextureFill({ texture });
+      graphic.beginFill(0)
 
       graphic.drawPolygon(pts);
 
@@ -153,6 +185,20 @@ export class HoleSizeLayer extends WebGLLayer {
       this.ctx.stage.addChild(line);
     }
   };
+  createBothTexure = () => {
+    var canvas = document.createElement('canvas');
+    canvas.width = 150;
+   const height = 150; // full width
+    canvas.height = height;
+    var canvasCtx = canvas.getContext('2d');
+    var gradient = canvasCtx.createLinearGradient(0, 0, 0, 150);
+    gradient.addColorStop(0, 'rgb(163, 102, 42)');
+      gradient.addColorStop(0.5, 'rgb(255, 255, 255)')
+      gradient.addColorStop(1, 'rgb(163, 102, 42)');
+    canvasCtx.fillStyle = gradient;
+    canvasCtx.fillRect(0, 0, 150, 150);
+    return Texture.from(canvas);
+  }
 
   createTexture = (height: number, reverse: boolean): Texture => {
     var canvas = document.createElement('canvas');
