@@ -1,9 +1,10 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "prettier"],
+  "plugins": ["@typescript-eslint/eslint-plugin", "prettier"],
   "env": {
     "es6": true,
-    "node": true
+    "node": true,
+    "browser":true
   },
   "extends": [
     "eslint:recommended",
@@ -18,7 +19,7 @@
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",
-    "project": "./.eslintrc.json"
+    "project": "./tsconfig.json"
   },
   "rules": {
     "no-continue": "off",

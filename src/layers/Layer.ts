@@ -71,7 +71,7 @@ export abstract class Layer {
     return this._opacity;
   }
 
-  get order() : Number {
+  get order(): Number {
     return this._order;
   }
 

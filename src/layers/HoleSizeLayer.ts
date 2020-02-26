@@ -1,11 +1,4 @@
-import {
-  Graphics,
-  Texture,
-  Point,
-  SimpleRope,
-  Rectangle,
-  Geometry,
-} from 'pixi.js';
+import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
 import {
   GeomodelLayerOptions,
@@ -67,17 +60,15 @@ export class HoleSizeLayer extends WebGLLayer {
       [150, 450],
       [120, 450],
     ];
-
     const sizes = data.map((d) => this.generateHoleSizeData(wbp, d));
+    const maxDiameter = Math.max(...sizes.map((s) => s.data.diameter));
+    const texture = this.createTexure(maxDiameter * 1.5);
     sizes
       // .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1))
-      .map((s: any) => this.drawHoleSize(s));
+      .map((s: any) => this.drawHoleSize(s, texture));
   }
 
-  drawHoleSize = (s: any) => {
-    const oneWayTextureGradient = this.createTexture(10, false);
-    const otherWayTextureGradient = this.createTexture(10, true);
-
+  drawHoleSize = (s: any, texture: any) => {
     const lineCoords = this.actualPoints(s);
     const normalVertexes = this.createNormal(lineCoords, s.data.diameter);
     const normalVertexes2 = this.createNormal(lineCoords, -s.data.diameter);
@@ -85,40 +76,34 @@ export class HoleSizeLayer extends WebGLLayer {
     this.drawLine(normalVertexes);
     this.drawLine(normalVertexes2);
 
-    // this.drawPolygon(lineCoords, normalVertexes, oneWayTextureGradient);
-    // this.drawPolygon(lineCoords, normalVertexes2, otherWayTextureGradient);
-    const rope = this.createRopeTextureBackground(lineCoords, this.createBothTexure())
-    const mask = this.drawBigPolygon(lineCoords, normalVertexes, normalVertexes2)
-    rope.mask = mask
-
+    const mask = this.drawBigPolygon(
+      lineCoords,
+      normalVertexes,
+      normalVertexes2,
+    );
+    const rope = this.createRopeTextureBackground(lineCoords, texture, mask);
   };
 
-  drawBigPolygon = (middleCoords:any, upCoords: any, downCoords: any ) => {
+  drawBigPolygon = (middleCoords: any, upCoords: any, downCoords: any) => {
+    const coords = [...upCoords, ...downCoords.reverse()];
 
-const coords = [...upCoords, ...downCoords.reverse()]
+    const polygon = new Graphics();
+    polygon.beginFill(0);
+    polygon.drawPolygon(coords);
+    polygon.endFill();
+    this.ctx.stage.addChild(polygon);
 
-    const polygon = new Graphics()
-    polygon.beginFill(0)
-    polygon.drawPolygon(coords)
-    polygon.endFill()
-    this.ctx.stage.addChild(polygon)
+    return polygon;
+  };
 
-    return polygon
-  }
+  createRopeTextureBackground = (coods: any, texture: any, mask: any) => {
+    const rope: SimpleRope = new SimpleRope(texture, coods);
 
-createRopeTextureBackground = (coods: any, texture: any ) => {
+    rope.mask = mask;
+    this.ctx.stage.addChild(rope);
 
-  const rope : SimpleRope = new SimpleRope(texture, coods)
-  
-const a = rope.geometry
-console.log(a)
-  this.ctx.stage.addChild(rope)
-
-  return rope
-
-
-}
-
+    return rope;
+  };
 
   drawPolygon = (coordsMiddle: any, coordsOffset: any, texture: any) => {
     for (
@@ -137,7 +122,7 @@ console.log(a)
       const graphic = new Graphics();
 
       // graphic.beginTextureFill({ texture });
-      graphic.beginFill(0)
+      graphic.beginFill(0);
 
       graphic.drawPolygon(pts);
 
@@ -172,53 +157,29 @@ console.log(a)
   };
 
   drawLine = (coords: Point[]) => {
-    for (let i = 0; i < coords.length - 1; i++) {
-      const startPoint = coords[i];
-      const endPoint = coords[i + 1];
+    const startPoint = coords[0];
 
-      const line = new Graphics();
-      line
-        .lineStyle(1, 0x0000ff)
-        .moveTo(startPoint.x, startPoint.y)
-        .lineTo(endPoint.x, endPoint.y);
+    const line = new Graphics();
+    line
+      .lineStyle(1, 0x8b4513) // 0x7b7575
+      .moveTo(startPoint.x, startPoint.y);
+    coords.map((p) => line.lineTo(p.x, p.y));
 
-      this.ctx.stage.addChild(line);
-    }
+    this.ctx.stage.addChild(line);
   };
-  createBothTexure = () => {
+  createTexure = (maxWidth: number = 150) => {
     var canvas = document.createElement('canvas');
     canvas.width = 150;
-   const height = 150; // full width
-    canvas.height = height;
+    canvas.height = maxWidth;
     var canvasCtx = canvas.getContext('2d');
-    var gradient = canvasCtx.createLinearGradient(0, 0, 0, 150);
+    var gradient = canvasCtx.createLinearGradient(0, 0, 0, maxWidth);
     gradient.addColorStop(0, 'rgb(163, 102, 42)');
-      gradient.addColorStop(0.5, 'rgb(255, 255, 255)')
-      gradient.addColorStop(1, 'rgb(163, 102, 42)');
+    gradient.addColorStop(0.5, 'rgb(255, 255, 255)');
+    gradient.addColorStop(1, 'rgb(163, 102, 42)');
     canvasCtx.fillStyle = gradient;
-    canvasCtx.fillRect(0, 0, 150, 150);
-    return Texture.from(canvas);
-  }
-
-  createTexture = (height: number, reverse: boolean): Texture => {
-    var canvas = document.createElement('canvas');
-    canvas.width = 150;
-    height = 150; // full width
-    canvas.height = height;
-    var canvasCtx = canvas.getContext('2d');
-    var gradient = canvasCtx.createLinearGradient(0, 0, 0, 150);
-    if (reverse) {
-      gradient.addColorStop(0, 'rgb(255, 255, 255)');
-      gradient.addColorStop(1, 'rgb(163, 102, 42)');
-    } else {
-      gradient.addColorStop(0, 'rgb(163, 102, 42)');
-      gradient.addColorStop(1, 'rgb(255, 255, 255)');
-    }
-    canvasCtx.fillStyle = gradient;
-    canvasCtx.fillRect(0, 0, 150, 150);
+    canvasCtx.fillRect(0, 0, 150, maxWidth);
     return Texture.from(canvas);
   };
-
   generateHoleSizeData = (wbp: any, data: any) => {
     const tension = 0.2;
     const interp = new CurveInterpolator(wbp, tension);

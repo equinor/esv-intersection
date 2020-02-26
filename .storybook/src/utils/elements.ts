@@ -1,17 +1,16 @@
-import {
-  Layer,
-} from '../../../src/layers';
-import {
-  ZoomPanHandler,
-} from '../../../src/control/ZoomPanHandler';
+import { Layer } from '../../../src/layers';
+import { ZoomPanHandler } from '../../../src/control/ZoomPanHandler';
 
-export const createRootContainer = (width : number) => {
+export const createRootContainer = (width: number) => {
   const root = document.createElement('div');
   root.setAttribute('height', '700px');
-  root.setAttribute('style', `display: flex;flex:1;flex-direction:column; width: ${width}px; background-color: white; padding: 12px;`);
+  root.setAttribute(
+    'style',
+    `display: flex;flex:1;flex-direction:column; width: ${width}px; background-color: white; padding: 12px;`,
+  );
 
   return root;
-}
+};
 
 export const createLayerContainer = (width: number, height: number) => {
   const container = document.createElement('div');
@@ -24,24 +23,26 @@ export const createLayerContainer = (width: number, height: number) => {
   container.setAttribute('width', `${width}`);
 
   return container;
-}
+};
 
 export const createButtonContainer = (width: number) => {
   const container = document.createElement('div');
   container.className = 'button-container';
-  container.setAttribute(
-    'style',
-    `width: ${width}px;background-color: white;`,
-  );
+  container.setAttribute('style', `width: ${width}px;background-color: white;`);
 
   return container;
-}
+};
 
-
-export const createButton = (layer : Layer, zoomHandler: ZoomPanHandler, title: string, additionalEventParams: any, onMount: any) => {
+export const createButton = (
+  layer: Layer,
+  zoomHandler: ZoomPanHandler,
+  title: string,
+  additionalEventParams: any,
+  onMount: any,
+) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
-  btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;')
+  btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;');
   let show = false;
   btn.onclick = () => {
     if (show) {
@@ -57,14 +58,14 @@ export const createButton = (layer : Layer, zoomHandler: ZoomPanHandler, title: 
       layer.onUnmount();
     }
     show = !show;
-  }
+  };
   return btn;
-}
+};
 
 export const createFPSLabel = () => {
   const label = document.createElement('p');
   const times: number[] = [];
-  let fps : number;
+  let fps: number;
 
   function refreshLoop() {
     window.requestAnimationFrame(() => {
@@ -82,4 +83,4 @@ export const createFPSLabel = () => {
 
   refreshLoop();
   return label;
-}
+};

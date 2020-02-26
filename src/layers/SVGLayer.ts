@@ -28,6 +28,12 @@ export abstract class SVGLayer extends Layer {
     const [, width] = xScale.range();
     const [, height] = yScale.range();
 
-    elm.attr('height', height).attr('width', width).attr('style', `position:absolute; opacity: ${this.opacity};z-index:${this.order}`);
+    elm
+      .attr('height', height)
+      .attr('width', width)
+      .attr(
+        'style',
+        `position:absolute; opacity: ${this.opacity};z-index:${this.order}`,
+      );
   }
 }

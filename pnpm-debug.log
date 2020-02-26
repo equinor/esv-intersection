@@ -1,0 +1,21 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 error pnpm": {
+    "message": {
+      "errno": 134,
+      "code": "ELIFECYCLE",
+      "pkgid": "@equinor/intersection@1.0.0",
+      "stage": "lint",
+      "script": "eslint --ext .js,.jsx,.ts,.tsx src",
+      "pkgname": "@equinor/intersection"
+    },
+    "err": {
+      "name": "Error",
+      "message": "@equinor/intersection@1.0.0 lint: `eslint --ext .js,.jsx,.ts,.tsx src`\nExit status 134",
+      "code": "ELIFECYCLE",
+      "stack": "Error: @equinor/intersection@1.0.0 lint: `eslint --ext .js,.jsx,.ts,.tsx src`\nExit status 134\n    at EventEmitter.<anonymous> (C:\\Users\\stale\\AppData\\Roaming\\npm\\pnpm-global\\3\\node_modules\\.pnpm\\registry.npmjs.org\\pnpm\\4.7.1\\node_modules\\pnpm\\lib\\node_modules\\@zkochan\\npm-lifecycle\\index.js:302:16)\n    at EventEmitter.emit (events.js:203:13)\n    at ChildProcess.<anonymous> (C:\\Users\\stale\\AppData\\Roaming\\npm\\pnpm-global\\3\\node_modules\\.pnpm\\registry.npmjs.org\\pnpm\\4.7.1\\node_modules\\pnpm\\lib\\node_modules\\@zkochan\\npm-lifecycle\\lib\\spawn.js:55:14)\n    at ChildProcess.emit (events.js:203:13)\n    at maybeClose (internal/child_process.js:1021:16)\n    at Process.ChildProcess._handle.onexit (internal/child_process.js:283:5)"
+    }
+  }
+}

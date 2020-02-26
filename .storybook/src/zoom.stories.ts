@@ -10,10 +10,10 @@ import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
 const width = 600;
 const height = 400;
 
-function createButton(label: string, cb: any){
+function createButton(label: string, cb: any) {
   const btn = document.createElement('button');
   btn.innerHTML = label;
-  btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;')
+  btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;');
   btn.onclick = cb;
   return btn;
 }
@@ -38,9 +38,7 @@ class TestLayer extends CanvasLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent) {
-    const {
-      ctx,
-    } = this;
+    const { ctx } = this;
 
     if (!ctx) {
       return;
@@ -88,7 +86,7 @@ class TestLayer extends CanvasLayer {
     ctx.fillStyle = '#bbb';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.ellipse(cx, cy, rx/1.5, ry/1.5, 0, 0, 2 * Math.PI);
+    ctx.ellipse(cx, cy, rx / 1.5, ry / 1.5, 0, 0, 2 * Math.PI);
     ctx.fill();
     ctx.stroke();
 
@@ -96,7 +94,7 @@ class TestLayer extends CanvasLayer {
     // Note: the transformation does not take bounds into account which means this is at a different scale the x/yScale(v)
     ctx.strokeStyle = 'black';
     ctx.fillStyle = 'lightgray';
-    ctx.lineWidth =  event.transform.k;
+    ctx.lineWidth = event.transform.k;
 
     ctx.beginPath();
     ctx.rect(
@@ -111,14 +109,14 @@ class TestLayer extends CanvasLayer {
     // Draw some lines
     // Note: the transformation does not take bounds into account which means this is at a different scale the x/yScale(v)
     ctx.beginPath();
-    for(let i = 0; i < 4; i++){
+    for (let i = 0; i < 4; i++) {
       ctx.moveTo(
         20 * event.transform.k + event.transform.x,
-        ((i+1)*40) * event.transform.k + event.transform.y,
+        (i + 1) * 40 * event.transform.k + event.transform.y,
       );
       ctx.lineTo(
         300 * event.transform.k + event.transform.x,
-        ((i+1)*40) * event.transform.k + event.transform.y,
+        (i + 1) * 40 * event.transform.k + event.transform.y,
       );
     }
     ctx.stroke();
@@ -149,26 +147,20 @@ class TestLayer extends CanvasLayer {
     // Draw rectangle below center
     ctx.fillStyle = 'gray';
     ctx.beginPath();
-    ctx.rect(
-      470,
-      700,
-      60,
-      220,
-    );
+    ctx.rect(470, 700, 60, 220);
     ctx.fill();
     ctx.stroke();
 
     //Restore canvas state
     ctx.restore();
   }
-};
+}
 
 export default {
   title: 'Zoom',
-}
+};
 
 export const Test = () => {
-
   const root = document.createElement('div');
 
   const container = document.createElement('div');
@@ -181,9 +173,9 @@ export const Test = () => {
   container.setAttribute('width', `${width}`);
   root.appendChild(container);
 
-  const testLayer = new TestLayer('test', {order: 1});
+  const testLayer = new TestLayer('test', { order: 1 });
 
-  testLayer.onMount({ elm : container });
+  testLayer.onMount({ elm: container });
 
   const zoomHandler = new ZoomPanHandler(root, (event: OnUpdateEvent) => {
     testLayer.onUpdate(event);
@@ -194,61 +186,88 @@ export const Test = () => {
   zoomHandler.zFactor = 1;
   zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
   zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(500,500, 3000);
+  zoomHandler.setViewport(500, 500, 3000);
 
   const buttons = document.createElement('div');
   //root.appendChild(buttons);
   buttons.className = 'Buttons-container';
-  root.appendChild(createButton('500x500', () => {
-    const w = 500;
-    const h = 500;
-    container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
-    container.setAttribute('height', `${h}`);
-    container.setAttribute('width', `${w}`);
-    zoomHandler.adjustToSize(w, h);
-  }));
-  root.appendChild(createButton('600x400', () => {
-    const w = 600;
-    const h = 400;
-    container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
-    container.setAttribute('height', `${h}`);
-    container.setAttribute('width', `${w}`);
-    zoomHandler.adjustToSize(w, h);
-  }));
-  root.appendChild(createButton('800x600', () => {
-    const w = 800;
-    const h = 600;
-    container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
-    container.setAttribute('height', `${h}`);
-    container.setAttribute('width', `${w}`);
-    zoomHandler.adjustToSize(w, h);
-  }));
+  root.appendChild(
+    createButton('500x500', () => {
+      const w = 500;
+      const h = 500;
+      container.setAttribute(
+        'style',
+        `height: ${h}px; width: ${w}px;background-color: #eee;`,
+      );
+      container.setAttribute('height', `${h}`);
+      container.setAttribute('width', `${w}`);
+      zoomHandler.adjustToSize(w, h);
+    }),
+  );
+  root.appendChild(
+    createButton('600x400', () => {
+      const w = 600;
+      const h = 400;
+      container.setAttribute(
+        'style',
+        `height: ${h}px; width: ${w}px;background-color: #eee;`,
+      );
+      container.setAttribute('height', `${h}`);
+      container.setAttribute('width', `${w}`);
+      zoomHandler.adjustToSize(w, h);
+    }),
+  );
+  root.appendChild(
+    createButton('800x600', () => {
+      const w = 800;
+      const h = 600;
+      container.setAttribute(
+        'style',
+        `height: ${h}px; width: ${w}px;background-color: #eee;`,
+      );
+      container.setAttribute('height', `${h}`);
+      container.setAttribute('width', `${w}`);
+      zoomHandler.adjustToSize(w, h);
+    }),
+  );
 
-  root.appendChild(createButton('1:1', () => {
-    zoomHandler.zFactor = 1;
-  }));
-  root.appendChild(createButton('2:1', () => {
-    zoomHandler.zFactor = 2;
-  }));
-  root.appendChild(createButton('1:2', () => {
-    zoomHandler.zFactor = 0.5;
-  }));
-  root.appendChild(createButton('center', () => {
-    zoomHandler.setViewport(500,500, null, 500);
-  }));
-  root.appendChild(createButton('reset', () => {
-    zoomHandler.zFactor = 1;
-    zoomHandler.setViewport(500,500, 3000);
-  }));
+  root.appendChild(
+    createButton('1:1', () => {
+      zoomHandler.zFactor = 1;
+    }),
+  );
+  root.appendChild(
+    createButton('2:1', () => {
+      zoomHandler.zFactor = 2;
+    }),
+  );
+  root.appendChild(
+    createButton('1:2', () => {
+      zoomHandler.zFactor = 0.5;
+    }),
+  );
+  root.appendChild(
+    createButton('center', () => {
+      zoomHandler.setViewport(500, 500, null, 500);
+    }),
+  );
+  root.appendChild(
+    createButton('reset', () => {
+      zoomHandler.zFactor = 1;
+      zoomHandler.setViewport(500, 500, 3000);
+    }),
+  );
 
   return root;
-}
+};
 
 export const Grid = () => {
-
   const root = document.createElement('div');
   root.className = 'Test-container';
-  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
+  root.setAttribute(
+    'style',
+    `height: ${height}px; width: ${width}px;background-color: #eee;`,
+  );
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 
@@ -260,7 +279,7 @@ export const Grid = () => {
     order: 1,
   });
 
-  gridLayer.onMount({ elm : root });
+  gridLayer.onMount({ elm: root });
 
   const zoomHandler = new ZoomPanHandler(root, (event: OnUpdateEvent) => {
     gridLayer.onUpdate(event);
@@ -270,4 +289,4 @@ export const Grid = () => {
   zoomHandler.adjustToSize(width, height);
 
   return root;
-}
+};
