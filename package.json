@@ -1,6 +1,6 @@
 {
-  "name": "@equinor/intersection",
-  "version": "1.0.0",
+  "name": "@equinor/esv-intersection",
+  "version": "0.1.1-alpha",
   "description": "Intersection component package with testing and automatic documentation.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/equinor/intersection.git"
+    "url": "git+https://github.com/equinor/esv-intersection.git"
   },
   "keywords": [
     "videx",
@@ -40,9 +40,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/equinor/intersection/issues"
+    "url": "https://github.com/equinor/esv-intersection/issues"
   },
-  "homepage": "https://github.com/equinor/intersection#readme",
+  "homepage": "https://github.com/equinor/esv-intersection#readme",
   "devDependencies": {
     "@babel/core": "^7.8.4",
     "@storybook/addon-storysource": "^5.3.13",
