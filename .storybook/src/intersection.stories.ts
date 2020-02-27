@@ -302,8 +302,8 @@ const createAxis = (container : HTMLElement, scaleX : ScaleLinear<number, number
     scaleX,
     scaleY,
     showLabels,
-    'Displacement',
     'TVD MSL',
+    'Displacement',
     'm',
   );
 

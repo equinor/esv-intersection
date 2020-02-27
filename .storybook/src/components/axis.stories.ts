@@ -42,8 +42,8 @@ export const SingleAxis = () => {
     scaleX,
     scaleY,
     showLabels,
-    'Displacement',
     'TVD MSL',
+    'Displacement',
     'm',
   );
   axis.render();
