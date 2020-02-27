@@ -215,7 +215,7 @@ export class HoleSizeLayer extends WebGLLayer {
     stop =
       s.points[stopIndex <= s.points.length ? stopIndex : s.points.length - 1]
         .point;
-    return [start, ...a.map((b: any) => b.point), stop];
+    return [start, ...a.map((b: MDPoint) => b.point), stop];
   };
 
   // utils
@@ -236,7 +236,7 @@ export class HoleSizeLayer extends WebGLLayer {
     return new Point(-dy, dx);
   };
 
-  pointToArray = (p: any) => [p.x, p.y];
+  pointToArray = (p: Point): [number, number] => [p.x, p.y];
 
-  arrayToPoint = (p: any) => new Point(p[0], p[1]);
+  arrayToPoint = (p: [number, number]): Point => new Point(p[0], p[1]);
 }
