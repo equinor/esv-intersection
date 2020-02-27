@@ -30,12 +30,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
     }
   }
 
-  private renderText(
-    xScale: ScaleLinear<number, number>,
-    x: number,
-    y: number,
-    title: string,
-  ) {
+  private renderText(xScale: ScaleLinear<number, number>, x: number, y: number, title: string) {
     this.ctx.font = `${calcTextSize(12, 7, 12, xScale)}px Arial`;
     this.ctx.fillText(title, x - OFFSET, y + OFFSET);
   }
@@ -50,10 +45,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
     this.ctx.moveTo(x, y);
     this.ctx.lineTo(x - OFFSET, y + OFFSET + 2);
     this.ctx.moveTo(x - OFFSET, y + OFFSET + 2);
-    this.ctx.lineTo(
-      x - OFFSET + this.ctx.measureText(title).width,
-      y + OFFSET + 2,
-    );
+    this.ctx.lineTo(x - OFFSET + this.ctx.measureText(title).width, y + OFFSET + 2);
     this.ctx.lineWidth = 1;
     this.ctx.stroke();
   }

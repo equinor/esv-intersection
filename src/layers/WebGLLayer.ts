@@ -32,9 +32,7 @@ export abstract class WebGLLayer extends Layer {
     this.ctx.view.style.width = `${width}px`;
 
     this.transform = new Transform();
-    this.transform.scale.x =
-      width / (event.xScale.domain()[1] - event.xScale.domain()[0]);
-    this.transform.scale.y =
-      height / (event.yScale.domain()[1] - event.yScale.domain()[0]);
+    this.transform.scale.x = width / (event.xScale.domain()[1] - event.xScale.domain()[0]);
+    this.transform.scale.y = height / (event.yScale.domain()[1] - event.yScale.domain()[0]);
   }
 }

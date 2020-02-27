@@ -15,14 +15,7 @@ export const SingleAxis = () => {
     .attr('height', '1000px')
     .attr('width', '1000px');
 
-  const createScale = (
-    xMin: number,
-    xMax: number,
-    yMin: number,
-    yMax: number,
-    height: number,
-    width: number,
-  ) => {
+  const createScale = (xMin: number, xMax: number, yMin: number, yMax: number, height: number, width: number) => {
     return [
       scaleLinear()
         .domain([xMin, xMax])
@@ -37,15 +30,7 @@ export const SingleAxis = () => {
   const mainGroup = svg;
   const showLabels = true;
 
-  const axis = new Axis(
-    mainGroup,
-    scaleX,
-    scaleY,
-    showLabels,
-    'Displacement',
-    'TVD MSL',
-    'm',
-  );
+  const axis = new Axis(mainGroup, scaleX, scaleY, showLabels, 'Displacement', 'TVD MSL', 'm');
   axis.render();
   return div;
 };

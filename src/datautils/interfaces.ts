@@ -22,14 +22,14 @@ export interface SurfaceMetaAndValues {
   [propType: string]: any;
   data: {
     values: number[];
-  }
+  };
   visualSettings: {
     displayName: string;
     crossSection: string;
     color: {
       crossSection: string;
-    }
-  }
+    };
+  };
 }
 
 /**
@@ -37,10 +37,10 @@ export interface SurfaceMetaAndValues {
  */
 export interface SurfaceLine {
   id: string;
-  label:  string;
-  width:  number;
-  color:  number;
-  data:  number[][];
+  label: string;
+  width: number;
+  color: number;
+  data: number[][];
 }
 
 /**
@@ -48,9 +48,9 @@ export interface SurfaceLine {
  */
 export interface SurfaceArea {
   id: string;
-  label:  string;
-  color:  number;
-  data:  number[][];
+  label: string;
+  color: number;
+  data: number[][];
 }
 
 /**

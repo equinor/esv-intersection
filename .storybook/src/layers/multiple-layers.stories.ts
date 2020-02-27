@@ -53,10 +53,7 @@ export const MultipleCanvasLayers = () => {
 const createRootContainer = () => {
   const root = document.createElement('div');
   root.setAttribute('height', '700px');
-  root.setAttribute(
-    'style',
-    `display: flex;flex:1;flex-direction:column; width: ${width}px; background-color: white; padding: 12px;`,
-  );
+  root.setAttribute('style', `display: flex;flex:1;flex-direction:column; width: ${width}px; background-color: white; padding: 12px;`);
 
   return root;
 };
@@ -64,10 +61,7 @@ const createRootContainer = () => {
 const createLayerContainer = () => {
   const container = document.createElement('div');
   container.className = 'layer-container';
-  container.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;`,
-  );
+  container.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
   container.setAttribute('height', `${height}`);
   container.setAttribute('width', `${width}`);
 

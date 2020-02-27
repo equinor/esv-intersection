@@ -26,22 +26,10 @@ export class ImageLayer extends CanvasLayer {
     if (this.isLoading) {
       this.img.onload = (): void => {
         this.isLoading = false;
-        this.ctx.drawImage(
-          this.img,
-          xScale(x || 0),
-          yScale(y || 0),
-          calcWidth,
-          calcHeight,
-        );
+        this.ctx.drawImage(this.img, xScale(x || 0), yScale(y || 0), calcWidth, calcHeight);
       };
     } else {
-      this.ctx.drawImage(
-        this.img,
-        xScale(x || 0),
-        yScale(y || 0),
-        calcWidth,
-        calcHeight,
-      );
+      this.ctx.drawImage(this.img, xScale(x || 0), yScale(y || 0), calcWidth, calcHeight);
     }
   }
 }

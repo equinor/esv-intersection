@@ -1,11 +1,7 @@
 import { line, curveCatmullRom } from 'd3-shape';
 import { ScaleLinear } from 'd3-scale';
 import { SVGLayer } from './SVGLayer';
-import {
-  WellborepathLayerOptions,
-  OnUpdateEvent,
-  OnRescaleEvent,
-} from '../interfaces';
+import { WellborepathLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 export class WellborepathLayer extends SVGLayer {
   options: WellborepathLayerOptions;
@@ -25,12 +21,7 @@ export class WellborepathLayer extends SVGLayer {
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
-    this.elm
-      .select('g')
-      .attr(
-        'transform',
-        `translate(${event.transform.x} ${event.transform.y}) scale(${event.xRatio}, ${event.yRatio})`,
-      );
+    this.elm.select('g').attr('transform', `translate(${event.transform.x} ${event.transform.y}) scale(${event.xRatio}, ${event.yRatio})`);
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
@@ -53,6 +44,5 @@ export class WellborepathLayer extends SVGLayer {
       .attr('fill', 'none');
   }
 
-  private renderWellborePath = (data: [number, number][]): string =>
-    line().curve(curveCatmullRom)(data);
+  private renderWellborePath = (data: [number, number][]): string => line().curve(curveCatmullRom)(data);
 }

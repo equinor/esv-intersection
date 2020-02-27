@@ -1,12 +1,6 @@
 import { Graphics } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
-import {
-  GeoModelData,
-  GeomodelLayerOptions,
-  OnUpdateEvent,
-  OnRescaleEvent,
-  OnMountEvent,
-} from '../interfaces';
+import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 
 export class GeomodelLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
@@ -91,7 +85,7 @@ export class GeomodelLayer extends WebGLLayer {
     g.lineStyle(1, s.color, 1);
     g.beginFill(s.color);
     const polygons = this.createPolygon(s.data);
-    polygons.forEach((polygon) => g.drawPolygon(polygon));
+    polygons.forEach(polygon => g.drawPolygon(polygon));
     g.endFill();
   };
 

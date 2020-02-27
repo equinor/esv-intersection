@@ -18,10 +18,7 @@ export const Holes = () => {
 
   const root = document.createElement('div');
   root.className = 'grid-container';
-  root.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;`,
-  );
+  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 

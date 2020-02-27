@@ -4,10 +4,7 @@ import { ZoomPanHandler } from '../../../src/control/ZoomPanHandler';
 export const createRootContainer = (width: number) => {
   const root = document.createElement('div');
   root.setAttribute('height', '700px');
-  root.setAttribute(
-    'style',
-    `display: flex;flex:1;flex-direction:column; width: ${width}px; background-color: white; padding: 12px;`,
-  );
+  root.setAttribute('style', `display: flex;flex:1;flex-direction:column; width: ${width}px; background-color: white; padding: 12px;`);
 
   return root;
 };
@@ -15,10 +12,7 @@ export const createRootContainer = (width: number) => {
 export const createLayerContainer = (width: number, height: number) => {
   const container = document.createElement('div');
   container.className = 'layer-container';
-  container.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;`,
-  );
+  container.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
   container.setAttribute('height', `${height}`);
   container.setAttribute('width', `${width}`);
 
@@ -33,13 +27,7 @@ export const createButtonContainer = (width: number) => {
   return container;
 };
 
-export const createButton = (
-  layer: Layer,
-  zoomHandler: ZoomPanHandler,
-  title: string,
-  additionalEventParams: any,
-  onMount: any,
-) => {
+export const createButton = (layer: Layer, zoomHandler: ZoomPanHandler, title: string, additionalEventParams: any, onMount: any) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
   btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;');

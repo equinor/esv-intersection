@@ -1,9 +1,5 @@
 import { CanvasLayer } from '../../src/layers/CanvasLayer';
-import {
-  OnUpdateEvent,
-  OnRescaleEvent,
-  LayerOptions,
-} from '../../src/interfaces';
+import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../../src/interfaces';
 import { GridLayer } from '../../src/layers/GridLayer';
 import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
 
@@ -110,14 +106,8 @@ class TestLayer extends CanvasLayer {
     // Note: the transformation does not take bounds into account which means this is at a different scale the x/yScale(v)
     ctx.beginPath();
     for (let i = 0; i < 4; i++) {
-      ctx.moveTo(
-        20 * event.transform.k + event.transform.x,
-        (i + 1) * 40 * event.transform.k + event.transform.y,
-      );
-      ctx.lineTo(
-        300 * event.transform.k + event.transform.x,
-        (i + 1) * 40 * event.transform.k + event.transform.y,
-      );
+      ctx.moveTo(20 * event.transform.k + event.transform.x, (i + 1) * 40 * event.transform.k + event.transform.y);
+      ctx.lineTo(300 * event.transform.k + event.transform.x, (i + 1) * 40 * event.transform.k + event.transform.y);
     }
     ctx.stroke();
 
@@ -165,10 +155,7 @@ export const Test = () => {
 
   const container = document.createElement('div');
   container.className = 'test-container';
-  container.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;position: relative;`,
-  );
+  container.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;position: relative;`);
   container.setAttribute('height', `${height}`);
   container.setAttribute('width', `${width}`);
   root.appendChild(container);
@@ -195,10 +182,7 @@ export const Test = () => {
     createButton('500x500', () => {
       const w = 500;
       const h = 500;
-      container.setAttribute(
-        'style',
-        `height: ${h}px; width: ${w}px;background-color: #eee;`,
-      );
+      container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
       container.setAttribute('height', `${h}`);
       container.setAttribute('width', `${w}`);
       zoomHandler.adjustToSize(w, h);
@@ -208,10 +192,7 @@ export const Test = () => {
     createButton('600x400', () => {
       const w = 600;
       const h = 400;
-      container.setAttribute(
-        'style',
-        `height: ${h}px; width: ${w}px;background-color: #eee;`,
-      );
+      container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
       container.setAttribute('height', `${h}`);
       container.setAttribute('width', `${w}`);
       zoomHandler.adjustToSize(w, h);
@@ -221,10 +202,7 @@ export const Test = () => {
     createButton('800x600', () => {
       const w = 800;
       const h = 600;
-      container.setAttribute(
-        'style',
-        `height: ${h}px; width: ${w}px;background-color: #eee;`,
-      );
+      container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
       container.setAttribute('height', `${h}`);
       container.setAttribute('width', `${w}`);
       zoomHandler.adjustToSize(w, h);
@@ -264,10 +242,7 @@ export const Test = () => {
 export const Grid = () => {
   const root = document.createElement('div');
   root.className = 'Test-container';
-  root.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;`,
-  );
+  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 

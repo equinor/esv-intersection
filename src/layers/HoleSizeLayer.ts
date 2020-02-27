@@ -1,15 +1,7 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
-import {
-  GeomodelLayerOptions,
-  OnUpdateEvent,
-  OnRescaleEvent,
-  MDPoint,
-  HoleObjectData,
-  NormalCoordsObject,
-  HoleSize,
-} from '../interfaces';
+import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, NormalCoordsObject, HoleSize } from '../interfaces';
 
 export class HoleSizeLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
@@ -34,12 +26,8 @@ export class HoleSizeLayer extends WebGLLayer {
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { data, wellborePath } = event;
-    const sizes: HoleObjectData[] = data.map((d: HoleSize) =>
-      this.generateHoleSizeData(wellborePath, d),
-    );
-    const maxDiameter = Math.max(
-      ...sizes.map((s: HoleObjectData) => s.data.diameter),
-    );
+    const sizes: HoleObjectData[] = data.map((d: HoleSize) => this.generateHoleSizeData(wellborePath, d));
+    const maxDiameter = Math.max(...sizes.map((s: HoleObjectData) => s.data.diameter));
     const texture = this.createTexure(maxDiameter * 1.5);
     sizes
       // .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1))
@@ -48,49 +36,26 @@ export class HoleSizeLayer extends WebGLLayer {
 
   createNormalCoords = (s: HoleObjectData): NormalCoordsObject => {
     const wellBorePathCoords = this.actualPoints(s);
-    const normalOffsetCoordsUpOrig = this.createNormal(
-      wellBorePathCoords,
-      s.data.diameter,
-    );
-    const normalOffsetCoordsDownOrig = this.createNormal(
-      wellBorePathCoords,
-      -s.data.diameter,
-    );
+    const normalOffsetCoordsUpOrig = this.createNormal(wellBorePathCoords, s.data.diameter);
+    const normalOffsetCoordsDownOrig = this.createNormal(wellBorePathCoords, -s.data.diameter);
 
     const tension = 0.2;
     const numPoints = 999;
-    const normalOffsetCoordsUpInterpolator = new CurveInterpolator(
-      normalOffsetCoordsUpOrig.map(this.pointToArray),
-      tension,
-    );
-    const normalOffsetCoordsDownInterpolator = new CurveInterpolator(
-      normalOffsetCoordsDownOrig.map(this.pointToArray),
-      tension,
-    );
-    const normalOffsetCoordsUp = normalOffsetCoordsUpInterpolator
-      .getPoints(numPoints)
-      .map(this.arrayToPoint);
-    const normalOffsetCoordsDown = normalOffsetCoordsDownInterpolator
-      .getPoints(numPoints)
-      .map(this.arrayToPoint);
+    const normalOffsetCoordsUpInterpolator = new CurveInterpolator(normalOffsetCoordsUpOrig.map(this.pointToArray), tension);
+    const normalOffsetCoordsDownInterpolator = new CurveInterpolator(normalOffsetCoordsDownOrig.map(this.pointToArray), tension);
+    const normalOffsetCoordsUp = normalOffsetCoordsUpInterpolator.getPoints(numPoints).map(this.arrayToPoint);
+    const normalOffsetCoordsDown = normalOffsetCoordsDownInterpolator.getPoints(numPoints).map(this.arrayToPoint);
 
     return { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp };
   };
 
   drawHoleSize = (holeObject: HoleObjectData, texture: Texture): void => {
-    const {
-      wellBorePathCoords,
-      normalOffsetCoordsDown,
-      normalOffsetCoordsUp,
-    } = this.createNormalCoords(holeObject);
+    const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = this.createNormalCoords(holeObject);
     // this.drawLine(wellBorePathCoords);
     // this.drawLine(normalOffsetCoordsUp;
     // this.drawLine(normalOffsetCoordsDown);
 
-    const polygonCoords = [
-      ...normalOffsetCoordsUp,
-      ...normalOffsetCoordsDown.reverse(),
-    ];
+    const polygonCoords = [...normalOffsetCoordsUp, ...normalOffsetCoordsDown.reverse()];
     const mask = this.drawBigPolygon(polygonCoords);
     this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
     this.drawLine(polygonCoords);
@@ -106,11 +71,7 @@ export class HoleSizeLayer extends WebGLLayer {
     return polygon;
   };
 
-  createRopeTextureBackground = (
-    coods: Point[],
-    texture: Texture,
-    mask: Graphics,
-  ): SimpleRope => {
+  createRopeTextureBackground = (coods: Point[], texture: Texture, mask: Graphics): SimpleRope => {
     const rope: SimpleRope = new SimpleRope(texture, coods);
     rope.mask = mask;
     this.ctx.stage.addChild(rope);
@@ -130,10 +91,7 @@ export class HoleSizeLayer extends WebGLLayer {
     }
 
     // Last point
-    const normal = this.normal(
-      coords[coords.length - lastPointIndex - 1],
-      coords[coords.length - lastPointIndex],
-    );
+    const normal = this.normal(coords[coords.length - lastPointIndex - 1], coords[coords.length - lastPointIndex]);
 
     const newPoint = coords[coords.length - lastPointIndex].clone();
     newPoint.x += normal.x * offset;
@@ -149,7 +107,7 @@ export class HoleSizeLayer extends WebGLLayer {
     line
       .lineStyle(1, 0x8b4513) // 0x7b7575
       .moveTo(startPoint.x, startPoint.y);
-    coords.map((p) => line.lineTo(p.x, p.y));
+    coords.map(p => line.lineTo(p.x, p.y));
 
     this.ctx.stage.addChild(line);
   };
@@ -212,9 +170,7 @@ export class HoleSizeLayer extends WebGLLayer {
     startIndex -= 1;
     stopIndex += 0;
     start = s.points[startIndex >= 0 ? startIndex : 0].point;
-    stop =
-      s.points[stopIndex <= s.points.length ? stopIndex : s.points.length - 1]
-        .point;
+    stop = s.points[stopIndex <= s.points.length ? stopIndex : s.points.length - 1].point;
     return [start, ...a.map((b: MDPoint) => b.point), stop];
   };
 

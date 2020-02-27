@@ -31,9 +31,6 @@ export abstract class SVGLayer extends Layer {
     elm
       .attr('height', height)
       .attr('width', width)
-      .attr(
-        'style',
-        `position:absolute; opacity: ${this.opacity};z-index:${this.order}`,
-      );
+      .attr('style', `position:absolute; opacity: ${this.opacity};z-index:${this.order}`);
   }
 }

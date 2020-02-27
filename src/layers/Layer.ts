@@ -1,10 +1,4 @@
-import {
-  LayerOptions,
-  OnMountEvent,
-  OnUnmountEvent,
-  OnUpdateEvent,
-  OnRescaleEvent,
-} from '../interfaces';
+import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 export abstract class Layer {
   id: String;

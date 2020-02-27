@@ -1,26 +1,11 @@
 import { select } from 'd3-selection';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
-import {
-  OnUpdateEvent,
-  WellborepathLayerOptions,
-  Annotation,
-} from '../../src/interfaces';
+import { OnUpdateEvent, WellborepathLayerOptions, Annotation } from '../../src/interfaces';
 import { Axis } from '../../src/components';
 import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
-import {
-  GridLayer,
-  WellborepathLayer,
-  CalloutCanvasLayer,
-  ImageLayer,
-} from '../../src/layers';
+import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer } from '../../src/layers';
 
-import {
-  createButton,
-  createButtonContainer,
-  createFPSLabel,
-  createLayerContainer,
-  createRootContainer,
-} from './utils';
+import { createButton, createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
 
 export default {
   title: 'Intersection',
@@ -129,14 +114,7 @@ const yRange = 500;
 const width = 700;
 const height = 600;
 
-const createScale = (
-  xMin: number,
-  xMax: number,
-  yMin: number,
-  yMax: number,
-  height: number,
-  width: number,
-) => {
+const createScale = (xMin: number, xMax: number, yMin: number, yMax: number, height: number, width: number) => {
   return [
     scaleLinear()
       .domain([xMin, xMax])
@@ -152,14 +130,7 @@ export const intersection = () => {
   const container = createLayerContainer(width, height);
   const btnContainer = createButtonContainer(width);
 
-  const [scaleX, scaleY] = createScale(
-    xbounds[0],
-    xbounds[1],
-    ybounds[0],
-    ybounds[1],
-    yRange,
-    xRange,
-  );
+  const [scaleX, scaleY] = createScale(xbounds[0], xbounds[1], ybounds[0], ybounds[1], yRange, xRange);
 
   // Instantiate and mount layers
   const axis = createAxis(container, scaleX, scaleY);
@@ -216,34 +187,10 @@ export const intersection = () => {
     y: -150,
   };
 
-  const btnCallout = createButton(
-    calloutLayer,
-    zoomHandler,
-    'Callout',
-    { annotations },
-    onMountEvent,
-  );
-  const btnWellbore = createButton(
-    wellboreLayer,
-    zoomHandler,
-    'Wellbore',
-    { data: wellborePath },
-    onMountEvent,
-  );
-  const btnImage1 = createButton(
-    image1Layer,
-    zoomHandler,
-    'Image 1',
-    { ...imgParams, url: bg1Img },
-    onMountEvent,
-  );
-  const btnImage2 = createButton(
-    image2Layer,
-    zoomHandler,
-    'Image 2',
-    { ...imgParams, url: bg2Img },
-    onMountEvent,
-  );
+  const btnCallout = createButton(calloutLayer, zoomHandler, 'Callout', { annotations }, onMountEvent);
+  const btnWellbore = createButton(wellboreLayer, zoomHandler, 'Wellbore', { data: wellborePath }, onMountEvent);
+  const btnImage1 = createButton(image1Layer, zoomHandler, 'Image 1', { ...imgParams, url: bg1Img }, onMountEvent);
+  const btnImage2 = createButton(image2Layer, zoomHandler, 'Image 2', { ...imgParams, url: bg2Img }, onMountEvent);
 
   btnContainer.appendChild(btnCallout);
   btnContainer.appendChild(btnWellbore);
@@ -257,12 +204,7 @@ export const intersection = () => {
   return root;
 };
 
-const createImageLayer = (
-  container: HTMLElement,
-  id: string,
-  img: any,
-  zIndex: number,
-) => {
+const createImageLayer = (container: HTMLElement, id: string, img: any, zIndex: number) => {
   const layer = new ImageLayer(id, {
     order: zIndex,
     layerOpacity: 0.5,
@@ -315,11 +257,7 @@ const createGridLayer = (container: HTMLElement) => {
   return gridLayer;
 };
 
-const createAxis = (
-  container: HTMLElement,
-  scaleX: ScaleLinear<number, number>,
-  scaleY: ScaleLinear<number, number>,
-) => {
+const createAxis = (container: HTMLElement, scaleX: ScaleLinear<number, number>, scaleY: ScaleLinear<number, number>) => {
   const svgContainer = document.createElement('div');
   svgContainer.setAttribute('style', 'position: absolute;');
   container.appendChild(svgContainer);
@@ -331,15 +269,7 @@ const createAxis = (
 
   const showLabels = true;
 
-  const axis = new Axis(
-    svg,
-    scaleX,
-    scaleY,
-    showLabels,
-    'Displacement',
-    'TVD MSL',
-    'm',
-  );
+  const axis = new Axis(svg, scaleX, scaleY, showLabels, 'Displacement', 'TVD MSL', 'm');
 
   axis.render();
 
