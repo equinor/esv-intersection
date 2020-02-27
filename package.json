@@ -91,6 +91,7 @@
   },
   "dependencies": {
     "@equinor/videx-math": "^1.0.12",
+    "@equinor/videx-vector2": "^1.0.44",
     "@types/d3": "^5.7.2",
     "curve-interpolator": "^1.0.6",
     "d3-axis": "^1.0.12",

@@ -1,5 +1,11 @@
-# Intersection component
+# ESV Intersection component
 A reusable component to create intersection visualizations for wells
+
+Part of the [Equinor Subsurface Visualization project](https://github.com/equinor/esv)
+
+- **Repository**: https://github.com/equinor/esv-intersection
+- **Storybook**: https://intersection-component.app.radix.equinor.com
+- **NPM Package**: https://www.npmjs.com/package/@equinor/esv-intersection
 
 
 ## Technical choices
@@ -39,10 +45,6 @@ A reusable component to create intersection visualizations for wells
 - During a _technical planning meeting_, current user stories and tasks can be discussed and potentially split into smaller tasks
 - A _demo_ for the stakeholders will be held approximately every 4 weeks
   - Stakeholders for the _WellX_ and _REP_ projects (including the _REP reference user group_) should be invited to the demo 
-
-
-## Resources
-- **Repository**: [GitHub](https://github.com/equinor/intersection)
 
 
 
