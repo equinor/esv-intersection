@@ -5,13 +5,11 @@ import {
   GeomodelLayerOptions,
   OnUpdateEvent,
   OnRescaleEvent,
+  MDPoint,
+  HoleObjectData,
+  NormalCoordsObject,
+  HoleSize,
 } from '../interfaces';
-
-interface HoleSize {
-  diameter: number;
-  length: number;
-  start: number;
-}
 
 export class HoleSizeLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
@@ -35,61 +33,70 @@ export class HoleSizeLayer extends WebGLLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    // const { data } = event;
-    const data: HoleSize[] = [
-      { diameter: 30 + 0, start: 0, length: 50 },
-      { diameter: 20 + 0, start: 50, length: 70 },
-      { diameter: 30 + 0, start: 120, length: 150 },
-      { diameter: 55 + 0, start: 270, length: 130 },
-      { diameter: 25 + 0, start: 400, length: 150 },
-      { diameter: 15 + 0, start: 550, length: 50 },
-      { diameter: 10 + 0, start: 600, length: 50 },
-      { diameter: 8 + 0, start: 650, length: 50 },
-      { diameter: 6.5 + 0, start: 700, length: 50 },
-    ];
-
-    const wbp = [
-      [50, 50],
-      [50, 100],
-      [100, 150],
-      [150, 190],
-      [200, 160],
-      [250, 150],
-      [300, 350],
-      [150, 450],
-      [120, 450],
-    ];
-    const sizes = data.map((d) => this.generateHoleSizeData(wbp, d));
-    const maxDiameter = Math.max(...sizes.map((s) => s.data.diameter));
+    const { data, wellborePath } = event;
+    const sizes: HoleObjectData[] = data.map((d: HoleSize) =>
+      this.generateHoleSizeData(wellborePath, d),
+    );
+    const maxDiameter = Math.max(
+      ...sizes.map((s: HoleObjectData) => s.data.diameter),
+    );
     const texture = this.createTexure(maxDiameter * 1.5);
     sizes
       // .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1))
       .map((s: any) => this.drawHoleSize(s, texture));
   }
 
-  drawHoleSize = (s: any, texture: any): void => {
-    const lineCoords = this.actualPoints(s);
-    const normalVertexes = this.createNormal(lineCoords, s.data.diameter);
-    const normalVertexes2 = this.createNormal(lineCoords, -s.data.diameter);
-    this.drawLine(lineCoords);
-    this.drawLine(normalVertexes);
-    this.drawLine(normalVertexes2);
-
-    const mask = this.drawBigPolygon(
-      lineCoords,
-      normalVertexes,
-      normalVertexes2,
+  createNormalCoords = (s: HoleObjectData): NormalCoordsObject => {
+    const wellBorePathCoords = this.actualPoints(s);
+    const normalOffsetCoordsUpOrig = this.createNormal(
+      wellBorePathCoords,
+      s.data.diameter,
     );
-    this.createRopeTextureBackground(lineCoords, texture, mask);
+    const normalOffsetCoordsDownOrig = this.createNormal(
+      wellBorePathCoords,
+      -s.data.diameter,
+    );
+
+    const tension = 0.2;
+    const numPoints = 999;
+    const normalOffsetCoordsUpInterpolator = new CurveInterpolator(
+      normalOffsetCoordsUpOrig.map(this.pointToArray),
+      tension,
+    );
+    const normalOffsetCoordsDownInterpolator = new CurveInterpolator(
+      normalOffsetCoordsDownOrig.map(this.pointToArray),
+      tension,
+    );
+    const normalOffsetCoordsUp = normalOffsetCoordsUpInterpolator
+      .getPoints(numPoints)
+      .map(this.arrayToPoint);
+    const normalOffsetCoordsDown = normalOffsetCoordsDownInterpolator
+      .getPoints(numPoints)
+      .map(this.arrayToPoint);
+
+    return { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp };
   };
 
-  drawBigPolygon = (
-    middleCoords: Point[],
-    upCoords: Point[],
-    downCoords: Point[],
-  ): Graphics => {
-    const coords = [...upCoords, ...downCoords.reverse()];
+  drawHoleSize = (holeObject: HoleObjectData, texture: Texture): void => {
+    const {
+      wellBorePathCoords,
+      normalOffsetCoordsDown,
+      normalOffsetCoordsUp,
+    } = this.createNormalCoords(holeObject);
+    // this.drawLine(wellBorePathCoords);
+    // this.drawLine(normalOffsetCoordsUp;
+    // this.drawLine(normalOffsetCoordsDown);
 
+    const polygonCoords = [
+      ...normalOffsetCoordsUp,
+      ...normalOffsetCoordsDown.reverse(),
+    ];
+    const mask = this.drawBigPolygon(polygonCoords);
+    this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
+    this.drawLine(polygonCoords);
+  };
+
+  drawBigPolygon = (coords: Point[]): Graphics => {
     const polygon = new Graphics();
     polygon.beginFill(0);
     polygon.drawPolygon(coords);
@@ -109,25 +116,6 @@ export class HoleSizeLayer extends WebGLLayer {
     this.ctx.stage.addChild(rope);
 
     return rope;
-  };
-
-  drawPolygon = (coordsMiddle: Point[], coordsOffset: Point[]): void => {
-    const max = Math.min(coordsMiddle.length, coordsOffset.length) - 2;
-    for (let i = 0; i < max; i++) {
-      const pts = [
-        coordsMiddle[i],
-        coordsOffset[i],
-        coordsOffset[i + 1],
-        coordsMiddle[i + 1],
-        coordsMiddle[i],
-      ];
-
-      const graphic = new Graphics();
-      graphic.beginFill(0);
-      graphic.drawPolygon(pts);
-      graphic.endFill();
-      this.ctx.stage.addChild(graphic);
-    }
   };
 
   createNormal = (coords: Point[], offset: number): Point[] => {
@@ -157,7 +145,6 @@ export class HoleSizeLayer extends WebGLLayer {
 
   drawLine = (coords: Point[]): void => {
     const startPoint = coords[0];
-
     const line = new Graphics();
     line
       .lineStyle(1, 0x8b4513) // 0x7b7575
@@ -168,20 +155,26 @@ export class HoleSizeLayer extends WebGLLayer {
   };
 
   createTexure = (maxWidth = 150): Texture => {
+    const firstColor = 'rgb(163, 102, 42)';
+    const secondColor = 'rgb(255, 255, 255)';
     const canvas = document.createElement('canvas');
+
     canvas.width = 150;
     canvas.height = maxWidth;
     const canvasCtx = canvas.getContext('2d');
+
     const gradient = canvasCtx.createLinearGradient(0, 0, 0, maxWidth);
-    gradient.addColorStop(0, 'rgb(163, 102, 42)');
-    gradient.addColorStop(0.5, 'rgb(255, 255, 255)');
-    gradient.addColorStop(1, 'rgb(163, 102, 42)');
+    gradient.addColorStop(0, firstColor);
+    gradient.addColorStop(0.5, secondColor);
+    gradient.addColorStop(1, firstColor);
+
     canvasCtx.fillStyle = gradient;
     canvasCtx.fillRect(0, 0, 150, maxWidth);
+
     return Texture.from(canvas);
   };
 
-  generateHoleSizeData = (wbp: number[][], data: any): any => {
+  generateHoleSizeData = (wbp: number[][], data: HoleSize): HoleObjectData => {
     const tension = 0.2;
     const interp = new CurveInterpolator(wbp, tension);
     let points = interp.getPoints(999);
@@ -199,15 +192,15 @@ export class HoleSizeLayer extends WebGLLayer {
       };
     });
 
-    return { color: 'black', data, points };
+    return { data, points };
   };
 
-  actualPoints = (s: any): Point[] => {
+  actualPoints = (s: HoleObjectData): Point[] => {
     let start = new Point();
     let stop = new Point();
     let startIndex = 0;
     let stopIndex = 0;
-    const a = s.points.filter((p: any, index: number) => {
+    const a = s.points.filter((p: MDPoint, index: number) => {
       if (s.data.start > p.md) {
         startIndex = index;
       }
@@ -242,4 +235,8 @@ export class HoleSizeLayer extends WebGLLayer {
     const dy = p2.y - p1.y;
     return new Point(-dy, dx);
   };
+
+  pointToArray = (p: any) => [p.x, p.y];
+
+  arrayToPoint = (p: any) => new Point(p[0], p[1]);
 }
