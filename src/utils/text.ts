@@ -33,7 +33,7 @@ const getBoundingBox = (ctx :any , anno : Annotation, xScale : ScaleLinear<numbe
   return annotation;
 }
 
-const checkForOverlap = (r1: any, r2: any) => {
+const isOverlapping = (r1: any, r2: any) => {
   const r1x2 = r1.x + r1.width;
   const r2x2 = r2.x + r2.width;
   const r1y2 = r1.y + r1.height;
@@ -79,7 +79,9 @@ export const positionCallout = (
   const offsetX = -20;
   const offsetY = -20;
 
-  if (annotations.length < 2) return;
+  if (annotations.length < 2) {
+    return;
+  }
   let nodes = annotations.map((a) => {
     return {
       ...a,
@@ -109,7 +111,7 @@ const initialPosition = (nodes: any[], bottom: any[], top: any[], offsetX: numbe
   for (let i = nodes.length - 2; i >= 0; i -= 1) {
     const prevNode = nodes[i + 1];
     const node = nodes[i];
-    const overlap = checkForOverlap(node, prevNode);
+    const overlap = isOverlapping(node, prevNode);
 
     if (overlap) {
       // flip to bottom
@@ -134,7 +136,7 @@ const positionBottom = (bottom : any[]) => {
     for (let j = bottom.length - 1; j > i; j -= 1) {
       const prevNode = bottom[j];
       if (testBottom(prevNode, node)) {
-        const overlap = checkForOverlap(prevNode, node);
+        const overlap = isOverlapping(prevNode, node);
         if (overlap) {
           node.dy += overlap.dy;
           node.y += overlap.dy;
@@ -150,7 +152,7 @@ const positionTop = (top : any[]) => {
     for (let j = 0; j < i; j += 1) {
       const prevNode = top[j];
       if (testTop(prevNode, node)) {
-        const overlap = checkForOverlap(node, prevNode);
+        const overlap = isOverlapping(node, prevNode);
         if (overlap) {
           node.dy -= overlap.dy;
           node.y -= overlap.dy;
