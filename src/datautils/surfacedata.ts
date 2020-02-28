@@ -1,13 +1,7 @@
 import { interpolateRgb, quantize } from 'd3-interpolate';
 import { scaleOrdinal } from 'd3-scale';
 import { color, Color } from 'd3-color';
-import {
-    StratUnit,
-    SurfaceMetaAndValues,
-    SurfaceLine,
-    SurfaceArea,
-    SurfaceData
-  } from './interfaces';
+import { StratUnit, SurfaceMetaAndValues, SurfaceLine, SurfaceArea, SurfaceData } from './interfaces';
 
 /**
  * Generate surface data from trajectory, stratcolum and surface data
@@ -26,7 +20,7 @@ export function generateSurfaceData(trajectory: number[][], stratColumn: StratUn
   const lines: SurfaceLine[] = getSurfaceLines(mappedSurfaces, trajectory);
 
   const stratigraphies: any = mappedSurfaces
-    .filter( (d: any) => d.visualization === 'interval' || d.visualization === 'none')
+    .filter((d: any) => d.visualization === 'interval' || d.visualization === 'none')
     .map((s: any) => {
       const path: StratUnit[] = [];
       const stratUnit: StratUnit = findStratcolumnUnit(stratColumn, s.name, path);
@@ -34,18 +28,18 @@ export function generateSurfaceData(trajectory: number[][], stratColumn: StratUn
         console.warn(`Not able to map ${s.name} to a strat column`);
       }
       const group: StratUnit = path[0] || stratUnit;
-      const groupName: string = group && group.identifier || defaultGroupName;
+      const groupName: string = (group && group.identifier) || defaultGroupName;
       if (group && !stratGroups.has(groupName)) {
         stratGroups.set(groupName, {
           age: group.topAge,
           name: group.identifier,
         });
       }
-      return ({
+      return {
         ...s,
         unit: stratUnit,
         group: groupName,
-      });
+      };
     })
     .sort((a: any, b: any) => {
       if (!a.unit && !b.unit) return 0;
@@ -74,28 +68,26 @@ export function generateSurfaceData(trajectory: number[][], stratColumn: StratUn
     .map((g: any, i: number) => {
       const surface = surfaceAreas[g.name];
       const top = surface[0];
-      return ({
+      return {
         id: g.name,
         color: unassignedColorScale(i),
         top: top.data.map((d: number[]) => d[1]),
-      });
+      };
     });
   const groupAreas: any = groups.map((g: any, i: number) => {
-    const next: any = (i + 1) < groups.length ? groups[i + 1] : null;
-    return ({
+    const next: any = i + 1 < groups.length ? groups[i + 1] : null;
+    return {
       id: g.id,
       color: convertColor(g.color),
-      data: trajectory.map((p, j) => ([
-        p[0],
-        g.top[j],
-        next ? next.top[j] : null,
-      ])),
-    });
+      data: trajectory.map((p, j) => [p[0], g.top[j], next ? next.top[j] : null]),
+    };
   });
 
-  const areas: SurfaceArea[] = groupAreas.concat(Object.keys(surfaceAreas)
-    .reduce((acc: any[], k: any) => [...acc, ...surfaceAreas[k]], [])
-    .filter( (d: any) => !d.exclude));
+  const areas: SurfaceArea[] = groupAreas.concat(
+    Object.keys(surfaceAreas)
+      .reduce((acc: any[], k: any) => [...acc, ...surfaceAreas[k]], [])
+      .filter((d: any) => !d.exclude),
+  );
   const data = {
     lines,
     areas,
@@ -109,16 +101,16 @@ export function generateSurfaceData(trajectory: number[][], stratColumn: StratUn
  * @param  mappedSurfaces
  * @param  trajectory
  */
-function getSurfaceLines(mappedSurfaces: any, trajectory: number[][]){
+function getSurfaceLines(mappedSurfaces: any, trajectory: number[][]) {
   const lines: SurfaceLine[] = mappedSurfaces
-  .filter((d: any) => d.visualization === 'line')
-  .map((l: any) => ({
-    id: l.name,
-    label: l.name,
-    width: 2,
-    color: convertColor(l.color || 'black'),
-    data: trajectory.map((p, j) => ([p[0],l.values[j]])),
-  }));
+    .filter((d: any) => d.visualization === 'line')
+    .map((l: any) => ({
+      id: l.name,
+      label: l.name,
+      width: 2,
+      color: convertColor(l.color || 'black'),
+      data: trajectory.map((p, j) => [p[0], l.values[j]]),
+    }));
 
   return lines;
 }
@@ -160,10 +152,10 @@ function mapSurfaceData(surfaces: SurfaceMetaAndValues[]): any {
 /**
  * Convert color string to number
  */
-function convertColor(colorStr: string): number{
+function convertColor(colorStr: string): number {
   const c: Color = color(colorStr);
   const d: string = c.hex();
-  const n: number = parseInt(d.replace('#','0x'));
+  const n: number = parseInt(d.replace('#', '0x'));
   return n;
 }
 
@@ -171,7 +163,7 @@ function getColorFromUnit(unit: any): number {
   if (unit.colorR === null || unit.colorG === null || unit.colorB === null) {
     return 0x80000000;
   }
-  const res: number = unit.colorR << 16 | unit.colorG << 8 | unit.colorB;
+  const res: number = (unit.colorR << 16) | (unit.colorG << 8) | unit.colorB;
   return res;
 }
 
@@ -216,7 +208,7 @@ function findBestMatchingBaseIndex(top: any, index: number, surfaces: any): numb
   if (isAcceptable) return ci;
 
   if (scores.length < 2) return nextIndex;
-  scores.sort((a: any, b: any) => (b.score - a.score) || (a.ci - b.ci));
+  scores.sort((a: any, b: any) => b.score - a.score || a.ci - b.ci);
 
   return scores[0].ci;
 }
@@ -234,8 +226,7 @@ function generateSurfaceAreas(projection: number[][], surfaces: any): any {
         color: (surface.unit && getColorFromUnit(surface.unit)) || 0xffffffff,
         exclude: surface.visualization === 'none' || !surface.unit,
         data: projection.map((p, j) => {
-          const baseValue: number = surface.values[j] !== null ?
-            getBaseValue(baseIndex, surfaces, j) : null;
+          const baseValue: number = surface.values[j] !== null ? getBaseValue(baseIndex, surfaces, j) : null;
           return [p[0], surface.values[j], baseValue];
         }),
       });

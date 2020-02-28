@@ -5,37 +5,32 @@ import { OnUpdateEvent, OnMountEvent, Annotation, OnRescaleEvent } from '../inte
 import { calcTextSize, positionCallout } from '../utils';
 
 type BoundingBox = {
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  offsetX: number,
-  offsetY: number,
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  offsetX: number;
+  offsetY: number;
 };
 
-const OFFSET : number = -20;
+const OFFSET: number = -20;
 const MAX_FONT_SIZE = 12;
 const MIN_FONT_SIZE = 7;
 
 export class CalloutCanvasLayer extends CanvasLayer {
-  data : Annotation[] = [];
+  data: Annotation[] = [];
   isPanning: boolean;
   xRatio: number;
   overlapped: any[];
 
-  onMount(event : OnMountEvent) {
+  onMount(event: OnMountEvent) {
     super.onMount(event);
     this.data = event.annotations;
   }
 
-  onRescale(event : OnRescaleEvent) {
+  onRescale(event: OnRescaleEvent) {
     super.onRescale(event);
-    const {
-      xScale,
-      yScale,
-      scale,
-      isLeftToRight,
-    } = event;
+    const { xScale, yScale, scale, isLeftToRight } = event;
     this.isPanning = this.xRatio && this.xRatio === event.xRatio;
     this.xRatio = event.xRatio;
 
@@ -45,17 +40,10 @@ export class CalloutCanvasLayer extends CanvasLayer {
   }
 
   render(event: OnUpdateEvent) {
-    const {
-      xScale,
-      yScale,
-      isLeftToRight,
-    } = event;
+    const { xScale, yScale, isLeftToRight } = event;
 
     for (var i = 0; i < this.data.length; i++) {
-      const {
-        data,
-        title,
-      } = this.data[i];
+      const { data, title } = this.data[i];
       const x = xScale(data[0]);
       const y = yScale(data[1]);
 
@@ -64,16 +52,13 @@ export class CalloutCanvasLayer extends CanvasLayer {
       const offsetX = anno ? anno.dx : OFFSET;
       const offsetY = anno ? anno.dy : -OFFSET;
 
-      const label = (event.scale === 0 ?
-        `${round(anno.md)} ${anno.mdUnit} MD ${anno.depthReferencePoint}` :
-        `${round(anno.tvd)} ${anno.mdUnit} TVD MSL`);
+      const label =
+        event.scale === 0 ? `${round(anno.md)} ${anno.mdUnit} MD ${anno.depthReferencePoint}` : `${round(anno.tvd)} ${anno.mdUnit} TVD MSL`;
 
-      const width =  this.ctx.measureText(title).width;
+      const width = this.ctx.measureText(title).width;
       const height = calcTextSize(12, MIN_FONT_SIZE, MAX_FONT_SIZE, xScale);
 
-      const color = anno.group === 'strat-picks' ?
-      '#227' :
-      'rgba(0,0,0,0.8)';
+      const color = anno.group === 'strat-picks' ? '#227' : 'rgba(0,0,0,0.8)';
 
       const alignment = isLeftToRight ? 'topleft' : 'topright';
 
@@ -90,46 +75,35 @@ export class CalloutCanvasLayer extends CanvasLayer {
     }
   }
 
-  private renderAnnotation = (title : string, label : string, x : number, y : number, height: number, color : string) => {
+  private renderAnnotation = (title: string, label: string, x: number, y: number, height: number, color: string) => {
     this.renderText(title, x, y - height, height, color);
     this.renderText(label, x, y, height, color);
-  }
+  };
 
-  private renderText(title : string, x : number, y : number, height: number, color : string) {
-    this.ctx.font =  `${height}px Arial`;
+  private renderText(title: string, x: number, y: number, height: number, color: string) {
+    this.ctx.font = `${height}px Arial`;
     this.ctx.fillStyle = color;
     this.ctx.fillText(title, x, y);
   }
 
-  private renderPoint(x : number, y : number) {
+  private renderPoint(x: number, y: number) {
     this.ctx.moveTo(x, y);
     this.ctx.arc(x, y, 2, 0, Math.PI * 2);
     this.ctx.fill();
   }
 
-
-  private renderCallout(title : string, label: string, bb: BoundingBox, color : string, position: string) {
+  private renderCallout(title: string, label: string, bb: BoundingBox, color: string, position: string) {
     const pos = this.getPosition(bb, position);
-    const {
-      x,
-      y,
-      dotX,
-      dotY,
-      height,
-    } = pos;
+    const { x, y, dotX, dotY, height } = pos;
 
     const placeLeft = position === 'topright' || position === 'bottomright';
-    this.renderAnnotation(title, label, x, y, height, color)
+    this.renderAnnotation(title, label, x, y, height, color);
     this.renderPoint(dotX, dotY);
     this.renderLine(pos, dotX, dotY, color, placeLeft);
   }
 
-  private renderLine = (bb: BoundingBox, dotX: number, dotY: number, color : string, placeLeft: boolean = true) => {
-    const {
-      x,
-      y,
-      width,
-    } = bb;
+  private renderLine = (bb: BoundingBox, dotX: number, dotY: number, color: string, placeLeft: boolean = true) => {
+    const { x, y, width } = bb;
     const { ctx } = this;
     const textX = placeLeft ? x : x + width;
     const inverseTextX = placeLeft ? x + width : x;
@@ -145,31 +119,24 @@ export class CalloutCanvasLayer extends CanvasLayer {
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
     ctx.stroke();
-  }
+  };
 
   private getPosition = (bb: BoundingBox, pos: string) => {
-    const {
-      x,
-      y,
-      offsetX,
-      offsetY,
-      width,
-      height,
-    } = bb;
-    const positions : any = {
-      'topright':  {
+    const { x, y, offsetX, offsetY, width, height } = bb;
+    const positions: any = {
+      topright: {
         x: x - offsetX,
         y: y + offsetY - height,
       },
-      'topleft': {
+      topleft: {
         x: x - width + offsetX,
         y: y + offsetY - height,
       },
-      'bottomleft': {
+      bottomleft: {
         x: x + offsetX,
         y: y - offsetY - height,
       },
-      'bottomright': {
+      bottomright: {
         x: x - offsetX,
         y: y - offsetY - height,
       },
@@ -181,5 +148,5 @@ export class CalloutCanvasLayer extends CanvasLayer {
       dotX: x,
       dotY: y,
     };
-  }
-};
+  };
+}

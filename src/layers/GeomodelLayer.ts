@@ -1,12 +1,6 @@
-import { Graphics } from 'pixi.js-legacy';
+import { Graphics } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
-import {
-  GeoModelData,
-  GeomodelLayerOptions,
-  OnUpdateEvent,
-  OnRescaleEvent,
-  OnMountEvent,
-} from '../interfaces';
+import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 
 export class GeomodelLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
@@ -20,7 +14,7 @@ export class GeomodelLayer extends WebGLLayer {
     this.render = this.render.bind(this);
   }
 
-  onMount(event: OnMountEvent){
+  onMount(event: OnMountEvent) {
     super.onMount(event);
     this.graphics = new Graphics();
     this.ctx.stage.addChild(this.graphics);
@@ -31,13 +25,13 @@ export class GeomodelLayer extends WebGLLayer {
     this.render(event);
   }
 
-  onRescale(event: OnRescaleEvent) {
+  onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     this.graphics.position.set(event.transform.x, event.transform.y);
     this.graphics.scale.set(event.xRatio, event.yRatio);
   }
 
-  render(event: OnRescaleEvent | OnUpdateEvent) {
+  render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { data } = event;
 
     this.graphics.clear();
@@ -59,10 +53,9 @@ export class GeomodelLayer extends WebGLLayer {
 
     //Start generating polygons
     for (let i: number = 0; i < data.length; i++) {
-
       //Generate top of polygon as long as we have valid values
-      if(data[i][1]){
-        if(polygon === null){
+      if (data[i][1]) {
+        if (polygon === null) {
           polygon = [];
         }
         polygon.push(data[i][0]);
@@ -70,11 +63,11 @@ export class GeomodelLayer extends WebGLLayer {
       }
 
       //If invalid top value or end is reached
-      if(!data[i][1] || i === data.length - 1){
-        if(polygon){
+      if (!data[i][1] || i === data.length - 1) {
+        if (polygon) {
           //Generate bottom of polygon
-          for (let j: number = i-1; j >= 0; j--) {
-            if(!data[j][1])break;
+          for (let j: number = i - 1; j >= 0; j--) {
+            if (!data[j][1]) break;
             polygon.push(data[j][0]);
             polygon.push(data[j][2] || 10000);
           }
@@ -89,10 +82,10 @@ export class GeomodelLayer extends WebGLLayer {
 
   drawAreaPolygon = (s: GeoModelData): void => {
     const { graphics: g } = this;
-    g.lineStyle(1, s.color, 1)
+    g.lineStyle(1, s.color, 1);
     g.beginFill(s.color);
     const polygons = this.createPolygon(s.data);
-    polygons.forEach((polygon) => g.drawPolygon(polygon));
+    polygons.forEach(polygon => g.drawPolygon(polygon));
     g.endFill();
   };
 
@@ -101,15 +94,15 @@ export class GeomodelLayer extends WebGLLayer {
     const { data: d } = s;
     g.lineStyle(s.width, s.color, 1);
     let penDown: boolean = false;
-    for(let i: number = 0; i < d.length; i++){
-      if(d[i][1]){
-        if(penDown){
+    for (let i: number = 0; i < d.length; i++) {
+      if (d[i][1]) {
+        if (penDown) {
           g.lineTo(d[i][0], d[i][1]);
-        }else{
+        } else {
           g.moveTo(d[i][0], d[i][1]);
           penDown = true;
         }
-      }else{
+      } else {
         penDown = false;
       }
     }

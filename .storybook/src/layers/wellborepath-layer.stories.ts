@@ -30,10 +30,7 @@ export const Wellborepath = () => {
 const createRootDiv = () => {
   const root = document.createElement('div');
   root.className = 'grid-container';
-  root.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;`,
-  );
+  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
   return root;
@@ -72,7 +69,6 @@ const createEventObj = (elm: any) => {
   };
 };
 
-
 export const WellborepathWithSampleData = () => {
   const root = createRootDiv();
   const wellborePath = generateProjectedWellborePath(poslog);
@@ -94,7 +90,7 @@ export const WellborepathWithSampleData = () => {
   zoomHandler.zFactor = 1;
   zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
   zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000,1000, 5000);
+  zoomHandler.setViewport(1000, 1000, 5000);
 
   return root;
 };

@@ -30,12 +30,7 @@ export class Axis {
     this.measurement = measurement;
   }
 
-  renderLabelx(
-    gx: Selection<BaseType, any, null, undefined>,
-    showLabels: any,
-    width: any,
-    label: string,
-  ): Selection<BaseType, any, null, undefined> {
+  renderLabelx(gx: Selection<BaseType, any, null, undefined>, showLabels: any, width: any, label: string): Selection<BaseType, any, null, undefined> {
     let labelx = gx.select('text.axis-labelx');
     if (showLabels) {
       if (labelx.empty()) {
@@ -80,11 +75,7 @@ export class Axis {
     return labely;
   }
 
-  renderGy(
-    mainGroup: Selection<BaseType, any, null, undefined>,
-    yAxis: any,
-    width: any,
-  ): Selection<BaseType, any, null, undefined> {
+  renderGy(mainGroup: Selection<BaseType, any, null, undefined>, yAxis: any, width: any): Selection<BaseType, any, null, undefined> {
     const gy = this.createOrGet(mainGroup, 'y-axis');
     gy.call(yAxis);
     gy.attr('transform', `translate(${width},0)`);
@@ -92,21 +83,14 @@ export class Axis {
     return gy;
   }
 
-  renderGx(
-    mainGroup: Selection<BaseType, any, null, undefined>,
-    xAxis: any,
-    height: any,
-  ): Selection<BaseType, any, null, undefined> {
+  renderGx(mainGroup: Selection<BaseType, any, null, undefined>, xAxis: any, height: any): Selection<BaseType, any, null, undefined> {
     const gx = this.createOrGet(mainGroup, 'x-axis');
     gx.attr('transform', `translate(0 ${height})`);
     gx.call(xAxis);
     return gx;
   }
 
-  createOrGet = (
-    mainGroup: Selection<BaseType, any, null, undefined>,
-    name: string,
-  ) => {
+  createOrGet = (mainGroup: Selection<BaseType, any, null, undefined>, name: string) => {
     let res = mainGroup.select(`g.${name}`);
     if (res.empty()) {
       res = mainGroup.append('g').attr('class', name);
@@ -124,18 +108,8 @@ export class Axis {
     const gx = this.renderGx(this.mainGroup, xAxis, height);
     const gy = this.renderGy(this.mainGroup, yAxis, width);
 
-    this.renderLabelx(
-      gx,
-      this.showLabels,
-      width,
-      `${this.labelXDesc} (${this.measurement})`,
-    );
-    this.renderLabely(
-      gy,
-      this.showLabels,
-      height,
-      `${this.labelYDesc} (${this.measurement})`,
-    );
+    this.renderLabelx(gx, this.showLabels, width, `${this.labelXDesc} (${this.measurement})`);
+    this.renderLabely(gy, this.showLabels, height, `${this.labelYDesc} (${this.measurement})`);
   }
 
   onRescale(event: any) {

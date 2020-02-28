@@ -1,5 +1,6 @@
 import { ScaleLinear } from 'd3-scale';
 import { ZoomTransform } from 'd3-zoom';
+import { Point } from 'pixi.js';
 import { Layer } from './layers/Layer';
 
 interface LayerEvent {
@@ -81,4 +82,26 @@ export interface Annotation {
   data: number[];
   connector?: Connector;
   group: string;
+}
+
+export interface HoleSize {
+  diameter: number;
+  length: number;
+  start: number;
+}
+
+export interface MDPoint {
+  point: Point;
+  md: number; // Currently calculated MD
+}
+
+export interface HoleObjectData {
+  data: HoleSize;
+  points: MDPoint[];
+}
+
+export interface NormalCoordsObject {
+  wellBorePathCoords: Point[];
+  normalOffsetCoordsDown: Point[];
+  normalOffsetCoordsUp: Point[];
 }

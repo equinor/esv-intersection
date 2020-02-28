@@ -4,11 +4,7 @@ import { GeomodelLayerOptions, OnUpdateEvent } from '../../src/interfaces';
 import { SurfaceGenerator } from './utils/surfaceGenerator';
 import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
 
-import {
-  generateSurfaceData,
-  generateProjectedTrajectory,
-  SurfaceData,
-} from '../../src/datautils';
+import { generateSurfaceData, generateProjectedTrajectory, SurfaceData } from '../../src/datautils';
 
 //Data
 import poslog from './exampledata/polog.json';
@@ -34,28 +30,21 @@ export const GeoModel = () => {
 
   const root = document.createElement('div');
   root.className = 'grid-container';
-  root.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;`,
-  );
+  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 
   geoModelLayer.onMount({ elm: root, height, width });
   const strat1: [number[], number[]] = [[0], [1]];
-  const data: [
-    number[],
-    number[],
-    number[],
-  ][] = new SurfaceGenerator().generateData();
+  const data: [number[], number[], number[]][] = new SurfaceGenerator().generateData();
 
   geoModelLayer.onUpdate(createEventObj(root, data));
 
   return root;
 };
 
-function transformData(inData: [number[], number[], number[]]){
-  const data = inData[0].map((v, index) => ([v, inData[1][index], inData[2][index]]));
+function transformData(inData: [number[], number[], number[]]) {
+  const data = inData[0].map((v, index) => [v, inData[1][index], inData[2][index]]);
   return data;
 }
 
@@ -67,7 +56,7 @@ const createEventObj = (elm: any, inputData: any) => {
     .domain(ybounds)
     .range([0, height]);
 
-  if(!inputData)return;
+  if (!inputData) return;
 
   const data = {
     lines: [],
@@ -102,8 +91,8 @@ const createEventObj = (elm: any, inputData: any) => {
         color: 0x155512,
         data: transformData(inputData[5]),
       },
-    ]
-  }
+    ],
+  };
   return {
     xScale: xScale.copy(),
     yScale: yScale.copy(),
@@ -115,10 +104,7 @@ const createEventObj = (elm: any, inputData: any) => {
 export const GeoModelWithSampleData = () => {
   const root = document.createElement('div');
   root.className = 'grid-container';
-  root.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;`,
-  );
+  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 
@@ -135,7 +121,7 @@ export const GeoModelWithSampleData = () => {
   zoomHandler.zFactor = 1;
   zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
   zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000,1000, 5000);
+  zoomHandler.setViewport(1000, 1000, 5000);
 
   return root;
 };

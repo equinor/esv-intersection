@@ -18,10 +18,7 @@ export const CanvasGrid = () => {
 
   const root = document.createElement('div');
   root.className = 'grid-container';
-  root.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;position: relative;`,
-  );
+  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;position: relative;`);
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 

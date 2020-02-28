@@ -5,61 +5,61 @@ import { Annotation } from '../../../src/interfaces';
 
 import { createLayerContainer, createRootContainer } from '../utils';
 
-const annotations : Annotation[] = [
+const annotations: Annotation[] = [
   {
-    title: "Heidur Top",
+    title: 'Heidur Top',
     md: 1234.3,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [150, 160],
   },
   {
-    title: "Balder Fm. Top",
+    title: 'Balder Fm. Top',
     md: 1234.3,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [460, 110],
   },
   {
-    title: "Odin Fm. Top",
+    title: 'Odin Fm. Top',
     md: 1234.3,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [350, 60],
   },
   {
-    title: "Loke Fm. 2.1 Top",
+    title: 'Loke Fm. 2.1 Top',
     md: 1234,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [40, 70],
   },
   {
-    title: "Balder Fm. 1.1 SB Top",
+    title: 'Balder Fm. 1.1 SB Top',
     md: 1234.7,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [200, 300],
   },
   {
-    title: "Balder Fm. 1.1 SB Base",
+    title: 'Balder Fm. 1.1 SB Base',
     md: 1234.59,
     tvd: 1234.75,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [115, 110],
-  }
+  },
 ];
 
 const margin = {
@@ -73,12 +73,11 @@ const xbounds = [0, 500];
 const ybounds = [0, 500];
 
 const xscale = scaleLinear()
-.domain(xbounds)
-.range([0, 500]);
+  .domain(xbounds)
+  .range([0, 500]);
 const yscale = scaleLinear()
-.domain(ybounds)
-.range([0, 500]);
-
+  .domain(ybounds)
+  .range([0, 500]);
 
 const width = 500;
 const height = 500;

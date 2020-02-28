@@ -1,9 +1,6 @@
 import { scaleLinear } from 'd3-scale';
 import { Layer, GridLayer, WellborepathLayer } from '../../../src/layers';
-import {
-  OnUpdateEvent,
-  WellborepathLayerOptions,
-} from '../../../src/interfaces';
+import { OnUpdateEvent, WellborepathLayerOptions } from '../../../src/interfaces';
 
 const width = 400;
 const height = 500;
@@ -20,10 +17,7 @@ const createRootDiv = () => {
 const createGridContainer = () => {
   const root = document.createElement('div');
   root.className = 'grid-container';
-  root.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;position: relative;`,
-  );
+  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;position: relative;`);
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
   return root;
@@ -35,12 +29,7 @@ const createGridContainer = () => {
  * @param root
  * @param event
  */
-const createButton = (
-  layer: Layer,
-  root: HTMLElement,
-  event: OnUpdateEvent,
-  title: string,
-) => {
+const createButton = (layer: Layer, root: HTMLElement, event: OnUpdateEvent, title: string) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
   btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;');
@@ -123,18 +112,8 @@ export const ToggleCanvasLayer = () => {
   gridLayer.onUpdate(createEventObj(container));
   wellborePathLayer.onUpdate(createEventObj(container));
 
-  const canvasBtn = createButton(
-    gridLayer,
-    container,
-    createEventObj(container),
-    'Canvas',
-  );
-  const svgBtn = createButton(
-    wellborePathLayer,
-    container,
-    createEventObj(container),
-    'SVG',
-  );
+  const canvasBtn = createButton(gridLayer, container, createEventObj(container), 'Canvas');
+  const svgBtn = createButton(wellborePathLayer, container, createEventObj(container), 'SVG');
 
   root.appendChild(container);
   root.appendChild(canvasBtn);

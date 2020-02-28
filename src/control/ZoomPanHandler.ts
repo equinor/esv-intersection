@@ -2,11 +2,7 @@ import { event, select, Selection } from 'd3-selection';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
 import { zoom, zoomIdentity, ZoomBehavior, ZoomTransform } from 'd3-zoom';
 
-import {
-  ZoomAndPanOptions,
-  OnRescaleEvent,
-  OnUpdateEvent
-} from '../interfaces'
+import { ZoomAndPanOptions, OnRescaleEvent, OnUpdateEvent } from '../interfaces';
 
 type RescaleFunction = (event: OnRescaleEvent) => void;
 /**
@@ -33,7 +29,7 @@ export class ZoomPanHandler {
    * @param  elm, -
    * @param  options - options
    */
-  constructor(elm: HTMLElement, onRescale: RescaleFunction,  options: ZoomAndPanOptions = { maxZoomLevel: 256 }){
+  constructor(elm: HTMLElement, onRescale: RescaleFunction, options: ZoomAndPanOptions = { maxZoomLevel: 256 }) {
     this.onZoom = this.onZoom.bind(this);
 
     this.container = select(elm);
@@ -54,8 +50,12 @@ export class ZoomPanHandler {
 
     this.updateTranslateExtent = this.updateTranslateExtent.bind(this);
 
-    this.scaleX = scaleLinear().domain(this.xBounds).range([0, 1]);
-    this.scaleY = scaleLinear().domain(this.yBounds).range([0, 1]);
+    this.scaleX = scaleLinear()
+      .domain(this.xBounds)
+      .range([0, 1]);
+    this.scaleY = scaleLinear()
+      .domain(this.yBounds)
+      .range([0, 1]);
 
     this.init();
   }
@@ -76,7 +76,7 @@ export class ZoomPanHandler {
     return this.scaleY.range()[1];
   }
 
-    /**
+  /**
    * Getter which calculate span from x bounds
    * @returns  x span
    */
@@ -105,7 +105,7 @@ export class ZoomPanHandler {
     return ratio;
   }
 
-   /**
+  /**
    * x ratios screen to value ratio
    * @returns  ratio
    */
@@ -180,15 +180,7 @@ export class ZoomPanHandler {
    * Update translate extent (pan limits)
    */
   updateTranslateExtent(): void {
-    const {
-      width,
-      xSpan,
-      ySpan,
-      zFactor,
-      enableTranslateExtent,
-      translateBoundsX,
-      translateBoundsY
-    } = this;
+    const { width, xSpan, ySpan, zFactor, enableTranslateExtent, translateBoundsX, translateBoundsY } = this;
 
     let x1: number = -Infinity;
     let y1: number = -Infinity;
@@ -209,24 +201,13 @@ export class ZoomPanHandler {
       [x1, y1],
       [x2, y2],
     ]);
-
   }
 
   /**
    * Create an event object from current state
    */
   createEventObject(): OnRescaleEvent {
-    const {
-      scaleX,
-      scaleY,
-      xBounds,
-      yBounds,
-      zFactor,
-      viewportRatio,
-      currentTransform,
-      xRatio,
-      yRatio,
-    } = this;
+    const { scaleX, scaleY, xBounds, yBounds, zFactor, viewportRatio, currentTransform, xRatio, yRatio } = this;
 
     return {
       xScale: scaleX.copy(),
@@ -245,9 +226,7 @@ export class ZoomPanHandler {
    * Update scale
    */
   rescale() {
-    const {
-      createEventObject,
-    } = this;
+    const { createEventObject } = this;
 
     this.onRescale(createEventObject());
   }
@@ -260,7 +239,7 @@ export class ZoomPanHandler {
       .scaleExtent([0.1, this.options.maxZoomLevel])
       .on('zoom', this.onZoom);
 
-      this.container.call(this.zoom);
+    this.container.call(this.zoom);
   }
 
   /**
@@ -268,7 +247,7 @@ export class ZoomPanHandler {
    */
   onZoom(): void {
     const { transform } = event;
-    if(!transform){
+    if (!transform) {
       return;
     }
 
@@ -280,22 +259,9 @@ export class ZoomPanHandler {
    * Update scale
    */
   applyTransform(transform: ZoomTransform): void {
-    const {
-      width,
-      scaleX,
-      scaleY,
-      xSpan,
-      ySpan,
-      xBounds,
-      yBounds,
-      zFactor,
-    } = this;
+    const { width, scaleX, scaleY, xSpan, ySpan, xBounds, yBounds, zFactor } = this;
 
-    const {
-      viewportRatio: ratio,
-      isXInverted,
-      isYInverted,
-    } = this;
+    const { viewportRatio: ratio, isXInverted, isYInverted } = this;
 
     const newWidth: number = width * transform.k;
 
@@ -306,11 +272,11 @@ export class ZoomPanHandler {
 
     const shiftx: number = unitsPerPixels * transform.x;
     const shifty: number = (unitsPerPixels / zFactor) * transform.y;
-    const dx0: number = xBounds[0] - (isXInverted ? -shiftx: shiftx);
-    const dy0: number = yBounds[0] - (isYInverted ? -shifty: shifty);
+    const dx0: number = xBounds[0] - (isXInverted ? -shiftx : shiftx);
+    const dy0: number = yBounds[0] - (isYInverted ? -shifty : shifty);
 
-    scaleX.domain([dx0, dx0 + (isXInverted ? -newXSpan: newXSpan)]);
-    scaleY.domain([dy0, dy0 + (isYInverted ? -newYSpan: newYSpan)]);
+    scaleX.domain([dx0, dx0 + (isXInverted ? -newXSpan : newXSpan)]);
+    scaleY.domain([dy0, dy0 + (isYInverted ? -newYSpan : newYSpan)]);
 
     this.currentTransform = transform;
   }
@@ -324,21 +290,13 @@ export class ZoomPanHandler {
    * @returns  a merge of filter and payload
    */
   setViewport(cx: number = null, cy: number = null, displ: number = null, duration: number = null): void {
-    const {
-      zoom,
-      container,
-      calculateTransform,
-      viewportRatio: ratio,
-      scaleX,
-      scaleY,
-      isXInverted,
-    } = this;
+    const { zoom, container, calculateTransform, viewportRatio: ratio, scaleX, scaleY, isXInverted } = this;
 
     if (cx === null || displ === null) {
       const xd: number[] = scaleX.domain();
       const dspan: number = xd[1] - xd[0];
       if (cx === null) {
-        cx = (xd[0] + dspan / 2) || 0;
+        cx = xd[0] + dspan / 2 || 0;
       }
       if (displ === null) {
         displ = Math.abs(dspan) || 1;
@@ -347,7 +305,7 @@ export class ZoomPanHandler {
 
     if (cy === null) {
       const yd: number[] = scaleY.domain();
-      cy = (yd[0] + (yd[1] - yd[0]) / 2) || 0;
+      cy = yd[0] + (yd[1] - yd[0]) / 2 || 0;
     }
 
     const xdispl: number = isXInverted ? -displ : displ;
@@ -389,18 +347,12 @@ export class ZoomPanHandler {
    * @param  force - force update even if size did not change
    */
   adjustToSize(width?: number | boolean, height?: number, force: boolean = false): void {
-    const {
-      width: oldWidth,
-      height: oldHeight,
-      scaleX,
-      scaleY,
-      recalculateZoomTransform,
-    } = this;
+    const { width: oldWidth, height: oldHeight, scaleX, scaleY, recalculateZoomTransform } = this;
 
     let w = 0;
     let h = 0;
 
-    if(typeof width === 'undefined' || typeof width === 'boolean'){
+    if (typeof width === 'undefined' || typeof width === 'boolean') {
       const { containerWidth, containerHeight } = this.container.node().getBoundingClientRect();
       w = containerWidth;
       h = containerHeight;
@@ -432,23 +384,14 @@ export class ZoomPanHandler {
    * @returns  New transformation matrix
    */
   calculateTransform(dx0: number, dx1: number, dy: number): ZoomTransform {
-    const {
-      scaleX,
-      xSpan,
-      xBounds,
-      yBounds,
-      zFactor,
-      viewportRatio: ratio,
-      isXInverted,
-      isYInverted,
-    } = this;
+    const { scaleX, xSpan, xBounds, yBounds, zFactor, viewportRatio: ratio, isXInverted, isYInverted } = this;
 
     const [rx1, rx2] = scaleX.range();
     const displ: number = Math.abs(dx1 - dx0);
     const k: number = xSpan / displ;
     const unitsPerPixels: number = displ / (rx2 - rx1);
 
-    const dy0: number = dy - ((isYInverted ? -displ : displ) / zFactor / ratio / 2);
+    const dy0: number = dy - (isYInverted ? -displ : displ) / zFactor / ratio / 2;
 
     const tx: number = (xBounds[0] - dx0) / (isXInverted ? -unitsPerPixels : unitsPerPixels);
     const ty: number = (yBounds[0] - dy0) / ((isYInverted ? -unitsPerPixels : unitsPerPixels) / zFactor);
@@ -460,18 +403,12 @@ export class ZoomPanHandler {
    * Recalcualate the transform
    */
   recalculateZoomTransform() {
-    const {
-      scaleX,
-      scaleY,
-      container,
-      calculateTransform,
-      updateTranslateExtent,
-    } = this;
+    const { scaleX, scaleY, container, calculateTransform, updateTranslateExtent } = this;
 
     const [dx0, dx1] = scaleX.domain();
     const [dy0, dy1] = scaleY.domain();
 
-    const dy: number = dy0 + ((dy1 - dy0) / 2)
+    const dy: number = dy0 + (dy1 - dy0) / 2;
 
     const transform: ZoomTransform = calculateTransform(dx0, dx1, dy);
 
@@ -479,5 +416,4 @@ export class ZoomPanHandler {
 
     this.zoom.transform(container, transform);
   }
-
 }

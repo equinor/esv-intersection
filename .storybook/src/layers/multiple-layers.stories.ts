@@ -56,26 +56,23 @@ const createRootContainer = () => {
   root.setAttribute('style', `display: flex;flex:1;flex-direction:column; width: ${width}px; background-color: white; padding: 12px;`);
 
   return root;
-}
+};
 
 const createLayerContainer = () => {
   const container = document.createElement('div');
   container.className = 'layer-container';
-  container.setAttribute(
-    'style',
-    `height: ${height}px; width: ${width}px;background-color: #eee;`,
-  );
+  container.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
   container.setAttribute('height', `${height}`);
   container.setAttribute('width', `${width}`);
 
   return container;
-}
+};
 
 const createHelpText = () => {
   const text = document.createElement('p');
-  text.innerHTML ='set opacity of the images';
+  text.innerHTML = 'set opacity of the images';
   return text;
-}
+};
 
 /**
  * Creates an event object that contains the element and x- and y-scale
@@ -106,6 +103,6 @@ const createSlider = (layer: ImageLayer, event: OnUpdateEvent) => {
   slider.oninput = () => {
     layer.opacity = parseInt(slider.value) / 10;
     layer.onUpdate(event);
-  }
+  };
   return slider;
-}
+};

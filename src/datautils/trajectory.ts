@@ -1,4 +1,3 @@
-
 import Vector2 from '@equinor/videx-vector2';
 import { seqI } from '@equinor/videx-math';
 // @ts-ignore
@@ -17,17 +16,12 @@ const pathSteps: number = 10;
  * Code originally developed for REP
  * @param {[]} poslog Position log from SMDA
  */
-export function generateProjectedWellborePath(poslog: SurveySample[]): number[][]{
-  if(!poslog || poslog.length === 0){
+export function generateProjectedWellborePath(poslog: SurveySample[]): number[][] {
+  if (!poslog || poslog.length === 0) {
     return [];
   }
 
-  const points: number[][] = poslog ? poslog.map((p: SurveySample) => [
-    p.easting,
-    p.northing,
-    p.tvd,
-    p.md,
-  ]) : [];
+  const points: number[][] = poslog ? poslog.map((p: SurveySample) => [p.easting, p.northing, p.tvd, p.md]) : [];
 
   const projection: number[][] = simplify(projectCurtain(points));
   const offset: number = projection[projection.length - 1][0];
@@ -46,16 +40,11 @@ export function generateProjectedWellborePath(poslog: SurveySample[]): number[][
  * @param {number} defaultIntersectionAngle Default intersection angle for the field
  */
 export function generateProjectedTrajectory(poslog: SurveySample[], defaultIntersectionAngle: number): number[][] {
-  if(!poslog || poslog.length === 0){
+  if (!poslog || poslog.length === 0) {
     return [];
   }
 
-  const points: number[][] = poslog ? poslog.map(p => [
-    p.easting,
-    p.northing,
-    p.tvd,
-    p.md,
-  ]) : [];
+  const points: number[][] = poslog ? poslog.map(p => [p.easting, p.northing, p.tvd, p.md]) : [];
 
   const interpolator: any = new CurveInterpolator(points, 0.75, 5000);
   const displacement: number = interpolator.length;
@@ -75,10 +64,7 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
 
   if (relativeDist < thresholdRelativeDist) {
     const radCurtainDirection = (defaultIntersectionAngle / 180) * Math.PI;
-    v = new Vector2(
-      Math.cos(radCurtainDirection),
-      Math.sin(radCurtainDirection),
-    ).mutable;
+    v = new Vector2(Math.cos(radCurtainDirection), Math.sin(radCurtainDirection)).mutable;
   } else {
     v = getDirectionVector(path, thresholdDirectionDist);
   }
@@ -94,7 +80,8 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
   if (extensionLengthStart > 0) {
     // extend from start
     firstPoints = seqI(Math.ceil(extensionLengthStart * stepSize)).map(t =>
-      v.set(initial)
+      v
+        .set(initial)
         .scale(extensionLengthStart * (1 - t))
         .subFrom(first)
         .toArray(),
@@ -104,17 +91,20 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
   }
   trajectory.push(...path);
 
-  const endPoints: number[][] = seqI(Math.ceil(extensionLength * stepSize)).map(t =>
-    v.set(initial)
-      .scale(extensionLength * t)
-      .add(last)
-      .toArray(),
-  ).splice(1);
+  const endPoints: number[][] = seqI(Math.ceil(extensionLength * stepSize))
+    .map(t =>
+      v
+        .set(initial)
+        .scale(extensionLength * t)
+        .add(last)
+        .toArray(),
+    )
+    .splice(1);
 
   trajectory.push(...endPoints);
   const a1: number = Vector2.angleRight(initial);
 
-  const angle: number = (a1 > 0 ? a1 : (2 * Math.PI + a1)) * 360 / (2 * Math.PI);
+  const angle: number = ((a1 > 0 ? a1 : 2 * Math.PI + a1) * 360) / (2 * Math.PI);
 
   const projectedTrajectory: number[][] = projectCurtain(trajectory, null, offset);
 
@@ -134,7 +124,7 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
   const temp: Vector2 = Vector2.zero.mutable;
 
   for (let i = 0; i < path.length - 1; i++) {
-    const index = (path.length - 1) - i;
+    const index = path.length - 1 - i;
     temp.set(path[index]).sub(path[index - 1]);
     res.add(temp);
 
@@ -145,7 +135,6 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
   if (len === 0) return null;
   return res.scale(1 / len);
 }
-
 
 /**
  * Simplify array
@@ -174,9 +163,7 @@ function simplify(inputArr: number[][], maxOffset: number = 0.001, maxDistance: 
     // If t->b vector is NOT [0, 0]
     if (b0 - t0 !== 0 || b1 - t1 !== 0) {
       // Proximity check
-      const proximity: number =
-        Math.abs(a0 * b1 - a1 * b0 + b0 * t1 - b1 * t0 + a1 * t0 - a0 * t1) /
-        Math.sqrt((b0 - a0) ** 2 + (b1 - a1) ** 2);
+      const proximity: number = Math.abs(a0 * b1 - a1 * b0 + b0 * t1 - b1 * t0 + a1 * t0 - a0 * t1) / Math.sqrt((b0 - a0) ** 2 + (b1 - a1) ** 2);
 
       const dir: number[] = [a0 - t0, a1 - t1];
       const len: number = Math.sqrt(dir[0] ** 2 + dir[1] ** 2);
@@ -193,25 +180,22 @@ function simplify(inputArr: number[][], maxOffset: number = 0.001, maxDistance: 
   return sim;
 }
 
- /**
-   * Perform a curtain projection on a set of points in 3D
-   * @param points
-   * @param origin
-   * @param offset
-   * @returns {array}
-   */
-  function projectCurtain(points: number[][], origin: number[] = null, offset = 0): number[][] {
-    let p0: number[] = origin || points[0];
-    let l: number = 0;
-    const projected = points.map((p1: number[]) => {
-      const dx = p1[0] - p0[0];
-      const dy = p1[1] - p0[1];
-      l += Math.sqrt((dx ** 2) + (dy ** 2));
-      p0 = p1;
-      return [
-        offset > 0 ? offset - l : l,
-        p1[2] || 0,
-      ];
-    });
-    return projected;
-  }
+/**
+ * Perform a curtain projection on a set of points in 3D
+ * @param points
+ * @param origin
+ * @param offset
+ * @returns {array}
+ */
+function projectCurtain(points: number[][], origin: number[] = null, offset = 0): number[][] {
+  let p0: number[] = origin || points[0];
+  let l: number = 0;
+  const projected = points.map((p1: number[]) => {
+    const dx = p1[0] - p0[0];
+    const dy = p1[1] - p0[1];
+    l += Math.sqrt(dx ** 2 + dy ** 2);
+    p0 = p1;
+    return [offset > 0 ? offset - l : l, p1[2] || 0];
+  });
+  return projected;
+}

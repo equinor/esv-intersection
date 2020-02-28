@@ -8,14 +8,8 @@ const checkForOverlap = (r1: any, r2: any) => {
     return null;
   }
 
-  const dx = Math.max(
-    0,
-    Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x),
-  );
-  const dy = Math.max(
-    0,
-    Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y),
-  );
+  const dx = Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x));
+  const dy = Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
 
   const newPoints = {
     dx,
@@ -181,7 +175,7 @@ describe('callout', () => {
           if (i !== j) {
             const overlapping = checkForOverlap(eli, elj);
             if (overlapping) {
-              const exist = overlap.find((s) => s.id === eli.id);
+              const exist = overlap.find(s => s.id === eli.id);
               if (!exist) {
                 overlap.push(eli);
               }

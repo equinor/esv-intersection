@@ -1,29 +1,11 @@
 import { select } from 'd3-selection';
-import {
-  scaleLinear,
-  ScaleLinear,
-} from 'd3-scale';
-import {
-  OnUpdateEvent,
-  WellborepathLayerOptions,
-  Annotation,
-} from '../../src/interfaces';
-import { Axis } from '../../src/components'
+import { scaleLinear, ScaleLinear } from 'd3-scale';
+import { OnUpdateEvent, WellborepathLayerOptions, Annotation } from '../../src/interfaces';
+import { Axis } from '../../src/components';
 import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
-import {
-  GridLayer,
-  WellborepathLayer,
-  CalloutCanvasLayer,
-  ImageLayer,
-} from '../../src/layers';
+import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer } from '../../src/layers';
 
-import {
-  createButton,
-  createButtonContainer,
-  createFPSLabel,
-  createLayerContainer,
-  createRootContainer,
-} from './utils';
+import { createButton, createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
 
 export default {
   title: 'Intersection',
@@ -32,61 +14,61 @@ export default {
 const bg1Img = require('./resources/bg1.jpeg');
 const bg2Img = require('./resources/bg2.jpg');
 
-const annotations : Annotation[] = [
+const annotations: Annotation[] = [
   {
-    title: "Heidur Top",
+    title: 'Heidur Top',
     md: 1234.3,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [150, 160],
   },
   {
-    title: "Balder Fm. Top",
+    title: 'Balder Fm. Top',
     md: 1234.3,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [460, 110],
   },
   {
-    title: "Odin Fm. Top",
+    title: 'Odin Fm. Top',
     md: 1234.3,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [350, 60],
   },
   {
-    title: "Loke Fm. 2.1 Top",
+    title: 'Loke Fm. 2.1 Top',
     md: 1234,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [40, 70],
   },
   {
-    title: "Balder Fm. 1.1 SB Top",
+    title: 'Balder Fm. 1.1 SB Top',
     md: 1234.7,
     tvd: 1234,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [200, 300],
   },
   {
-    title: "Balder Fm. 1.1 SB Base",
+    title: 'Balder Fm. 1.1 SB Base',
     md: 1234.59,
     tvd: 1234.75,
-    mdUnit: "m",
-    depthReferencePoint: "RKB",
-    group: "strat-picks",
+    mdUnit: 'm',
+    depthReferencePoint: 'RKB',
+    group: 'strat-picks',
     data: [115, 110],
-  }
+  },
 ];
 
 const margin = {
@@ -123,8 +105,8 @@ const wellborePath = [
   [490, 110],
 ];
 
-const xbounds : [number, number] = [0, 1000];
-const ybounds : [number, number] = [0, 1000];
+const xbounds: [number, number] = [0, 1000];
+const ybounds: [number, number] = [0, 1000];
 
 const xRange = 600;
 const yRange = 500;
@@ -132,14 +114,7 @@ const yRange = 500;
 const width = 700;
 const height = 600;
 
-const createScale = (
-  xMin: number,
-  xMax: number,
-  yMin: number,
-  yMax: number,
-  height: number,
-  width: number,
-) => {
+const createScale = (xMin: number, xMax: number, yMin: number, yMax: number, height: number, width: number) => {
   return [
     scaleLinear()
       .domain([xMin, xMax])
@@ -147,8 +122,8 @@ const createScale = (
     scaleLinear()
       .domain([yMin, yMax])
       .range([0, height]),
-  ]
-}
+  ];
+};
 
 export const intersection = () => {
   const root = createRootContainer(width);
@@ -177,12 +152,12 @@ export const intersection = () => {
     gridLayer.onUpdate(event);
     wellboreLayer.onRescale(event);
     calloutLayer.onRescale({
-        ...event,
-        data: annotations,
-        annotations,
-        isLeftToRight: true,
-        margin,
-        scale: 0,
+      ...event,
+      data: annotations,
+      annotations,
+      isLeftToRight: true,
+      margin,
+      scale: 0,
     });
     image1Layer.onUpdate({
       ...event,
@@ -194,7 +169,7 @@ export const intersection = () => {
       x: -50,
       y: -150,
     });
-    });
+  });
 
   zoomHandler.setBounds(xbounds, ybounds);
   zoomHandler.adjustToSize(xRange, yRange);
@@ -213,7 +188,7 @@ export const intersection = () => {
   };
 
   const btnCallout = createButton(calloutLayer, zoomHandler, 'Callout', { annotations }, onMountEvent);
-  const btnWellbore = createButton(wellboreLayer, zoomHandler,  'Wellbore', { data: wellborePath }, onMountEvent);
+  const btnWellbore = createButton(wellboreLayer, zoomHandler, 'Wellbore', { data: wellborePath }, onMountEvent);
   const btnImage1 = createButton(image1Layer, zoomHandler, 'Image 1', { ...imgParams, url: bg1Img }, onMountEvent);
   const btnImage2 = createButton(image2Layer, zoomHandler, 'Image 2', { ...imgParams, url: bg2Img }, onMountEvent);
 
@@ -229,36 +204,33 @@ export const intersection = () => {
   return root;
 };
 
-const createImageLayer = (container : HTMLElement, id: string, img: any, zIndex: number) => {
-  const layer = new ImageLayer(id,
-    {
-      order: zIndex,
-      layerOpacity: 0.5,
-    });
+const createImageLayer = (container: HTMLElement, id: string, img: any, zIndex: number) => {
+  const layer = new ImageLayer(id, {
+    order: zIndex,
+    layerOpacity: 0.5,
+  });
   layer.onMount({
     elm: container,
     url: img,
   });
 
   return layer;
-}
+};
 
-const createCanvasCallout = (container : HTMLElement) => {
+const createCanvasCallout = (container: HTMLElement) => {
   const layer = new CalloutCanvasLayer('callout', { order: 4 });
-  layer.onMount(
-    {
-      elm: container,
-      annotations,
-      isLeftToRight: true,
-      margin,
-      scale: 0,
-    },
-  );
+  layer.onMount({
+    elm: container,
+    annotations,
+    isLeftToRight: true,
+    margin,
+    scale: 0,
+  });
 
   return layer;
-}
+};
 
-const createWellboreLayer = (container : HTMLElement) => {
+const createWellboreLayer = (container: HTMLElement) => {
   const options: WellborepathLayerOptions = {
     order: 3,
     strokeWidth: '5px',
@@ -271,7 +243,7 @@ const createWellboreLayer = (container : HTMLElement) => {
   return layer;
 };
 
-const createGridLayer = (container : HTMLElement) => {
+const createGridLayer = (container: HTMLElement) => {
   const gridLayer = new GridLayer('grid', {
     majorColor: 'black',
     minorColor: 'gray',
@@ -280,34 +252,26 @@ const createGridLayer = (container : HTMLElement) => {
     order: 1,
   });
 
-  gridLayer.onMount({ elm : container });
+  gridLayer.onMount({ elm: container });
 
   return gridLayer;
-}
+};
 
-const createAxis = (container : HTMLElement, scaleX : ScaleLinear<number, number>, scaleY : ScaleLinear<number, number>) => {
+const createAxis = (container: HTMLElement, scaleX: ScaleLinear<number, number>, scaleY: ScaleLinear<number, number>) => {
   const svgContainer = document.createElement('div');
   svgContainer.setAttribute('style', 'position: absolute;');
   container.appendChild(svgContainer);
 
   const svg = select(svgContainer)
-  .append('svg')
-  .attr('height', `${height}px`)
-  .attr('width', `${width}px`);
+    .append('svg')
+    .attr('height', `${height}px`)
+    .attr('width', `${width}px`);
 
   const showLabels = true;
 
-  const axis = new Axis(
-    svg,
-    scaleX,
-    scaleY,
-    showLabels,
-    'Displacement',
-    'TVD MSL',
-    'm',
-  );
+  const axis = new Axis(svg, scaleX, scaleY, showLabels, 'Displacement', 'TVD MSL', 'm');
 
   axis.render();
 
   return axis;
-}
+};

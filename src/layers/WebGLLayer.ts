@@ -1,12 +1,6 @@
 import { Layer } from './Layer';
 import { OnMountEvent, OnUpdateEvent } from '../interfaces';
-import {
-  Application,
-  utils,
-  Transform,
-  settings,
-  Ticker,
-} from 'pixi.js-legacy'; // because of canvas fallback
+import { Application, utils, Transform, settings, Ticker } from 'pixi.js';
 
 export abstract class WebGLLayer extends Layer {
   elm: HTMLElement;
@@ -38,9 +32,7 @@ export abstract class WebGLLayer extends Layer {
     this.ctx.view.style.width = `${width}px`;
 
     this.transform = new Transform();
-    this.transform.scale.x =
-      width / (event.xScale.domain()[1] - event.xScale.domain()[0]);
-    this.transform.scale.y =
-      height / (event.yScale.domain()[1] - event.yScale.domain()[0]);
+    this.transform.scale.x = width / (event.xScale.domain()[1] - event.xScale.domain()[0]);
+    this.transform.scale.y = height / (event.yScale.domain()[1] - event.yScale.domain()[0]);
   }
 }

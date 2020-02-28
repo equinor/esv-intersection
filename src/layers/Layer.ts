@@ -1,10 +1,4 @@
-import {
-  LayerOptions,
-  OnMountEvent,
-  OnUnmountEvent,
-  OnUpdateEvent,
-  OnRescaleEvent,
-} from '../interfaces';
+import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 export abstract class Layer {
   id: String;
@@ -71,7 +65,7 @@ export abstract class Layer {
     return this._opacity;
   }
 
-  get order() : Number {
+  get order(): Number {
     return this._order;
   }
 
