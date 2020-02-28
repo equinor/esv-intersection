@@ -8,8 +8,8 @@ export class Axis {
   scaleX: ScaleLinear<number, number>;
   scaleY: ScaleLinear<number, number>;
   showLabels = true;
-  labelYDesc: string;
   labelXDesc: string;
+  labelYDesc: string;
   measurement: string;
 
   constructor(
@@ -17,16 +17,16 @@ export class Axis {
     scaleX: ScaleLinear<number, number>,
     scaleY: ScaleLinear<number, number>,
     showLabels = true,
-    labelYDesc: string,
     labelXDesc: string,
+    labelYDesc: string,
     measurement: string,
   ) {
     this.mainGroup = mainGroup;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.showLabels = showLabels;
-    this.labelYDesc = labelYDesc;
     this.labelXDesc = labelXDesc;
+    this.labelYDesc = labelYDesc;
     this.measurement = measurement;
   }
 
@@ -102,14 +102,14 @@ export class Axis {
     const xAxis = axisBottom(this.scaleX);
     const yAxis = axisRight(this.scaleY);
 
-    const [, height] = this.scaleY.range();
     const [, width] = this.scaleX.range();
+    const [, height] = this.scaleY.range();
 
     const gx = this.renderGx(this.mainGroup, xAxis, height);
     const gy = this.renderGy(this.mainGroup, yAxis, width);
 
-    this.renderLabely(gy, this.showLabels, height, `${this.labelYDesc} (${this.measurement})`);
     this.renderLabelx(gx, this.showLabels, width, `${this.labelXDesc} (${this.measurement})`);
+    this.renderLabely(gy, this.showLabels, height, `${this.labelYDesc} (${this.measurement})`);
   }
 
   onRescale(event: any) {
