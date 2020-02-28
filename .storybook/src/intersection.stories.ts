@@ -151,7 +151,7 @@ export const intersection = () => {
 
     gridLayer.onUpdate(event);
     wellboreLayer.onRescale(event);
-    calloutLayer.onUpdate({
+    calloutLayer.onRescale({
       ...event,
       data: annotations,
       annotations,
