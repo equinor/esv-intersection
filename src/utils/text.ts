@@ -76,7 +76,7 @@ export const positionCallout = (
   if (isPanning) {
     return overlapped;
   }
-  const offsetX = (isLeftToRight ? 20 : -20);
+  const offsetX = -20;
   const offsetY = -20;
 
   if (annotations.length < 2) return;
@@ -90,8 +90,22 @@ export const positionCallout = (
   });
 
   const top = [nodes[nodes.length - 1]];
-  const bottom = [];
+  const bottom: any[] = [];
   // initial best effort
+  initialPosition(nodes, bottom, top, offsetX, offsetY);
+
+  // adjust top
+  if (top.length > 1) {
+    positionTop(top);
+  }
+  // adjust bottom
+  if (bottom.length > 1) {
+    positionBottom(bottom);
+  }
+  return nodes;
+}
+
+const initialPosition = (nodes: any[], bottom: any[], top: any[], offsetX: number, offsetY: number) => {
   for (let i = nodes.length - 2; i >= 0; i -= 1) {
     const prevNode = nodes[i + 1];
     const node = nodes[i];
@@ -112,38 +126,36 @@ export const positionCallout = (
       top.push(node);
     }
   }
+}
 
-  // adjust top
-  if (top.length > 1) {
-    for (let i = 1; i < top.length; i += 1) {
-      const node = top[i];
-      for (let j = 0; j < i; j += 1) {
-        const prevNode = top[j];
-        if (testTop(prevNode, node)) {
-          const overlap = checkForOverlap(node, prevNode);
-          if (overlap) {
-            node.dy -= overlap.dy;
-            node.y -= overlap.dy;
-          }
+const positionBottom = (bottom : any[]) => {
+  for (let i = bottom.length - 2; i >= 0; i -= 1) {
+    const node = bottom[i];
+    for (let j = bottom.length - 1; j > i; j -= 1) {
+      const prevNode = bottom[j];
+      if (testBottom(prevNode, node)) {
+        const overlap = checkForOverlap(prevNode, node);
+        if (overlap) {
+          node.dy += overlap.dy;
+          node.y += overlap.dy;
         }
       }
     }
   }
-  // adjust bottom
-  if (bottom.length > 1) {
-    for (let i = bottom.length - 2; i >= 0; i -= 1) {
-      const node = bottom[i];
-      for (let j = bottom.length - 1; j > i; j -= 1) {
-        const prevNode = bottom[j];
-        if (testBottom(prevNode, node)) {
-          const overlap = checkForOverlap(prevNode, node);
-          if (overlap) {
-            node.dy += overlap.dy;
-            node.y += overlap.dy;
-          }
+}
+
+const positionTop = (top : any[]) => {
+  for (let i = 1; i < top.length; i += 1) {
+    const node = top[i];
+    for (let j = 0; j < i; j += 1) {
+      const prevNode = top[j];
+      if (testTop(prevNode, node)) {
+        const overlap = checkForOverlap(node, prevNode);
+        if (overlap) {
+          node.dy -= overlap.dy;
+          node.y -= overlap.dy;
         }
       }
     }
   }
-  return nodes;
 }

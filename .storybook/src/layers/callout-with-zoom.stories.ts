@@ -114,7 +114,7 @@ export const CalloutCanvasWithZoom = () => {
   layer.onUpdate(createEventObj(container));
 
   const zoomHandler = new ZoomPanHandler(container, (event: OnUpdateEvent) => {
-    layer.onUpdate({
+    layer.onRescale({
         ...event,
         data: annotations,
         annotations,
