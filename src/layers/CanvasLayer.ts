@@ -29,6 +29,17 @@ export abstract class CanvasLayer extends Layer {
     this.canvas = null;
   }
 
+  onRescale(event: OnUpdateEvent) {
+    super.onRescale(event);
+    const { ctx } = this;
+    const { xScale, yScale } = event;
+    const [, width] = xScale.range();
+    const [, height] = yScale.range();
+
+    ctx.canvas.setAttribute('width', `${width}px`);
+    ctx.canvas.setAttribute('height', `${height}px`);
+  }
+
   onUpdate(event: OnUpdateEvent) {
     super.onUpdate(event);
     const { ctx } = this;

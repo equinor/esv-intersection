@@ -176,7 +176,7 @@ export const intersection = () => {
 
     gridLayer.onUpdate(event);
     wellboreLayer.onRescale(event);
-    calloutLayer.onUpdate({
+    calloutLayer.onRescale({
         ...event,
         data: annotations,
         annotations,
@@ -194,7 +194,7 @@ export const intersection = () => {
       x: -50,
       y: -150,
     });
-  });
+    });
 
   zoomHandler.setBounds(xbounds, ybounds);
   zoomHandler.adjustToSize(xRange, yRange);
