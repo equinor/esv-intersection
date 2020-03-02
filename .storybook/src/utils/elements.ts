@@ -1,5 +1,6 @@
 import { Layer } from '../../../src/layers';
 import { ZoomPanHandler } from '../../../src/control/ZoomPanHandler';
+import { OnUpdateEvent } from '../../../src/interfaces';
 
 export const createRootContainer = (width: number) => {
   const root = document.createElement('div');
@@ -38,7 +39,7 @@ export const createButton = (layer: Layer, zoomHandler: ZoomPanHandler, title: s
         ...onMount,
         ...additionalEventParams,
       });
-      layer.onUpdate({
+      layer.onRescale({
         ...additionalEventParams,
         ...zoomHandler.createEventObject(),
       });
@@ -71,4 +72,24 @@ export const createFPSLabel = () => {
 
   refreshLoop();
   return label;
+};
+
+export const createHelpText = (description: string) => {
+  const text = document.createElement('p');
+  text.innerHTML = description;
+  return text;
+};
+
+export const createSlider = (layer: Layer, event: OnUpdateEvent, width: number) => {
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.value = `${layer.opacity.valueOf() * 10}`;
+  slider.min = '0';
+  slider.max = '10';
+  slider.setAttribute('style', `width:${width}px`);
+  slider.oninput = () => {
+    layer.opacity = parseInt(slider.value) / 10;
+    layer.onUpdate(event);
+  };
+  return slider;
 };
