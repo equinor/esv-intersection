@@ -10,9 +10,6 @@ export class GeomodelLayer extends WebGLLayer {
 
   constructor(id: string, options: GeomodelLayerOptions) {
     super(id, options);
-    this.options = {
-      ...options,
-    };
     this.render = this.render.bind(this);
   }
 
@@ -39,6 +36,9 @@ export class GeomodelLayer extends WebGLLayer {
       return;
     }
     const { data } = this;
+    if(!data){
+      return;
+    }
 
     this.graphics.clear();
 

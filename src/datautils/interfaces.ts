@@ -51,6 +51,7 @@ export interface SurfaceArea {
   label: string;
   color: number;
   data: number[][];
+  exclude?:  boolean;
 }
 
 /**

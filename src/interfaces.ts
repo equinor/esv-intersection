@@ -61,6 +61,14 @@ export interface WellborepathLayerOptions extends LayerOptions {
 
 export interface GeomodelLayerOptions extends LayerOptions {}
 
+export interface GeomodelLayerLabelsOptions extends LayerOptions {
+  margins?: number;
+  minFontSize?: number;
+  maxFontSize?: number;
+  textColor?: string;
+  font?: string;
+}
+
 export interface GeoModelData {
   name: string;
   color: number;
