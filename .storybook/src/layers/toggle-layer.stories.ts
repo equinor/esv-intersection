@@ -2,33 +2,24 @@ import { scaleLinear } from 'd3-scale';
 import { Layer, GridLayer, WellborepathLayer } from '../../../src/layers';
 import { OnUpdateEvent, WellborepathLayerOptions } from '../../../src/interfaces';
 
+import { createRootContainer, createLayerContainer, createButtonContainer } from '../utils';
+
+export default {
+  title: 'Mixed Layers',
+};
+
 const width = 400;
 const height = 500;
 
 const xbounds = [0, 1000];
 const ybounds = [0, 1000];
 
-const createRootDiv = () => {
-  const root = document.createElement('div');
-  root.setAttribute('height', '700px');
-  return root;
-};
-
-const createGridContainer = () => {
-  const root = document.createElement('div');
-  root.className = 'grid-container';
-  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;position: relative;`);
-  root.setAttribute('height', `${height}`);
-  root.setAttribute('width', `${width}`);
-  return root;
-};
-
-/**
- * helper function to create a button that toggles a layer on and off
- * @param layer
- * @param root
- * @param event
- */
+// /**
+//  * helper function to create a button that toggles a layer on and off
+//  * @param layer
+//  * @param root
+//  * @param event
+//  */
 const createButton = (layer: Layer, root: HTMLElement, event: OnUpdateEvent, title: string) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
@@ -84,8 +75,9 @@ const createEventObj = (elm: any) => {
 };
 
 export const ToggleCanvasLayer = () => {
-  const root = createRootDiv();
-  const container = createGridContainer();
+  const root = createRootContainer(width);
+  const container = createLayerContainer(width, height);
+  const btnContainer = createButtonContainer(width);
 
   const options: WellborepathLayerOptions = {
     order: 1,
@@ -115,9 +107,11 @@ export const ToggleCanvasLayer = () => {
   const canvasBtn = createButton(gridLayer, container, createEventObj(container), 'Canvas');
   const svgBtn = createButton(wellborePathLayer, container, createEventObj(container), 'SVG');
 
+  btnContainer.appendChild(canvasBtn);
+  btnContainer.appendChild(svgBtn);
+
   root.appendChild(container);
-  root.appendChild(canvasBtn);
-  root.appendChild(svgBtn);
+  root.appendChild(btnContainer);
 
   return root;
 };

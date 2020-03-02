@@ -1,10 +1,5 @@
-export * from './grid-layer.stories';
-export * from './toggle-layer.stories';
-export * from './multiple-layers.stories';
-export * from './wellborepath-layer.stories';
-export * from './callout-canvas.layer.stories';
-export * from './callout-with-zoom.stories';
+export * from './canvas/index.stories';
+export * from './webgl/index.stories';
+export * from './svg/index.stories';
 
-export default {
-  title: 'Layers',
-};
+export * from './toggle-layer.stories';
