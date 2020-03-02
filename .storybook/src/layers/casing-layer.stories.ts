@@ -1,6 +1,6 @@
 import { HoleSizeLayer } from '../../../src/layers/HoleSizeLayer';
 import { scaleLinear } from 'd3-scale';
-import { HoleSize } from '../../../src/interfaces';
+import { Casing } from '../../../src/interfaces';
 
 export default {
   title: 'PIXI JS WebGL Layer',
@@ -12,7 +12,7 @@ const height = 800;
 const xbounds = [0, 300];
 const ybounds = [0, 800];
 
-export const Holes = () => {
+export const Casings = () => {
   const options = { order: 1 };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 
@@ -30,16 +30,16 @@ export const Holes = () => {
 };
 
 const createEventObj = (elm: any) => {
-  const data: HoleSize[] = [
-    { diameter: 30 + 0, start: 0, length: 50 },
-    { diameter: 20 + 0, start: 50, length: 70 },
-    { diameter: 30 + 0, start: 120, length: 150 },
-    { diameter: 55 + 0, start: 270, length: 130 },
-    { diameter: 25 + 0, start: 400, length: 150 },
-    { diameter: 15 + 0, start: 550, length: 50 },
-    { diameter: 10 + 0, start: 600, length: 50 },
-    { diameter: 8 + 0, start: 650, length: 50 },
-    { diameter: 6.5 + 0, start: 700, length: 50 },
+  const data: Casing[] = [
+    { diameter: 30 + 0, start: 0, length: 50, hasShoe: true },
+    { diameter: 20 + 0, start: 50, length: 70, hasShoe: true },
+    { diameter: 30 + 0, start: 120, length: 150, hasShoe: false },
+    { diameter: 55 + 0, start: 270, length: 130, hasShoe: true },
+    { diameter: 25 + 0, start: 400, length: 150, hasShoe: false },
+    { diameter: 15 + 0, start: 550, length: 50, hasShoe: false },
+    { diameter: 10 + 0, start: 600, length: 50, hasShoe: true },
+    { diameter: 8 + 0, start: 650, length: 50, hasShoe: true },
+    { diameter: 6.5 + 0, start: 700, length: 50, hasShoe: true },
   ];
 
   const wellborePath: [number, number][] = [
@@ -66,8 +66,8 @@ const createEventObj = (elm: any) => {
     elm,
     data,
     wellborePath,
-    firstColor: 'rgb(163, 102, 42)',
-    secondColor: 'rgb(255, 255, 255)',
-    lineColor: 0x8b4513,
+    firstColor: '#EEEEFF',
+    secondColor: '#EEEEFF', // maybe not needed, refactor holesizelayer
+    borderColor: 0x777788,
   };
 };

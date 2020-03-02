@@ -1,6 +1,6 @@
 import { ScaleLinear } from 'd3-scale';
 import { ZoomTransform } from 'd3-zoom';
-import { Point } from 'pixi.js';
+import { Point, Graphics } from 'pixi.js';
 import { Layer } from './layers/Layer';
 
 interface LayerEvent {
@@ -88,6 +88,14 @@ export interface HoleSize {
   diameter: number;
   length: number;
   start: number;
+  hasShoe?: boolean;
+}
+
+export interface Casing {
+  diameter: number;
+  length: number;
+  start: number;
+  hasShoe: boolean;
 }
 
 export interface MDPoint {
@@ -98,6 +106,11 @@ export interface MDPoint {
 export interface HoleObjectData {
   data: HoleSize;
   points: MDPoint[];
+  hasShoe?: boolean;
+}
+
+export interface WellItemGraphics {
+  graphics: Graphics;
 }
 
 export interface NormalCoordsObject {

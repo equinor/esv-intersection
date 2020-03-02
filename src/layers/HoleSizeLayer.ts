@@ -1,7 +1,17 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
-import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, NormalCoordsObject, HoleSize } from '../interfaces';
+import {
+  GeomodelLayerOptions,
+  OnUpdateEvent,
+  OnRescaleEvent,
+  MDPoint,
+  HoleObjectData,
+  NormalCoordsObject,
+  HoleSize,
+  Casing,
+  MDpoint,
+} from '../interfaces';
 
 export class HoleSizeLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
@@ -25,13 +35,13 @@ export class HoleSizeLayer extends WebGLLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    const { data, wellborePath } = event;
-    const sizes: HoleObjectData[] = data.map((d: HoleSize) => this.generateHoleSizeData(wellborePath, d));
+    const { data, wellborePath, firstColor, secondColor, lineColor } = event;
+    const sizes: HoleObjectData[] = data.map((d: HoleSize | Casing) => this.generateHoleSizeData(wellborePath, d));
     const maxDiameter = Math.max(...sizes.map((s: HoleObjectData) => s.data.diameter));
-    const texture = this.createTexure(maxDiameter * 1.5);
+    const texture = this.createTexure(maxDiameter * 1.5, firstColor, secondColor);
     sizes
       // .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1))
-      .map((s: any) => this.drawHoleSize(s, texture));
+      .map((s: any) => this.drawHoleSize(s, texture, lineColor));
   }
 
   createNormalCoords = (s: HoleObjectData): NormalCoordsObject => {
@@ -49,16 +59,45 @@ export class HoleSizeLayer extends WebGLLayer {
     return { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp };
   };
 
-  drawHoleSize = (holeObject: HoleObjectData, texture: Texture): void => {
+  drawHoleSize = (holeObject: HoleObjectData, texture: Texture, lineColor: number): void => {
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = this.createNormalCoords(holeObject);
     // this.drawLine(wellBorePathCoords);
     // this.drawLine(normalOffsetCoordsUp;
     // this.drawLine(normalOffsetCoordsDown);
 
-    const polygonCoords = [...normalOffsetCoordsUp, ...normalOffsetCoordsDown.reverse()];
+    const polygonCoords = [...normalOffsetCoordsUp, ...normalOffsetCoordsDown.map(d => d.clone()).reverse()];
     const mask = this.drawBigPolygon(polygonCoords);
     this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
-    this.drawLine(polygonCoords);
+    this.drawLine(polygonCoords, lineColor);
+
+    const takeMeters = (points: MDPoint[], meters: number) => {
+      let tot = 0;
+      const newPoints: MDpoint[] = [];
+      for (let i = 0; tot < meters || i > points.length; i++) {
+        tot += points[length - i].md;
+        newPoints.push(newPoints);
+      }
+      return newPoints.reverse();
+    };
+
+    if (holeObject.hasShoe === true) {
+      const shoeWidth = holeObject.data.diameter + 3;
+
+      const shoeHeightCoords = takeMeters(normalOffsetCoordsDown, 10);
+      const shoeCoords = this.generateShoe(shoeHeightCoords, -shoeWidth);
+      this.drawBigPolygon(shoeCoords);
+
+      const shoeHeightCoords2 = normalOffsetCoordsUp.slice(-50);
+      const shoeCoords2 = this.generateShoe(shoeHeightCoords2, shoeWidth);
+      this.drawBigPolygon(shoeCoords2);
+    }
+  };
+
+  generateShoe = (triangleSideShoe: Point[], offset: number): Point[] => {
+    const normalOffset = this.createNormal(triangleSideShoe, offset);
+
+    const a = [triangleSideShoe[0], triangleSideShoe[triangleSideShoe.length - 1], normalOffset[normalOffset.length - 1], triangleSideShoe[0]];
+    return a;
   };
 
   drawBigPolygon = (coords: Point[]): Graphics => {
@@ -101,20 +140,18 @@ export class HoleSizeLayer extends WebGLLayer {
     return newPoints;
   };
 
-  drawLine = (coords: Point[]): void => {
+  drawLine = (coords: Point[], lineColor: number): void => {
     const startPoint = coords[0];
     const line = new Graphics();
     line
-      .lineStyle(1, 0x8b4513) // 0x7b7575
+      .lineStyle(1, lineColor) // 0x7b7575
       .moveTo(startPoint.x, startPoint.y);
     coords.map(p => line.lineTo(p.x, p.y));
 
     this.ctx.stage.addChild(line);
   };
 
-  createTexure = (maxWidth = 150): Texture => {
-    const firstColor = 'rgb(163, 102, 42)';
-    const secondColor = 'rgb(255, 255, 255)';
+  createTexure = (maxWidth = 150, firstColor: string, secondColor: string): Texture => {
     const canvas = document.createElement('canvas');
 
     canvas.width = 150;
@@ -132,7 +169,7 @@ export class HoleSizeLayer extends WebGLLayer {
     return Texture.from(canvas);
   };
 
-  generateHoleSizeData = (wbp: number[][], data: HoleSize): HoleObjectData => {
+  generateHoleSizeData = (wbp: number[][], data: HoleSize | Casing): HoleObjectData => {
     const tension = 0.2;
     const interp = new CurveInterpolator(wbp, tension);
     let points = interp.getPoints(999);
@@ -150,7 +187,7 @@ export class HoleSizeLayer extends WebGLLayer {
       };
     });
 
-    return { data, points };
+    return { data, points, hasShoe: data.hasShoe };
   };
 
   actualPoints = (s: HoleObjectData): Point[] => {
