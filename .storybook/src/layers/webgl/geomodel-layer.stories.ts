@@ -1,15 +1,16 @@
-import { GeomodelLayer } from '../../src/layers/GeomodelLayer';
+import { GeomodelLayer } from '../../../../src/layers';
 import { scaleLinear } from 'd3-scale';
-import { GeomodelLayerOptions, OnUpdateEvent } from '../../src/interfaces';
-import { SurfaceGenerator } from './utils/surfaceGenerator';
-import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
+import { GeomodelLayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
+import { SurfaceGenerator } from '../../utils/surfaceGenerator';
+import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 
-import { generateSurfaceData, generateProjectedTrajectory, SurfaceData } from '../../src/datautils';
+import { generateSurfaceData, generateProjectedTrajectory, SurfaceData } from '../../../../src/datautils';
+import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
 
 //Data
-import poslog from './exampledata/polog.json';
-import stratColumn from './exampledata/stratcolumn.json';
-import surfaceValues from './exampledata/surfaces.json';
+import poslog from '../../exampledata/polog.json';
+import stratColumn from '../../exampledata/stratcolumn.json';
+import surfaceValues from '../../exampledata/surfaces.json';
 
 const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
 const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
@@ -20,25 +21,20 @@ const height: number = 1024;
 const xbounds: number[] = [0, 1000];
 const ybounds: number[] = [0, 1000];
 
-export default {
-  title: 'PIXI JS WebGL Layer',
-};
-
 export const GeoModel = () => {
   const options: GeomodelLayerOptions = { order: 1 };
   const geoModelLayer = new GeomodelLayer('webgl', options);
 
-  const root = document.createElement('div');
-  root.className = 'grid-container';
-  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
-  root.setAttribute('height', `${height}`);
-  root.setAttribute('width', `${width}`);
+  const root = createRootContainer(width);
+  const container = createLayerContainer(width, height);
 
-  geoModelLayer.onMount({ elm: root, height, width });
+  geoModelLayer.onMount({ elm: container, height, width });
   const strat1: [number[], number[]] = [[0], [1]];
   const data: [number[], number[], number[]][] = new SurfaceGenerator().generateData();
 
   geoModelLayer.onUpdate(createEventObj(root, data));
+
+  root.appendChild(container);
 
   return root;
 };
@@ -102,18 +98,16 @@ const createEventObj = (elm: any, inputData: any) => {
 };
 
 export const GeoModelWithSampleData = () => {
-  const root = document.createElement('div');
-  root.className = 'grid-container';
-  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
-  root.setAttribute('height', `${height}`);
-  root.setAttribute('width', `${width}`);
+  const root = createRootContainer(width);
+  const container = createLayerContainer(width, height);
+  const fpsLabel = createFPSLabel();
 
   const options: GeomodelLayerOptions = { order: 1 };
   const geoModelLayer = new GeomodelLayer('webgl', options);
-  geoModelLayer.onMount({ elm: root, height, width });
+  geoModelLayer.onMount({ elm: container, height, width });
 
-  const zoomHandler = new ZoomPanHandler(root, (event: OnUpdateEvent) => {
-    geoModelLayer.onUpdate({ ...event, data: geolayerdata });
+  geoModelLayer.onUpdate({ data: geolayerdata });
+  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     geoModelLayer.onRescale(event);
   });
   zoomHandler.setBounds([0, 1000], [0, 1000]);
@@ -122,6 +116,9 @@ export const GeoModelWithSampleData = () => {
   zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
   zoomHandler.enableTranslateExtent = false;
   zoomHandler.setViewport(1000, 1000, 5000);
+
+  root.appendChild(container);
+  root.appendChild(fpsLabel);
 
   return root;
 };

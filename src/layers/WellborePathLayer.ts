@@ -21,6 +21,9 @@ export class WellborepathLayer extends SVGLayer {
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
+    if (!this.elm) {
+      return;
+    }
     this.elm.select('g').attr('transform', `translate(${event.transform.x} ${event.transform.y}) scale(${event.xRatio}, ${event.yRatio})`);
   }
 
@@ -31,8 +34,6 @@ export class WellborepathLayer extends SVGLayer {
     this.elm.select('g').remove();
 
     const { data } = event;
-
-    this.elm.select('g').remove();
 
     this.elm
       .append('g')

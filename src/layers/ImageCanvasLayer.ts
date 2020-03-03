@@ -1,5 +1,5 @@
-import { CanvasLayer } from '.';
-import { OnUpdateEvent, OnMountEvent } from '../interfaces';
+import { CanvasLayer } from './CanvasLayer';
+import { OnUpdateEvent, OnMountEvent, OnRescaleEvent } from '../interfaces';
 
 export class ImageLayer extends CanvasLayer {
   img: HTMLImageElement;
@@ -14,6 +14,11 @@ export class ImageLayer extends CanvasLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
+    this.render(event);
+  }
+
+  onRescale(event: OnRescaleEvent): void {
+    super.onRescale(event);
     this.render(event);
   }
 

@@ -1,14 +1,15 @@
 import { Layer } from './Layer';
-import { OnMountEvent, OnUpdateEvent } from '../interfaces';
+import { OnMountEvent, OnUpdateEvent, OnResizeEvent, OnRescaleEvent } from '../interfaces';
 
 export abstract class CanvasLayer extends Layer {
   ctx: CanvasRenderingContext2D;
   elm: HTMLElement;
   canvas: HTMLCanvasElement;
 
-  onMount(event: OnMountEvent) {
+  onMount(event: OnMountEvent): void {
     super.onMount(event);
-    this.elm = event.elm;
+    const { elm, width, height } = event;
+    this.elm = elm;
     let canvas;
     if (!this.canvas) {
       canvas = document.createElement('canvas');
@@ -17,35 +18,38 @@ export abstract class CanvasLayer extends Layer {
     }
     this.canvas.setAttribute('id', `${this.id}`);
     this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
+    this.canvas.setAttribute('width', `${width || 300}px`);
+    this.canvas.setAttribute('height', `${height || 150}px`);
     this.ctx = this.canvas.getContext('2d');
   }
 
-  onUnmount() {
+  onUnmount(): void {
     super.onUnmount();
     this.canvas.remove();
     this.canvas = null;
   }
 
-  onRescale(event: OnUpdateEvent) {
-    super.onRescale(event);
+  onResize(event: OnResizeEvent): void {
     const { ctx } = this;
-    const { xScale, yScale } = event;
-    const [, width] = xScale.range();
-    const [, height] = yScale.range();
+    const { width, height } = event;
 
     ctx.canvas.setAttribute('width', `${width}px`);
     ctx.canvas.setAttribute('height', `${height}px`);
   }
 
-  onUpdate(event: OnUpdateEvent) {
+  onRescale(event: OnRescaleEvent): void {
+    super.onRescale(event);
+    const {
+      xScale,
+      yScale,
+    } = event;
+    this.onResize({ width: xScale.range()[1], height: yScale.range()[1] });
+  }
+
+  onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     const { ctx } = this;
-    const { xScale, yScale } = event;
-    const [, width] = xScale.range();
-    const [, height] = yScale.range();
 
     ctx.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
-    ctx.canvas.setAttribute('width', `${width}px`);
-    ctx.canvas.setAttribute('height', `${height}px`);
   }
 }

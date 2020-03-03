@@ -14,13 +14,13 @@ export class GeomodelLayer extends WebGLLayer {
     this.render = this.render.bind(this);
   }
 
-  onMount(event: OnMountEvent) {
+  onMount(event: OnMountEvent): void {
     super.onMount(event);
     this.graphics = new Graphics();
     this.ctx.stage.addChild(this.graphics);
   }
 
-  onUpdate(event: OnUpdateEvent) {
+  onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.render(event);
   }
@@ -31,7 +31,10 @@ export class GeomodelLayer extends WebGLLayer {
     this.graphics.scale.set(event.xRatio, event.yRatio);
   }
 
-  render(event: OnRescaleEvent | OnUpdateEvent): void {
+  render(event: OnUpdateEvent): void {
+    if (!this.ctx) {
+      return;
+    }
     const { data } = event;
 
     this.graphics.clear();

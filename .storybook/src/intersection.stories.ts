@@ -1,6 +1,6 @@
 import { select } from 'd3-selection';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
-import { OnUpdateEvent, WellborepathLayerOptions, Annotation } from '../../src/interfaces';
+import {  WellborepathLayerOptions, Annotation, OnRescaleEvent, OnMountEvent } from '../../src/interfaces';
 import { Axis } from '../../src/components';
 import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
 import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer } from '../../src/layers';
@@ -14,7 +14,7 @@ export default {
 const bg1Img = require('./resources/bg1.jpeg');
 const bg2Img = require('./resources/bg2.jpg');
 
-const annotations: Annotation[] = [
+const annotations : Annotation[] = [
   {
     title: 'Heidur Top',
     md: 1234.3,
@@ -131,14 +131,19 @@ export const intersection = () => {
   const btnContainer = createButtonContainer(width);
 
   const [scaleX, scaleY] = createScale(xbounds[0], xbounds[1], ybounds[0], ybounds[1], yRange, xRange);
+  const onMountEvent = {
+    elm: container,
+    width: scaleX.range()[1],
+    height: scaleY.range()[1],
+  };
 
   // Instantiate and mount layers
   const axis = createAxis(container, scaleX, scaleY);
-  const gridLayer = createGridLayer(container);
-  const wellboreLayer = createWellboreLayer(container);
-  const calloutLayer = createCanvasCallout(container);
-  const image1Layer = createImageLayer(container, 'bg1Img', bg1Img, 1);
-  const image2Layer = createImageLayer(container, 'bg2Img', bg2Img, 2);
+  const gridLayer = createGridLayer(onMountEvent);
+  const wellboreLayer = createWellboreLayer(onMountEvent);
+  const calloutLayer = createCanvasCallout(onMountEvent);
+  const image1Layer = createImageLayer(onMountEvent, 'bg1Img', bg1Img, 1);
+  const image2Layer = createImageLayer(onMountEvent, 'bg2Img', bg2Img, 2);
 
   wellboreLayer.onUpdate({
     xScale: scaleX,
@@ -146,10 +151,10 @@ export const intersection = () => {
     data: wellborePath,
   });
 
-  const zoomHandler = new ZoomPanHandler(container, (event: OnUpdateEvent) => {
+  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     axis.onRescale(event);
 
-    gridLayer.onUpdate(event);
+    gridLayer.onRescale(event);
     wellboreLayer.onRescale(event);
     calloutLayer.onRescale({
       ...event,
@@ -159,12 +164,12 @@ export const intersection = () => {
       margin,
       scale: 0,
     });
-    image1Layer.onUpdate({
+    image1Layer.onRescale({
       ...event,
       x: -50,
       y: -150,
     });
-    image2Layer.onUpdate({
+    image2Layer.onRescale({
       ...event,
       x: -50,
       y: -150,
@@ -177,9 +182,6 @@ export const intersection = () => {
 
   const FPSLabel = createFPSLabel();
 
-  const onMountEvent = {
-    elm: container,
-  };
   const imgParams = {
     margin,
     scale: 0,
@@ -204,23 +206,24 @@ export const intersection = () => {
   return root;
 };
 
-const createImageLayer = (container: HTMLElement, id: string, img: any, zIndex: number) => {
-  const layer = new ImageLayer(id, {
-    order: zIndex,
-    layerOpacity: 0.5,
-  });
+const createImageLayer = (onMountEvent : OnMountEvent, id: string, img: any, zIndex: number) => {
+  const layer = new ImageLayer(id,
+    {
+      order: zIndex,
+      layerOpacity: 0.5,
+    });
   layer.onMount({
-    elm: container,
+    ...onMountEvent,
     url: img,
   });
 
   return layer;
 };
 
-const createCanvasCallout = (container: HTMLElement) => {
+const createCanvasCallout = (onMountEvent: OnMountEvent) => {
   const layer = new CalloutCanvasLayer('callout', { order: 4 });
   layer.onMount({
-    elm: container,
+    ...onMountEvent,
     annotations,
     isLeftToRight: true,
     margin,
@@ -230,7 +233,7 @@ const createCanvasCallout = (container: HTMLElement) => {
   return layer;
 };
 
-const createWellboreLayer = (container: HTMLElement) => {
+const createWellboreLayer = (onMountEvent : OnMountEvent) => {
   const options: WellborepathLayerOptions = {
     order: 3,
     strokeWidth: '5px',
@@ -238,12 +241,12 @@ const createWellboreLayer = (container: HTMLElement) => {
   };
   const layer = new WellborepathLayer('wellborepath', options);
 
-  layer.onMount({ elm: container });
+  layer.onMount(onMountEvent);
 
   return layer;
 };
 
-const createGridLayer = (container: HTMLElement) => {
+const createGridLayer = (onMountEvent: OnMountEvent) => {
   const gridLayer = new GridLayer('grid', {
     majorColor: 'black',
     minorColor: 'gray',
@@ -252,7 +255,7 @@ const createGridLayer = (container: HTMLElement) => {
     order: 1,
   });
 
-  gridLayer.onMount({ elm: container });
+  gridLayer.onMount(onMountEvent);
 
   return gridLayer;
 };

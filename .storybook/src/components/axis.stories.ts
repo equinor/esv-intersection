@@ -6,14 +6,17 @@ export default {
   title: 'Axis',
 };
 
+const width = 1000;
+const height = 1000;
+
 export const SingleAxis = () => {
   const div = document.createElement('div');
-  div.setAttribute('style', 'background-color: white; width: 1000px;');
+  div.setAttribute('style', `background-color: white; width: ${width}px;`);
 
   const svg = select(div)
     .append('svg')
-    .attr('height', '1000px')
-    .attr('width', '1000px');
+    .attr('height', `${height}px`)
+    .attr('width', `${width}px`);
 
   const createScale = (xMin: number, xMax: number, yMin: number, yMax: number, height: number, width: number) => {
     return [
