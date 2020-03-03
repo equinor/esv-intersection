@@ -1,6 +1,6 @@
 import { select } from 'd3-selection';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
-import {  WellborepathLayerOptions, Annotation, OnRescaleEvent, OnMountEvent } from '../../src/interfaces';
+import { WellborepathLayerOptions, Annotation, OnRescaleEvent, OnMountEvent } from '../../src/interfaces';
 import { Axis } from '../../src/components';
 import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
 import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer } from '../../src/layers';
@@ -14,7 +14,7 @@ export default {
 const bg1Img = require('./resources/bg1.jpeg');
 const bg2Img = require('./resources/bg2.jpg');
 
-const annotations : Annotation[] = [
+const annotations: Annotation[] = [
   {
     title: 'Heidur Top',
     md: 1234.3,
@@ -206,12 +206,11 @@ export const intersection = () => {
   return root;
 };
 
-const createImageLayer = (onMountEvent : OnMountEvent, id: string, img: any, zIndex: number) => {
-  const layer = new ImageLayer(id,
-    {
-      order: zIndex,
-      layerOpacity: 0.5,
-    });
+const createImageLayer = (onMountEvent: OnMountEvent, id: string, img: any, zIndex: number) => {
+  const layer = new ImageLayer(id, {
+    order: zIndex,
+    layerOpacity: 0.5,
+  });
   layer.onMount({
     ...onMountEvent,
     url: img,
@@ -233,7 +232,7 @@ const createCanvasCallout = (onMountEvent: OnMountEvent) => {
   return layer;
 };
 
-const createWellboreLayer = (onMountEvent : OnMountEvent) => {
+const createWellboreLayer = (onMountEvent: OnMountEvent) => {
   const options: WellborepathLayerOptions = {
     order: 3,
     strokeWidth: '5px',

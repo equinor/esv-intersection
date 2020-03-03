@@ -142,7 +142,7 @@ export class HoleSizeLayer extends WebGLLayer {
     const startPoint = coords[0];
     const line = new Graphics();
     line
-      .lineStyle(lineWidth, lineColor) // 0x7b7575
+      .lineStyle(lineWidth, lineColor, null, 1) // 0x7b7575
       .moveTo(startPoint.x, startPoint.y);
     coords.map(p => line.lineTo(p.x, p.y));
 

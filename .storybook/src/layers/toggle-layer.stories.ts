@@ -99,7 +99,7 @@ export const ToggleCanvasLayer = () => {
     elm: container,
     width,
     height,
-  }
+  };
 
   gridLayer.onMount(event);
   wellborePathLayer.onMount(event);
