@@ -89,6 +89,7 @@ export interface HoleSize {
   length: number;
   start: number;
   hasShoe?: boolean;
+  innerDiameter?: number;
 }
 
 export interface Casing {
@@ -96,6 +97,7 @@ export interface Casing {
   length: number;
   start: number;
   hasShoe: boolean;
+  innerDiameter: number;
 }
 
 export interface MDPoint {
@@ -107,6 +109,7 @@ export interface HoleObjectData {
   data: HoleSize;
   points: MDPoint[];
   hasShoe?: boolean;
+  innerDiameter?: number;
 }
 
 export interface WellItemGraphics {

@@ -31,15 +31,15 @@ export const Casings = () => {
 
 const createEventObj = (elm: any) => {
   const data: Casing[] = [
-    { diameter: 30 + 0, start: 0, length: 50, hasShoe: true },
-    { diameter: 20 + 0, start: 50, length: 70, hasShoe: true },
-    { diameter: 30 + 0, start: 120, length: 150, hasShoe: false },
-    { diameter: 55 + 0, start: 270, length: 130, hasShoe: true },
-    { diameter: 25 + 0, start: 400, length: 150, hasShoe: false },
-    { diameter: 15 + 0, start: 550, length: 50, hasShoe: false },
-    { diameter: 10 + 0, start: 600, length: 50, hasShoe: true },
-    { diameter: 8 + 0, start: 650, length: 50, hasShoe: true },
-    { diameter: 6.5 + 0, start: 700, length: 50, hasShoe: true },
+    { diameter: 30 + 0, innerDiameter: 29, start: 0, length: 50, hasShoe: true },
+    { diameter: 20 + 0, innerDiameter: 19, start: 50, length: 70, hasShoe: true },
+    { diameter: 30 + 0, innerDiameter: 29, start: 120, length: 150, hasShoe: false },
+    { diameter: 55 + 0, innerDiameter: 52, start: 270, length: 130, hasShoe: true },
+    { diameter: 25 + 0, innerDiameter: 20, start: 400, length: 150, hasShoe: false },
+    { diameter: 15 + 0, innerDiameter: 29, start: 550, length: 50, hasShoe: false },
+    { diameter: 10 + 0, innerDiameter: 29, start: 600, length: 50, hasShoe: true },
+    { diameter: 8 + 0, innerDiameter: 29, start: 650, length: 50, hasShoe: true },
+    { diameter: 6.5 + 0, innerDiameter: 29, start: 700, length: 50, hasShoe: true },
   ];
 
   const wellborePath: [number, number][] = [
