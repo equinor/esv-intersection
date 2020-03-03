@@ -1,17 +1,7 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
-import {
-  GeomodelLayerOptions,
-  OnUpdateEvent,
-  OnRescaleEvent,
-  MDPoint,
-  HoleObjectData,
-  NormalCoordsObject,
-  HoleSize,
-  Casing,
-  MDpoint,
-} from '../interfaces';
+import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, NormalCoordsObject, HoleSize, Casing } from '../interfaces';
 
 export class HoleSizeLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
@@ -41,7 +31,7 @@ export class HoleSizeLayer extends WebGLLayer {
     const texture = this.createTexure(maxDiameter * 1.5, firstColor, secondColor);
     sizes
       // .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1))
-      .map((s: any) => this.drawHoleSize(s, texture, lineColor));
+      .map((s: any) => this.drawHoleSize(s, texture, lineColor, firstColor, secondColor));
   }
 
   createNormalCoords = (s: HoleObjectData): NormalCoordsObject => {
@@ -59,7 +49,7 @@ export class HoleSizeLayer extends WebGLLayer {
     return { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp };
   };
 
-  drawHoleSize = (holeObject: HoleObjectData, texture: Texture, lineColor: number): void => {
+  drawHoleSize = (holeObject: HoleObjectData, texture: Texture, lineColor: number, firstColor = '', secondColor = ''): void => {
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = this.createNormalCoords(holeObject);
     // this.drawLine(wellBorePathCoords);
     // this.drawLine(normalOffsetCoordsUp;
@@ -67,27 +57,33 @@ export class HoleSizeLayer extends WebGLLayer {
 
     const polygonCoords = [...normalOffsetCoordsUp, ...normalOffsetCoordsDown.map(d => d.clone()).reverse()];
     const mask = this.drawBigPolygon(polygonCoords);
-    this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
+    let texture2 = texture;
+    if (holeObject.hasShoe != null) {
+      texture2 = this.createTexure(holeObject.data.diameter * 1.5, firstColor, secondColor, 0.35);
+    }
+    this.createRopeTextureBackground(wellBorePathCoords, texture2, mask);
     this.drawLine(polygonCoords, lineColor);
 
-    const takeMeters = (points: MDPoint[], meters: number) => {
+    const takeMeters = (points: Point[], meters: number) => {
       let tot = 0;
-      const newPoints: MDpoint[] = [];
-      for (let i = 0; tot < meters || i > points.length; i++) {
-        tot += points[length - i].md;
-        newPoints.push(newPoints);
+      const newPoints: Point[] = [];
+
+      for (let i = 0; tot < meters || i > points.length - 2; i++) {
+        tot += this.calcDistPoint(points[points.length - 1 - i], points[points.length - 2 - i]);
+        newPoints.push(points[points.length - 1 - i]);
       }
+
       return newPoints.reverse();
     };
 
     if (holeObject.hasShoe === true) {
-      const shoeWidth = holeObject.data.diameter + 3;
+      const shoeWidth = 125;
 
       const shoeHeightCoords = takeMeters(normalOffsetCoordsDown, 10);
       const shoeCoords = this.generateShoe(shoeHeightCoords, -shoeWidth);
       this.drawBigPolygon(shoeCoords);
 
-      const shoeHeightCoords2 = normalOffsetCoordsUp.slice(-50);
+      const shoeHeightCoords2 = takeMeters(normalOffsetCoordsUp, 10);
       const shoeCoords2 = this.generateShoe(shoeHeightCoords2, shoeWidth);
       this.drawBigPolygon(shoeCoords2);
     }
@@ -151,7 +147,7 @@ export class HoleSizeLayer extends WebGLLayer {
     this.ctx.stage.addChild(line);
   };
 
-  createTexure = (maxWidth = 150, firstColor: string, secondColor: string): Texture => {
+  createTexure = (maxWidth = 150, firstColor: string, secondColor: string, startPctOffset = 0): Texture => {
     const canvas = document.createElement('canvas');
 
     canvas.width = 150;
@@ -160,7 +156,8 @@ export class HoleSizeLayer extends WebGLLayer {
 
     const gradient = canvasCtx.createLinearGradient(0, 0, 0, maxWidth);
     gradient.addColorStop(0, firstColor);
-    gradient.addColorStop(0.5, secondColor);
+    gradient.addColorStop(0.5 - startPctOffset, secondColor);
+    gradient.addColorStop(0.5 + startPctOffset, secondColor);
     gradient.addColorStop(1, firstColor);
 
     canvasCtx.fillStyle = gradient;

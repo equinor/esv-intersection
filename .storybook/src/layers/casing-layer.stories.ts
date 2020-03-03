@@ -66,8 +66,8 @@ const createEventObj = (elm: any) => {
     elm,
     data,
     wellborePath,
-    firstColor: '#EEEEFF',
-    secondColor: '#EEEEFF', // maybe not needed, refactor holesizelayer
+    firstColor: '#777788', // maybe not needed, refactor holesizelayer
+    secondColor: '#EEEEFF',
     borderColor: 0x777788,
   };
 };
