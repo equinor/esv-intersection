@@ -1,4 +1,4 @@
-import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
+import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
 
 export abstract class Layer {
   id: String;
@@ -22,6 +22,7 @@ export abstract class Layer {
     this.onUnmount = this.onUnmount.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
     this.onRescale = this.onRescale.bind(this);
+    this.onResize = this.onResize.bind(this);
   }
 
   onMount(event: OnMountEvent): void {
@@ -37,13 +38,19 @@ export abstract class Layer {
     }
   }
 
+  onResize(event: OnResizeEvent): void {
+    if (this.options.onResize) {
+      this.options.onResize(event, this);
+    }
+  }
+
   onUpdate(event: OnUpdateEvent): void {
     if (this.options.onUpdate) {
       this.options.onUpdate(event, this);
     }
   }
 
-  onRescale(event: OnRescaleEvent) {
+  onRescale(event: OnRescaleEvent): void {
     if (this.options.onRescale) {
       this.options.onRescale(event, this);
     }
@@ -53,6 +60,7 @@ export abstract class Layer {
     // TODO: update d3 element
     this.loading = loading;
   }
+
   get isLoading(): boolean {
     return this.loading;
   }

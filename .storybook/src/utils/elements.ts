@@ -31,13 +31,17 @@ export const createButtonContainer = (width: number) => {
 export const createButton = (layer: Layer, zoomHandler: ZoomPanHandler, title: string, additionalEventParams: any, onMount: any) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
-  btn.setAttribute('style', 'width: 100px;height:32px;margin-top:12px;');
+  btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
   let show = false;
   btn.onclick = () => {
     if (show) {
       layer.onMount({
         ...onMount,
         ...additionalEventParams,
+      });
+      layer.onUpdate({
+        ...additionalEventParams,
+        ...zoomHandler.createEventObject(),
       });
       layer.onRescale({
         ...additionalEventParams,

@@ -13,7 +13,7 @@ type BoundingBox = {
   offsetY: number;
 };
 
-const OFFSET: number = -20;
+const OFFSET = -20;
 const MAX_FONT_SIZE = 12;
 const MIN_FONT_SIZE = 7;
 
@@ -39,7 +39,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
     this.render({ ...event, isLeftToRight });
   }
 
-  render(event: OnUpdateEvent) {
+  render(event: OnRescaleEvent) {
     const { xScale, yScale, isLeftToRight } = event;
 
     for (var i = 0; i < this.data.length; i++) {

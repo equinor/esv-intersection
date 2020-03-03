@@ -162,10 +162,10 @@ export const Test = () => {
 
   const testLayer = new TestLayer('test', { order: 1 });
 
-  testLayer.onMount({ elm: container });
+  testLayer.onMount({ elm: container, width, height });
 
-  const zoomHandler = new ZoomPanHandler(root, (event: OnUpdateEvent) => {
-    testLayer.onUpdate(event);
+  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
+    testLayer.onRescale(event);
   });
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
@@ -254,10 +254,10 @@ export const Grid = () => {
     order: 1,
   });
 
-  gridLayer.onMount({ elm: root });
+  gridLayer.onMount({ elm: root, width, height });
 
-  const zoomHandler = new ZoomPanHandler(root, (event: OnUpdateEvent) => {
-    gridLayer.onUpdate(event);
+  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
+    gridLayer.onRescale(event);
   });
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
