@@ -14,6 +14,11 @@ export interface OnMountEvent extends LayerEvent {
 
 export interface OnUnmountEvent extends LayerEvent {}
 
+export interface OnResizeEvent extends LayerEvent {
+  width: number;
+  height: number;
+}
+
 export interface OnRescaleEvent extends LayerEvent {
   xScale: ScaleLinear<number, number>;
   yScale: ScaleLinear<number, number>;
@@ -28,10 +33,7 @@ export interface OnRescaleEvent extends LayerEvent {
   transform?: ZoomTransform;
 }
 
-export interface OnUpdateEvent extends OnRescaleEvent {
-  xScale: ScaleLinear<number, number>;
-  yScale: ScaleLinear<number, number>;
-}
+export interface OnUpdateEvent extends LayerEvent {}
 
 export interface LayerOptions {
   order: Number;
@@ -41,6 +43,7 @@ export interface LayerOptions {
   onUnmount?(event: OnUnmountEvent, layer: Layer): void;
   onUpdate?(event: OnUpdateEvent, layer: Layer): void;
   onRescale?(event: OnRescaleEvent, layer: Layer): void;
+  onResize?(event: OnResizeEvent, layer: Layer): void;
 }
 
 export interface GridLayerOptions extends LayerOptions {

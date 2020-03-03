@@ -2,7 +2,7 @@ import { scaleLinear } from 'd3-scale';
 
 import { CalloutCanvasLayer } from '../../../../src/layers';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
-import { Annotation, OnUpdateEvent } from '../../../../src/interfaces';
+import { Annotation, OnRescaleEvent } from '../../../../src/interfaces';
 
 import { createLayerContainer, createRootContainer, createFPSLabel } from '../../utils';
 
@@ -110,13 +110,10 @@ export const CalloutCanvasWithZoom = () => {
 
   const layer = new CalloutCanvasLayer('callout', { order: 1 });
   layer.onMount(createEventObj(container));
-  layer.onUpdate(createEventObj(container));
 
-  const zoomHandler = new ZoomPanHandler(container, (event: OnUpdateEvent) => {
+  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     layer.onRescale({
       ...event,
-      data: annotations,
-      annotations,
       isLeftToRight: true,
       margin,
       scale: 0,
@@ -142,5 +139,7 @@ const createEventObj = (elm: any) => {
     isLeftToRight: true,
     margin,
     scale: 0,
+    width: xscale.range()[1],
+    height: yscale.range()[1],
   };
 };

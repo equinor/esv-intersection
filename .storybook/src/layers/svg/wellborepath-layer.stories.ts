@@ -1,6 +1,6 @@
 import { scaleLinear } from 'd3-scale';
 import { WellborepathLayer } from '../../../../src/layers';
-import { WellborepathLayerOptions, OnUpdateEvent } from '../../../../src/interfaces';
+import { WellborepathLayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
 import { generateProjectedWellborePath } from '../../../../src/datautils/trajectory';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 
@@ -77,10 +77,10 @@ export const WellborepathWithSampleDataAndZoom = () => {
     stroke: 'black',
   };
   const wellborePathLayer = new WellborepathLayer('wellborepath', options);
-  wellborePathLayer.onMount({ elm: container });
+  wellborePathLayer.onMount({ elm: container, width, height });
   wellborePathLayer.onUpdate({ ...createEventObj(container), data: wellborePath });
 
-  const zoomHandler = new ZoomPanHandler(container, (event: OnUpdateEvent) => {
+  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     wellborePathLayer.onRescale({ ...event, data: wellborePath });
   });
   zoomHandler.setBounds([0, 1000], [0, 1000]);

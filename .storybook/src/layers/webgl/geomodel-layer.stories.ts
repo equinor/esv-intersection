@@ -1,6 +1,6 @@
-import { GeomodelLayer } from '../../../../src/layers/GeomodelLayer';
+import { GeomodelLayer } from '../../../../src/layers';
 import { scaleLinear } from 'd3-scale';
-import { GeomodelLayerOptions, OnUpdateEvent } from '../../../../src/interfaces';
+import { GeomodelLayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
 import { SurfaceGenerator } from '../../utils/surfaceGenerator';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 
@@ -106,8 +106,8 @@ export const GeoModelWithSampleData = () => {
   const geoModelLayer = new GeomodelLayer('webgl', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
-  const zoomHandler = new ZoomPanHandler(container, (event: OnUpdateEvent) => {
-    geoModelLayer.onUpdate({ ...event, data: geolayerdata });
+  geoModelLayer.onUpdate({ data: geolayerdata });
+  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     geoModelLayer.onRescale(event);
   });
   zoomHandler.setBounds([0, 1000], [0, 1000]);

@@ -104,5 +104,7 @@ const createEventObj = (elm: any) => {
     isLeftToRight: true,
     margin,
     scale: 0,
+    width,
+    height,
   };
 };

@@ -30,7 +30,7 @@ export const MultipleCanvasLayers = () => {
     order: 3,
     layerOpacity: 1,
   });
-  const ev = { elm: container };
+  const ev = { elm: container, width, height };
 
   gridLayer.onMount(ev);
   backgroundLayer1.onMount({ ...ev, url: bgImg1 });

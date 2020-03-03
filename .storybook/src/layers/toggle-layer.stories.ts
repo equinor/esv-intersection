@@ -27,7 +27,7 @@ const createButton = (layer: Layer, root: HTMLElement, event: OnUpdateEvent, tit
   let show = false;
   btn.onclick = () => {
     if (show) {
-      layer.onMount({ elm: root });
+      layer.onMount({ elm: root, width, height });
       layer.onUpdate(event);
     } else {
       layer.onUnmount();
@@ -95,8 +95,14 @@ export const ToggleCanvasLayer = () => {
 
   const wellborePathLayer = new WellborepathLayer('wellborepath', options);
 
-  gridLayer.onMount({ elm: container });
-  wellborePathLayer.onMount({ elm: container });
+  const event = {
+    elm: container,
+    width,
+    height,
+  }
+
+  gridLayer.onMount(event);
+  wellborePathLayer.onMount(event);
 
   /**
    * .onUpdate(...) sets width and height of the canvas, currently .render() uses default dimensions (150, 300)

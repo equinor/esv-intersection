@@ -21,7 +21,7 @@ export const CanvasGrid = () => {
     minorWidth: 0.5,
   });
 
-  gridLayer.onMount({ elm: container });
+  gridLayer.onMount({ elm: container, width, height });
 
   /**
    * .onUpdate(...) sets width and height of the canvas, currently .render() uses default dimensions (150, 300)
