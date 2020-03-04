@@ -49,21 +49,23 @@ export class HoleSizeLayer extends WebGLLayer {
     return { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp };
   };
 
-  drawHoleSize = (holeObject: HoleObjectData, texture: Texture, lineColor: number, firstColor = '', secondColor = ''): void => {
+  drawHoleSize = (holeObject: HoleObjectData, defaultTexture: Texture, lineColor: number, firstColor = '', secondColor = ''): void => {
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = this.createNormalCoords(holeObject);
-    // this.drawLine(wellBorePathCoords);
-    // this.drawLine(normalOffsetCoordsUp;
-    // this.drawLine(normalOffsetCoordsDown);
+    // this.drawLine(wellBorePathCoords, 0xff0000);
+    // this.drawLine(normalOffsetCoordsUp, 0xff0000);
+    // this.drawLine(normalOffsetCoordsDown, 0xff0000);
 
     const polygonCoords = [...normalOffsetCoordsUp, ...normalOffsetCoordsDown.map((d: Point) => d.clone()).reverse()];
     const mask = this.drawBigPolygon(polygonCoords);
-    let texture2 = texture;
+    let texture = defaultTexture;
     let casingWallWidth = 1;
+
     if (holeObject.hasShoe != null) {
-      texture2 = this.createTexure(holeObject.data.diameter * 1.5, firstColor, secondColor, 0.35);
+      texture = this.createTexure(holeObject.data.diameter * 1.5, firstColor, secondColor, 0.35);
       casingWallWidth = Math.abs(holeObject.data.diameter - holeObject.innerDiameter);
     }
-    this.createRopeTextureBackground(wellBorePathCoords, texture2, mask);
+
+    this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
     this.drawLine(polygonCoords, lineColor, casingWallWidth);
 
     const takeMeters = (points: Point[], meters: number) => {
@@ -122,6 +124,7 @@ export class HoleSizeLayer extends WebGLLayer {
   createNormal = (coords: Point[], offset: number): Point[] => {
     const newPoints: Point[] = [];
     const lastPointIndex = 2;
+
     for (let i = 1; i < coords.length - lastPointIndex; i++) {
       const normal = this.normal(coords[i], coords[i + 1]);
       const newPoint = coords[i].clone();
@@ -130,12 +133,10 @@ export class HoleSizeLayer extends WebGLLayer {
       newPoints.push(newPoint);
     }
 
-    // Last point
-    const normal = this.normal(coords[coords.length - lastPointIndex - 1], coords[coords.length - lastPointIndex]);
-
+    const lastPoint = this.normal(coords[coords.length - lastPointIndex - 1], coords[coords.length - lastPointIndex]);
     const newPoint = coords[coords.length - lastPointIndex].clone();
-    newPoint.x += normal.x * offset;
-    newPoint.y += normal.y * offset;
+    newPoint.x += lastPoint.x * offset;
+    newPoint.y += lastPoint.y * offset;
     newPoints.push(newPoint);
 
     return newPoints;
@@ -144,10 +145,8 @@ export class HoleSizeLayer extends WebGLLayer {
   drawLine = (coords: Point[], lineColor: number, lineWidth = 1): void => {
     const startPoint = coords[0];
     const line = new Graphics();
-    line
-      .lineStyle(lineWidth, lineColor, null, 1) // 0x7b7575
-      .moveTo(startPoint.x, startPoint.y);
-    coords.map(p => line.lineTo(p.x, p.y));
+    line.lineStyle(lineWidth, lineColor, undefined, 1).moveTo(startPoint.x, startPoint.y);
+    coords.map((p: Point) => line.lineTo(p.x, p.y));
 
     this.ctx.stage.addChild(line);
   };
