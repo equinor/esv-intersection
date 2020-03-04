@@ -69,5 +69,6 @@ const createEventObj = (elm: any) => {
     firstColor: '#777788', // maybe not needed, refactor holesizelayer
     secondColor: '#EEEEFF',
     lineColor: 0x575757,
+    topBottomLineColor: 0x575757,
   };
 };
