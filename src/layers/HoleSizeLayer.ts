@@ -55,13 +55,13 @@ export class HoleSizeLayer extends WebGLLayer {
     // this.drawLine(normalOffsetCoordsUp;
     // this.drawLine(normalOffsetCoordsDown);
 
-    const polygonCoords = [...normalOffsetCoordsUp, ...normalOffsetCoordsDown.map(d => d.clone()).reverse()];
+    const polygonCoords = [...normalOffsetCoordsUp, ...normalOffsetCoordsDown.map((d: Point) => d.clone()).reverse()];
     const mask = this.drawBigPolygon(polygonCoords);
     let texture2 = texture;
     let casingWallWidth = 1;
     if (holeObject.hasShoe != null) {
       texture2 = this.createTexure(holeObject.data.diameter * 1.5, firstColor, secondColor, 0.35);
-      casingWallWidth = holeObject.data.diameter - holeObject.innerDiameter;
+      casingWallWidth = Math.abs(holeObject.data.diameter - holeObject.innerDiameter);
     }
     this.createRopeTextureBackground(wellBorePathCoords, texture2, mask);
     this.drawLine(polygonCoords, lineColor, casingWallWidth);
@@ -72,14 +72,14 @@ export class HoleSizeLayer extends WebGLLayer {
 
       for (let i = 0; tot < meters || i > points.length - 2; i++) {
         tot += this.calcDistPoint(points[points.length - 1 - i], points[points.length - 2 - i]);
-        newPoints.push(points[points.length - 1 - i]);
+        newPoints.push(points[points.length - 1 - i].clone());
       }
 
       return newPoints.reverse();
     };
 
     if (holeObject.hasShoe === true) {
-      const shoeWidth = 125;
+      const shoeWidth = 2;
 
       const shoeHeightCoords = takeMeters(normalOffsetCoordsDown, 10);
       const shoeCoords = this.generateShoe(shoeHeightCoords, -shoeWidth);
@@ -92,7 +92,10 @@ export class HoleSizeLayer extends WebGLLayer {
   };
 
   generateShoe = (triangleSideShoe: Point[], offset: number): Point[] => {
-    const normalOffset = this.createNormal(triangleSideShoe, offset);
+    const normalOffset = this.createNormal(
+      [triangleSideShoe[0], triangleSideShoe[1], triangleSideShoe[triangleSideShoe.length - 2], triangleSideShoe[triangleSideShoe.length - 1]],
+      offset,
+    );
 
     const a = [triangleSideShoe[0], triangleSideShoe[triangleSideShoe.length - 1], normalOffset[normalOffset.length - 1], triangleSideShoe[0]];
     return a;
