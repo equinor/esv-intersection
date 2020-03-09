@@ -11,7 +11,7 @@ interface AxisOptions {
   unitOfMeasure: string;
 }
 
-export class MainManager {
+export class LayerManager {
   private container: HTMLElement;
 
   private _zoomPanHandler: ZoomPanHandler;
@@ -34,14 +34,14 @@ export class MainManager {
     this.rescale = this.rescale.bind(this);
   }
 
-  addLayer(layer: Layer, params?: any): MainManager {
+  addLayer(layer: Layer, params?: any): LayerManager {
     this.layers.push(layer);
     this.initLayer(layer, params);
 
     return this;
   }
 
-  removeLayer(layerId: string): MainManager {
+  removeLayer(layerId: string): LayerManager {
     const idx = this.layers.findIndex(l => l.id === layerId);
     if (idx) {
       this.layers[idx].onUnmount();
@@ -51,7 +51,7 @@ export class MainManager {
     return this;
   }
 
-  initLayer(layer: Layer, params?: any): MainManager {
+  initLayer(layer: Layer, params?: any): LayerManager {
     const event: OnMountEvent = {
       elm: this.container,
       width: this._scaleManager.xRange[1],

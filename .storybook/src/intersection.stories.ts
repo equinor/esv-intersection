@@ -1,5 +1,5 @@
 import { WellborepathLayerOptions, Annotation } from '../../src/interfaces';
-import { MainManager } from '../../src/control';
+import { LayerManager } from '../../src/control';
 import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer, GeomodelLayer, Layer } from '../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
@@ -141,7 +141,7 @@ export const intersection = () => {
   const image2Layer = createImageLayer( 'bg2Img', 2);
   const geomodelLayer = createGeomodelLayer('geomodel', 1);
 
-  const manager = new MainManager(container, scaleOptions, axisOptions);
+  const manager = new LayerManager(container, scaleOptions, axisOptions);
 
   const sm = manager.scaleManager;
 
@@ -178,7 +178,7 @@ export const intersection = () => {
   return root;
 };
 
-const createButton = (manager: MainManager, layer: Layer, title: string, additionalEventParams: any) => {
+const createButton = (manager: LayerManager, layer: Layer, title: string, additionalEventParams: any) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
   btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
