@@ -1,11 +1,10 @@
-import { select } from 'd3-selection';
-import { scaleLinear, ScaleLinear } from 'd3-scale';
-import {  WellborepathLayerOptions, Annotation, OnRescaleEvent, OnMountEvent } from '../../src/interfaces';
-import { Axis } from '../../src/components';
-import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
-import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer } from '../../src/layers';
+import { WellborepathLayerOptions, Annotation } from '../../src/interfaces';
+import { LayerManager } from '../../src/control';
+import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer, GeomodelLayer, Layer } from '../../src/layers';
 
-import { createButton, createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
+import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
+
+import { generateSurfaceData, generateProjectedTrajectory, SurfaceData } from '../../src/datautils';
 
 export default {
   title: 'Intersection',
@@ -13,6 +12,14 @@ export default {
 
 const bg1Img = require('./resources/bg1.jpeg');
 const bg2Img = require('./resources/bg2.jpg');
+
+//Data
+import poslog from './exampledata/polog.json';
+import stratColumn from './exampledata/stratcolumn.json';
+import surfaceValues from './exampledata/surfaces.json';
+
+const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
+const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
 
 const annotations : Annotation[] = [
   {
@@ -114,90 +121,55 @@ const yRange = 500;
 const width = 700;
 const height = 600;
 
-const createScale = (xMin: number, xMax: number, yMin: number, yMax: number, height: number, width: number) => {
-  return [
-    scaleLinear()
-      .domain([xMin, xMax])
-      .range([0, width]),
-    scaleLinear()
-      .domain([yMin, yMax])
-      .range([0, height]),
-  ];
-};
-
 export const intersection = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
   const btnContainer = createButtonContainer(width);
 
-  const [scaleX, scaleY] = createScale(xbounds[0], xbounds[1], ybounds[0], ybounds[1], yRange, xRange);
-  const onMountEvent = {
-    elm: container,
-    width: scaleX.range()[1],
-    height: scaleY.range()[1],
+  const scaleOptions = { xMin: xbounds[0], xMax: xbounds[1], yMin: ybounds[0], yMax: ybounds[1], height: yRange, width: xRange };
+  const axisOptions = {
+    xLabel: 'Displacement',
+    yLabel: 'TVD MSL',
+    unitOfMeasure: 'm',
   };
 
   // Instantiate and mount layers
-  const axis = createAxis(container, scaleX, scaleY);
-  const gridLayer = createGridLayer(onMountEvent);
-  const wellboreLayer = createWellboreLayer(onMountEvent);
-  const calloutLayer = createCanvasCallout(onMountEvent);
-  const image1Layer = createImageLayer(onMountEvent, 'bg1Img', bg1Img, 1);
-  const image2Layer = createImageLayer(onMountEvent, 'bg2Img', bg2Img, 2);
+  const gridLayer = createGridLayer();
+  const wellboreLayer = createWellboreLayer();
+  const calloutLayer = createCanvasCallout();
+  const image1Layer = createImageLayer('bg1Img', 1);
+  const image2Layer = createImageLayer( 'bg2Img', 2);
+  const geomodelLayer = createGeomodelLayer('geomodel', 1);
 
-  wellboreLayer.onUpdate({
-    xScale: scaleX,
-    yScale: scaleY,
-    data: wellborePath,
-  });
+  const manager = new LayerManager(container, scaleOptions, axisOptions);
 
-  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
-    axis.onRescale(event);
+  const sm = manager.scaleManager;
 
-    gridLayer.onRescale(event);
-    wellboreLayer.onRescale(event);
-    calloutLayer.onRescale({
-      ...event,
-      data: annotations,
-      annotations,
-      isLeftToRight: true,
-      margin,
-      scale: 0,
-    });
-    image1Layer.onRescale({
-      ...event,
-      x: -50,
-      y: -150,
-    });
-    image2Layer.onRescale({
-      ...event,
-      x: -50,
-      y: -150,
-    });
-  });
+  manager
+    .addLayer(gridLayer)
+    .addLayer(wellboreLayer, { xScale: sm.xScale, yScale: sm.yScale, data: wellborePath })
+    .addLayer(calloutLayer, { data: annotations })
+    .addLayer(image1Layer, { url: bg1Img })
+    .addLayer(image2Layer, { url: bg2Img })
+    .addLayer(geomodelLayer, { data: geolayerdata });
 
-  zoomHandler.setBounds(xbounds, ybounds);
-  zoomHandler.adjustToSize(xRange, yRange);
-  zoomHandler.setViewport(250, 150, 600);
+  manager.zoomPanHandler.setBounds(sm.xDomain as [number, number], sm.yDomain as [number, number]);
+  manager.zoomPanHandler.adjustToSize(sm.xRange[1], sm.yRange[1]);
+  manager.zoomPanHandler.setViewport(250, 550, 600);
 
   const FPSLabel = createFPSLabel();
 
-  const imgParams = {
-    margin,
-    scale: 0,
-    x: -50,
-    y: -150,
-  };
-
-  const btnCallout = createButton(calloutLayer, zoomHandler, 'Callout', { annotations }, onMountEvent);
-  const btnWellbore = createButton(wellboreLayer, zoomHandler, 'Wellbore', { data: wellborePath }, onMountEvent);
-  const btnImage1 = createButton(image1Layer, zoomHandler, 'Image 1', { ...imgParams, url: bg1Img }, onMountEvent);
-  const btnImage2 = createButton(image2Layer, zoomHandler, 'Image 2', { ...imgParams, url: bg2Img }, onMountEvent);
+  const btnCallout = createButton(manager, calloutLayer, 'Callout', { data: annotations });
+  const btnWellbore = createButton(manager, wellboreLayer, 'Wellbore', { data: wellborePath });
+  const btnImage1 = createButton(manager, image1Layer, 'Image 1', { url: bg1Img });
+  const btnImage2 = createButton(manager, image2Layer, 'Image 2', { url: bg2Img });
+  const btnGeomodel = createButton(manager, geomodelLayer, 'Geo model', { data: geolayerdata });
 
   btnContainer.appendChild(btnCallout);
   btnContainer.appendChild(btnWellbore);
   btnContainer.appendChild(btnImage1);
   btnContainer.appendChild(btnImage2);
+  btnContainer.appendChild(btnGeomodel);
 
   root.appendChild(container);
   root.appendChild(btnContainer);
@@ -206,34 +178,48 @@ export const intersection = () => {
   return root;
 };
 
-const createImageLayer = (onMountEvent : OnMountEvent, id: string, img: any, zIndex: number) => {
+const createButton = (manager: LayerManager, layer: Layer, title: string, additionalEventParams: any) => {
+  const btn = document.createElement('button');
+  btn.innerHTML = `Toggle ${title}`;
+  btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
+  let show = false;
+  btn.onclick = () => {
+    if (show) {
+      manager.addLayer(layer, additionalEventParams);
+    } else {
+      manager.removeLayer(layer.id.toString());
+    }
+    show = !show;
+  };
+  return btn;
+};
+
+const createGeomodelLayer = (id: string, zIndex: number) => {
+  const layer = new GeomodelLayer(id,
+    {
+      order: zIndex,
+      layerOpacity: 1,
+    });
+
+  return layer;
+}
+
+const createImageLayer = (id: string, zIndex: number) => {
   const layer = new ImageLayer(id,
     {
       order: zIndex,
       layerOpacity: 0.5,
     });
-  layer.onMount({
-    ...onMountEvent,
-    url: img,
-  });
 
   return layer;
 };
 
-const createCanvasCallout = (onMountEvent: OnMountEvent) => {
+const createCanvasCallout = () => {
   const layer = new CalloutCanvasLayer('callout', { order: 4 });
-  layer.onMount({
-    ...onMountEvent,
-    annotations,
-    isLeftToRight: true,
-    margin,
-    scale: 0,
-  });
-
   return layer;
 };
 
-const createWellboreLayer = (onMountEvent : OnMountEvent) => {
+const createWellboreLayer = () => {
   const options: WellborepathLayerOptions = {
     order: 3,
     strokeWidth: '5px',
@@ -241,12 +227,10 @@ const createWellboreLayer = (onMountEvent : OnMountEvent) => {
   };
   const layer = new WellborepathLayer('wellborepath', options);
 
-  layer.onMount(onMountEvent);
-
   return layer;
 };
 
-const createGridLayer = (onMountEvent: OnMountEvent) => {
+const createGridLayer = () => {
   const gridLayer = new GridLayer('grid', {
     majorColor: 'black',
     minorColor: 'gray',
@@ -255,26 +239,5 @@ const createGridLayer = (onMountEvent: OnMountEvent) => {
     order: 1,
   });
 
-  gridLayer.onMount(onMountEvent);
-
   return gridLayer;
-};
-
-const createAxis = (container: HTMLElement, scaleX: ScaleLinear<number, number>, scaleY: ScaleLinear<number, number>) => {
-  const svgContainer = document.createElement('div');
-  svgContainer.setAttribute('style', 'position: absolute;');
-  container.appendChild(svgContainer);
-
-  const svg = select(svgContainer)
-    .append('svg')
-    .attr('height', `${height}px`)
-    .attr('width', `${width}px`);
-
-  const showLabels = true;
-
-  const axis = new Axis(svg, scaleX, scaleY, showLabels, 'Displacement', 'TVD MSL', 'm');
-
-  axis.render();
-
-  return axis;
 };

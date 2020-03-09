@@ -7,13 +7,13 @@ export class ImageLayer extends CanvasLayer {
   onMount(event: OnMountEvent): void {
     super.onMount(event);
     const img = document.createElement('img');
-    img.src = event.url;
     this.img = img;
     this.isLoading = true;
   }
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
+    this.img.src = event.url;
     this.render(event);
   }
 

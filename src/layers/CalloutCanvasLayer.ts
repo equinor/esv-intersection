@@ -1,6 +1,6 @@
 import { round } from '@equinor/videx-math';
 import { CanvasLayer } from './CanvasLayer';
-import { OnUpdateEvent, OnMountEvent, Annotation, OnRescaleEvent } from '../interfaces';
+import { OnUpdateEvent, Annotation, OnRescaleEvent } from '../interfaces';
 
 import { calcTextSize, positionCallout } from '../utils';
 
@@ -23,9 +23,9 @@ export class CalloutCanvasLayer extends CanvasLayer {
   xRatio: number;
   overlapped: any[];
 
-  onMount(event: OnMountEvent) {
-    super.onMount(event);
-    this.data = event.annotations;
+  onUpdate(event: OnUpdateEvent) {
+    super.onUpdate(event);
+    this.data = event.data;
   }
 
   onRescale(event: OnRescaleEvent) {
