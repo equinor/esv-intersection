@@ -9,7 +9,14 @@ const xbounds = [0, 300];
 const ybounds = [0, 800];
 
 export const Holes = () => {
-  const options = { order: 1 };
+  const options = {
+    order: 1,
+    firstColor: 'rgb(163, 102, 42)',
+    secondColor: 'rgb(255, 255, 255)',
+    lineColor: 0x8b4513,
+    topBottomLineColor: 0x8b4513,
+    maxTextureDiameterScale: 1.5,
+  };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 
   const root = document.createElement('div');
@@ -62,8 +69,5 @@ const createEventObj = (elm: any) => {
     elm,
     data,
     wellborePath,
-    firstColor: 'rgb(163, 102, 42)',
-    secondColor: 'rgb(255, 255, 255)',
-    lineColor: 0x8b4513,
   };
 };

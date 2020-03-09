@@ -1,10 +1,9 @@
 import { HoleSizeLayer } from '../../../../src/layers/HoleSizeLayer';
 import { scaleLinear } from 'd3-scale';
-import { Casing } from '../../../../src/interfaces';
+import { Casing, HoleSizeLayerOptions } from '../../../../src/interfaces';
 
-export default {
-  title: 'PIXI JS WebGL Layer',
-};
+import poslog from '../../exampledata/polog.json';
+import { generateProjectedWellborePath } from '../../../../src/datautils';
 
 const width = 400;
 const height = 800;
@@ -12,9 +11,40 @@ const height = 800;
 const xbounds = [0, 300];
 const ybounds = [0, 800];
 
-export const Casings = () => {
-  const options = { order: 1 };
+export const CasingLayer = () => {
+  const options: HoleSizeLayerOptions = {
+    order: 1,
+    firstColor: '#777788', // maybe not needed, refactor holesizelayer
+    secondColor: '#EEEEFF',
+    lineColor: 0x575757,
+    topBottomLineColor: 0x575757,
+  };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
+
+  const root = document.createElement('div');
+  root.className = 'grid-container';
+  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
+  root.setAttribute('height', `${height}`);
+  root.setAttribute('width', `${width}`);
+
+  holeSizeLayer.onMount({ elm: root, height, width });
+
+  holeSizeLayer.onUpdate(createEventObj(root));
+
+  return root;
+};
+
+export const CasingLayerWithSampleData = () => {
+  const options: HoleSizeLayerOptions = {
+    order: 1,
+    firstColor: '#777788', // maybe not needed, refactor holesizelayer
+    secondColor: '#EEEEFF',
+    lineColor: 0x575757,
+    topBottomLineColor: 0x575757,
+  };
+  const holeSizeLayer = new HoleSizeLayer('webgl', options);
+  const wellborePath = generateProjectedWellborePath(poslog);
+  console.log(wellborePath);
 
   const root = document.createElement('div');
   root.className = 'grid-container';
@@ -66,9 +96,5 @@ const createEventObj = (elm: any) => {
     elm,
     data,
     wellborePath,
-    firstColor: '#777788', // maybe not needed, refactor holesizelayer
-    secondColor: '#EEEEFF',
-    lineColor: 0x575757,
-    topBottomLineColor: 0x575757,
   };
 };

@@ -10,6 +10,7 @@ export class HoleSizeLayer extends WebGLLayer {
     super(id, options);
     this.options = {
       ...options,
+      maxTextureDiameterScale: 1.5,
     };
     this.render = this.render.bind(this);
   }
@@ -25,13 +26,14 @@ export class HoleSizeLayer extends WebGLLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    const { data, wellborePath, firstColor, secondColor, lineColor, topBottomLineColor } = event;
+    const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
+    const { data, wellborePath } = event;
     const sizes: HoleObjectData[] = data.map((d: HoleSize | Casing) => this.generateHoleSizeData(wellborePath, d));
     const maxDiameter = Math.max(...sizes.map((s: HoleObjectData) => s.data.diameter));
-    const texture = this.createTexure(maxDiameter * 1.5, firstColor, secondColor);
+    const texture = this.createTexure(maxDiameter * maxTextureDiameterScale, firstColor, secondColor);
     sizes
       // .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1))
-      .map((s: any) => this.drawHoleSize(s, texture, lineColor, firstColor, secondColor, topBottomLineColor));
+      .map((s: any) => this.drawHoleSize(s, texture));
   }
 
   createNormalCoords = (s: HoleObjectData): NormalCoordsObject => {
@@ -49,14 +51,8 @@ export class HoleSizeLayer extends WebGLLayer {
     return { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp };
   };
 
-  drawHoleSize = (
-    holeObject: HoleObjectData,
-    defaultTexture: Texture,
-    lineColor: number,
-    firstColor = '',
-    secondColor = '',
-    topBottomLineColor = 0,
-  ): void => {
+  drawHoleSize = (holeObject: HoleObjectData, defaultTexture: Texture): void => {
+    const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = this.createNormalCoords(holeObject);
     // this.drawLine(wellBorePathCoords, 0xff0000);
     // this.drawLine(normalOffsetCoordsUp, 0xff0000);
@@ -70,7 +66,8 @@ export class HoleSizeLayer extends WebGLLayer {
     let casingWallWidth = 1;
 
     if (holeObject.hasShoe != null) {
-      texture = this.createTexure(holeObject.data.diameter * 1.5, firstColor, secondColor, 0.35);
+      const pctOffset = 0.35;
+      texture = this.createTexure(holeObject.data.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
       casingWallWidth = Math.abs(holeObject.data.diameter - holeObject.innerDiameter);
     }
 
@@ -79,12 +76,13 @@ export class HoleSizeLayer extends WebGLLayer {
     this.drawLine(casingTopLineCoords, topBottomLineColor, 1);
     this.drawLine(casingBottomLineCoords, topBottomLineColor, 1);
 
-    const takeMeters = (points: Point[], meters: number) => {
+    const takeMeters = (points: Point[], meters: number): Point[] => {
       let tot = 0;
+      const lastMeterPoint = 2;
       const newPoints: Point[] = [];
 
-      for (let i = 0; tot < meters || i > points.length - 2; i++) {
-        tot += this.calcDistPoint(points[points.length - 1 - i], points[points.length - 2 - i]);
+      for (let i = 0; tot < meters || i > points.length - lastMeterPoint; i++) {
+        tot += this.calcDistPoint(points[points.length - 1 - i], points[points.length - lastMeterPoint - i]);
         newPoints.push(points[points.length - 1 - i].clone());
       }
 
@@ -93,20 +91,26 @@ export class HoleSizeLayer extends WebGLLayer {
 
     if (holeObject.hasShoe === true) {
       const shoeWidth = 2;
-
-      const shoeHeightCoords = takeMeters(normalOffsetCoordsDown, 10);
+      const meters = 10;
+      const shoeHeightCoords = takeMeters(normalOffsetCoordsDown, meters);
       const shoeCoords = this.generateShoe(shoeHeightCoords, -shoeWidth);
       this.drawBigPolygon(shoeCoords);
 
-      const shoeHeightCoords2 = takeMeters(normalOffsetCoordsUp, 10);
+      const shoeHeightCoords2 = takeMeters(normalOffsetCoordsUp, meters);
       const shoeCoords2 = this.generateShoe(shoeHeightCoords2, shoeWidth);
       this.drawBigPolygon(shoeCoords2);
     }
   };
 
   generateShoe = (triangleSideShoe: Point[], offset: number): Point[] => {
+    const nextToLastIndex = 2;
     const normalOffset = this.createNormal(
-      [triangleSideShoe[0], triangleSideShoe[1], triangleSideShoe[triangleSideShoe.length - 2], triangleSideShoe[triangleSideShoe.length - 1]],
+      [
+        triangleSideShoe[0],
+        triangleSideShoe[1],
+        triangleSideShoe[triangleSideShoe.length - nextToLastIndex],
+        triangleSideShoe[triangleSideShoe.length - 1],
+      ],
       offset,
     );
 
@@ -163,29 +167,30 @@ export class HoleSizeLayer extends WebGLLayer {
     this.ctx.stage.addChild(line);
   };
 
-  createTexure = (maxWidth = 150, firstColor: string, secondColor: string, startPctOffset = 0): Texture => {
+  createTexure = (maxWidth: number, firstColor: string, secondColor: string, startPctOffset = 0): Texture => {
+    const halfWayPct = 0.5;
     const canvas = document.createElement('canvas');
-
     canvas.width = 150;
     canvas.height = maxWidth;
     const canvasCtx = canvas.getContext('2d');
 
     const gradient = canvasCtx.createLinearGradient(0, 0, 0, maxWidth);
     gradient.addColorStop(0, firstColor);
-    gradient.addColorStop(0.5 - startPctOffset, secondColor);
-    gradient.addColorStop(0.5 + startPctOffset, secondColor);
+    gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
+    gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
     gradient.addColorStop(1, firstColor);
 
     canvasCtx.fillStyle = gradient;
-    canvasCtx.fillRect(0, 0, 150, maxWidth);
+    canvasCtx.fillRect(0, 0, canvas.width, maxWidth);
 
     return Texture.from(canvas);
   };
 
   generateHoleSizeData = (wbp: number[][], data: HoleSize | Casing): HoleObjectData => {
     const tension = 0.2;
+    const numberOfInterpolatedPoints = 999;
     const interp = new CurveInterpolator(wbp, tension);
-    let points = interp.getPoints(999);
+    let points = interp.getPoints(numberOfInterpolatedPoints);
 
     let md = 0;
     let prev = points[0];

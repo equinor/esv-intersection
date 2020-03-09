@@ -36,8 +36,8 @@ export interface OnRescaleEvent extends LayerEvent {
 export interface OnUpdateEvent extends LayerEvent {}
 
 export interface LayerOptions {
-  order: Number;
-  layerOpacity?: Number;
+  order: number;
+  layerOpacity?: number;
 
   onMount?(event: OnMountEvent, layer: Layer): void;
   onUnmount?(event: OnUnmountEvent, layer: Layer): void;
@@ -61,7 +61,13 @@ export interface WellborepathLayerOptions extends LayerOptions {
 
 export interface GeomodelLayerOptions extends LayerOptions {}
 
-export interface HoleSizeLayerOptions extends LayerOptions {}
+export interface HoleSizeLayerOptions extends LayerOptions {
+  firstColor: string;
+  secondColor: string;
+  lineColor: number;
+  topBottomLineColor: number;
+  maxTextureDiameterScale: number;
+}
 
 export interface GeoModelData {
   name: string;
