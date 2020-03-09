@@ -1,12 +1,12 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
-import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, NormalCoordsObject, HoleSize, Casing } from '../interfaces';
+import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, NormalCoordsObject, HoleSize, Casing } from '../interfaces';
 
 export class HoleSizeLayer extends WebGLLayer {
-  options: GeomodelLayerOptions;
+  options: HoleSizeLayerOptions;
 
-  constructor(id: string, options: GeomodelLayerOptions) {
+  constructor(id: string, options: HoleSizeLayerOptions) {
     super(id, options);
     this.options = {
       ...options,

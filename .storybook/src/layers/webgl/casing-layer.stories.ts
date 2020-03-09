@@ -1,6 +1,6 @@
-import { HoleSizeLayer } from '../../../src/layers/HoleSizeLayer';
+import { HoleSizeLayer } from '../../../../src/layers/HoleSizeLayer';
 import { scaleLinear } from 'd3-scale';
-import { Casing } from '../../../src/interfaces';
+import { Casing } from '../../../../src/interfaces';
 
 export default {
   title: 'PIXI JS WebGL Layer',

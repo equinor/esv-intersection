@@ -1,4 +1,4 @@
-export * from './HoleSizeLayer.stories';
+export * from './holesize-layer.stories';
 export * from './geomodel-layer.stories';
 
 export default {
