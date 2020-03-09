@@ -108,3 +108,12 @@ export interface NormalCoordsObject {
   normalOffsetCoordsDown: Point[];
   normalOffsetCoordsUp: Point[];
 }
+
+export interface ScaleOptions {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  width: number;
+  height: number;
+}
