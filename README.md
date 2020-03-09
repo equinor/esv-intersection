@@ -1,3 +1,6 @@
+[![npm version](https://badge.fury.io/js/%40equinor%2Fesv-intersection.svg)](https://badge.fury.io/js/%40equinor%2Fesv-intersection)
+![Publish Package](https://github.com/equinor/esv-intersection/workflows/Publish%20Package/badge.svg)
+![Unit tests](https://github.com/equinor/esv-intersection/workflows/Unit%20tests/badge.svg)
 # ESV Intersection component
 A reusable component to create intersection visualizations for wells
 
