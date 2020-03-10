@@ -3,7 +3,7 @@ import { scaleLinear } from 'd3-scale';
 import { Casing, HoleSizeLayerOptions } from '../../../../src/interfaces';
 
 import poslog from '../../exampledata/polog.json';
-import { generateProjectedWellborePath } from '../../../../src/datautils';
+import { generateProjectedWellborePath, generateProjectedTrajectory } from '../../../../src/datautils';
 
 const width = 400;
 const height = 800;
@@ -18,6 +18,7 @@ export const CasingLayer = () => {
     secondColor: '#EEEEFF',
     lineColor: 0x575757,
     topBottomLineColor: 0x575757,
+    maxTextureDiameterScale: 1.5,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 
@@ -41,10 +42,15 @@ export const CasingLayerWithSampleData = () => {
     secondColor: '#EEEEFF',
     lineColor: 0x575757,
     topBottomLineColor: 0x575757,
+    maxTextureDiameterScale: 1.5,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
-  const wellborePath = generateProjectedWellborePath(poslog);
-  console.log(wellborePath);
+
+  const width: number = 1280;
+  const height: number = 1024;
+
+  const xbounds: number[] = [0, 1000];
+  const ybounds: number[] = [-500, 4000];
 
   const root = document.createElement('div');
   root.className = 'grid-container';
@@ -52,11 +58,35 @@ export const CasingLayerWithSampleData = () => {
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 
-  holeSizeLayer.onMount({ elm: root, height, width });
+  const xScale = scaleLinear()
+    .domain(xbounds)
+    .range([0, width]);
+  const yScale = scaleLinear()
+    .domain(ybounds)
+    .range([0, height]);
 
-  holeSizeLayer.onUpdate(createEventObj(root));
+  holeSizeLayer.onMount({ elm: root, height, width, xScale: xScale.copy(), yScale: yScale.copy() });
+
+  holeSizeLayer.onUpdate(createEventWithSampleDataObj(root));
 
   return root;
+};
+
+const createEventWithSampleDataObj = (elm: any) => {
+  const data: Casing[] = [
+    { diameter: 30, start: 0, length: 500, hasShoe: false, innerDiameter: 29 },
+    { diameter: 28, start: 1510, length: 500, hasShoe: true, innerDiameter: 26 },
+  ];
+
+  const wellborePath: [number, number][] = (generateProjectedTrajectory(poslog, 45) as [number, number][])
+    .reverse()
+    .map(arr => [arr[1] + 200, arr[0]]);
+
+  return {
+    elm,
+    data,
+    wellborePath,
+  };
 };
 
 const createEventObj = (elm: any) => {

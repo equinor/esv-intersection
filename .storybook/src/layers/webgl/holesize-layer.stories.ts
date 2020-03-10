@@ -25,7 +25,14 @@ export const Holes = () => {
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 
-  holeSizeLayer.onMount({ elm: root, height, width });
+  const xScale = scaleLinear()
+    .domain(xbounds)
+    .range([0, width]);
+  const yScale = scaleLinear()
+    .domain(ybounds)
+    .range([0, height]);
+
+  holeSizeLayer.onMount({ elm: root, height, width, xScale: xScale.copy(), yScale: yScale.copy() });
 
   holeSizeLayer.onUpdate(createEventObj(root));
 

@@ -171,17 +171,17 @@ export class HoleSizeLayer extends WebGLLayer {
     const halfWayPct = 0.5;
     const canvas = document.createElement('canvas');
     canvas.width = 150;
-    canvas.height = maxWidth;
+    canvas.height = maxWidth > 0 ? maxWidth : canvas.width; // needs togrow with scale
     const canvasCtx = canvas.getContext('2d');
 
-    const gradient = canvasCtx.createLinearGradient(0, 0, 0, maxWidth);
+    const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, firstColor);
     gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
     gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
     gradient.addColorStop(1, firstColor);
 
     canvasCtx.fillStyle = gradient;
-    canvasCtx.fillRect(0, 0, canvas.width, maxWidth);
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
     return Texture.from(canvas);
   };

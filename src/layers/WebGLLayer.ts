@@ -1,6 +1,6 @@
+import { Application, Transform } from 'pixi.js';
 import { Layer } from './Layer';
 import { OnMountEvent, OnRescaleEvent } from '../interfaces';
-import { Application, Transform } from 'pixi.js';
 
 export abstract class WebGLLayer extends Layer {
   elm: HTMLElement;
@@ -8,8 +8,9 @@ export abstract class WebGLLayer extends Layer {
   ctx: Application;
   transform: Transform;
 
-  onMount(event: OnMountEvent) {
+  onMount(event: OnMountEvent): void {
     super.onMount(event);
+    console.log('onmount');
     if (!this.container) {
       this.container = document.createElement('div');
       this.container.setAttribute('id', `${this.id}`);
@@ -28,7 +29,13 @@ export abstract class WebGLLayer extends Layer {
         // failIfMajorPerformanceCaveat: false,
       };
       this.ctx = new Application(pixiOptions);
+      const tr = this.setTransform(width, height, event.xScale, event.yScale);
+      if (tr != null) {
+        this.ctx.stage.position.set(tr.x, tr.y);
+      }
+      // this.ctx.stage.scale.set(event.xRatio, event.yRatio);
       this.container.appendChild(this.ctx.view);
+      // this.ctx.stage.transform = this.transform;
       this.elm.appendChild(this.container);
     }
   }
@@ -51,9 +58,23 @@ export abstract class WebGLLayer extends Layer {
     const [, width] = event.xScale.range();
     this.ctx.view.style.height = `${height}px`;
     this.ctx.view.style.width = `${width}px`;
-
-    this.transform = new Transform();
-    this.transform.scale.x = width / (event.xScale.domain()[1] - event.xScale.domain()[0]);
-    this.transform.scale.y = height / (event.yScale.domain()[1] - event.yScale.domain()[0]);
+    const tr = this.setTransform(width, height, event.xScale, event.yScale);
+    console.log('tr', tr);
+    this.ctx.stage.position.set(tr.x, tr.y);
+    this.ctx.stage.scale.set(event.xRatio, event.yRatio);
   }
+
+  setTransform = (width: number, height: number, xScale: any, yScale: any): any => {
+    if (!(width != 0 && height != 0 && xScale != null && yScale != null)) {
+      return null;
+    }
+    const [xmin, xmax] = xScale.domain();
+    const [ymin, ymax] = yScale.domain();
+    const xRatio = 1 / Math.abs((xmin - xmax) / width);
+    const yRatio = 1 / Math.abs((ymin - ymax) / height);
+
+    console.log('scaleeee', xRatio, yRatio);
+
+    return { xRatio, yRatio };
+  };
 }
