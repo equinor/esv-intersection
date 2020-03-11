@@ -14,7 +14,7 @@ const bg1Img = require('./resources/bg1.jpeg');
 const bg2Img = require('./resources/bg2.jpg');
 
 //Data
-import poslog from './exampledata/polog.json';
+import poslog from './exampledata/poslog.json';
 import stratColumn from './exampledata/stratcolumn.json';
 import surfaceValues from './exampledata/surfaces.json';
 

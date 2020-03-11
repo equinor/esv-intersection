@@ -1,14 +1,18 @@
+import { Application, Transform } from 'pixi.js';
+
 import { Layer } from './Layer';
 import { OnMountEvent, OnRescaleEvent } from '../interfaces';
-import { Application, Transform } from 'pixi.js';
 
 export abstract class WebGLLayer extends Layer {
   elm: HTMLElement;
+
   container: HTMLElement;
+
   ctx: Application;
+
   transform: Transform;
 
-  onMount(event: OnMountEvent) {
+  onMount(event: OnMountEvent): void {
     super.onMount(event);
     if (!this.container) {
       this.container = document.createElement('div');
@@ -33,7 +37,7 @@ export abstract class WebGLLayer extends Layer {
     }
   }
 
-  onUnmount() {
+  onUnmount(): void {
     super.onUnmount();
     this.ctx.stop();
     this.ctx.destroy(true);
@@ -42,7 +46,7 @@ export abstract class WebGLLayer extends Layer {
     this.ctx = null;
   }
 
-  onRescale(event: OnRescaleEvent) {
+  onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     if (!this.ctx) {
       return;
