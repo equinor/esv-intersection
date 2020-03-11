@@ -67,6 +67,11 @@ export interface HoleSizeLayerOptions extends LayerOptions {
   lineColor: number;
   topBottomLineColor: number;
   maxTextureDiameterScale: number;
+  margins?: number;
+  minFontSize?: number;
+  maxFontSize?: number;
+  textColor?: string;
+  font?: string;
 }
 
 export interface GeoModelData {
@@ -131,4 +136,13 @@ export interface NormalCoordsObject {
   wellBorePathCoords: Point[];
   normalOffsetCoordsDown: Point[];
   normalOffsetCoordsUp: Point[];
+}
+
+export interface ScaleOptions {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  width: number;
+  height: number;
 }

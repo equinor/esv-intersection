@@ -5,12 +5,11 @@ import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMo
 export class GeomodelLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
   graphics: Graphics;
+  // TODO: create proper interface
+  data: any;
 
   constructor(id: string, options: GeomodelLayerOptions) {
     super(id, options);
-    this.options = {
-      ...options,
-    };
     this.render = this.render.bind(this);
   }
 
@@ -22,7 +21,8 @@ export class GeomodelLayer extends WebGLLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.render(event);
+    this.data = event.data;
+    this.render();
   }
 
   onRescale(event: OnRescaleEvent): void {
@@ -31,11 +31,14 @@ export class GeomodelLayer extends WebGLLayer {
     this.graphics.scale.set(event.xRatio, event.yRatio);
   }
 
-  render(event: OnUpdateEvent): void {
+  render(): void {
     if (!this.ctx) {
       return;
     }
-    const { data } = event;
+    const { data } = this;
+    if(!data){
+      return;
+    }
 
     this.graphics.clear();
 
