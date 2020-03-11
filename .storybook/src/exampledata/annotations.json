@@ -1,0 +1,56 @@
+[
+  {
+    "title": "Heidur Top",
+    "md": 1234.3,
+    "tvd": 1234,
+    "mdUnit": "m",
+    "depthReferencePoint": "RKB",
+    "group": "strat-picks",
+    "data": [150, 160]
+  },
+  {
+    "title": "Balder Fm. Top",
+    "md": 1234.3,
+    "tvd": 1234,
+    "mdUnit": "m",
+    "depthReferencePoint": "RKB",
+    "group": "strat-picks",
+    "data": [460, 110]
+  },
+  {
+    "title": "Odin Fm. Top",
+    "md": 1234.3,
+    "tvd": 1234,
+    "mdUnit": "m",
+    "depthReferencePoint": "RKB",
+    "group": "strat-picks",
+    "data": [350, 60]
+  },
+  {
+    "title": "Loke Fm. 2.1 Top",
+    "md": 1234,
+    "tvd": 1234,
+    "mdUnit": "m",
+    "depthReferencePoint": "RKB",
+    "group": "strat-picks",
+    "data": [40, 70]
+  },
+  {
+    "title": "Balder Fm. 1.1 SB Top",
+    "md": 1234.7,
+    "tvd": 1234,
+    "mdUnit": "m",
+    "depthReferencePoint": "RKB",
+    "group": "strat-picks",
+    "data": [200, 300]
+  },
+  {
+    "title": "Balder Fm. 1.1 SB Base",
+    "md": 1234.59,
+    "tvd": 1234.75,
+    "mdUnit": "m",
+    "depthReferencePoint": "RKB",
+    "group": "strat-picks",
+    "data": [115, 110]
+  }
+]

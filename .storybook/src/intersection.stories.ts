@@ -1,6 +1,6 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { WellborepathLayerOptions, Annotation, HoleSize, Casing } from '../../src/interfaces';
-import { LayerManager } from '../../src/control';
+import { LayerManager, DataManager } from '../../src/control';
 import {
   GridLayer,
   WellborepathLayer,
@@ -114,74 +114,12 @@ const seismicColorMap = [
   '#00e4ff',
   '#00f0ff',
 ];
+import annotations from './exampledata/annotations';
+import mockedWellborePath from './exampledata/wellborepathMock.json';
 
 const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
 const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
 const seismicInfo = getSeismicInfo(seismic, trajectory);
-
-const annotations: Annotation[] = [
-  {
-    title: 'Heidur Top',
-    md: 1234.3,
-    tvd: 1234,
-    mdUnit: 'm',
-    depthReferencePoint: 'RKB',
-    group: 'strat-picks',
-    data: [150, 160],
-  },
-  {
-    title: 'Balder Fm. Top',
-    md: 1234.3,
-    tvd: 1234,
-    mdUnit: 'm',
-    depthReferencePoint: 'RKB',
-    group: 'strat-picks',
-    data: [460, 110],
-  },
-  {
-    title: 'Odin Fm. Top',
-    md: 1234.3,
-    tvd: 1234,
-    mdUnit: 'm',
-    depthReferencePoint: 'RKB',
-    group: 'strat-picks',
-    data: [350, 60],
-  },
-  {
-    title: 'Loke Fm. 2.1 Top',
-    md: 1234,
-    tvd: 1234,
-    mdUnit: 'm',
-    depthReferencePoint: 'RKB',
-    group: 'strat-picks',
-    data: [40, 70],
-  },
-  {
-    title: 'Balder Fm. 1.1 SB Top',
-    md: 1234.7,
-    tvd: 1234,
-    mdUnit: 'm',
-    depthReferencePoint: 'RKB',
-    group: 'strat-picks',
-    data: [200, 300],
-  },
-  {
-    title: 'Balder Fm. 1.1 SB Base',
-    md: 1234.59,
-    tvd: 1234.75,
-    mdUnit: 'm',
-    depthReferencePoint: 'RKB',
-    group: 'strat-picks',
-    data: [115, 110],
-  },
-];
-
-const margin = {
-  top: 0,
-  right: 40,
-  bottom: 26,
-  left: 0,
-};
 
 const wellborePathCoords = [
   [50, 10 + 775],
@@ -250,15 +188,19 @@ export const intersection = () => {
     unitOfMeasure: 'm',
   };
 
-  // Instantiate and mount layers
-  const gridLayer = createGridLayer();
-  const wellboreLayer = createWellboreLayer();
-  const calloutLayer = createCanvasCallout();
-  const image1Layer = createImageLayer('bg1Img', 1);
-  const holeSizeLayer = createHoleSizeLayer();
-  const casingLayer = createCasingLayer();
-  const image2Layer = createImageLayer('bg2Img', 2);
-  const geomodelLayer = createGeomodelLayer('geomodel', 2);
+  const dataManager = new DataManager(poslog, 45);
+
+  const wellborePath: number[][]  = dataManager.projectedPath;
+
+  // Instantiate layers
+  const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1 });
+  const calloutLayer = new CalloutCanvasLayer('callout', { order: 4 });
+  const geomodelLayer = new GeomodelLayer('geomodel', { order: 1, layerOpacity: 1 });
+  const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
+  const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
+  const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red' });
+  const holeSizeLayer = new HoleSizeLayer('holesize', { order: 1 });
+  const casingLayer = new CasingLayer('casing', { order: 1 });
   const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3 });
   const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
 
@@ -268,7 +210,7 @@ export const intersection = () => {
 
   manager
     .addLayer(gridLayer)
-    .addLayer(wellboreLayer, { xScale: sm.xScale, yScale: sm.yScale, data: wellborePath })
+    .addLayer(wellboreLayer, { xScale: sm.xScale, yScale: sm.yScale, data: wellborePath || mockedWellborePath })
     .addLayer(calloutLayer, { data: annotations })
     .addLayer(image1Layer, { url: bg1Img })
     .addLayer(image2Layer, { url: bg2Img })
@@ -291,7 +233,7 @@ export const intersection = () => {
 
   manager.zoomPanHandler.setBounds(sm.xDomain as [number, number], sm.yDomain as [number, number]);
   manager.zoomPanHandler.adjustToSize(sm.xRange[1], sm.yRange[1]);
-  manager.zoomPanHandler.setViewport(250, 550, 600);
+  manager.zoomPanHandler.setViewport(250, 550, 6000);
 
   const FPSLabel = createFPSLabel();
 
@@ -303,7 +245,7 @@ export const intersection = () => {
   const btnHoleSize = createButton(manager, holeSizeLayer, 'Hole size', { data: holeSizeData, wellborePath });
   const btnCasing = createButton(manager, casingLayer, 'Casing', { data: casingData, wellborePath });
   const btnGeomodelLabels = createButton(manager, geomodelLabelsLayer, 'Geo model labels', { data: geolayerdata });
-  const btnSeismic = createButton(manager, seismicLayer, 'Seismic');
+  const btnSeismic = createButton(manager, seismicLayer, 'Seismic', {});
 
   btnContainer.appendChild(btnCallout);
   btnContainer.appendChild(btnWellbore);
@@ -322,7 +264,14 @@ export const intersection = () => {
   return root;
 };
 
-const createButton = (manager: LayerManager, layer: Layer, title: string, additionalEventParams?: any) => {
+/**
+ * storybook helper button for toggling a layer on and off
+ * @param manager
+ * @param layer
+ * @param title
+ * @param additionalEventParams
+ */
+const createButton = (manager: LayerManager, layer: Layer, title: string, additionalEventParams: any) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
   btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
@@ -336,60 +285,4 @@ const createButton = (manager: LayerManager, layer: Layer, title: string, additi
     show = !show;
   };
   return btn;
-};
-
-const createGeomodelLayer = (id: string, zIndex: number) => {
-  const layer = new GeomodelLayer(id, {
-    order: zIndex,
-    layerOpacity: 0.8,
-  });
-
-  return layer;
-};
-
-const createImageLayer = (id: string, zIndex: number) => {
-  const layer = new ImageLayer(id, {
-    order: zIndex,
-    layerOpacity: 0.5,
-  });
-
-  return layer;
-};
-
-const createCanvasCallout = () => {
-  const layer = new CalloutCanvasLayer('callout', { order: 4 });
-  return layer;
-};
-
-const createWellboreLayer = () => {
-  const options: WellborepathLayerOptions = {
-    order: 3,
-    strokeWidth: '5px',
-    stroke: 'black',
-  };
-  const layer = new WellborepathLayer('wellborepath', options);
-
-  return layer;
-};
-
-const createGridLayer = () => {
-  const gridLayer = new GridLayer('grid', {
-    majorColor: 'black',
-    minorColor: 'gray',
-    majorWidth: 0.5,
-    minorWidth: 0.5,
-    order: 1,
-  });
-
-  return gridLayer;
-};
-
-const createHoleSizeLayer = () => {
-  const holesizeLayer = new HoleSizeLayer('holesize', { order: 1 });
-  return holesizeLayer;
-};
-
-const createCasingLayer = () => {
-  const casingLayer = new CasingLayer('casing', { order: 1 });
-  return casingLayer;
 };
