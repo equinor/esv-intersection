@@ -10,7 +10,7 @@ export abstract class WebGLLayer extends Layer {
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
-    console.log('onmount');
+
     if (!this.container) {
       this.container = document.createElement('div');
       this.container.setAttribute('id', `${this.id}`);
@@ -29,10 +29,10 @@ export abstract class WebGLLayer extends Layer {
         // failIfMajorPerformanceCaveat: false,
       };
       this.ctx = new Application(pixiOptions);
-      const tr = this.setTransform(width, height, event.xScale, event.yScale);
-      if (tr != null) {
-        this.ctx.stage.position.set(tr.x, tr.y);
-      }
+      // const tr = this.setTransform(width, height, event.xScale, event.yScale);
+      // if (tr != null) {
+      //   this.ctx.stage.position.set(tr.x, tr.y);
+      // }
       // this.ctx.stage.scale.set(event.xRatio, event.yRatio);
       this.container.appendChild(this.ctx.view);
       // this.ctx.stage.transform = this.transform;
@@ -58,14 +58,13 @@ export abstract class WebGLLayer extends Layer {
     const [, width] = event.xScale.range();
     this.ctx.view.style.height = `${height}px`;
     this.ctx.view.style.width = `${width}px`;
-    const tr = this.setTransform(width, height, event.xScale, event.yScale);
-    console.log('tr', tr);
-    this.ctx.stage.position.set(tr.x, tr.y);
+    // const tr = this.setTransform(width, height, event.xScale, event.yScale);
+    // this.ctx.stage.position.set(tr.x, tr.y);
     this.ctx.stage.scale.set(event.xRatio, event.yRatio);
   }
 
   setTransform = (width: number, height: number, xScale: any, yScale: any): any => {
-    if (!(width != 0 && height != 0 && xScale != null && yScale != null)) {
+    if (!(width !== 0 && height !== 0 && xScale != null && yScale != null)) {
       return null;
     }
     const [xmin, xmax] = xScale.domain();
@@ -73,7 +72,7 @@ export abstract class WebGLLayer extends Layer {
     const xRatio = 1 / Math.abs((xmin - xmax) / width);
     const yRatio = 1 / Math.abs((ymin - ymax) / height);
 
-    console.log('scaleeee', xRatio, yRatio);
+    // console.log('scaleeee', xRatio, yRatio);
 
     return { xRatio, yRatio };
   };

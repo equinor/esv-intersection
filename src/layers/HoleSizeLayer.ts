@@ -1,7 +1,17 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
-import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, NormalCoordsObject, HoleSize, Casing } from '../interfaces';
+import {
+  HoleSizeLayerOptions,
+  OnUpdateEvent,
+  OnRescaleEvent,
+  MDPoint,
+  HoleObjectData,
+  NormalCoordsObject,
+  HoleSize,
+  Casing,
+  OnMountEvent,
+} from '../interfaces';
 
 export class HoleSizeLayer extends WebGLLayer {
   options: HoleSizeLayerOptions;
@@ -15,6 +25,10 @@ export class HoleSizeLayer extends WebGLLayer {
     this.render = this.render.bind(this);
   }
 
+  onMount(event: OnMountEvent): void {
+    super.onMount(event);
+  }
+
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.render(event);
@@ -22,13 +36,19 @@ export class HoleSizeLayer extends WebGLLayer {
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
-    this.render(event);
+    this.ctx.stage.position.set(event.transform.x, event.transform.y);
+    this.ctx.stage.scale.set(event.xRatio, event.yRatio);
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
     const { data, wellborePath } = event;
+    if (data == null) {
+      return;
+    }
+
     const sizes: HoleObjectData[] = data.map((d: HoleSize | Casing) => this.generateHoleSizeData(wellborePath, d));
+    console.log(sizes);
     const maxDiameter = Math.max(...sizes.map((s: HoleObjectData) => s.data.diameter));
     const texture = this.createTexure(maxDiameter * maxTextureDiameterScale, firstColor, secondColor);
     sizes
@@ -54,6 +74,7 @@ export class HoleSizeLayer extends WebGLLayer {
   drawHoleSize = (holeObject: HoleObjectData, defaultTexture: Texture): void => {
     const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = this.createNormalCoords(holeObject);
+    // console.log(wellBorePathCoords, normalOffsetCoordsDown);
     // this.drawLine(wellBorePathCoords, 0xff0000);
     // this.drawLine(normalOffsetCoordsUp, 0xff0000);
     // this.drawLine(normalOffsetCoordsDown, 0xff0000);
@@ -140,8 +161,9 @@ export class HoleSizeLayer extends WebGLLayer {
     const newPoints: Point[] = [];
     const lastPointIndex = 2;
 
-    for (let i = 1; i < coords.length - lastPointIndex; i++) {
+    for (let i = 0; i < coords.length - lastPointIndex; i++) {
       const normal = this.normal(coords[i], coords[i + 1]);
+      // TODO convert to unit vector ?
       const newPoint = coords[i].clone();
       newPoint.x += normal.x * offset;
       newPoint.y += normal.y * offset;
@@ -171,7 +193,7 @@ export class HoleSizeLayer extends WebGLLayer {
     const halfWayPct = 0.5;
     const canvas = document.createElement('canvas');
     canvas.width = 150;
-    canvas.height = maxWidth > 0 ? maxWidth : canvas.width; // needs togrow with scale
+    canvas.height = maxWidth > 0 ? maxWidth : canvas.width; // TODO needs to grow with scale
     const canvasCtx = canvas.getContext('2d');
 
     const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
@@ -242,8 +264,10 @@ export class HoleSizeLayer extends WebGLLayer {
   };
 
   normal = (p1: Point, p2: Point): Point => {
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
+    let dx = p2.x - p1.x;
+    let dy = p2.y - p1.y;
+    dx = dy === 0 ? 1 : dx;
+    dy = dx === 0 ? 1 : dy;
     return new Point(-dy, dx);
   };
 

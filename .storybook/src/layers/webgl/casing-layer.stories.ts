@@ -1,9 +1,11 @@
 import { HoleSizeLayer } from '../../../../src/layers/HoleSizeLayer';
 import { scaleLinear } from 'd3-scale';
-import { Casing, HoleSizeLayerOptions } from '../../../../src/interfaces';
+import { Casing, HoleSizeLayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
 
 import poslog from '../../exampledata/polog.json';
 import { generateProjectedWellborePath, generateProjectedTrajectory } from '../../../../src/datautils';
+import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
+import { createRootContainer, createLayerContainer } from '../../utils';
 
 const width = 400;
 const height = 800;
@@ -52,11 +54,8 @@ export const CasingLayerWithSampleData = () => {
   const xbounds: number[] = [0, 1000];
   const ybounds: number[] = [-500, 4000];
 
-  const root = document.createElement('div');
-  root.className = 'grid-container';
-  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
-  root.setAttribute('height', `${height}`);
-  root.setAttribute('width', `${width}`);
+  const root = createRootContainer(width);
+  const container = createLayerContainer(width, height);
 
   const xScale = scaleLinear()
     .domain(xbounds)
@@ -69,13 +68,26 @@ export const CasingLayerWithSampleData = () => {
 
   holeSizeLayer.onUpdate(createEventWithSampleDataObj(root));
 
+  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
+    holeSizeLayer.onRescale(event);
+  });
+  zoomHandler.setBounds([0, 1000], [0, 1000]);
+  zoomHandler.adjustToSize(width, height);
+  zoomHandler.zFactor = 1;
+  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+  zoomHandler.enableTranslateExtent = false;
+  zoomHandler.setViewport(1000, 1000, 5000);
+
+  root.appendChild(container);
+
   return root;
 };
 
 const createEventWithSampleDataObj = (elm: any) => {
   const data: Casing[] = [
     { diameter: 30, start: 0, length: 500, hasShoe: false, innerDiameter: 29 },
-    { diameter: 28, start: 1510, length: 500, hasShoe: true, innerDiameter: 26 },
+    { diameter: 29, start: 500, length: 500, hasShoe: false, innerDiameter: 27 },
+    { diameter: 28, start: 1210, length: 75000, hasShoe: true, innerDiameter: 26 },
   ];
 
   const wellborePath: [number, number][] = (generateProjectedTrajectory(poslog, 45) as [number, number][])

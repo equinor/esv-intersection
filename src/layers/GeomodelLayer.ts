@@ -54,9 +54,9 @@ export class GeomodelLayer extends WebGLLayer {
     let polygons: number[][] = [];
     let polygon: number[] = null;
 
-    //Start generating polygons
+    // Start generating polygons
     for (let i: number = 0; i < data.length; i++) {
-      //Generate top of polygon as long as we have valid values
+      // Generate top of polygon as long as we have valid values
       if (data[i][1]) {
         if (polygon === null) {
           polygon = [];
@@ -65,14 +65,15 @@ export class GeomodelLayer extends WebGLLayer {
         polygon.push(data[i][1]);
       }
 
-      //If invalid top value or end is reached
+      // If invalid top value or end is reached
       if (!data[i][1] || i === data.length - 1) {
         if (polygon) {
-          //Generate bottom of polygon
+          const maxDepth = 10000;
+          // Generate bottom of polygon
           for (let j: number = i - 1; j >= 0; j--) {
             if (!data[j][1]) break;
             polygon.push(data[j][0]);
-            polygon.push(data[j][2] || 10000);
+            polygon.push(data[j][2] || maxDepth);
           }
           polygons.push(polygon);
           polygon = null;
