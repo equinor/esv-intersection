@@ -34,10 +34,8 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
-    this.ctx.resetTransform();
-    this.ctx.translate(event.transform.x, event.transform.y);
-    this.ctx.scale(event.xRatio, event.yRatio);
     this.rescaleEvent = event;
+    this.setTransform(event);
     this.render(event);
   }
 
@@ -52,7 +50,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       return;
     }
 
-    this.clearScreen();
+    this.clearCanvas();
 
     const { data } = this;
     if (!data) {
@@ -65,14 +63,6 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     this.drawAreaLabels();
     this.drawLineLabels();
-  }
-
-  clearScreen(): void {
-    const { xScale, yScale } = this.rescaleEvent;
-    this.ctx.save();
-    this.ctx.resetTransform();
-    this.ctx.clearRect(0, 0, xScale.range()[1], yScale.range()[1]);
-    this.ctx.restore();
   }
 
   drawAreaLabels(): void {
