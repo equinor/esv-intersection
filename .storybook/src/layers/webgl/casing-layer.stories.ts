@@ -20,7 +20,7 @@ export const CasingLayer = () => {
     secondColor: '#EEEEFF',
     lineColor: 0x575757,
     topBottomLineColor: 0x575757,
-    maxTextureDiameterScale: 1.5,
+    maxTextureDiameterScale: 2,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 

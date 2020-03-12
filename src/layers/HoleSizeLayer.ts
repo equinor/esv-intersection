@@ -20,7 +20,6 @@ export class HoleSizeLayer extends WebGLLayer {
     super(id, options);
     this.options = {
       ...options,
-      maxTextureDiameterScale: 1.5,
     };
     this.render = this.render.bind(this);
   }
@@ -74,7 +73,6 @@ export class HoleSizeLayer extends WebGLLayer {
   drawHoleSize = (holeObject: HoleObjectData, defaultTexture: Texture): void => {
     const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = this.createNormalCoords(holeObject);
-    // console.log(wellBorePathCoords, normalOffsetCoordsDown);
     // this.drawLine(wellBorePathCoords, 0xff0000);
     // this.drawLine(normalOffsetCoordsUp, 0xff0000);
     // this.drawLine(normalOffsetCoordsDown, 0xff0000);
@@ -200,7 +198,7 @@ export class HoleSizeLayer extends WebGLLayer {
   createTexure = (maxWidth: number, firstColor: string, secondColor: string, startPctOffset = 0): Texture => {
     const halfWayPct = 0.5;
     const canvas = document.createElement('canvas');
-    canvas.width = 150;
+    canvas.width = 300;
     canvas.height = maxWidth > 0 ? maxWidth : canvas.width; // TODO needs to grow with scale
     const canvasCtx = canvas.getContext('2d');
 
@@ -217,10 +215,13 @@ export class HoleSizeLayer extends WebGLLayer {
   };
 
   generateHoleSizeData = (wbp: number[][], data: HoleSize | Casing): HoleObjectData => {
-    const tension = 0.2;
-    const numberOfInterpolatedPoints = 999;
-    const interp = new CurveInterpolator(wbp, tension);
-    let points = interp.getPoints(numberOfInterpolatedPoints);
+    // const tension = 0.2;
+    // const numberOfInterpolatedPoints = 999;
+    // const interp = new CurveInterpolator(wbp, tension);
+    // let points = interp.getPoints(numberOfInterpolatedPoints);
+    // console.log(wbp, points);
+    let points: any = wbp;
+    // TODO no extra interpolating neccessary?
 
     let md = 0;
     let prev = points[0];
