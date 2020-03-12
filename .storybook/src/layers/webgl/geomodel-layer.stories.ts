@@ -4,23 +4,9 @@ import { GeomodelLayer } from '../../../../src/layers/GeomodelLayer';
 import { GeomodelLabelsLayer } from '../../../../src/layers/GeomodelLabelsLayer';
 import { SurfaceGenerator } from '../../utils/surfaceGenerator';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
-import {
-  GeomodelLayerOptions,
-  OnUpdateEvent,
-  LayerOptions,
-} from '../../../../src/interfaces';
-import {
-  createRootContainer,
-  createLayerContainer,
-  createFPSLabel
-} from '../../utils';
-import {
-  generateSurfaceData,
-  generateProjectedTrajectory,
-  SurfaceLine,
-  SurfaceData,
-  generateProjectedWellborePath,
-} from '../../../../src/datautils';
+import { GeomodelLayerOptions, OnUpdateEvent, LayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
+import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
+import { generateSurfaceData, generateProjectedTrajectory, SurfaceLine, SurfaceData, generateProjectedWellborePath } from '../../../../src/datautils';
 
 //Data
 import poslog from '../../exampledata/polog.json';
@@ -30,7 +16,6 @@ import surfaceValues from '../../exampledata/surfaces.json';
 const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
 const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
 const wellborePath = generateProjectedWellborePath(poslog);
-
 
 const width: number = 800;
 const height: number = 600;
@@ -75,7 +60,7 @@ const createEventObj = (elm: any, inputData?: any): OnUpdateEvent => {
     elm,
   };
 
-  if(inputData){
+  if (inputData) {
     const data = {
       lines: [],
       areas: [
@@ -109,9 +94,9 @@ const createEventObj = (elm: any, inputData?: any): OnUpdateEvent => {
           color: 0x155512,
           data: transformData(inputData[5]),
         },
-      ]
-    }
-    event = {... event, ...data};
+      ],
+    };
+    event = { ...event, ...data };
   }
 
   return event;
@@ -159,14 +144,14 @@ export const GeoModelWithLabels = () => {
     geoModelLayer.onRescale(event);
     geoModelLabelsLayer.onRescale({ ...event });
   });
-  geoModelLabelsLayer.onUpdate( { ...createEventObj(root), data: geolayerdata, wellborePath});
+  geoModelLabelsLayer.onUpdate({ ...createEventObj(root), data: geolayerdata, wellborePath });
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
   zoomHandler.adjustToSize(width, height);
   zoomHandler.zFactor = 1;
   zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
   zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000,1000, 5000);
+  zoomHandler.setViewport(1000, 1000, 5000);
 
   return root;
 };

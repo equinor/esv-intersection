@@ -85,14 +85,12 @@ export const CasingLayerWithSampleData = () => {
 
 const createEventWithSampleDataObj = (elm: any) => {
   const data: Casing[] = [
-    { diameter: 30, start: 0, length: 500, hasShoe: false, innerDiameter: 29 },
-    { diameter: 29, start: 500, length: 500, hasShoe: false, innerDiameter: 27 },
-    { diameter: 28, start: 1210, length: 75000, hasShoe: true, innerDiameter: 26 },
+    // { diameter: 30, start: 0, length: 500, hasShoe: false, innerDiameter: 29 },
+    // { diameter: 29, start: 500, length: 500, hasShoe: false, innerDiameter: 27 },
+    { diameter: 28, start: 0, length: 7500, hasShoe: true, innerDiameter: 26 },
   ];
 
-  const wellborePath: [number, number][] = (generateProjectedTrajectory(poslog, 45) as [number, number][])
-    .reverse()
-    .map(arr => [arr[1] + 200, arr[0]]);
+  const wellborePath: [number, number][] = generateProjectedWellborePath(poslog) as [number, number][]; //.reverse().map(arr => [arr[1] + 200, arr[0]]);
 
   return {
     elm,

@@ -111,13 +111,13 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     const labelMetrics = ctx.measureText(s.label);
     const labelLength = labelMetrics.width;
     if (leftSide) {
-      const labelRightEdge = leftEdge + (margins / xRatio) + labelLength;
-      if (labelRightEdge > maxX - (margins / xRatio)) {
+      const labelRightEdge = leftEdge + margins / xRatio + labelLength;
+      if (labelRightEdge > maxX - margins / xRatio) {
         leftSide = false;
       }
     } else {
-      const labelLeftEdge = rightEdge - (margins / xRatio) - labelLength;
-      if (labelLeftEdge < minX + (margins / xRatio)) {
+      const labelLeftEdge = rightEdge - margins / xRatio - labelLength;
+      if (labelLeftEdge < minX + margins / xRatio) {
         leftSide = true;
       }
     }
@@ -125,9 +125,9 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     // Find edge where to draw
     let startPos: number;
     if (leftSide) {
-      startPos = Math.max(minX, leftEdge) + (margins / xRatio);
+      startPos = Math.max(minX, leftEdge) + margins / xRatio;
     } else {
-      startPos = Math.min(maxX, rightEdge) - (margins / xRatio);
+      startPos = Math.min(maxX, rightEdge) - margins / xRatio;
     }
 
     const topEdge = yScale.invert(yScale.range()[0]);
@@ -171,7 +171,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     // Calculate position and direction for label
     const textX = startPos;
-    const textY = (topPos.y + bottomPos.y)/2;
+    const textY = (topPos.y + bottomPos.y) / 2;
     const textVec = Vector2.add(topDir, bottomDir);
     const textDir = Vector2.angleRight(textVec) - (leftSide ? 0 : Math.PI);
 
@@ -191,7 +191,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     const { ctx } = this;
     const { xScale, xRatio, yRatio } = this.rescaleEvent;
     const maxX = s.data[0][0];
-    const minX = s.data[s.data.length-1][0];
+    const minX = s.data[s.data.length - 1][0];
     const { leftSide } = this;
     const margins = this.options.margins || this.defaultMargins;
     const maxFontSize = this.options.maxFontSize || this.defaultMaxFontSize;
@@ -209,10 +209,10 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     if (leftSide) {
       const rightEdge = xScale.invert(xScale.range()[1]);
-      startPos = Math.min(maxX, rightEdge) - (margins / xRatio);
+      startPos = Math.min(maxX, rightEdge) - margins / xRatio;
     } else {
       const leftEdge = xScale.invert(xScale.range()[0]);
-      startPos = Math.max(minX, leftEdge) + (margins / xRatio);
+      startPos = Math.max(minX, leftEdge) + margins / xRatio;
     }
 
     // Calculate where to sample points
@@ -276,7 +276,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     const b: Vector2 = this.findSampleAtPos(data, offset, topLimit, bottomLimit);
     if (b == null) return null;
     for (let i: number = 0; i < count; i++) {
-      const x = offset + i*step;
+      const x = offset + i * step;
       const a: Vector2 = this.findSampleAtPos(data, x, topLimit, bottomLimit);
       if (a === null) continue;
       const tmpVec: Vector2 = Vector2.sub(a, b);
@@ -321,7 +321,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     }
 
     for (let i = lowLim; i < highLim; i++) {
-      if (data[i][0] >= pos && data[i+1][0] <= pos) {
+      if (data[i][0] >= pos && data[i + 1][0] <= pos) {
         index = i;
         break;
       }

@@ -4,7 +4,9 @@ import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMo
 
 export class GeomodelLayer extends WebGLLayer {
   options: GeomodelLayerOptions;
+
   graphics: Graphics;
+
   // TODO: create proper interface
   data: any;
 
@@ -36,7 +38,7 @@ export class GeomodelLayer extends WebGLLayer {
       return;
     }
     const { data } = this;
-    if(!data){
+    if (!data) {
       return;
     }
 
@@ -54,7 +56,7 @@ export class GeomodelLayer extends WebGLLayer {
   }
 
   createPolygon = (data: any): number[][] => {
-    let polygons: number[][] = [];
+    const polygons: number[][] = [];
     let polygon: number[] = null;
 
     // Start generating polygons

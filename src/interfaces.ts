@@ -20,8 +20,6 @@ export interface OnResizeEvent extends LayerEvent {
 }
 
 export interface OnRescaleEvent extends LayerEvent {
-  xScale: ScaleLinear<number, number>;
-  yScale: ScaleLinear<number, number>;
   xBounds?: [number, number];
   yBounds?: [number, number];
   zFactor?: number;
@@ -60,6 +58,14 @@ export interface WellborepathLayerOptions extends LayerOptions {
 }
 
 export interface GeomodelLayerOptions extends LayerOptions {}
+
+export interface GeomodelLayerLabelsOptions extends LayerOptions {
+  margins?: number;
+  minFontSize?: number;
+  maxFontSize?: number;
+  textColor?: string;
+  font?: string;
+}
 
 export interface HoleSizeLayerOptions extends LayerOptions {
   firstColor: string;
