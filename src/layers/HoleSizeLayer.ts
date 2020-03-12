@@ -157,13 +157,21 @@ export class HoleSizeLayer extends WebGLLayer {
     return rope;
   };
 
+  convertToUnitVector = (vector: Point): Point => {
+    const dist = this.calcDistPoint(new Point(0, 0), vector);
+    const div = 1 / dist;
+    const unitVector = new Point(div * vector.x, div * vector.y);
+    console.log('vvv', vector, dist, unitVector);
+    return unitVector;
+  };
+
   createNormal = (coords: Point[], offset: number): Point[] => {
     const newPoints: Point[] = [];
     const lastPointIndex = 2;
 
     for (let i = 0; i < coords.length - lastPointIndex; i++) {
-      const normal = this.normal(coords[i], coords[i + 1]);
-      // TODO convert to unit vector ?
+      const normal = this.convertToUnitVector(this.normal(coords[i], coords[i + 1]));
+
       const newPoint = coords[i].clone();
       newPoint.x += normal.x * offset;
       newPoint.y += normal.y * offset;
