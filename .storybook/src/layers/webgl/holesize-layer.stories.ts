@@ -20,7 +20,7 @@ export const Holes = () => {
     secondColor: 'rgb(255, 255, 255)',
     lineColor: 0x8b4513,
     topBottomLineColor: 0x8b4513,
-    maxTextureDiameterScale: 1.5,
+    maxTextureDiameterScale: 2,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 

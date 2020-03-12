@@ -109,7 +109,7 @@ export class HoleSizeLayer extends WebGLLayer {
     };
 
     if (holeObject.hasShoe === true) {
-      const shoeWidth = 2;
+      const shoeWidth = 5;
       const meters = 10;
       const shoeHeightCoords = takeMeters(normalOffsetCoordsDown, meters);
       const shoeCoords = this.generateShoe(shoeHeightCoords, -shoeWidth);

@@ -44,7 +44,7 @@ export const CasingLayerWithSampleData = () => {
     secondColor: '#EEEEFF',
     lineColor: 0x575757,
     topBottomLineColor: 0x575757,
-    maxTextureDiameterScale: 1.5,
+    maxTextureDiameterScale: 2,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 
@@ -85,9 +85,16 @@ export const CasingLayerWithSampleData = () => {
 
 const createEventWithSampleDataObj = (elm: any) => {
   const data: Casing[] = [
-    { diameter: 30, start: 0, length: 500, hasShoe: false, innerDiameter: 29 },
-    { diameter: 29, start: 500, length: 500, hasShoe: false, innerDiameter: 27 },
-    { diameter: 28, start: 1000, length: 750, hasShoe: true, innerDiameter: 26 },
+    { diameter: 30, start: 0, length: 500, hasShoe: false, innerDiameter: 30 - 1 },
+    { diameter: 29, start: 500, length: 500, hasShoe: false, innerDiameter: 29 - 1 },
+    { diameter: 28, start: 1000, length: 500, hasShoe: true, innerDiameter: 28 - 1 },
+    { diameter: 26, start: 1500, length: 500, hasShoe: true, innerDiameter: 26 - 1 },
+    { diameter: 20, start: 2000, length: 500, hasShoe: true, innerDiameter: 20 - 1 },
+    { diameter: 18, start: 2500, length: 500, hasShoe: true, innerDiameter: 18 - 1 },
+    { diameter: 16, start: 3000, length: 500, hasShoe: true, innerDiameter: 16 - 1 },
+    { diameter: 10, start: 3500, length: 500, hasShoe: true, innerDiameter: 10 - 1 },
+    // { diameter: 28, start: 4000, length: 500, hasShoe: true, innerDiameter: 26 },
+    // { diameter: 28, start: 4500, length: 500, hasShoe: true, innerDiameter: 26 },
   ];
 
   const wellborePath: [number, number][] = generateProjectedWellborePath(poslog) as [number, number][];
