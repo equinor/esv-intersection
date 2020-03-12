@@ -124,7 +124,8 @@ export class HoleSizeLayer extends WebGLLayer {
   };
 
   generateShoe = (triangleSideShoe: Point[], offset: number): Point[] => {
-    const nextToLastIndex = 2;
+    const nextToLastIndex = 1;
+    console.log('trign', triangleSideShoe);
     const normalOffset = this.createNormal(
       [
         triangleSideShoe[0],
@@ -161,7 +162,6 @@ export class HoleSizeLayer extends WebGLLayer {
     const dist = this.calcDistPoint(new Point(0, 0), vector);
     const div = 1 / dist;
     const unitVector = new Point(div * vector.x, div * vector.y);
-    console.log('vvv', vector, dist, unitVector);
     return unitVector;
   };
 
@@ -178,7 +178,7 @@ export class HoleSizeLayer extends WebGLLayer {
       newPoints.push(newPoint);
     }
 
-    const lastPoint = this.normal(coords[coords.length - lastPointIndex - 1], coords[coords.length - lastPointIndex]);
+    const lastPoint = this.convertToUnitVector(this.normal(coords[coords.length - lastPointIndex - 1], coords[coords.length - lastPointIndex]));
     const newPoint = coords[coords.length - lastPointIndex].clone();
     newPoint.x += lastPoint.x * offset;
     newPoint.y += lastPoint.y * offset;
