@@ -1,11 +1,12 @@
-import { HoleSizeLayer } from '../../../../src/layers/HoleSizeLayer';
+import { CasingLayer } from '../../../../src/layers/CasingLayer';
 import { scaleLinear } from 'd3-scale';
-import { Casing, HoleSizeLayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
+import { Casing, OnRescaleEvent, CasingLayerOptions } from '../../../../src/interfaces';
 
-import poslog from '../../exampledata/polog.json';
-import { generateProjectedWellborePath, generateProjectedTrajectory } from '../../../../src/datautils';
+import { generateProjectedWellborePath } from '../../../../src/datautils';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
+
+import poslog from '../../exampledata/polog.json';
 
 const width = 400;
 const height = 800;
@@ -13,16 +14,11 @@ const height = 800;
 const xbounds = [0, 300];
 const ybounds = [0, 800];
 
-export const CasingLayer = () => {
-  const options: HoleSizeLayerOptions = {
+export const CasingLayerBasic = () => {
+  const options: CasingLayerOptions = {
     order: 1,
-    firstColor: '#777788', // maybe not needed, refactor holesizelayer
-    secondColor: '#EEEEFF',
-    lineColor: 0x575757,
-    topBottomLineColor: 0x575757,
-    maxTextureDiameterScale: 2,
   };
-  const holeSizeLayer = new HoleSizeLayer('webgl', options);
+  const casingLayer = new CasingLayer('webgl', options);
 
   const root = document.createElement('div');
   root.className = 'grid-container';
@@ -30,23 +26,18 @@ export const CasingLayer = () => {
   root.setAttribute('height', `${height}`);
   root.setAttribute('width', `${width}`);
 
-  holeSizeLayer.onMount({ elm: root, height, width });
+  casingLayer.onMount({ elm: root, height, width });
 
-  holeSizeLayer.onUpdate(createEventObj(root));
+  casingLayer.onUpdate(createEventObj(root));
 
   return root;
 };
 
 export const CasingLayerWithSampleData = () => {
-  const options: HoleSizeLayerOptions = {
+  const options: CasingLayerOptions = {
     order: 1,
-    firstColor: '#777788', // maybe not needed, refactor holesizelayer
-    secondColor: '#EEEEFF',
-    lineColor: 0x575757,
-    topBottomLineColor: 0x575757,
-    maxTextureDiameterScale: 2,
   };
-  const holeSizeLayer = new HoleSizeLayer('webgl', options);
+  const casingLayer = new CasingLayer('webgl', options);
 
   const width: number = 1280;
   const height: number = 1024;
@@ -64,12 +55,12 @@ export const CasingLayerWithSampleData = () => {
     .domain(ybounds)
     .range([0, height]);
 
-  holeSizeLayer.onMount({ elm: root, height, width, xScale: xScale.copy(), yScale: yScale.copy() });
+  casingLayer.onMount({ elm: root, height, width, xScale: xScale.copy(), yScale: yScale.copy() });
 
-  holeSizeLayer.onUpdate(createEventWithSampleDataObj(root));
+  casingLayer.onUpdate(createEventWithSampleDataObj(root));
 
   const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
-    holeSizeLayer.onRescale(event);
+    casingLayer.onRescale(event);
   });
   zoomHandler.setBounds([0, 1000], [0, 1000]);
   zoomHandler.adjustToSize(width, height);
@@ -93,8 +84,6 @@ const createEventWithSampleDataObj = (elm: any) => {
     { diameter: 18, start: 2500, length: 500, hasShoe: true, innerDiameter: 18 - 1 },
     { diameter: 16, start: 3000, length: 500, hasShoe: true, innerDiameter: 16 - 1 },
     { diameter: 10, start: 3500, length: 500, hasShoe: true, innerDiameter: 10 - 1 },
-    // { diameter: 28, start: 4000, length: 500, hasShoe: true, innerDiameter: 26 },
-    // { diameter: 28, start: 4500, length: 500, hasShoe: true, innerDiameter: 26 },
   ];
 
   const wellborePath: [number, number][] = generateProjectedWellborePath(poslog) as [number, number][];

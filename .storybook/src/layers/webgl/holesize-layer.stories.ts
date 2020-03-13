@@ -16,11 +16,6 @@ const ybounds = [0, 800];
 export const Holes = () => {
   const options = {
     order: 1,
-    firstColor: 'rgb(163, 102, 42)',
-    secondColor: 'rgb(255, 255, 255)',
-    lineColor: 0x8b4513,
-    topBottomLineColor: 0x8b4513,
-    maxTextureDiameterScale: 2,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 
@@ -47,11 +42,6 @@ export const Holes = () => {
 export const HoleSizeLayerWithSampleData = () => {
   const options: HoleSizeLayerOptions = {
     order: 1,
-    firstColor: 'rgb(163, 102, 42)',
-    secondColor: 'rgb(255, 255, 255)',
-    lineColor: 0x8b4513,
-    topBottomLineColor: 0x8b4513,
-    maxTextureDiameterScale: 2,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 

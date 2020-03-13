@@ -67,12 +67,16 @@ export interface GeomodelLayerLabelsOptions extends LayerOptions {
   font?: string;
 }
 
-export interface HoleSizeLayerOptions extends LayerOptions {
-  firstColor: string;
-  secondColor: string;
-  lineColor: number;
-  topBottomLineColor: number;
-  maxTextureDiameterScale: number;
+export interface HoleSizeLayerOptions extends WellComponentBaseOptions {}
+
+export interface CasingLayerOptions extends WellComponentBaseOptions {}
+
+export interface WellComponentBaseOptions extends LayerOptions {
+  firstColor?: string;
+  secondColor?: string;
+  lineColor?: number;
+  topBottomLineColor?: number;
+  maxTextureDiameterScale?: number;
   margins?: number;
   minFontSize?: number;
   maxFontSize?: number;

@@ -26,16 +26,10 @@ export abstract class WebGLLayer extends Layer {
         transparent: true,
         clearBeforeRender: true,
         forceCanvas: true,
-        // failIfMajorPerformanceCaveat: false,
       };
+
       this.ctx = new Application(pixiOptions);
-      // const tr = this.setTransform(width, height, event.xScale, event.yScale);
-      // if (tr != null) {
-      //   this.ctx.stage.position.set(tr.x, tr.y);
-      // }
-      // this.ctx.stage.scale.set(event.xRatio, event.yRatio);
       this.container.appendChild(this.ctx.view);
-      // this.ctx.stage.transform = this.transform;
       this.elm.appendChild(this.container);
     }
   }
@@ -54,25 +48,22 @@ export abstract class WebGLLayer extends Layer {
     if (!this.ctx) {
       return;
     }
+
     const [, height] = event.yScale.range();
     const [, width] = event.xScale.range();
     this.ctx.view.style.height = `${height}px`;
     this.ctx.view.style.width = `${width}px`;
-    // const tr = this.setTransform(width, height, event.xScale, event.yScale);
-    // this.ctx.stage.position.set(tr.x, tr.y);
-    this.ctx.stage.scale.set(event.xRatio, event.yRatio);
   }
 
   setTransform = (width: number, height: number, xScale: any, yScale: any): any => {
     if (!(width !== 0 && height !== 0 && xScale != null && yScale != null)) {
       return null;
     }
+
     const [xmin, xmax] = xScale.domain();
     const [ymin, ymax] = yScale.domain();
     const xRatio = 1 / Math.abs((xmin - xmax) / width);
     const yRatio = 1 / Math.abs((ymin - ymax) / height);
-
-    // console.log('scaleeee', xRatio, yRatio);
 
     return { xRatio, yRatio };
   };

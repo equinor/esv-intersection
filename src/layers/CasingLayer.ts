@@ -1,16 +1,16 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent } from '..';
+import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent } from '..';
 
-export class HoleSizeLayer extends WellboreBaseComponentLayer {
-  options: HoleSizeLayerOptions;
+export class CasingLayer extends WellboreBaseComponentLayer {
+  options: CasingLayerOptions;
 
-  constructor(id: string, options: HoleSizeLayerOptions) {
+  constructor(id: string, options: CasingLayerOptions) {
     super(id, options);
     this.options = {
-      firstColor: 'rgb(163, 102, 42)',
-      secondColor: 'rgb(255, 255, 255)',
-      lineColor: 0x8b4513,
-      topBottomLineColor: 0x8b4513,
+      firstColor: '#777788', // maybe not needed, refactor holesizelayer
+      secondColor: '#EEEEFF',
+      lineColor: 0x575757,
+      topBottomLineColor: 0x575757,
       maxTextureDiameterScale: 2,
       ...options,
     };
