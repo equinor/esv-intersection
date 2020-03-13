@@ -1,4 +1,3 @@
-import { ScaleLinear } from 'd3-scale';
 import { ZoomTransform } from 'd3-zoom';
 import { Point, Graphics } from 'pixi.js';
 import { Layer } from './layers/Layer';

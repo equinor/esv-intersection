@@ -1,6 +1,6 @@
-import { WellborepathLayerOptions, Annotation } from '../../src/interfaces';
+import { WellborepathLayerOptions, Annotation, HoleSize, Casing } from '../../src/interfaces';
 import { LayerManager } from '../../src/control';
-import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer, GeomodelLayer, Layer } from '../../src/layers';
+import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer, GeomodelLayer, HoleSizeLayer, CasingLayer, Layer } from '../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
 
@@ -112,6 +112,18 @@ const wellborePath = [
   [490, 110],
 ];
 
+const holeSizeData: HoleSize[] = [
+  { start: 0, length: 100, diameter: 36 },
+  { start: 100, length: 400, diameter: 30 },
+  { start: 500, length: 400, diameter: 28 },
+];
+const casingData: Casing[] = [
+  { start: 0, length: 100, diameter: 34, innerDiameter: 34 - 1, hasShoe: false },
+  { start: 0, length: 200, diameter: 32, innerDiameter: 32 - 1, hasShoe: true },
+  { start: 200, length: 400, diameter: 10, innerDiameter: 10 - 1, hasShoe: true },
+  { start: 600, length: 400, diameter: 8, innerDiameter: 8 - 1, hasShoe: true },
+];
+
 const xbounds: [number, number] = [0, 1000];
 const ybounds: [number, number] = [0, 1000];
 
@@ -140,6 +152,8 @@ export const intersection = () => {
   const image1Layer = createImageLayer('bg1Img', 1);
   const image2Layer = createImageLayer('bg2Img', 2);
   const geomodelLayer = createGeomodelLayer('geomodel', 1);
+  const holeSizeLayer = createHoleSizeLayer();
+  const casingLayer = createCasingLayer();
 
   const manager = new LayerManager(container, scaleOptions, axisOptions);
 
@@ -151,7 +165,9 @@ export const intersection = () => {
     .addLayer(calloutLayer, { data: annotations })
     .addLayer(image1Layer, { url: bg1Img })
     .addLayer(image2Layer, { url: bg2Img })
-    .addLayer(geomodelLayer, { data: geolayerdata });
+    .addLayer(geomodelLayer, { data: geolayerdata })
+    .addLayer(holeSizeLayer, { data: holeSizeData, wellborePath })
+    .addLayer(casingLayer, { data: casingData, wellborePath });
 
   manager.zoomPanHandler.setBounds(sm.xDomain as [number, number], sm.yDomain as [number, number]);
   manager.zoomPanHandler.adjustToSize(sm.xRange[1], sm.yRange[1]);
@@ -164,12 +180,16 @@ export const intersection = () => {
   const btnImage1 = createButton(manager, image1Layer, 'Image 1', { url: bg1Img });
   const btnImage2 = createButton(manager, image2Layer, 'Image 2', { url: bg2Img });
   const btnGeomodel = createButton(manager, geomodelLayer, 'Geo model', { data: geolayerdata });
+  const btnHoleSize = createButton(manager, holeSizeLayer, 'Hole size', { data: holeSizeData, wellborePath });
+  const btnCasing = createButton(manager, casingLayer, 'Casing', { data: casingData, wellborePath });
 
   btnContainer.appendChild(btnCallout);
   btnContainer.appendChild(btnWellbore);
   btnContainer.appendChild(btnImage1);
   btnContainer.appendChild(btnImage2);
   btnContainer.appendChild(btnGeomodel);
+  btnContainer.appendChild(btnHoleSize);
+  btnContainer.appendChild(btnCasing);
 
   root.appendChild(container);
   root.appendChild(btnContainer);
@@ -238,4 +258,14 @@ const createGridLayer = () => {
   });
 
   return gridLayer;
+};
+
+const createHoleSizeLayer = () => {
+  const holesizeLayer = new HoleSizeLayer('holesize', { order: 1 });
+  return holesizeLayer;
+};
+
+const createCasingLayer = () => {
+  const casingLayer = new CasingLayer('casing', { order: 1 });
+  return casingLayer;
 };

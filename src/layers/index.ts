@@ -6,3 +6,5 @@ export * from './WellborePathLayer';
 export * from './GeomodelLayer';
 export * from './CalloutCanvasLayer';
 export * from './ImageCanvasLayer';
+export * from './HoleSizeLayer';
+export * from './CasingLayer';
