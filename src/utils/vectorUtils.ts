@@ -12,6 +12,10 @@ export const calcDistPoint = (prev: Point, point: Point): number => {
 };
 
 export const calcNormal = (p1: Point, p2: Point): Point => {
+  if (p1 == null || p2 == null) {
+    throw `Calculate normal null point: P1: ${p1} P2: ${p2}`;
+  }
+
   let dx = p2.x - p1.x;
   let dy = p2.y - p1.y;
   dx = dy === 0 ? 1 : dx;
@@ -32,9 +36,9 @@ export const convertToUnitVector = (vector: Point): Point => {
 
 export const createNormal = (coords: Point[], offset: number): Point[] => {
   const newPoints: Point[] = [];
-  const lastPointIndex = 2;
+  const nextToLastPointIndex = 2;
 
-  for (let i = 0; i < coords.length - lastPointIndex; i++) {
+  for (let i = 0; i < coords.length - nextToLastPointIndex; i++) {
     const normalVec = convertToUnitVector(calcNormal(coords[i], coords[i + 1]));
 
     const newPoint = coords[i].clone();
@@ -42,12 +46,12 @@ export const createNormal = (coords: Point[], offset: number): Point[] => {
     newPoint.y += normalVec.y * offset;
     newPoints.push(newPoint);
   }
-
-  const lastPoint = convertToUnitVector(calcNormal(coords[coords.length - lastPointIndex - 1], coords[coords.length - lastPointIndex]));
-  const newPoint = coords[coords.length - lastPointIndex].clone();
-  newPoint.x += lastPoint.x * offset;
-  newPoint.y += lastPoint.y * offset;
-  newPoints.push(newPoint);
-
+  if (coords.length > nextToLastPointIndex) {
+    const lastPoint = convertToUnitVector(calcNormal(coords[coords.length - nextToLastPointIndex - 1], coords[coords.length - nextToLastPointIndex]));
+    const newPoint = coords[coords.length - nextToLastPointIndex].clone();
+    newPoint.x += lastPoint.x * offset;
+    newPoint.y += lastPoint.y * offset;
+    newPoints.push(newPoint);
+  }
   return newPoints;
 };
