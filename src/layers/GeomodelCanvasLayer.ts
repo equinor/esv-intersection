@@ -1,10 +1,4 @@
-import {
-  GeoModelData,
-  GeomodelLayerOptions,
-  OnUpdateEvent,
-  OnRescaleEvent,
-  OnMountEvent
-} from '../interfaces';
+import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 import { CanvasLayer } from './CanvasLayer';
 
 export class GeomodelCanvasLayer extends CanvasLayer {
@@ -74,7 +68,10 @@ export class GeomodelCanvasLayer extends CanvasLayer {
   generateSurfaceAreasPaths(): void {
     this.surfaceAreasPaths = this.data.areas.reduce((acc: any, s: GeoModelData) => {
       const polygons = this.createPolygons(s.data);
-      const mapped = polygons.map((polygon: any) => ({ color: `#${s.color.toString(16).padStart(6, '0')}`, path: this.generatePolygonPath(polygon) }));
+      const mapped = polygons.map((polygon: any) => ({
+        color: `#${s.color.toString(16).padStart(6, '0')}`,
+        path: this.generatePolygonPath(polygon),
+      }));
       return [...acc, ...mapped];
     }, []);
   }
