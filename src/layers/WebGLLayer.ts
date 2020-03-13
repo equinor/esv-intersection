@@ -4,8 +4,11 @@ import { OnMountEvent, OnRescaleEvent } from '../interfaces';
 
 export abstract class WebGLLayer extends Layer {
   elm: HTMLElement;
+
   container: HTMLElement;
+
   ctx: Application;
+
   transform: Transform;
 
   onMount(event: OnMountEvent): void {
@@ -34,7 +37,7 @@ export abstract class WebGLLayer extends Layer {
     }
   }
 
-  onUnmount() {
+  onUnmount(): void {
     super.onUnmount();
     this.ctx.stop();
     this.ctx.destroy(true);
@@ -43,7 +46,7 @@ export abstract class WebGLLayer extends Layer {
     this.ctx = null;
   }
 
-  onRescale(event: OnRescaleEvent) {
+  onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     if (!this.ctx) {
       return;

@@ -1,53 +1,48 @@
-import { Graphics } from 'pixi.js';
+import { Graphics, Container } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
-import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import {
+  GeoModelData,
+  GeomodelLayerOptions,
+  OnUpdateEvent,
+  OnRescaleEvent,
+  OnMountEvent
+} from '../interfaces';
 
-export class GeomodelLayer extends WebGLLayer {
+export class GeomodelLayerV2 extends WebGLLayer {
   options: GeomodelLayerOptions;
 
-  graphics: Graphics;
+  pixiContainer: Container;
 
-  // TODO: create proper interface
   data: any;
 
-  constructor(id: string, options: GeomodelLayerOptions) {
-    super(id, options);
-    this.render = this.render.bind(this);
-  }
+  polygons: any;
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
-    this.graphics = new Graphics();
-    this.ctx.stage.addChild(this.graphics);
+    this.pixiContainer = new Container();
+    this.ctx.stage.addChild(this.pixiContainer);
   }
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.data = event.data;
-    this.render();
+    this.cleanUpContainer();
+
+    this.data.areas.forEach((p: any) => this.generateAreaPolygon(p));
+    this.data.lines.forEach((l: any) => this.generateSurfaceLine(l));
   }
 
   onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-    this.graphics.position.set(event.transform.x, event.transform.y);
-    this.graphics.scale.set(event.xRatio, event.yRatio);
+    this.pixiContainer.position.set(event.transform.x, event.transform.y);
+    this.pixiContainer.scale.set(event.xRatio, event.yRatio);
   }
 
-  render(): void {
-    if (!this.ctx) {
-      return;
-    }
-    const { data } = this;
-    if (!data) {
-      return;
-    }
-
-    this.graphics.clear();
-    data.areas.forEach((s: GeoModelData) => this.drawAreaPolygon(s));
-    data.lines.forEach((s: any) => this.drawSurfaceLine(s));
+  cleanUpContainer(): void {
+    this.pixiContainer.children.forEach((g: Graphics) => g.destroy());
+    this.pixiContainer.removeChildren();
   }
 
-  createPolygon = (data: any): number[][] => {
+  createPolygons = (data: any): number[][] => {
     const polygons: number[][] = [];
     let polygon: number[] = null;
 
@@ -75,22 +70,21 @@ export class GeomodelLayer extends WebGLLayer {
         }
       }
     }
-
     return polygons;
   };
 
-  drawAreaPolygon = (s: GeoModelData): void => {
-    const { graphics: g } = this;
-    const polygons = this.createPolygon(s.data);
-    polygons.forEach((polygon: any) => {
-      g.beginFill(s.color);
-      g.drawPolygon(polygon);
-      g.endFill();
-    });
+  generateAreaPolygon = (s: GeoModelData): void => {
+    const g = new Graphics();
+    g.lineStyle(1, s.color, 1);
+    g.beginFill(s.color);
+    const polygons = this.createPolygons(s.data);
+    polygons.forEach((polygon: any) => g.drawPolygon(polygon));
+    g.endFill();
+    this.pixiContainer.addChild(g);
   };
 
-  drawSurfaceLine = (s: any): void => {
-    const { graphics: g } = this;
+  generateSurfaceLine = (s: any): void => {
+    const g = new Graphics();
     const { data: d } = s;
     g.lineStyle(s.width, s.color, 1);
     let penDown = false;
@@ -106,5 +100,6 @@ export class GeomodelLayer extends WebGLLayer {
         penDown = false;
       }
     }
+    this.pixiContainer.addChild(g);
   };
 }

@@ -244,8 +244,8 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
   calcPos(data: number[][], offset: number, count: number, step: number, topLimit: number = null, bottomLimit: number = null): Vector2 {
     const pos: Vector2 = Vector2.zero.mutable;
-    let samples: number = 0;
-    for (let i: number = 0; i < count; i++) {
+    let samples = 0;
+    for (let i = 0; i < count; i++) {
       const x = offset + i * step;
 
       const vec: Vector2 = this.findSampleAtPos(data, x, topLimit, bottomLimit);
@@ -275,7 +275,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     const b: Vector2 = this.findSampleAtPos(data, offset, topLimit, bottomLimit);
     if (b == null) return null;
-    for (let i: number = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
       const x = offset + i * step;
       const a: Vector2 = this.findSampleAtPos(data, x, topLimit, bottomLimit);
       if (a === null) continue;
@@ -289,7 +289,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   findSampleAtPos(data: number[][], pos: number, topLimit: number = null, bottomLimit: number = null): Vector2 {
     let vec: Vector2 = null;
     const index = this.findIndexOfSample(data, pos);
-    if (index != -1 && data[index][1] && data[index + 1][1]) {
+    if (index !== -1 && data[index][1] && data[index + 1][1]) {
       const x: number = pos;
       let y: number = (data[index][1] + data[index + 1][1]) / 2;
       if (topLimit && topLimit > y) {

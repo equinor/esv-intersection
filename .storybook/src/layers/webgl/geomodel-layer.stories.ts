@@ -1,6 +1,8 @@
 import { scaleLinear } from 'd3-scale';
 
 import { GeomodelLayer } from '../../../../src/layers/GeomodelLayer';
+import { GeomodelCanvasLayer } from '../../../../src/layers/GeomodelCanvasLayer';
+import { GeomodelLayerV2 } from '../../../../src/layers/GeomodelLayerV2';
 import { GeomodelLabelsLayer } from '../../../../src/layers/GeomodelLabelsLayer';
 import { SurfaceGenerator } from '../../utils/surfaceGenerator';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
@@ -9,7 +11,7 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 import { generateSurfaceData, generateProjectedTrajectory, SurfaceLine, SurfaceData, generateProjectedWellborePath } from '../../../../src/datautils';
 
 //Data
-import poslog from '../../exampledata/polog.json';
+import poslog from '../../exampledata/poslog.json';
 import stratColumn from '../../exampledata/stratcolumn.json';
 import surfaceValues from '../../exampledata/surfaces.json';
 
@@ -130,21 +132,23 @@ export const GeoModelWithSampleData = () => {
 
 export const GeoModelWithLabels = () => {
   const root = createRootContainer(800);
+  const container = createLayerContainer(width, height);
+  const fpsLabel = createFPSLabel();
 
   const options: GeomodelLayerOptions = { order: 1 };
-  const geoModelLayer = new GeomodelLayer('webgl', options);
-  geoModelLayer.onMount({ elm: root, height, width });
+  const geoModelLayer = new GeomodelLayer('geomodels', options);
+  geoModelLayer.onMount({ elm: container, height, width });
 
   const options2: LayerOptions = { order: 1 };
   const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
-  geoModelLabelsLayer.onMount({ elm: root });
+  geoModelLabelsLayer.onMount({ elm: container });
 
-  const zoomHandler = new ZoomPanHandler(root, (event: OnUpdateEvent) => {
-    geoModelLayer.onUpdate({ ...event, data: geolayerdata });
+  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
     geoModelLayer.onRescale(event);
     geoModelLabelsLayer.onRescale({ ...event });
   });
-  geoModelLabelsLayer.onUpdate({ ...createEventObj(root), data: geolayerdata, wellborePath });
+  geoModelLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+  geoModelLabelsLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
   zoomHandler.adjustToSize(width, height);
@@ -152,6 +156,75 @@ export const GeoModelWithLabels = () => {
   zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
   zoomHandler.enableTranslateExtent = false;
   zoomHandler.setViewport(1000, 1000, 5000);
+
+  root.appendChild(container);
+  root.appendChild(fpsLabel);
+
+  return root;
+};
+
+export const GeoModelWithLabelsUsingCanvas = () => {
+  const root = createRootContainer(800);
+  const container = createLayerContainer(width, height);
+  const fpsLabel = createFPSLabel();
+
+  const options: GeomodelLayerOptions = { order: 1 };
+  const geoModelLayer = new GeomodelCanvasLayer('geomodels', options);
+  geoModelLayer.onMount({ elm: container, height, width });
+
+  const options2: LayerOptions = { order: 1 };
+  const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
+  geoModelLabelsLayer.onMount({ elm: container });
+
+  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
+    geoModelLayer.onRescale(event);
+    geoModelLabelsLayer.onRescale({ ...event });
+  });
+  geoModelLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+  geoModelLabelsLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+
+  zoomHandler.setBounds([0, 1000], [0, 1000]);
+  zoomHandler.adjustToSize(width, height);
+  zoomHandler.zFactor = 1;
+  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+  zoomHandler.enableTranslateExtent = false;
+  zoomHandler.setViewport(1000, 1000, 5000);
+
+  root.appendChild(container);
+  root.appendChild(fpsLabel);
+
+  return root;
+};
+
+export const GeoModelWithLabelsUsingVersion2 = () => {
+  const root = createRootContainer(800);
+  const container = createLayerContainer(width, height);
+  const fpsLabel = createFPSLabel();
+
+  const options: GeomodelLayerOptions = { order: 1 };
+  const geoModelLayer = new GeomodelLayerV2('geomodels', options);
+  geoModelLayer.onMount({ elm: container, height, width });
+
+  const options2: LayerOptions = { order: 1 };
+  const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
+  geoModelLabelsLayer.onMount({ elm: container });
+
+  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
+    geoModelLayer.onRescale(event);
+    geoModelLabelsLayer.onRescale({ ...event });
+  });
+  geoModelLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+  geoModelLabelsLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+
+  zoomHandler.setBounds([0, 1000], [0, 1000]);
+  zoomHandler.adjustToSize(width, height);
+  zoomHandler.zFactor = 1;
+  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+  zoomHandler.enableTranslateExtent = false;
+  zoomHandler.setViewport(1000, 1000, 5000);
+
+  root.appendChild(container);
+  root.appendChild(fpsLabel);
 
   return root;
 };
