@@ -46,7 +46,28 @@ export abstract class CanvasLayer extends Layer {
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     const { ctx } = this;
+    if (!ctx) {
+      return;
+    }
 
     ctx.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
+  }
+
+  resetTransform(): void {
+    this.ctx.resetTransform();
+  }
+
+  setTransform(event: OnRescaleEvent): void {
+    this.resetTransform();
+    this.ctx.translate(event.transform.x, event.transform.y);
+    this.ctx.scale(event.xRatio, event.yRatio);
+  }
+
+  clearCanvas(): void {
+    const { ctx, canvas } = this;
+    ctx.save();
+    ctx.resetTransform();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
   }
 }

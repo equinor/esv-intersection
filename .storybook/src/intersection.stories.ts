@@ -1,10 +1,22 @@
 import { WellborepathLayerOptions, Annotation, HoleSize, Casing } from '../../src/interfaces';
 import { LayerManager } from '../../src/control';
-import { GridLayer, WellborepathLayer, CalloutCanvasLayer, ImageLayer, GeomodelLayer, HoleSizeLayer, CasingLayer, Layer } from '../../src/layers';
+import {
+  GridLayer,
+  WellborepathLayer,
+  CalloutCanvasLayer,
+  ImageLayer,
+  GeomodelLayer,
+  HoleSizeLayer,
+  CasingLayer,
+  Layer,
+  SeismicCanvasLayer,
+  GeomodelLabelsLayer,
+} from '../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
 
 import { generateSurfaceData, generateProjectedTrajectory, SurfaceData } from '../../src/datautils';
+import { getSeismicInfo, generateSeismicSliceImage } from '../../src/datautils/seismicimage';
 
 export default {
   title: 'Intersection',
@@ -17,9 +29,94 @@ const bg2Img = require('./resources/bg2.jpg');
 import poslog from './exampledata/poslog.json';
 import stratColumn from './exampledata/stratcolumn.json';
 import surfaceValues from './exampledata/surfaces.json';
+import seismic from './exampledata/seismic.json';
+
+const seismicColorMap = [
+  '#ffe700',
+  '#ffdf00',
+  '#ffd600',
+  '#ffce00',
+  '#ffc500',
+  '#ffbc00',
+  '#ffb400',
+  '#ffab00',
+  '#ffa200',
+  '#ff9a00',
+  '#ff9100',
+  '#ff8900',
+  '#ff8000',
+  '#ff7700',
+  '#ff6f00',
+  '#ff6600',
+  '#ff5e00',
+  '#ff5500',
+  '#f55400',
+  '#ea5200',
+  '#e05100',
+  '#d55000',
+  '#cb4e00',
+  '#c04d00',
+  '#b64b00',
+  '#ab4a00',
+  '#a14900',
+  '#964700',
+  '#8c4600',
+  '#925213',
+  '#975d25',
+  '#9d6938',
+  '#a2744a',
+  '#a8805d',
+  '#ad8b6f',
+  '#b39782',
+  '#b8a294',
+  '#beaea7',
+  '#c3b9b9',
+  '#b7aeae',
+  '#aaa2a2',
+  '#9e9797',
+  '#918b8b',
+  '#858080',
+  '#787474',
+  '#6c6969',
+  '#5f5d5d',
+  '#535252',
+  '#464646',
+  '#404057',
+  '#393968',
+  '#333378',
+  '#2d2d89',
+  '#26269a',
+  '#2020ab',
+  '#1919bc',
+  '#1313cd',
+  '#0d0ddd',
+  '#0606ee',
+  '#0000ff',
+  '#000cff',
+  '#0018ff',
+  '#0024ff',
+  '#0030ff',
+  '#003cff',
+  '#0048ff',
+  '#0054ff',
+  '#0060ff',
+  '#006cff',
+  '#0078ff',
+  '#0084ff',
+  '#0090ff',
+  '#009cff',
+  '#00a8ff',
+  '#00b4ff',
+  '#00c0ff',
+  '#00ccff',
+  '#00d8ff',
+  '#00e4ff',
+  '#00f0ff',
+];
 
 const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
 const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
+const seismicInfo = getSeismicInfo(seismic, trajectory);
 
 const annotations: Annotation[] = [
   {
@@ -133,6 +230,8 @@ const yRange = 500;
 const width = 700;
 const height = 600;
 
+let image: ImageBitmap = null;
+
 export const intersection = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
@@ -150,10 +249,12 @@ export const intersection = () => {
   const wellboreLayer = createWellboreLayer();
   const calloutLayer = createCanvasCallout();
   const image1Layer = createImageLayer('bg1Img', 1);
-  const image2Layer = createImageLayer('bg2Img', 2);
-  const geomodelLayer = createGeomodelLayer('geomodel', 1);
   const holeSizeLayer = createHoleSizeLayer();
   const casingLayer = createCasingLayer();
+  const image2Layer = createImageLayer('bg2Img', 2);
+  const geomodelLayer = createGeomodelLayer('geomodel', 2);
+  const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3 });
+  const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
 
   const manager = new LayerManager(container, scaleOptions, axisOptions);
 
@@ -167,7 +268,20 @@ export const intersection = () => {
     .addLayer(image2Layer, { url: bg2Img })
     .addLayer(geomodelLayer, { data: geolayerdata })
     .addLayer(holeSizeLayer, { data: holeSizeData, wellborePath })
-    .addLayer(casingLayer, { data: casingData, wellborePath });
+    .addLayer(casingLayer, { data: casingData, wellborePath })
+    .addLayer(geomodelLabelsLayer, { data: geolayerdata, wellborePath })
+    .addLayer(seismicLayer, {});
+
+  const seismicOptions = {
+    x: seismicInfo.minX,
+    y: seismicInfo.minTvdMsl,
+    width: seismicInfo.maxX - seismicInfo.minX,
+    height: seismicInfo.maxTvdMsl - seismicInfo.minTvdMsl,
+  };
+  generateSeismicSliceImage(seismic, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
+    image = seismicImage;
+    seismicLayer.onUpdate({ image, options: seismicOptions });
+  });
 
   manager.zoomPanHandler.setBounds(sm.xDomain as [number, number], sm.yDomain as [number, number]);
   manager.zoomPanHandler.adjustToSize(sm.xRange[1], sm.yRange[1]);
@@ -182,6 +296,8 @@ export const intersection = () => {
   const btnGeomodel = createButton(manager, geomodelLayer, 'Geo model', { data: geolayerdata });
   const btnHoleSize = createButton(manager, holeSizeLayer, 'Hole size', { data: holeSizeData, wellborePath });
   const btnCasing = createButton(manager, casingLayer, 'Casing', { data: casingData, wellborePath });
+  const btnGeomodelLabels = createButton(manager, geomodelLabelsLayer, 'Geo model labels', { data: geolayerdata });
+  const btnSeismic = createButton(manager, seismicLayer, 'Seismic');
 
   btnContainer.appendChild(btnCallout);
   btnContainer.appendChild(btnWellbore);
@@ -190,6 +306,8 @@ export const intersection = () => {
   btnContainer.appendChild(btnGeomodel);
   btnContainer.appendChild(btnHoleSize);
   btnContainer.appendChild(btnCasing);
+  btnContainer.appendChild(btnGeomodelLabels);
+  btnContainer.appendChild(btnSeismic);
 
   root.appendChild(container);
   root.appendChild(btnContainer);
@@ -198,7 +316,7 @@ export const intersection = () => {
   return root;
 };
 
-const createButton = (manager: LayerManager, layer: Layer, title: string, additionalEventParams: any) => {
+const createButton = (manager: LayerManager, layer: Layer, title: string, additionalEventParams?: any) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
   btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
@@ -217,7 +335,7 @@ const createButton = (manager: LayerManager, layer: Layer, title: string, additi
 const createGeomodelLayer = (id: string, zIndex: number) => {
   const layer = new GeomodelLayer(id, {
     order: zIndex,
-    layerOpacity: 1,
+    layerOpacity: 0.8,
   });
 
   return layer;
