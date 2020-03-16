@@ -1,6 +1,7 @@
 import { CasingLayer } from '../../../../src/layers/CasingLayer';
 import { scaleLinear } from 'd3-scale';
 import { Casing, OnRescaleEvent, CasingLayerOptions } from '../../../../src/interfaces';
+import { CurveInterpolator } from 'curve-interpolator';
 
 import { generateProjectedWellborePath } from '../../../../src/datautils';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
@@ -108,7 +109,7 @@ const createEventObj = (elm: any) => {
     { diameter: 6.5 + 0, innerDiameter: 2, start: 700, length: 50, hasShoe: true },
   ];
 
-  const wellborePath: [number, number][] = [
+  const wellborePathCoords: [number, number][] = [
     [50, 50],
     [50, 100],
     [100, 150],
@@ -119,6 +120,10 @@ const createEventObj = (elm: any) => {
     [150, 450],
     [120, 450],
   ];
+  const tension = 0.2;
+  const numPoints = 999;
+  const wbpInterp = new CurveInterpolator(wellborePathCoords, tension);
+  const wellborePath = wbpInterp.getPoints(numPoints);
 
   const xScale = scaleLinear()
     .domain(xbounds)

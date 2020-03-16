@@ -4,6 +4,7 @@ import { HoleSize, HoleSizeLayerOptions, OnRescaleEvent } from '../../../../src/
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { generateProjectedWellborePath } from '../../../../src/datautils';
+import { CurveInterpolator } from 'curve-interpolator';
 
 import poslog from '../../exampledata/polog.json';
 
@@ -112,7 +113,7 @@ const createEventObj = (elm: any) => {
     { diameter: 6.5 + 0, start: 710, length: 50 },
   ];
 
-  const wellborePath: [number, number][] = [
+  const wellborePathCoords: [number, number][] = [
     [50, 50],
     [50, 100],
     [100, 150],
@@ -123,6 +124,10 @@ const createEventObj = (elm: any) => {
     [150, 450],
     [120, 450],
   ];
+  const tension = 0.2;
+  const numPoints = 999;
+  const wbpInterp = new CurveInterpolator(wellborePathCoords, tension);
+  const wellborePath = wbpInterp.getPoints(numPoints);
 
   const xScale = scaleLinear()
     .domain(xbounds)

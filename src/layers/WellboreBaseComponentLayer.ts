@@ -52,7 +52,7 @@ export class WellboreBaseComponentLayer extends WebGLLayer {
     const maxDiameter = Math.max(...sizes.map((s: HoleObjectData) => s.data.diameter));
     const texture = this.createTexure(maxDiameter * maxTextureDiameterScale, firstColor, secondColor);
     sizes
-      // .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1)) // draw smaller casings and holes inside bigger once if overlapping
+      .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1)) // draw smaller casings and holes inside bigger ones if overlapping
       .map((s: any) => this.drawHoleSize(s, texture));
   }
 

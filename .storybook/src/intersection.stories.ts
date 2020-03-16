@@ -1,3 +1,4 @@
+import { CurveInterpolator } from 'curve-interpolator';
 import { WellborepathLayerOptions, Annotation, HoleSize, Casing } from '../../src/interfaces';
 import { LayerManager } from '../../src/control';
 import {
@@ -182,43 +183,48 @@ const margin = {
   left: 0,
 };
 
-const wellborePath = [
-  [30, 400],
-  [40, 700],
-  [45, 1000],
-  [50, 1100],
-  [55, 1400],
-  [95, 1100],
-  [115, 1100],
-  [115, 1100],
-  [120, 1100],
-  [150, 1600],
-  [200, 3000],
-  [210, 2400],
-  [300, 1500],
-  [320, 1200],
-  [340, 500],
-  [350, 600],
-  [360, 700],
-  [370, 800],
-  [375, 900],
-  [400, 1000],
-  [420, 1100],
-  [440, 1100],
-  [460, 1100],
-  [490, 1100],
+const wellborePathCoords = [
+  [50, 10 + 775],
+  [50, 100 + 300 + 775],
+  [50, 150 + 300 + 775],
+  [70, 170 + 300 + 775],
+  [100, 180 + 300 + 775],
+  [125, 200 + 300 + 775],
+  [150, 250 + 300 + 775],
+  [150, 300 + 300 + 775],
+  [160, 350 + 300 + 775],
+  [170, 400 + 300 + 775],
+  [195, 410 + 300 + 775],
+  [215, 412 + 300 + 775],
+  [240, 408 + 300 + 775],
+  [280, 409 + 300 + 775],
+  [310, 410 + 300 + 775],
+  [350, 408 + 300 + 775],
+  [400, 418 + 300 + 775],
+  [450, 448 + 300 + 775],
+  [470, 455 + 300 + 775],
+  [477, 470 + 300 + 775],
+  [490, 510 + 300 + 775],
+  [492, 560 + 300 + 775],
+  [494, 610 + 300 + 775],
+  [496, 690 + 300 + 775],
 ];
+const tension = 0.2;
+const numPoints = 999;
+const wbpInterp = new CurveInterpolator(wellborePathCoords, tension);
+const wellborePath = wbpInterp.getPoints(numPoints);
 
 const holeSizeData: HoleSize[] = [
-  { start: 0, length: 100, diameter: 36 },
-  { start: 100, length: 400, diameter: 30 },
-  { start: 500, length: 400, diameter: 28 },
+  { start: 0, length: 400, diameter: 36 },
+  { start: 400, length: 400, diameter: 22 },
+  { start: 800, length: 700, diameter: 10 },
 ];
 const casingData: Casing[] = [
   { start: 0, length: 100, diameter: 34, innerDiameter: 34 - 1, hasShoe: false },
-  { start: 0, length: 200, diameter: 32, innerDiameter: 32 - 1, hasShoe: true },
-  { start: 200, length: 400, diameter: 10, innerDiameter: 10 - 1, hasShoe: true },
+  { start: 0, length: 250, diameter: 30, innerDiameter: 30 - 1, hasShoe: true },
+  { start: 250, length: 350, diameter: 10, innerDiameter: 10 - 1, hasShoe: true },
   { start: 600, length: 400, diameter: 8, innerDiameter: 8 - 1, hasShoe: true },
+  { start: 1000, length: 400, diameter: 7.5, innerDiameter: 7.5 - 1, hasShoe: true },
 ];
 
 const xbounds: [number, number] = [0, 1000];
