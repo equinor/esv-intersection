@@ -15,6 +15,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   data: SurfaceData = null;
   leftSide: boolean = true;
   wellborePath: any = null;
+  wellborePathBoundingBox: any = null;
 
   constructor(id: string, options: GeomodelLayerLabelsOptions) {
     super(id, options);
@@ -45,6 +46,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     }
     if (event.wellborePath) {
       this.wellborePath = event.wellborePath;
+      this.wellborePathBoundingBox = this.getWellborePathBBox(this.wellborePath);
     }
     if (!this.rescaleEvent) {
       return;
@@ -324,32 +326,35 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   checkDrawLabelsOnLeftSide(): boolean {
+    const { wellborePathBoundingBox } = this;
     const { xScale } = this.rescaleEvent;
     const t = 200;
 
     const [dx1, dx2] = xScale.domain();
     const [rx1] = xScale.range();
 
-    const wBBox = this.getWellborePathBBox(this.wellborePath);
+    const wbBBox = {
+      left: xScale(wellborePathBoundingBox.left),
+      right: xScale(wellborePathBoundingBox.right),
+    };
 
-    return wBBox === null || Math.abs(dx1 - wBBox.left) > Math.abs(wBBox.right - dx2) || Math.abs(rx1 - xScale(wBBox.left)) > t;
+    return Math.abs(dx1 - wbBBox.left) > Math.abs(wbBBox.right - dx2) || Math.abs(rx1 - xScale(wbBBox.left)) > t;
   }
 
   getWellborePathBBox(wellborePath: any): any {
     if (!wellborePath || wellborePath.length <= 0) {
       return null;
     }
-    const { xScale, yScale } = this.rescaleEvent;
     const left = wellborePath[wellborePath.length - 1][0];
     const right = wellborePath[0][0];
     const top = wellborePath[0][1];
     const bottom = wellborePath.reduce((acc: number, v: number[]) => (acc > v[1] ? acc : v[1]), -Infinity);
 
     return {
-      left: xScale(left),
-      right: xScale(right),
-      top: yScale(top),
-      bottom: yScale(bottom),
+      left,
+      right,
+      top,
+      bottom,
     };
   }
 }
