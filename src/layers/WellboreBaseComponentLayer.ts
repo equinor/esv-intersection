@@ -61,6 +61,10 @@ export class WellboreBaseComponentLayer extends WebGLLayer {
     const normalOffsetCoordsUpOrig = createNormal(wellBorePathCoords, s.data.diameter);
     const normalOffsetCoordsDownOrig = createNormal(wellBorePathCoords, -s.data.diameter);
 
+    if (normalOffsetCoordsUpOrig.length <= 2) {
+      return { wellBorePathCoords, normalOffsetCoordsDown: wellBorePathCoords, normalOffsetCoordsUp: wellBorePathCoords };
+    }
+
     const tension = 0.2;
     const numPoints = 999;
     const normalOffsetCoordsUpInterpolator = new CurveInterpolator(normalOffsetCoordsUpOrig.map(pointToArray), tension);
@@ -97,7 +101,7 @@ export class WellboreBaseComponentLayer extends WebGLLayer {
       const lastMeterPoint = 2;
       const newPoints: Point[] = [];
 
-      for (let i = 0; tot < meters || i > points.length - lastMeterPoint; i++) {
+      for (let i = 0; tot < meters && i > points.length - lastMeterPoint; i++) {
         tot += calcDistPoint(points[points.length - 1 - i], points[points.length - lastMeterPoint - i]);
         newPoints.push(points[points.length - 1 - i].clone());
       }
@@ -119,6 +123,9 @@ export class WellboreBaseComponentLayer extends WebGLLayer {
   };
 
   generateShoe = (triangleSideShoe: Point[], offset: number): Point[] => {
+    if (triangleSideShoe.length < 1) {
+      return [];
+    }
     const normalOffset = createNormal(
       [triangleSideShoe[0], triangleSideShoe[1], triangleSideShoe[triangleSideShoe.length - 1], triangleSideShoe[triangleSideShoe.length - 1]],
       offset,

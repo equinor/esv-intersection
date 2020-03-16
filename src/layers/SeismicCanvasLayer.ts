@@ -36,12 +36,6 @@ export class SeismicCanvasLayer extends CanvasLayer {
     if (!ctx || !seismicImage) {
       return;
     }
-    ctx.drawImage(
-      seismicImage,
-      options.x,
-      options.y,
-      options.width,
-      options.height,
-    );
+    ctx.drawImage(seismicImage, options.x, options.y, options.width, options.height);
   }
 }

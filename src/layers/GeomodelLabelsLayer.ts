@@ -286,7 +286,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       const span = data[index + 1][0] - data[index][0];
       const d = pos - data[index][0];
       const f = d / span;
-      let y: number = (data[index][1]*(1 - f)) + (data[index + 1][1]*f);
+      let y: number = data[index][1] * (1 - f) + data[index + 1][1] * f;
       if (topLimit && topLimit > y) {
         y = topLimit;
       }

@@ -12,9 +12,9 @@ export const calcDistPoint = (prev: Point, point: Point): number => {
 };
 
 export const calcNormal = (p1: Point, p2: Point): Point => {
-  if (p1 == null || p2 == null) {
-    throw `Calculate normal null point: P1: ${p1} P2: ${p2}`;
-  }
+  // if (p1 == null || p2 == null) {
+  //   throw `Calculate normal null point: P1: ${p1} P2: ${p2}`;
+  // }
 
   let dx = p2.x - p1.x;
   let dy = p2.y - p1.y;
