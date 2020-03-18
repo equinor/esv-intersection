@@ -99,7 +99,7 @@ export async function generateSeismicSliceImage(
         col = black;
         opacity = 0;
       } else {
-        val = (val1 * (1 - ratio)) + (val2 * ratio);
+        val = val1 * (1 - ratio) + val2 * ratio;
         i = (val - domain.min) * colorFactor;
         i = clamp(Math.floor(i), 0, steps - 1);
         col = colorTable[i];

@@ -1,6 +1,5 @@
-import { ScaleLinear } from 'd3-scale';
 import { ZoomTransform } from 'd3-zoom';
-import { Point } from 'pixi.js';
+import { Point, Graphics } from 'pixi.js';
 import { Layer } from './layers/Layer';
 
 interface LayerEvent {
@@ -20,8 +19,6 @@ export interface OnResizeEvent extends LayerEvent {
 }
 
 export interface OnRescaleEvent extends LayerEvent {
-  xScale: ScaleLinear<number, number>;
-  yScale: ScaleLinear<number, number>;
   xBounds?: [number, number];
   yBounds?: [number, number];
   zFactor?: number;
@@ -36,8 +33,8 @@ export interface OnRescaleEvent extends LayerEvent {
 export interface OnUpdateEvent extends LayerEvent {}
 
 export interface LayerOptions {
-  order: Number;
-  layerOpacity?: Number;
+  order: number;
+  layerOpacity?: number;
 
   onMount?(event: OnMountEvent, layer: Layer): void;
   onUnmount?(event: OnUnmountEvent, layer: Layer): void;
@@ -62,6 +59,23 @@ export interface WellborepathLayerOptions extends LayerOptions {
 export interface GeomodelLayerOptions extends LayerOptions {}
 
 export interface GeomodelLayerLabelsOptions extends LayerOptions {
+  margins?: number;
+  minFontSize?: number;
+  maxFontSize?: number;
+  textColor?: string;
+  font?: string;
+}
+
+export interface HoleSizeLayerOptions extends WellComponentBaseOptions {}
+
+export interface CasingLayerOptions extends WellComponentBaseOptions {}
+
+export interface WellComponentBaseOptions extends LayerOptions {
+  firstColor?: string;
+  secondColor?: string;
+  lineColor?: number;
+  topBottomLineColor?: number;
+  maxTextureDiameterScale?: number;
   margins?: number;
   minFontSize?: number;
   maxFontSize?: number;
@@ -99,6 +113,16 @@ export interface HoleSize {
   diameter: number;
   length: number;
   start: number;
+  hasShoe?: boolean;
+  innerDiameter?: number;
+}
+
+export interface Casing {
+  diameter: number;
+  length: number;
+  start: number;
+  hasShoe: boolean;
+  innerDiameter: number;
 }
 
 export interface MDPoint {
@@ -109,6 +133,12 @@ export interface MDPoint {
 export interface HoleObjectData {
   data: HoleSize;
   points: MDPoint[];
+  hasShoe?: boolean;
+  innerDiameter?: number;
+}
+
+export interface WellItemGraphics {
+  graphics: Graphics;
 }
 
 export interface NormalCoordsObject {

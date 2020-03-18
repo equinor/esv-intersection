@@ -1,12 +1,6 @@
 import { Graphics } from 'pixi.js';
 import { WebGLLayer } from './WebGLLayer';
-import {
-  GeoModelData,
-  GeomodelLayerOptions,
-  OnUpdateEvent,
-  OnRescaleEvent,
-  OnMountEvent
-} from '../interfaces';
+import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 
 export class GeomodelLayer extends WebGLLayer {
   options: GeomodelLayerOptions;

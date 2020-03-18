@@ -1,4 +1,5 @@
 node_modules
 dist
+.storybook/src/exampledata/**
 storybook-static
 report*

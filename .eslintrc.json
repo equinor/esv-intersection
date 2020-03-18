@@ -25,6 +25,8 @@
     "no-param-reassign": "off",
     "prettier/prettier": "error",
     "import/prefer-default-export": "off",
-    "max-len": ["error", { "code": 150 }]
+    "max-len": ["error", { "code": 150 }],
+    "no-magic-numbers": ["error", { "ignore": [0, 1] }],
+    "object-curly-newline": "off"
   }
 }

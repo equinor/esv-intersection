@@ -33,7 +33,7 @@ export function findSampleAtPos(data: number[][], pos: number, topLimit: number 
     const span = data[index + 1][0] - data[index][0];
     const d = pos - data[index][0];
     const f = d / span;
-    y = (data[index][1]*(1 - f)) + (data[index + 1][1]*f);
+    y = data[index][1] * (1 - f) + data[index + 1][1] * f;
     if (topLimit && topLimit > y) {
       y = topLimit;
     }
@@ -43,4 +43,3 @@ export function findSampleAtPos(data: number[][], pos: number, topLimit: number 
   }
   return y;
 }
-

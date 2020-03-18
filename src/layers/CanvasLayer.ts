@@ -39,10 +39,7 @@ export abstract class CanvasLayer extends Layer {
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
-    const {
-      xScale,
-      yScale,
-    } = event;
+    const { xScale, yScale } = event;
     this.onResize({ width: xScale.range()[1], height: yScale.range()[1] });
   }
 

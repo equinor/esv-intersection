@@ -70,5 +70,3 @@ const createEventObj = (elm: any) => {
     elm,
   };
 };
-
-

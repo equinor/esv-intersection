@@ -7,4 +7,6 @@ export * from './GeomodelLayer';
 export * from './GeomodelLabelsLayer';
 export * from './CalloutCanvasLayer';
 export * from './ImageCanvasLayer';
+export * from './HoleSizeLayer';
+export * from './CasingLayer';
 export * from './SeismicCanvasLayer';

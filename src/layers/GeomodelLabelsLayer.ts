@@ -103,13 +103,13 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     const labelMetrics = ctx.measureText(s.label);
     const labelLength = labelMetrics.width;
     if (leftSide) {
-      const labelRightEdge = leftEdge + (margins / xRatio) + labelLength;
-      if (labelRightEdge > maxX - (margins / xRatio)) {
+      const labelRightEdge = leftEdge + margins / xRatio + labelLength;
+      if (labelRightEdge > maxX - margins / xRatio) {
         leftSide = false;
       }
     } else {
-      const labelLeftEdge = rightEdge - (margins / xRatio) - labelLength;
-      if (labelLeftEdge < minX + (margins / xRatio)) {
+      const labelLeftEdge = rightEdge - margins / xRatio - labelLength;
+      if (labelLeftEdge < minX + margins / xRatio) {
         leftSide = true;
       }
     }
@@ -117,9 +117,9 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     // Find edge where to draw
     let startPos: number;
     if (leftSide) {
-      startPos = Math.max(minX, leftEdge) + (margins / xRatio);
+      startPos = Math.max(minX, leftEdge) + margins / xRatio;
     } else {
-      startPos = Math.min(maxX, rightEdge) - (margins / xRatio);
+      startPos = Math.min(maxX, rightEdge) - margins / xRatio;
     }
 
     const topEdge = yScale.invert(yScale.range()[0]);
@@ -201,10 +201,10 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     if (leftSide) {
       const rightEdge = xScale.invert(xScale.range()[1]);
-      startPos = Math.min(maxX, rightEdge) - (margins / xRatio);
+      startPos = Math.min(maxX, rightEdge) - margins / xRatio;
     } else {
       const leftEdge = xScale.invert(xScale.range()[0]);
-      startPos = Math.max(minX, leftEdge) + (margins / xRatio);
+      startPos = Math.max(minX, leftEdge) + margins / xRatio;
     }
 
     // Calculate where to sample points
