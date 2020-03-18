@@ -155,3 +155,29 @@ export interface ScaleOptions {
   width: number;
   height: number;
 }
+
+export interface Position {
+  easting: number;
+  northing: number;
+  tvd: number;
+  md: number;
+}
+
+export interface Interpolator {
+  trajectory: any;
+  curtain: any;
+  position?: any;
+  curve?: any;
+}
+
+export interface Trajectory {
+  points: number[][];
+  offset: number;
+}
+
+export interface ReferenceSystemOptions {
+  defaultIntersectionAngle?: number;
+  tension?: number;
+  arcDivisions?: number;
+  thresholdDirectionDist?: number;
+}

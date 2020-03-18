@@ -1,6 +1,6 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { WellborepathLayerOptions, Annotation, HoleSize, Casing } from '../../src/interfaces';
-import { LayerManager, DataManager } from '../../src/control';
+import { LayerManager, IntersectionReferenceSystem } from '../../src/control';
 import {
   GridLayer,
   WellborepathLayer,
@@ -188,9 +188,14 @@ export const intersection = () => {
     unitOfMeasure: 'm',
   };
 
-  const dataManager = new DataManager(poslog, 45);
+  const defaultOptions = {
+    defaultIntersectionAngle: 135,
+    tension: 0.75,
+    arcDivisions: 2000,
+    thresholdDirectionDist: 0.001,
+  };
 
-  const wellborePath: number[][]  = dataManager.projectedPath;
+  const dataManager = new IntersectionReferenceSystem(poslog, defaultOptions);
 
   // Instantiate layers
   const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1 });
@@ -210,7 +215,7 @@ export const intersection = () => {
 
   manager
     .addLayer(gridLayer)
-    .addLayer(wellboreLayer, { xScale: sm.xScale, yScale: sm.yScale, data: wellborePath || mockedWellborePath })
+    .addLayer(wellboreLayer, { xScale: sm.xScale, yScale: sm.yScale, data: dataManager.projectedPath || mockedWellborePath })
     .addLayer(calloutLayer, { data: annotations })
     .addLayer(image1Layer, { url: bg1Img })
     .addLayer(image2Layer, { url: bg2Img })
@@ -238,7 +243,7 @@ export const intersection = () => {
   const FPSLabel = createFPSLabel();
 
   const btnCallout = createButton(manager, calloutLayer, 'Callout', { data: annotations });
-  const btnWellbore = createButton(manager, wellboreLayer, 'Wellbore', { data: wellborePath });
+  const btnWellbore = createButton(manager, wellboreLayer, 'Wellbore', { data: dataManager.projectedPath });
   const btnImage1 = createButton(manager, image1Layer, 'Image 1', { url: bg1Img });
   const btnImage2 = createButton(manager, image2Layer, 'Image 2', { url: bg2Img });
   const btnGeomodel = createButton(manager, geomodelLayer, 'Geo model', { data: geolayerdata });

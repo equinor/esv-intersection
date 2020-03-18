@@ -4,12 +4,12 @@ import { seqI } from '@equinor/videx-math';
 import { CurveInterpolator } from 'curve-interpolator';
 import { SurveySample } from './interfaces';
 
-const stepSize: number = 0.1;
-const extensionLength: number = 1000;
-const thresholdRelativeDist: number = 150;
-const thresholdDirectionDist: number = 30;
+const stepSize = 0.1;
+const extensionLength = 1000;
+const thresholdRelativeDist = 150;
+const thresholdDirectionDist = 30;
 
-const pathSteps: number = 10;
+const pathSteps = 10;
 
 /**
  * Generate projected wellbore path for drawing using wellbore path layer
@@ -46,7 +46,7 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
 
   const points: number[][] = poslog ? poslog.map(p => [p.easting, p.northing, p.tvd, p.md]) : [];
 
-  const interpolator: any = new CurveInterpolator(points, 0.75, 5000);
+  const interpolator: any = new CurveInterpolator(points, { tension: 0.75, arcDivisons: 5000 });
   const displacement: number = interpolator.length;
 
   const nPoints: number = Math.round(displacement * pathSteps);
@@ -120,7 +120,7 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
  */
 function getDirectionVector(path: number[][], threshold: number): Vector2 {
   const res: Vector2 = Vector2.zero.mutable;
-  let len: number = 0;
+  let len = 0;
   const temp: Vector2 = Vector2.zero.mutable;
 
   for (let i = 0; i < path.length - 1; i++) {
@@ -149,14 +149,14 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
  *
  * @return {Number[]}    Simplified array
  */
-function simplify(inputArr: number[][], maxOffset: number = 0.001, maxDistance: number = 10): number[][] {
+function simplify(inputArr: number[][], maxOffset = 0.001, maxDistance = 10): number[][] {
   if (inputArr.length <= 4) return inputArr;
   const [o0, o1] = inputArr[0];
   const arr = inputArr.map(d => [d[0] - o0, d[1] - o1]);
   let [a0, a1] = arr[0];
   const sim: number[][] = [inputArr[0]];
 
-  for (let i: number = 1; i + 1 < arr.length; i++) {
+  for (let i = 1; i + 1 < arr.length; i++) {
     const [t0, t1] = arr[i];
     const [b0, b1] = arr[i + 1];
 
@@ -189,7 +189,7 @@ function simplify(inputArr: number[][], maxOffset: number = 0.001, maxDistance: 
  */
 function projectCurtain(points: number[][], origin: number[] = null, offset = 0): number[][] {
   let p0: number[] = origin || points[0];
-  let l: number = 0;
+  let l = 0;
   const projected = points.map((p1: number[]) => {
     const dx = p1[0] - p0[0];
     const dy = p1[1] - p0[1];
