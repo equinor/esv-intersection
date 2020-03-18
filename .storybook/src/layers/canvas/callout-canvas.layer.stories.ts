@@ -88,6 +88,7 @@ export const CalloutCanvas = () => {
 
   const layer = new CalloutCanvasLayer('callout', { order: 1 });
   layer.onMount(createEventObj(container));
+  layer.onUpdate({data: annotations});
   layer.onRescale(createEventObj(container));
 
   root.appendChild(container);

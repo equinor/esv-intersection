@@ -32,11 +32,11 @@ export const GeoModel = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  geoModelLayer.onMount({ elm: container, height, width });
-  const strat1: [number[], number[]] = [[0], [1]];
   const data: [number[], number[], number[]][] = new SurfaceGenerator().generateData();
 
+  geoModelLayer.onMount({ elm: container, height, width });
   geoModelLayer.onUpdate(createEventObj(root, data));
+  geoModelLayer.onRescale(createEventObj(root));
 
   root.appendChild(container);
 
@@ -60,6 +60,12 @@ const createEventObj = (elm: any, inputData?: any): OnUpdateEvent => {
     xScale: xScale.copy(),
     yScale: yScale.copy(),
     elm,
+    transform: {
+      x: 0,
+      y: 0,
+    },
+    xRatio: width / xbounds[1],
+    yRatio: height / ybounds[1],
   };
 
   if (inputData) {
@@ -98,9 +104,8 @@ const createEventObj = (elm: any, inputData?: any): OnUpdateEvent => {
         },
       ],
     };
-    event = { ...event, ...data };
+    event = { ...event, data };
   }
-
   return event;
 };
 

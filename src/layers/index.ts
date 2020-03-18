@@ -4,6 +4,8 @@ export * from './GridLayer';
 export * from './SVGLayer';
 export * from './WellborePathLayer';
 export * from './GeomodelLayer';
+export * from './GeomodelCanvasLayer';
+export * from './GeomodelLayerV2';
 export * from './GeomodelLabelsLayer';
 export * from './CalloutCanvasLayer';
 export * from './ImageCanvasLayer';

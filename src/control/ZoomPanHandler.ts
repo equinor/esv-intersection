@@ -133,6 +133,15 @@ export class ZoomPanHandler {
     return this._zFactor;
   }
 
+ /**
+   * Set z factor
+   * @param  factor
+   */
+  set zFactor(factor: number) {
+    this._zFactor = factor;
+    this.recalculateZoomTransform();
+  }
+
   /**
    * Check if x is inverted (right to left is positive) from x bounds
    * @returns  true if inverted
@@ -147,15 +156,6 @@ export class ZoomPanHandler {
    */
   get isYInverted(): boolean {
     return this.yBounds[1] < this.yBounds[0];
-  }
-
-  /**
-   * Set z factor
-   * @param  factor
-   */
-  set zFactor(factor: number) {
-    this._zFactor = factor;
-    this.recalculateZoomTransform();
   }
 
   /**
@@ -225,7 +225,7 @@ export class ZoomPanHandler {
   /**
    * Update scale
    */
-  rescale() {
+  rescale(): void {
     const { createEventObject } = this;
 
     this.onRescale(createEventObject());

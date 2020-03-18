@@ -33,7 +33,7 @@ export const SingleAxis = () => {
   const mainGroup = svg;
   const showLabels = true;
 
-  const axis = new Axis(mainGroup, scaleX, scaleY, showLabels, 'Displacement', 'TVD MSL', 'm');
-  axis.render();
+  const axis = new Axis(mainGroup, showLabels, 'Displacement', 'TVD MSL', 'm');
+  axis.onRescale({xScale: scaleX, yScale: scaleY});
   return div;
 };
