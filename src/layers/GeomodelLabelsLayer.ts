@@ -2,7 +2,7 @@ import Vector2 from '@equinor/videx-vector2';
 
 import { CanvasLayer } from './CanvasLayer';
 import { GeomodelLayerLabelsOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
-import { SurfaceData, SurfaceArea, SurfaceLine } from '../datautils';
+import { SurfaceData, SurfaceArea, SurfaceLine, findSampleAtPos } from '../datautils';
 
 export class GeomodelLabelsLayer extends CanvasLayer {
   options: GeomodelLayerLabelsOptions;
@@ -240,9 +240,9 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     for (let i = 0; i < count; i++) {
       const x = offset + i * step;
 
-      const vec: Vector2 = this.findSampleAtPos(data, x, topLimit, bottomLimit);
-      if (vec) {
-        pos.add(vec);
+      const y = findSampleAtPos(data, x, topLimit, bottomLimit);
+      if (y) {
+        pos.add(x, y);
         samples++;
       }
     }
@@ -265,64 +265,20 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   ): Vector2 {
     const dir: Vector2 = initalVector.mutable;
 
-    const b: Vector2 = this.findSampleAtPos(data, offset, topLimit, bottomLimit);
-    if (b == null) return null;
+    const by = findSampleAtPos(data, offset, topLimit, bottomLimit);
+    if (by == null) return null;
+    const vecAtEnd: Vector2 = new Vector2(offset, by);
+    const tmpVec: Vector2 = Vector2.zero.mutable;
     for (let i = 0; i < count; i++) {
       const x = offset + i * step;
-      const a: Vector2 = this.findSampleAtPos(data, x, topLimit, bottomLimit);
-      if (a === null) continue;
-      const tmpVec: Vector2 = Vector2.sub(a, b);
+      const y = findSampleAtPos(data, x, topLimit, bottomLimit);
+      if (y === null) continue;
+      tmpVec.set(x, y);
+      tmpVec.sub(vecAtEnd);
       dir.add(tmpVec);
     }
 
     return dir;
-  }
-
-  findSampleAtPos(data: number[][], pos: number, topLimit: number = null, bottomLimit: number = null): Vector2 {
-    let vec: Vector2 = null;
-    const index = this.findIndexOfSample(data, pos);
-    if (index !== -1 && data[index][1] && data[index + 1][1]) {
-      const x: number = pos;
-      const span = data[index + 1][0] - data[index][0];
-      const d = pos - data[index][0];
-      const f = d / span;
-      let y: number = data[index][1] * (1 - f) + data[index + 1][1] * f;
-      if (topLimit && topLimit > y) {
-        y = topLimit;
-      }
-      if (bottomLimit && bottomLimit < y) {
-        y = bottomLimit;
-      }
-      vec = new Vector2(x, y);
-    }
-    return vec;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  findIndexOfSample(data: number[][], pos: number): number {
-    let index = -1;
-    let lowLim = 0;
-    let highLim = data.length - 2;
-    const linearSearchLimit = 20;
-
-    while (highLim - lowLim > linearSearchLimit) {
-      const mid = Math.floor((highLim + lowLim) / 2);
-      const midX = data[mid][0];
-      if (midX <= pos) {
-        highLim = mid;
-      } else {
-        lowLim = mid;
-      }
-    }
-
-    for (let i = lowLim; i < highLim; i++) {
-      if (data[i][0] >= pos && data[i + 1][0] <= pos) {
-        index = i;
-        break;
-      }
-    }
-
-    return index;
   }
 
   checkDrawLabelsOnLeftSide(): boolean {

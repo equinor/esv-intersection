@@ -1,6 +1,7 @@
 import { clamp } from '@equinor/videx-math';
 
 import { createColorTable } from './colortable';
+import { findIndexOfSample } from './findsample';
 
 export function getSeismicInfo(seismic: any, trajectory: number[][]): any {
   const minX = trajectory.reduce((acc: number, val: number[]) => Math.min(acc, val[0]), 0);
@@ -38,6 +39,7 @@ export async function generateSeismicSliceImage(
   data: { datapoints: number[][]; yAxisValues: number[] },
   trajectory: number[][],
   colormap: string[],
+  isLeftToRight = false,
 ): Promise<ImageBitmap> {
   const { datapoints: dp } = data;
 
@@ -55,8 +57,6 @@ export async function generateSeismicSliceImage(
     difference: dmax - dmin,
   };
 
-  const isLeftToRight = false; //TODO: need to support this in the future
-
   const length = trajectory[0][0] - trajectory[trajectory.length - 1][0];
   const width = Math.floor(length / 5);
   const height = data.yAxisValues.length;
@@ -73,15 +73,6 @@ export async function generateSeismicSliceImage(
 
   let pos = isLeftToRight ? trajectory[0][0] : trajectory[trajectory.length - 1][0];
 
-  const findIndexByPos = (cur: number[], i: number, array: number[][]): boolean => {
-    let v1 = array[i + 1][0];
-    let v2 = cur[0];
-    if (v1 > v2) {
-      [v1, v2] = [v2, v1];
-    }
-    return v1 <= pos && v2 >= pos;
-  };
-
   const step = (length / width) * (isLeftToRight ? -1 : 1);
 
   let val1;
@@ -94,7 +85,7 @@ export async function generateSeismicSliceImage(
 
   for (let x = 0; x < width; x++) {
     offset = x * 4;
-    const index = trajectory.findIndex(findIndexByPos);
+    const index = findIndexOfSample(trajectory, pos);
     const x1 = trajectory[index][0];
     const x2 = trajectory[index + 1][0];
     const span = x2 - x1;
