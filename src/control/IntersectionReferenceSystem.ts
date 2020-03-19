@@ -86,7 +86,13 @@ export class IntersectionReferenceSystem {
   /**
    * Map a displacement back to length along the curve
    */
-  unproject(displacement: number[][]): number {
+  unproject(displacement: number): number {
+    if (displacement < 0) {
+      return displacement;
+    }
+    if (displacement > this.displacement) {
+      return this.length + (displacement - this.displacement);
+    }
     const ls = this.interpolators.curtain.lookupPositions(displacement, 0, 1);
     if (ls && ls.length) {
       return ls[0] * this.length;
