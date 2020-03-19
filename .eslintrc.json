@@ -27,6 +27,7 @@
     "import/prefer-default-export": "off",
     "max-len": ["error", { "code": 150 }],
     "no-magic-numbers": ["error", { "ignore": [0, 1] }],
-    "object-curly-newline": "off"
+    "object-curly-newline": "off",
+    "no-underscore-dangle": "off"
   }
 }
