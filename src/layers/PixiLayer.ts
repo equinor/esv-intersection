@@ -2,7 +2,7 @@ import { Application, Transform } from 'pixi.js';
 import { Layer } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
 
-export abstract class WebGLLayer extends Layer {
+export abstract class PixiLayer extends Layer {
   elm: HTMLElement;
 
   container: HTMLElement;

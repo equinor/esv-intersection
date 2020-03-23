@@ -1,6 +1,6 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
-import { WebGLLayer } from './WebGLLayer';
+import { PixiLayer } from './PixiLayer';
 import { calcDist, calcDistPoint, createNormal, arrayToPoint, pointToArray } from '../utils/vectorUtils';
 import {
   HoleSizeLayerOptions,
@@ -14,7 +14,7 @@ import {
   OnMountEvent,
 } from '../interfaces';
 
-export class WellboreBaseComponentLayer extends WebGLLayer {
+export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;
 
   constructor(id: string, options: HoleSizeLayerOptions) {
