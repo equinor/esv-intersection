@@ -6,6 +6,18 @@ export abstract class CanvasLayer extends Layer {
   elm: HTMLElement;
   canvas: HTMLCanvasElement;
 
+  onOpacityChanged(opacity: number) {
+    if (this.canvas) {
+      this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
+    }
+  }
+
+  onOrderChanged(order: number) {
+    if (this.canvas) {
+      this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
+    }
+  }
+
   onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm, width, height } = event;
@@ -18,8 +30,9 @@ export abstract class CanvasLayer extends Layer {
     }
     this.canvas.setAttribute('id', `${this.id}`);
     this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
-    this.canvas.setAttribute('width', `${width || 300}px`);
-    this.canvas.setAttribute('height', `${height || 150}px`);
+    this.canvas.setAttribute('width', `${width || (this.elm && this.elm.getAttribute('width')) || 300}px`);
+    this.canvas.setAttribute('height', `${height || (this.elm && this.elm.getAttribute('height')) || 150}px`);
+    this.canvas.setAttribute('class', 'canvas-layer');
     this.ctx = this.canvas.getContext('2d');
   }
 
@@ -37,20 +50,12 @@ export abstract class CanvasLayer extends Layer {
     ctx.canvas.setAttribute('height', `${height}px`);
   }
 
-  onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-    const { xScale, yScale } = event;
-    this.onResize({ width: xScale.range()[1], height: yScale.range()[1] });
-  }
-
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     const { ctx } = this;
     if (!ctx) {
       return;
     }
-
-    ctx.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
   }
 
   resetTransform(): void {

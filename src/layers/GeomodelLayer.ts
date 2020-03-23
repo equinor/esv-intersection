@@ -28,9 +28,9 @@ export class GeomodelLayer extends WebGLLayer {
   }
 
   onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
     this.graphics.position.set(event.transform.x, event.transform.y);
     this.graphics.scale.set(event.xRatio, event.yRatio);
+    this.render();
   }
 
   render(): void {

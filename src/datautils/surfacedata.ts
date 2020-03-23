@@ -101,7 +101,7 @@ export function generateSurfaceData(trajectory: number[][], stratColumn: StratUn
  * @param  mappedSurfaces
  * @param  trajectory
  */
-function getSurfaceLines(mappedSurfaces: any, trajectory: number[][]) {
+function getSurfaceLines(mappedSurfaces: any, trajectory: number[][]): SurfaceLine[] {
   const lines: SurfaceLine[] = mappedSurfaces
     .filter((d: any) => d.visualization === 'line')
     .map((l: any) => ({
@@ -120,7 +120,7 @@ function getSurfaceLines(mappedSurfaces: any, trajectory: number[][]) {
  * @param {string} unitname
  * @param {[]} path
  */
-function findStratcolumnUnit(units: any, unitname: any, path: any[] = []) {
+function findStratcolumnUnit(units: any, unitname: any, path: any[] = []): any {
   const unit: any = units.find((u: any) => u.identifier.toLowerCase() === unitname.toLowerCase());
   if (unit) {
     // Build path

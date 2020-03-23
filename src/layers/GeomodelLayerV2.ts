@@ -17,6 +17,11 @@ export class GeomodelLayerV2 extends WebGLLayer {
     this.ctx.stage.addChild(this.pixiContainer);
   }
 
+  onUnmount(): void {
+    super.onUnmount();
+    this.pixiContainer = null;
+  }
+
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.data = event.data;

@@ -26,7 +26,7 @@ export interface SurfaceMetaAndValues {
   visualSettings: {
     displayName: string;
     crossSection: string;
-    color: {
+    colors: {
       crossSection: string;
     };
   };

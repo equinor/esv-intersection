@@ -7,7 +7,7 @@ import { generateProjectedWellborePath } from '../../../../src/datautils';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 
-import poslog from '../../exampledata/polog.json';
+import poslog from '../../exampledata/poslog.json';
 
 const width = 400;
 const height = 800;

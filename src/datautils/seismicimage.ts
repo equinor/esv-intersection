@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import { clamp } from '@equinor/videx-math';
 
 import { createColorTable } from './colortable';
@@ -39,7 +40,7 @@ export async function generateSeismicSliceImage(
   data: { datapoints: number[][]; yAxisValues: number[] },
   trajectory: number[][],
   colormap: string[],
-  isLeftToRight = false,
+  isLeftToRight = true,
 ): Promise<ImageBitmap> {
   const { datapoints: dp } = data;
 
@@ -58,7 +59,7 @@ export async function generateSeismicSliceImage(
   };
 
   const length = trajectory[0][0] - trajectory[trajectory.length - 1][0];
-  const width = Math.floor(length / 5);
+  const width = Math.abs(Math.floor(length / 5));
   const height = data.yAxisValues.length;
 
   // Generate color table
@@ -95,7 +96,7 @@ export async function generateSeismicSliceImage(
     for (let y = 0; y < height; y++) {
       val1 = dp[y][index];
       val2 = dp[y][index + 1];
-      if (val1 === null || val2 === null) {
+      if (val1 == null || val2 == null) {
         col = black;
         opacity = 0;
       } else {

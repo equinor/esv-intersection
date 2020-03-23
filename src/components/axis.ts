@@ -2,6 +2,7 @@ import { axisRight, axisBottom } from 'd3-axis';
 import { Selection } from 'd3-selection';
 import { ScaleLinear } from 'd3-scale';
 import { BaseType } from 'd3';
+import { OnResizeEvent } from '../interfaces';
 
 export class Axis {
   mainGroup: Selection<SVGElement, any, null, undefined>;
@@ -14,16 +15,12 @@ export class Axis {
 
   constructor(
     mainGroup: Selection<SVGElement, any, null, undefined>,
-    scaleX: ScaleLinear<number, number>,
-    scaleY: ScaleLinear<number, number>,
     showLabels = true,
     labelXDesc: string,
     labelYDesc: string,
     measurement: string,
   ) {
     this.mainGroup = mainGroup;
-    this.scaleX = scaleX;
-    this.scaleY = scaleY;
     this.showLabels = showLabels;
     this.labelXDesc = labelXDesc;
     this.labelYDesc = labelYDesc;
@@ -90,7 +87,7 @@ export class Axis {
     return gx;
   }
 
-  createOrGet = (mainGroup: Selection<BaseType, any, null, undefined>, name: string) => {
+  createOrGet = (mainGroup: Selection<BaseType, any, null, undefined>, name: string): Selection<BaseType, any, null, undefined> => {
     let res = mainGroup.select(`g.${name}`);
     if (res.empty()) {
       res = mainGroup.append('g').attr('class', name);
@@ -98,7 +95,7 @@ export class Axis {
     return res;
   };
 
-  render() {
+  render(): void {
     const xAxis = axisBottom(this.scaleX);
     const yAxis = axisRight(this.scaleY);
 
@@ -112,7 +109,11 @@ export class Axis {
     this.renderLabely(gy, this.showLabels, height, `${this.labelYDesc} (${this.measurement})`);
   }
 
-  onRescale(event: any) {
+  onResize(event: OnResizeEvent): void {
+    this.mainGroup.attr('height', `${event.height}px`).attr('width', `${event.width}px`);
+  }
+
+  onRescale(event: any): void {
     this.scaleX = event.xScale;
     this.scaleY = event.yScale;
     this.render();

@@ -28,6 +28,7 @@ export class ImageLayer extends CanvasLayer {
     const { xScale, yScale, xRatio, yRatio, x, y } = event;
     const calcWidth = width * (xRatio || 1);
     const calcHeight = height * (yRatio || 1);
+    this.clearCanvas();
     if (this.isLoading) {
       this.img.onload = (): void => {
         this.isLoading = false;

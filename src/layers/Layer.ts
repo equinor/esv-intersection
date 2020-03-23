@@ -1,14 +1,14 @@
 import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
 
 export abstract class Layer {
-  id: String;
-  _order: Number;
+  id: string;
+  _order: number;
   options: LayerOptions;
   loading: boolean;
   element?: HTMLElement;
-  _opacity: Number;
+  _opacity: number;
 
-  constructor(id: String, options: LayerOptions) {
+  constructor(id: string, options: LayerOptions) {
     this.id = id;
     this._order = options.order;
     this.options = {
@@ -23,6 +23,34 @@ export abstract class Layer {
     this.onUpdate = this.onUpdate.bind(this);
     this.onRescale = this.onRescale.bind(this);
     this.onResize = this.onResize.bind(this);
+    this.onOrderChanged = this.onOrderChanged.bind(this);
+    this.onOpacityChanged = this.onOpacityChanged.bind(this);
+  }
+
+  set isLoading(loading: boolean) {
+    this.loading = loading;
+  }
+
+  get isLoading(): boolean {
+    return this.loading;
+  }
+
+  set opacity(opacity: number) {
+    this._opacity = opacity;
+    this.onOpacityChanged(opacity);
+  }
+
+  get opacity(): number {
+    return this._opacity;
+  }
+
+  set order(order: number) {
+    this._order = order;
+    this.onOrderChanged(order);
+  }
+
+  get order(): number {
+    return this._order;
   }
 
   onMount(event: OnMountEvent): void {
@@ -56,28 +84,10 @@ export abstract class Layer {
     }
   }
 
-  set isLoading(loading: boolean) {
-    // TODO: update d3 element
-    this.loading = loading;
+  onOpacityChanged(opacity: number): void {
   }
 
-  get isLoading(): boolean {
-    return this.loading;
+  onOrderChanged(order: number): void {
   }
 
-  set opacity(opacity: Number) {
-    this._opacity = opacity;
-  }
-
-  get opacity(): Number {
-    return this._opacity;
-  }
-
-  get order(): Number {
-    return this._order;
-  }
-
-  set order(order: Number) {
-    this._order = order;
-  }
 }
