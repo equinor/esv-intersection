@@ -3,6 +3,7 @@ import { LayerManager } from './LayerManager';
 import { Layer } from '../layers';
 import { ControllerOptions, Position } from './interfaces';
 import { ZoomPanHandler } from './ZoomPanHandler';
+import { ReferenceSystemOptions } from '..';
 
 /**
  * API for controlling data and layers
@@ -31,8 +32,21 @@ export class Controller {
 
     this._referenceSystem = referenceSystem || new IntersectionReferenceSystem(poslog);
     this.layerManager = new LayerManager(container, scaleOptions, axisOptions);
+  }
 
-    // this.setup();
+  setReferenceSystem(referenceSystem: IntersectionReferenceSystem): Controller {
+    this._referenceSystem = referenceSystem;
+    this.layers.forEach(layer => {
+      layer.referenceSystem = referenceSystem;
+    });
+
+    return this;
+  }
+
+  updatePoslog(poslog: Position[], options?: ReferenceSystemOptions): Controller {
+    this.setReferenceSystem(new IntersectionReferenceSystem(poslog, options));
+
+    return this;
   }
 
   addLayer(layer: Layer, params?: any): Controller {
@@ -47,6 +61,16 @@ export class Controller {
 
   getLayer(layerId: string): Layer {
     return this.layerManager.getLayer(layerId);
+  }
+
+  showLayer(layerId: string): Controller {
+    this.getLayer(layerId).isVisible = true;
+    return this;
+  }
+
+  hideLayer(layerId: string): Controller {
+    this.getLayer(layerId).isVisible = false;
+    return this;
   }
 
   /**

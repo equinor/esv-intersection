@@ -10,6 +10,7 @@ export abstract class Layer {
   _opacity: number;
   _referenceSystem?: IntersectionReferenceSystem;
   _data?: any;
+  _visible: boolean;
 
   constructor(id: string, options: LayerOptions) {
     this.id = id;
@@ -20,6 +21,7 @@ export abstract class Layer {
     this.loading = false;
     this.element = null;
     this._opacity = options.layerOpacity || 1;
+    this._visible = true;
 
     this._data = options.data;
 
@@ -75,7 +77,15 @@ export abstract class Layer {
   }
 
   set data(data: any) {
-    this.data = data;
+    this._data = data;
+  }
+
+  get isVisible(): boolean {
+    return this._visible;
+  }
+
+  set isVisible(visible: boolean) {
+    this._visible = visible;
   }
 
   onMount(event: OnMountEvent): void {
@@ -98,6 +108,9 @@ export abstract class Layer {
   }
 
   onUpdate(event: OnUpdateEvent): void {
+    if (event.data) {
+      this._data = event.data;
+    }
     if (this.options.onUpdate) {
       this.options.onUpdate(event, this);
     }

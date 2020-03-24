@@ -160,15 +160,15 @@ export const intersection = () => {
   const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
   const seismicInfo = getSeismicInfo(seismic, trajectory);
 
-  const wb = referenceSystem.generateProjectedWellborePath();
+  const wb = generateProjectedWellborePath(referenceSystem.projectedPath);
 
   // Instantiate layers
   const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1 });
   // const calloutLayer = new CalloutCanvasLayer('callout', { order: 4 });
-  // const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
-  // const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
-  const geomodelLayer = new GeomodelLayer('geomodel', { order: 2, layerOpacity: 0.8, data: geolayerdata });
-  const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red', data: wb || mockedWellborePath });
+  const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
+  const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
+  const geomodelLayer = new GeomodelLayer('geomodel', { order: 2, layerOpacity: 0.8});
+  const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red' });
   const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData });
   const casingLayer = new CasingLayer('casing', { order: 5, data: casingData });
   const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
@@ -191,11 +191,13 @@ export const intersection = () => {
 
   const controller = new Controller(poslog, layers, opts);
   controller.setup();
+  controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
+  controller.getLayer('wellborepath').onUpdate({ data: wb || mockedWellborePath });
 
   controller
     // .addLayer(calloutLayer, { annotations })
-  // .addLayer(image1Layer, { url: bg1Img })
-  // .addLayer(image2Layer, { url: bg2Img })
+    // .addLayer(image1Layer, { url: bg1Img })
+    // .addLayer(image2Layer, { url: bg2Img })
     .addLayer(holeSizeLayer, { wellborePath: wb })
     .addLayer(casingLayer, { wellborePath: wb });
 
@@ -260,6 +262,16 @@ export const intersection = () => {
 
   return root;
 };
+
+const generateProjectedWellborePath = (projection: number[][]) => {
+  const offset: number = projection[projection.length - 1][0];
+
+  projection.forEach((p, i) => {
+    projection[i][0] = offset - p[0];
+  });
+
+  return projection;
+}
 
 /**
  * storybook helper button for toggling a layer on and off

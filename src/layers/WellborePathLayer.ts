@@ -28,11 +28,14 @@ export class WellborepathLayer extends SVGLayer {
   }
 
   render(): void {
-    if (!(this.elm || this.data)) {
+    if (!this.elm) {
       return;
     }
     this.elm.select('g').remove();
 
+    if (!this.data) {
+      return;
+    }
     const { data } = this;
 
     this.elm
