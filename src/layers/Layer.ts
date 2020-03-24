@@ -1,4 +1,5 @@
 import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
+import { IntersectionReferenceSystem } from '../control';
 
 export abstract class Layer {
   id: string;
@@ -7,6 +8,8 @@ export abstract class Layer {
   loading: boolean;
   element?: HTMLElement;
   _opacity: number;
+  _referenceSystem?: IntersectionReferenceSystem;
+  _data?: any;
 
   constructor(id: string, options: LayerOptions) {
     this.id = id;
@@ -17,6 +20,12 @@ export abstract class Layer {
     this.loading = false;
     this.element = null;
     this._opacity = options.layerOpacity || 1;
+
+    this._data = options.data;
+
+    if (options.referenceSystem) {
+      this._referenceSystem = options.referenceSystem;
+    }
 
     this.onMount = this.onMount.bind(this);
     this.onUnmount = this.onUnmount.bind(this);
@@ -51,6 +60,22 @@ export abstract class Layer {
 
   get order(): number {
     return this._order;
+  }
+
+  get referenceSystem(): IntersectionReferenceSystem {
+    return this._referenceSystem;
+  }
+
+  set referenceSystem(referenceSystem: IntersectionReferenceSystem) {
+    this._referenceSystem = referenceSystem;
+  }
+
+  get data(): any {
+    return this._data;
+  }
+
+  set data(data: any) {
+    this.data = data;
   }
 
   onMount(event: OnMountEvent): void {
@@ -89,5 +114,4 @@ export abstract class Layer {
 
   onOrderChanged(order: number): void {
   }
-
 }

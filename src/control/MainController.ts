@@ -1,28 +1,8 @@
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
 import { LayerManager } from './LayerManager';
 import { Layer } from '../layers';
-import { ScaleOptions } from '../interfaces';
+import { ControllerOptions, Position } from './interfaces';
 import { ZoomPanHandler } from './ZoomPanHandler';
-
-type Position = {
-  easting: number;
-  northing: number;
-  tvd: number;
-  md: number;
-};
-
-interface AxisOptions {
-  xLabel: string;
-  yLabel: string;
-  unitOfMeasure: string;
-}
-
-interface ControllerOptions {
-  container: HTMLElement;
-  axisOptions?: AxisOptions;
-  scaleOptions: ScaleOptions;
-  referenceSystem?: IntersectionReferenceSystem;
-}
 
 /**
  * API for controlling data and layers
@@ -52,15 +32,17 @@ export class Controller {
     this._referenceSystem = referenceSystem || new IntersectionReferenceSystem(poslog);
     this.layerManager = new LayerManager(container, scaleOptions, axisOptions);
 
-    this.setup();
+    // this.setup();
   }
 
-  addLayer(layer: Layer, params?: any): void {
+  addLayer(layer: Layer, params?: any): Controller {
     this.layerManager.addLayer(layer, params);
+    return this;
   }
 
-  removeLayer(layerId: string): void {
+  removeLayer(layerId: string): Controller {
     this.layerManager.removeLayer(layerId);
+    return this;
   }
 
   getLayer(layerId: string): Layer {
@@ -71,8 +53,9 @@ export class Controller {
    * Adjust zoom due to changes in size of target
    * @param  force - force update even if size did not change, defaults to false
    */
-  adjustToSize(width: number, height: number, force?: boolean): void {
+  adjustToSize(width: number, height: number, force?: boolean): Controller {
     this.zoomPanHandler.adjustToSize(width, height, force);
+    return this;
   }
 
   /**
@@ -82,12 +65,14 @@ export class Controller {
    * @param  displ - displacement
    * @param  duration - duration of transition
    */
-  setViewport(cx?: number, cy?: number, displacement?: number, duration?: number): void {
+  setViewport(cx?: number, cy?: number, displacement?: number, duration?: number): Controller {
     this.zoomPanHandler.setViewport(cx, cy, displacement, duration);
+    return this;
   }
 
-  setBounds(xBounds: [number, number], yBounds: [number, number]): void {
+  setBounds(xBounds: [number, number], yBounds: [number, number]): Controller {
     this.zoomPanHandler.setBounds(xBounds, yBounds);
+    return this;
   }
 
   get referenceSystem(): IntersectionReferenceSystem {
@@ -109,8 +94,9 @@ export class Controller {
   /**
    * mounts layers
    */
-  private setup(): void {
+  setup(): Controller {
     const { layerManager, layers } = this;
     layerManager.addLayers(layers);
+    return this;
   }
 }

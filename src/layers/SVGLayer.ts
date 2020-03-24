@@ -33,9 +33,7 @@ export abstract class SVGLayer extends Layer {
       return;
     }
     super.onUpdate(event);
-    const { elm } = this;
   }
-
 
   onOpacitChanged(opacity: number): void {
     this._opacity = opacity;

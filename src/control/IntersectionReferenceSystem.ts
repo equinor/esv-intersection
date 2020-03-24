@@ -67,6 +67,21 @@ export class IntersectionReferenceSystem {
     this.getPosition = this.getPosition.bind(this);
     this.getProjectedLength = this.getProjectedLength.bind(this);
     this.getTrajectory = this.getTrajectory.bind(this);
+
+    this.generateProjectedWellborePath = this.generateProjectedWellborePath.bind(this);
+  }
+
+  generateProjectedWellborePath(): number[][] {
+    const { path } = this;
+
+    const projection: number[][] = IntersectionReferenceSystem.toDisplacement(path);
+    const offset: number = projection[projection.length - 1][0];
+
+    projection.forEach((p, i) => {
+      projection[i][0] = offset - p[0];
+    });
+
+    return projection;
   }
 
   /**
