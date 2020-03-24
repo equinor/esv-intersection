@@ -64,12 +64,12 @@ export class Controller {
   }
 
   showLayer(layerId: string): Controller {
-    this.getLayer(layerId).isVisible = true;
+    this.getLayer(layerId).setVisibility(true);
     return this;
   }
 
   hideLayer(layerId: string): Controller {
-    this.getLayer(layerId).isVisible = false;
+    this.getLayer(layerId).setVisibility(false);
     return this;
   }
 

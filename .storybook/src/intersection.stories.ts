@@ -218,14 +218,14 @@ export const intersection = () => {
   const FPSLabel = createFPSLabel();
 
   // const btnCallout = createButton(manager, calloutLayer, 'Callout', { data: annotations });
-  const btnWellbore = createButton(controller, wellboreLayer, 'Wellbore', { });
+  const btnWellbore = createButton(controller, wellboreLayer, 'Wellbore');
   // const btnImage1 = createButton(manager, image1Layer, 'Image 1', { url: bg1Img });
   // const btnImage2 = createButton(manager, image2Layer, 'Image 2', { url: bg2Img });
-  const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model', { });
-  const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size', { wellborePath: wb });
-  const btnCasing = createButton(controller, casingLayer, 'Casing', { wellborePath: wb });
-  const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels', { });
-  const btnSeismic = createButton(controller, seismicLayer, 'Seismic', {});
+  const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model');
+  const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size');
+  const btnCasing = createButton(controller, casingLayer, 'Casing');
+  const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
+  const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
   const btnLarger = createButtonWithCb('800x600', () => {
     const w = 800;
     const h = 600;
@@ -280,16 +280,16 @@ const generateProjectedWellborePath = (projection: number[][]) => {
  * @param title
  * @param additionalEventParams
  */
-const createButton = (manager: Controller, layer: Layer, title: string, additionalEventParams: any) => {
+const createButton = (manager: Controller, layer: Layer, title: string) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
   btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
   let show = false;
   btn.onclick = () => {
     if (show) {
-      manager.addLayer(layer, additionalEventParams);
+      manager.showLayer(layer.id);
     } else {
-      manager.removeLayer(layer.id.toString());
+      manager.hideLayer(layer.id);
     }
     show = !show;
   };

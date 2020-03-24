@@ -35,6 +35,11 @@ export abstract class SVGLayer extends Layer {
     super.onUpdate(event);
   }
 
+  setVisibility(visible: boolean): void {
+    super.setVisibility(visible);
+    this.elm.attr('visibility', visible ? 'visible' : 'hidden');
+  }
+
   onOpacitChanged(opacity: number): void {
     this._opacity = opacity;
     if (this.elm) {

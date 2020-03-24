@@ -36,6 +36,7 @@ export abstract class Layer {
     this.onResize = this.onResize.bind(this);
     this.onOrderChanged = this.onOrderChanged.bind(this);
     this.onOpacityChanged = this.onOpacityChanged.bind(this);
+    this.setVisibility = this.setVisibility.bind(this);
   }
 
   set isLoading(loading: boolean) {
@@ -84,7 +85,7 @@ export abstract class Layer {
     return this._visible;
   }
 
-  set isVisible(visible: boolean) {
+  setVisibility(visible: boolean): void {
     this._visible = visible;
   }
 
