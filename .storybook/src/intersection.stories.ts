@@ -33,6 +33,10 @@ import poslog from './exampledata/poslog.json';
 import stratColumn from './exampledata/stratcolumn.json';
 import surfaceValues from './exampledata/surfaces.json';
 import seismic from './exampledata/seismic.json';
+import annotations from './exampledata/annotations.json';
+import mockedWellborePath from './exampledata/wellborepathMock.json';
+import holeSizeData from './exampledata/holesizeData.json';
+import casingData from './exampledata/casingMock.json';
 
 const seismicColorMap = [
   '#ffe700',
@@ -116,22 +120,6 @@ const seismicColorMap = [
   '#00e4ff',
   '#00f0ff',
 ];
-import annotations from './exampledata/annotations.json';
-import mockedWellborePath from './exampledata/wellborepathMock.json';
-
-
-const holeSizeData: HoleSize[] = [
-  { start: 0, length: 400, diameter: 36 },
-  { start: 400, length: 400, diameter: 22 },
-  { start: 800, length: 700, diameter: 10 },
-];
-const casingData: Casing[] = [
-  { start: 0, length: 100, diameter: 34, innerDiameter: 34 - 1, hasShoe: false },
-  { start: 0, length: 250, diameter: 30, innerDiameter: 30 - 1, hasShoe: true },
-  { start: 250, length: 350, diameter: 10, innerDiameter: 10 - 1, hasShoe: true },
-  { start: 600, length: 400, diameter: 8, innerDiameter: 8 - 1, hasShoe: true },
-  { start: 1000, length: 400, diameter: 7.5, innerDiameter: 7.5 - 1, hasShoe: true },
-];
 
 const xbounds: [number, number] = [0, 1000];
 const ybounds: [number, number] = [0, 1000];
@@ -163,16 +151,16 @@ export const intersection = () => {
   const container = createLayerContainer(width, height);
   const btnContainer = createButtonContainer(width);
 
-  const dataManager = new IntersectionReferenceSystem(poslog, defaultOptions);
-  const displacement = dataManager.displacement;
+  const referenceSystem = new IntersectionReferenceSystem(poslog, defaultOptions);
+  const displacement = referenceSystem.displacement;
   const extend = 1000 / displacement;
   const steps = surfaceValues[0].data.values.length;
-  const traj = dataManager.getTrajectory(steps, 0, 1 + extend);
+  const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
   const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
   const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
   const seismicInfo = getSeismicInfo(seismic, trajectory);
 
-  const wb = dataManager.generateProjectedWellborePath();
+  const wb = referenceSystem.generateProjectedWellborePath();
 
   // Instantiate layers
   const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1 });
@@ -190,8 +178,6 @@ export const intersection = () => {
     gridLayer,
     geomodelLayer,
     wellboreLayer,
-    // holeSizeLayer,
-    // casingLayer,
     geomodelLabelsLayer,
     seismicLayer
   ];
@@ -200,23 +186,18 @@ export const intersection = () => {
     scaleOptions,
     axisOptions,
     container,
-    referenceSystem: dataManager,
+    referenceSystem,
   };
 
-  const manager = new Controller(poslog, layers, opts);
-  manager.setup();
+  const controller = new Controller(poslog, layers, opts);
+  controller.setup();
 
-  manager
-  //   .addLayer(gridLayer)
-  //   .addLayer(wellboreLayer)
+  controller
     // .addLayer(calloutLayer, { annotations })
   // .addLayer(image1Layer, { url: bg1Img })
   // .addLayer(image2Layer, { url: bg2Img })
-  //   .addLayer(geomodelLayer)
-    .addLayer(holeSizeLayer, { data: holeSizeData, wellborePath: wb })
-    .addLayer(casingLayer, { data: casingData, wellborePath: wb })
-  //   .addLayer(geomodelLabelsLayer, { wellborePath: wb })
-  //   .addLayer(seismicLayer);
+    .addLayer(holeSizeLayer, { wellborePath: wb })
+    .addLayer(casingLayer, { wellborePath: wb });
 
   const seismicOptions = {
     x: seismicInfo.minX,
@@ -229,27 +210,27 @@ export const intersection = () => {
     seismicLayer.onUpdate({ image, options: seismicOptions });
   });
 
-  manager.adjustToSize(width, height);
-  manager.setViewport(1000, 1500, 5000);
+  controller.adjustToSize(width, height);
+  controller.setViewport(1000, 1500, 5000);
 
   const FPSLabel = createFPSLabel();
 
   // const btnCallout = createButton(manager, calloutLayer, 'Callout', { data: annotations });
-  const btnWellbore = createButton(manager, wellboreLayer, 'Wellbore', { data: dataManager.projectedPath });
+  const btnWellbore = createButton(controller, wellboreLayer, 'Wellbore', { });
   // const btnImage1 = createButton(manager, image1Layer, 'Image 1', { url: bg1Img });
   // const btnImage2 = createButton(manager, image2Layer, 'Image 2', { url: bg2Img });
-  const btnGeomodel = createButton(manager, geomodelLayer, 'Geo model', { data: geolayerdata });
-  // const btnHoleSize = createButton(manager, holeSizeLayer, 'Hole size', { data: holeSizeData, wellborePath });
-  // const btnCasing = createButton(manager, casingLayer, 'Casing', { data: casingData, wellborePath });
-  const btnGeomodelLabels = createButton(manager, geomodelLabelsLayer, 'Geo model labels', { data: geolayerdata });
-  const btnSeismic = createButton(manager, seismicLayer, 'Seismic', {});
+  const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model', { });
+  const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size', { wellborePath: wb });
+  const btnCasing = createButton(controller, casingLayer, 'Casing', { wellborePath: wb });
+  const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels', { });
+  const btnSeismic = createButton(controller, seismicLayer, 'Seismic', {});
   const btnLarger = createButtonWithCb('800x600', () => {
     const w = 800;
     const h = 600;
     container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
     container.setAttribute('height', `${h}`);
     container.setAttribute('width', `${w}`);
-    manager.adjustToSize(w, h);
+    controller.adjustToSize(w, h);
   });
   const btnSmaller = createButtonWithCb('600x400', () => {
     const w = 600;
@@ -257,7 +238,7 @@ export const intersection = () => {
     container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
     container.setAttribute('height', `${h}`);
     container.setAttribute('width', `${w}`);
-    manager.adjustToSize(w, h);
+    controller.adjustToSize(w, h);
 
   });
 
@@ -266,8 +247,8 @@ export const intersection = () => {
   // btnContainer.appendChild(btnImage1);
   // btnContainer.appendChild(btnImage2);
   btnContainer.appendChild(btnGeomodel);
-  // btnContainer.appendChild(btnHoleSize);
-  // btnContainer.appendChild(btnCasing);
+  btnContainer.appendChild(btnHoleSize);
+  btnContainer.appendChild(btnCasing);
   btnContainer.appendChild(btnGeomodelLabels);
   btnContainer.appendChild(btnSeismic);
   btnContainer.appendChild(btnLarger);
