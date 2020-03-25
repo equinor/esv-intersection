@@ -1,6 +1,11 @@
 import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
 import { IntersectionReferenceSystem } from '../control';
 
+const defaultOptions = {
+  order: 1,
+  layerOpacity: 1,
+};
+
 export abstract class Layer {
   id: string;
   _order: number;
@@ -8,26 +13,24 @@ export abstract class Layer {
   loading: boolean;
   element?: HTMLElement;
   _opacity: number;
-  _referenceSystem?: IntersectionReferenceSystem;
+  _referenceSystem?: IntersectionReferenceSystem = null;
   _data?: any;
   _visible: boolean;
 
-  constructor(id: string, options: LayerOptions) {
-    this.id = id;
-    this._order = options.order;
+  constructor(id?: string, options?: LayerOptions) {
+    this.id = id || `layer-${Math.floor(Math.random() * 1000)}`;
+    const opts = options || defaultOptions;
+    this._order = opts.order || 1;
     this.options = {
-      ...options,
+      ...opts,
     };
     this.loading = false;
     this.element = null;
-    this._opacity = options.layerOpacity || 1;
+    this._opacity = opts.layerOpacity || 1;
     this._visible = true;
 
-    this._data = options.data;
-
-    if (options.referenceSystem) {
-      this._referenceSystem = options.referenceSystem;
-    }
+    this._data = options && options.data;
+    this._referenceSystem = options && options.referenceSystem;
 
     this.onMount = this.onMount.bind(this);
     this.onUnmount = this.onUnmount.bind(this);
@@ -84,6 +87,14 @@ export abstract class Layer {
 
   get isVisible(): boolean {
     return this._visible;
+  }
+
+  setData(data: any): void {
+    this._data = data;
+  }
+
+  clearData(): void {
+    this._data = null;
   }
 
   setVisibility(visible: boolean): void {

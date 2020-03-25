@@ -4,7 +4,7 @@ import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent } fro
 export class HoleSizeLayer extends WellboreBaseComponentLayer {
   options: HoleSizeLayerOptions;
 
-  constructor(id: string, options: HoleSizeLayerOptions) {
+  constructor(id?: string, options?: HoleSizeLayerOptions) {
     super(id, options);
     this.options = {
       firstColor: 'rgb(163, 102, 42)',

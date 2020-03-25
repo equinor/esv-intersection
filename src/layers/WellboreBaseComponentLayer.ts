@@ -17,7 +17,7 @@ import {
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;
 
-  constructor(id: string, options: HoleSizeLayerOptions) {
+  constructor(id?: string, options?: HoleSizeLayerOptions) {
     super(id, options);
     this.options = {
       ...options,

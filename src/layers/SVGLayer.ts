@@ -26,6 +26,9 @@ export abstract class SVGLayer extends Layer {
   }
 
   onResize(event: OnResizeEvent): void {
+    if (!this.elm) {
+      return;
+    }
     super.onResize(event);
     this.elm.attr('height', event.height).attr('width', event.width);
   }
@@ -34,7 +37,9 @@ export abstract class SVGLayer extends Layer {
 
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
-    this.elm.attr('visibility', visible ? 'visible' : 'hidden');
+    if (this.elm) {
+      this.elm.attr('visibility', visible ? 'visible' : 'hidden');
+    }
   }
 
   onOpacitChanged(opacity: number): void {
