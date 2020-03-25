@@ -10,8 +10,11 @@ export abstract class SVGLayer extends Layer {
     const { elm, width, height } = event;
     if (!this.elm) {
       this.elm = select(elm).append('svg');
+      this.elm.attr('id', `${this.id}`);
+      this.elm.attr('class', 'svg-layer');
     }
-    this.elm.attr('height', height).attr('width', width);
+    this.elm.attr('height', height || parseInt(elm.getAttribute('height'), 10)).attr('width', width || parseInt(elm.getAttribute('width'), 10));
+    this.elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${this.order}`);
   }
 
   onUnmount(): void {
@@ -22,11 +25,7 @@ export abstract class SVGLayer extends Layer {
 
   onResize(event: OnResizeEvent): void {
     super.onResize(event);
-    const { elm } = this;
-    const { xScale, yScale } = event;
-    const [, width] = xScale.range();
-    const [, height] = yScale.range();
-    elm.attr('height', height).attr('width', width);
+    this.elm.attr('height', event.height).attr('width', event.width);
   }
 
   onUpdate(event: OnUpdateEvent): void {
@@ -34,8 +33,25 @@ export abstract class SVGLayer extends Layer {
       return;
     }
     super.onUpdate(event);
-    const { elm } = this;
-
-    elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${this.order}`);
   }
+
+  setVisibility(visible: boolean): void {
+    super.setVisibility(visible);
+    this.elm.attr('visibility', visible ? 'visible' : 'hidden');
+  }
+
+  onOpacitChanged(opacity: number): void {
+    this._opacity = opacity;
+    if (this.elm) {
+      this.elm.attr('style', `position:absolute; opacity: ${opacity};z-index:${this.order}`);
+    }
+  }
+
+  onOrderChanged(order: number): void {
+    this._order = order;
+    if (this.elm) {
+      this.elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${order}`);
+    }
+  }
+
 }

@@ -23,12 +23,12 @@ export class CalloutCanvasLayer extends CanvasLayer {
   xRatio: number;
   overlapped: any[];
 
-  onUpdate(event: OnUpdateEvent) {
+  onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.data = event.data;
   }
 
-  onRescale(event: OnRescaleEvent) {
+  onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     const { xScale, yScale, scale, isLeftToRight } = event;
     this.isPanning = this.xRatio && this.xRatio === event.xRatio;
@@ -39,10 +39,12 @@ export class CalloutCanvasLayer extends CanvasLayer {
     this.render({ ...event, isLeftToRight });
   }
 
-  render(event: OnRescaleEvent) {
+  render(event: OnRescaleEvent): void {
+    this.clearCanvas();
+
     const { xScale, yScale, isLeftToRight } = event;
 
-    for (var i = 0; i < this.data.length; i++) {
+    for (let i = 0; i < this.data.length; i++) {
       const { data, title } = this.data[i];
       const x = xScale(data[0]);
       const y = yScale(data[1]);
@@ -75,25 +77,27 @@ export class CalloutCanvasLayer extends CanvasLayer {
     }
   }
 
-  private renderAnnotation = (title: string, label: string, x: number, y: number, height: number, color: string) => {
+  private renderAnnotation = (title: string, label: string, x: number, y: number, height: number, color: string): void => {
     this.renderText(title, x, y - height, height, color);
     this.renderText(label, x, y, height, color);
   };
 
-  private renderText(title: string, x: number, y: number, height: number, color: string) {
+  private renderText(title: string, x: number, y: number, height: number, color: string): void {
     this.ctx.font = `${height}px Arial`;
     this.ctx.fillStyle = color;
     this.ctx.fillText(title, x, y);
   }
 
-  private renderPoint(x: number, y: number) {
-    this.ctx.moveTo(x, y);
-    this.ctx.arc(x, y, 2, 0, Math.PI * 2);
-    this.ctx.fill();
+  private renderPoint(x: number, y: number): void {
+    const { ctx } = this;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  private renderCallout(title: string, label: string, bb: BoundingBox, color: string, position: string) {
-    const pos = this.getPosition(bb, position);
+  private renderCallout(title: string, label: string, bb: BoundingBox, color: string, position: string): void {
+    const pos: any = this.getPosition(bb, position);
     const { x, y, dotX, dotY, height } = pos;
 
     const placeLeft = position === 'topright' || position === 'bottomright';
@@ -102,13 +106,14 @@ export class CalloutCanvasLayer extends CanvasLayer {
     this.renderLine(pos, dotX, dotY, color, placeLeft);
   }
 
-  private renderLine = (bb: BoundingBox, dotX: number, dotY: number, color: string, placeLeft: boolean = true) => {
+  private renderLine = (bb: BoundingBox, dotX: number, dotY: number, color: string, placeLeft: boolean = true): void => {
     const { x, y, width } = bb;
     const { ctx } = this;
     const textX = placeLeft ? x : x + width;
     const inverseTextX = placeLeft ? x + width : x;
     const textY = y + 2;
 
+    ctx.beginPath();
     ctx.moveTo(dotX, dotY);
 
     ctx.lineTo(textX, textY);
@@ -121,7 +126,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
     ctx.stroke();
   };
 
-  private getPosition = (bb: BoundingBox, pos: string) => {
+  private getPosition = (bb: BoundingBox, pos: string): void => {
     const { x, y, offsetX, offsetY, width, height } = bb;
     const positions: any = {
       topright: {

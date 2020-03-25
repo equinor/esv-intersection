@@ -1,6 +1,7 @@
 import { ZoomTransform } from 'd3-zoom';
 import { Point, Graphics } from 'pixi.js';
 import { Layer } from './layers/Layer';
+import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
 
 interface LayerEvent {
   [propType: string]: any;
@@ -35,6 +36,8 @@ export interface OnUpdateEvent extends LayerEvent {}
 export interface LayerOptions {
   order: number;
   layerOpacity?: number;
+  referenceSystem?: IntersectionReferenceSystem;
+  data?: any;
 
   onMount?(event: OnMountEvent, layer: Layer): void;
   onUnmount?(event: OnUnmountEvent, layer: Layer): void;

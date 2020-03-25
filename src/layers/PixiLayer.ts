@@ -1,8 +1,8 @@
 import { Application, Transform } from 'pixi.js';
 import { Layer } from './Layer';
-import { OnMountEvent, OnRescaleEvent } from '../interfaces';
+import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
 
-export abstract class WebGLLayer extends Layer {
+export abstract class PixiLayer extends Layer {
   elm: HTMLElement;
 
   container: HTMLElement;
@@ -18,16 +18,18 @@ export abstract class WebGLLayer extends Layer {
       this.container = document.createElement('div');
       this.container.setAttribute('id', `${this.id}`);
       this.container.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
+      this.container.setAttribute('class', 'webgl-layer');
 
       const { elm, height, width } = event;
       this.elm = elm;
 
       const pixiOptions = {
-        width,
-        height,
+        width: width || parseInt(this.elm.getAttribute('width'), 10) || 300,
+        height: height || parseInt(this.elm.getAttribute('height'), 10) || 100,
         antialias: true,
         transparent: true,
         clearBeforeRender: true,
+        autoResize: true,
       };
 
       this.ctx = new Application(pixiOptions);
@@ -43,6 +45,11 @@ export abstract class WebGLLayer extends Layer {
     this.container.remove();
     this.container = null;
     this.ctx = null;
+  }
+
+  onResize(event: OnResizeEvent): void {
+    super.onResize(event);
+    this.ctx.renderer.resize(event.width, event.height);
   }
 
   onRescale(event: OnRescaleEvent): void {
@@ -69,4 +76,24 @@ export abstract class WebGLLayer extends Layer {
 
     return { xRatio, yRatio };
   };
+
+  setVisibility(visible: boolean): void {
+    super.setVisibility(visible);
+    if (this.container) {
+      const visibility = visible ? 'visible' : 'hidden';
+      this.container.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`);
+    }
+  }
+
+  onOpacityChanged(opacity: number): void {
+    if (this.container) {
+      this.container.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${opacity}`);
+    }
+  }
+
+  onOrderChanged(order: number): void {
+    if (this.container) {
+      this.container.setAttribute('style', `position:absolute;z-index:${order};opacity:${this.opacity}`);
+    }
+  }
 }

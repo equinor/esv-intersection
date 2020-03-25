@@ -12,7 +12,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   defaultMaxFontSize: number = 13;
   defaultTextColor: string = 'black';
   defaultFont: string = 'Arial';
-  data: SurfaceData = null;
+  // data: SurfaceData = null;
   leftSide: boolean = true;
   wellborePath: any = null;
   wellborePathBoundingBox: any = null;
@@ -30,24 +30,20 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.render(event);
-  }
-
-  onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-    this.rescaleEvent = event;
-    this.setTransform(event);
-    this.render(event);
-  }
-
-  render(event: OnRescaleEvent | OnUpdateEvent): void {
-    if (event.data) {
-      this.data = event.data;
-    }
-    if (event.wellborePath) {
+    if (event.wellborePath !== this.wellborePath) {
       this.wellborePath = event.wellborePath;
       this.wellborePathBoundingBox = this.getWellborePathBBox(this.wellborePath);
     }
+    this.render();
+  }
+
+  onRescale(event: OnRescaleEvent): void {
+    this.rescaleEvent = event;
+    this.setTransform(event);
+    this.render();
+  }
+
+  render(): void {
     if (!this.rescaleEvent) {
       return;
     }
@@ -68,19 +64,19 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   drawAreaLabels(): void {
-    this.data.areas.filter(d => d.label).forEach((s: SurfaceArea) => this.drawAreaLabel(s));
+    this.data.areas.filter((d: any) => d.label).forEach((s: SurfaceArea) => this.drawAreaLabel(s));
   }
 
   drawLineLabels(): void {
-    this.data.lines.filter(d => d.label).forEach((s: SurfaceLine) => this.drawLineLabel(s));
+    this.data.lines.filter((d: any) => d.label).forEach((s: SurfaceLine) => this.drawLineLabel(s));
   }
 
-  drawAreaLabel = (s: SurfaceArea): void => {
+  drawAreaLabel = (s: SurfaceArea, flip = true): void => {
     const { data } = s;
     const { ctx } = this;
     const { xScale, yScale, xRatio, yRatio } = this.rescaleEvent;
-    const maxX = data[0][0];
-    const minX = data[data.length - 1][0];
+    const maxX = flip ? data[data.length - 1][0] : data[0][0];
+    const minX = flip ? data[0][0] : data[data.length - 1][0];
     let { leftSide } = this;
     const margins = this.options.margins || this.defaultMargins;
     const minFontSize = this.options.minFontSize || this.defaultMinFontSize;
@@ -126,7 +122,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     const bottomEdge = yScale.invert(yScale.range()[1]);
 
     // Calculate where to sample points
-    const dirSteps = 17;
+    const dirSteps = 7;
     const posSteps = 5;
     const posStep = 0.3 * (labelLength / posSteps) * (leftSide ? 1 : -1);
     const dirStep = (labelLength / dirSteps) * (leftSide ? 1 : -1);

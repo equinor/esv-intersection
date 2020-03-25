@@ -4,8 +4,7 @@ import { OnUpdateEvent } from '../../../src/interfaces';
 
 export const createRootContainer = (width: number) => {
   const root = document.createElement('div');
-  root.setAttribute('height', '700px');
-  root.setAttribute('style', `display: flex;flex:1;flex-direction:column; width: ${width}px; background-color: white; padding: 12px;`);
+  root.setAttribute('style', `display: flex;flex:1;flex-direction:column; width: ${width}px;height:100%; background-color: white; padding: 12px;`);
 
   return root;
 };

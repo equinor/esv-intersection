@@ -1,8 +1,8 @@
 import { Graphics, Container } from 'pixi.js';
-import { WebGLLayer } from './WebGLLayer';
+import { PixiLayer } from './PixiLayer';
 import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 
-export class GeomodelLayerV2 extends WebGLLayer {
+export class GeomodelLayerV2 extends PixiLayer {
   options: GeomodelLayerOptions;
 
   pixiContainer: Container;
@@ -15,6 +15,11 @@ export class GeomodelLayerV2 extends WebGLLayer {
     super.onMount(event);
     this.pixiContainer = new Container();
     this.ctx.stage.addChild(this.pixiContainer);
+  }
+
+  onUnmount(): void {
+    super.onUnmount();
+    this.pixiContainer = null;
   }
 
   onUpdate(event: OnUpdateEvent): void {

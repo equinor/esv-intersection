@@ -1,14 +1,11 @@
 import { Graphics } from 'pixi.js';
-import { WebGLLayer } from './WebGLLayer';
+import { PixiLayer } from './PixiLayer';
 import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 
-export class GeomodelLayer extends WebGLLayer {
+export class GeomodelLayer extends PixiLayer {
   options: GeomodelLayerOptions;
 
   graphics: Graphics;
-
-  // TODO: create proper interface
-  data: any;
 
   constructor(id: string, options: GeomodelLayerOptions) {
     super(id, options);
@@ -23,14 +20,13 @@ export class GeomodelLayer extends WebGLLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.data = event.data;
     this.render();
   }
 
   onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
     this.graphics.position.set(event.transform.x, event.transform.y);
     this.graphics.scale.set(event.xRatio, event.yRatio);
+    this.render();
   }
 
   render(): void {

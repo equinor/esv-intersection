@@ -1,14 +1,18 @@
 import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
+import { IntersectionReferenceSystem } from '../control';
 
 export abstract class Layer {
-  id: String;
-  _order: Number;
+  id: string;
+  _order: number;
   options: LayerOptions;
   loading: boolean;
   element?: HTMLElement;
-  _opacity: Number;
+  _opacity: number;
+  _referenceSystem?: IntersectionReferenceSystem;
+  _data?: any;
+  _visible: boolean;
 
-  constructor(id: String, options: LayerOptions) {
+  constructor(id: string, options: LayerOptions) {
     this.id = id;
     this._order = options.order;
     this.options = {
@@ -17,12 +21,72 @@ export abstract class Layer {
     this.loading = false;
     this.element = null;
     this._opacity = options.layerOpacity || 1;
+    this._visible = true;
+
+    this._data = options.data;
+
+    if (options.referenceSystem) {
+      this._referenceSystem = options.referenceSystem;
+    }
 
     this.onMount = this.onMount.bind(this);
     this.onUnmount = this.onUnmount.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
     this.onRescale = this.onRescale.bind(this);
     this.onResize = this.onResize.bind(this);
+    this.onOrderChanged = this.onOrderChanged.bind(this);
+    this.onOpacityChanged = this.onOpacityChanged.bind(this);
+    this.setVisibility = this.setVisibility.bind(this);
+  }
+
+  set isLoading(loading: boolean) {
+    this.loading = loading;
+  }
+
+  get isLoading(): boolean {
+    return this.loading;
+  }
+
+  set opacity(opacity: number) {
+    this._opacity = opacity;
+    this.onOpacityChanged(opacity);
+  }
+
+  get opacity(): number {
+    return this._opacity;
+  }
+
+  set order(order: number) {
+    this._order = order;
+    this.onOrderChanged(order);
+  }
+
+  get order(): number {
+    return this._order;
+  }
+
+  get referenceSystem(): IntersectionReferenceSystem {
+    return this._referenceSystem;
+  }
+
+  set referenceSystem(referenceSystem: IntersectionReferenceSystem) {
+    this._referenceSystem = referenceSystem;
+  }
+
+  get data(): any {
+    return this._data;
+  }
+
+  set data(data: any) {
+    this._data = data;
+  }
+
+  get isVisible(): boolean {
+    return this._visible;
+  }
+
+  setVisibility(visible: boolean): void {
+    this._visible = visible;
   }
 
   onMount(event: OnMountEvent): void {
@@ -45,6 +109,9 @@ export abstract class Layer {
   }
 
   onUpdate(event: OnUpdateEvent): void {
+    if (event.data) {
+      this._data = event.data;
+    }
     if (this.options.onUpdate) {
       this.options.onUpdate(event, this);
     }
@@ -56,28 +123,9 @@ export abstract class Layer {
     }
   }
 
-  set isLoading(loading: boolean) {
-    // TODO: update d3 element
-    this.loading = loading;
+  onOpacityChanged(opacity: number): void {
   }
 
-  get isLoading(): boolean {
-    return this.loading;
-  }
-
-  set opacity(opacity: Number) {
-    this._opacity = opacity;
-  }
-
-  get opacity(): Number {
-    return this._opacity;
-  }
-
-  get order(): Number {
-    return this._order;
-  }
-
-  set order(order: Number) {
-    this._order = order;
+  onOrderChanged(order: number): void {
   }
 }
