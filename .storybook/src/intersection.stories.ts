@@ -1,6 +1,6 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { WellborepathLayerOptions, Annotation, HoleSize, Casing } from '../../src/interfaces';
-import { LayerManager, IntersectionReferenceSystem } from '../../src/control';
+import { LayerManager, IntersectionReferenceSystem, Controller } from '../../src/control';
 import {
   GridLayer,
   WellborepathLayer,
@@ -33,6 +33,10 @@ import poslog from './exampledata/poslog.json';
 import stratColumn from './exampledata/stratcolumn.json';
 import surfaceValues from './exampledata/surfaces.json';
 import seismic from './exampledata/seismic.json';
+import annotations from './exampledata/annotations.json';
+import mockedWellborePath from './exampledata/wellborepathMock.json';
+import holeSizeData from './exampledata/holesizeData.json';
+import casingData from './exampledata/casingMock.json';
 
 const seismicColorMap = [
   '#ffe700',
@@ -116,58 +120,26 @@ const seismicColorMap = [
   '#00e4ff',
   '#00f0ff',
 ];
-import annotations from './exampledata/annotations.json';
-import mockedWellborePath from './exampledata/wellborepathMock.json';
-
-const wellborePathCoords = [
-  [50, 10 + 775],
-  [50, 100 + 300 + 775],
-  [50, 150 + 300 + 775],
-  [70, 170 + 300 + 775],
-  [100, 180 + 300 + 775],
-  [125, 200 + 300 + 775],
-  [150, 250 + 300 + 775],
-  [150, 300 + 300 + 775],
-  [160, 350 + 300 + 775],
-  [170, 400 + 300 + 775],
-  [195, 410 + 300 + 775],
-  [215, 412 + 300 + 775],
-  [240, 408 + 300 + 775],
-  [280, 409 + 300 + 775],
-  [310, 410 + 300 + 775],
-  [350, 408 + 300 + 775],
-  [400, 418 + 300 + 775],
-  [450, 448 + 300 + 775],
-  [470, 455 + 300 + 775],
-  [477, 470 + 300 + 775],
-  [490, 510 + 300 + 775],
-  [492, 560 + 300 + 775],
-  [494, 610 + 300 + 775],
-  [496, 690 + 300 + 775],
-];
-const tension = 0.2;
-const numPoints = 999;
-const wbpInterp = new CurveInterpolator(wellborePathCoords, tension);
-const wellborePath = wbpInterp.getPoints(numPoints);
-
-const holeSizeData: HoleSize[] = [
-  { start: 0, length: 400, diameter: 36 },
-  { start: 400, length: 400, diameter: 22 },
-  { start: 800, length: 700, diameter: 10 },
-];
-const casingData: Casing[] = [
-  { start: 0, length: 100, diameter: 34, innerDiameter: 34 - 1, hasShoe: false },
-  { start: 0, length: 250, diameter: 30, innerDiameter: 30 - 1, hasShoe: true },
-  { start: 250, length: 350, diameter: 10, innerDiameter: 10 - 1, hasShoe: true },
-  { start: 600, length: 400, diameter: 8, innerDiameter: 8 - 1, hasShoe: true },
-  { start: 1000, length: 400, diameter: 7.5, innerDiameter: 7.5 - 1, hasShoe: true },
-];
 
 const xbounds: [number, number] = [0, 1000];
 const ybounds: [number, number] = [0, 1000];
 
 const xRange = 600;
 const yRange = 500;
+
+const scaleOptions = { xMin: xbounds[0], xMax: xbounds[1], yMin: ybounds[0], yMax: ybounds[1], height: yRange, width: xRange };
+const axisOptions = {
+  xLabel: 'Displacement',
+  yLabel: 'TVD MSL',
+  unitOfMeasure: 'm',
+};
+
+const defaultOptions = {
+  defaultIntersectionAngle: 135,
+  tension: 0.75,
+  arcDivisions: 5000,
+  thresholdDirectionDist: 0.001,
+};
 
 const width = 700;
 const height = 600;
@@ -179,54 +151,55 @@ export const intersection = () => {
   const container = createLayerContainer(width, height);
   const btnContainer = createButtonContainer(width);
 
-  const scaleOptions = { xMin: xbounds[0], xMax: xbounds[1], yMin: ybounds[0], yMax: ybounds[1], height: yRange, width: xRange };
-  const axisOptions = {
-    xLabel: 'Displacement',
-    yLabel: 'TVD MSL',
-    unitOfMeasure: 'm',
-  };
-
-  const defaultOptions = {
-    defaultIntersectionAngle: 135,
-    tension: 0.75,
-    arcDivisions: 2000,
-    thresholdDirectionDist: 0.001,
-  };
-
-  const dataManager = new IntersectionReferenceSystem(poslog, defaultOptions);
-  const displacement = dataManager.displacement;
+  const referenceSystem = new IntersectionReferenceSystem(poslog, defaultOptions);
+  const displacement = referenceSystem.displacement;
   const extend = 1000 / displacement;
   const steps = surfaceValues[0].data.values.length;
-  const traj = dataManager.getTrajectory(steps, 0, 1 + extend);
-  const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points);
+  const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
+  const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
   const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
   const seismicInfo = getSeismicInfo(seismic, trajectory);
 
+  const wb = generateProjectedWellborePath(referenceSystem.projectedPath);
+
   // Instantiate layers
   const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1 });
-  const calloutLayer = new CalloutCanvasLayer('callout', { order: 4 });
-  const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8 });
+  // const calloutLayer = new CalloutCanvasLayer('callout', { order: 4 });
   const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
   const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
+  const geomodelLayer = new GeomodelLayer('geomodel', { order: 2, layerOpacity: 0.8});
   const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red' });
-  const holeSizeLayer = new HoleSizeLayer('holesize', { order: 1 });
-  const casingLayer = new CasingLayer('casing', { order: 1 });
-  const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3 });
+  const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData });
+  const casingLayer = new CasingLayer('casing', { order: 5, data: casingData });
+  const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
   const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
 
-  const manager = new LayerManager(container, scaleOptions, axisOptions);
+  const layers = [
+    gridLayer,
+    geomodelLayer,
+    wellboreLayer,
+    geomodelLabelsLayer,
+    seismicLayer
+  ];
 
-  manager
-    .addLayer(gridLayer)
-    .addLayer(wellboreLayer, { data: dataManager.projectedPath || mockedWellborePath })
-    .addLayer(calloutLayer, { data: annotations })
-    .addLayer(image1Layer, { url: bg1Img })
-    .addLayer(image2Layer, { url: bg2Img })
-    .addLayer(geomodelLayer, { data: geolayerdata })
-    .addLayer(holeSizeLayer, { data: holeSizeData, wellborePath })
-    .addLayer(casingLayer, { data: casingData, wellborePath })
-    .addLayer(geomodelLabelsLayer, { data: geolayerdata, wellborePath })
-    .addLayer(seismicLayer, {});
+  const opts = {
+    scaleOptions,
+    axisOptions,
+    container,
+    referenceSystem,
+  };
+
+  const controller = new Controller(poslog, layers, opts);
+  controller.setup();
+  controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
+  controller.getLayer('wellborepath').onUpdate({ data: wb || mockedWellborePath });
+
+  controller
+    // .addLayer(calloutLayer, { annotations })
+    // .addLayer(image1Layer, { url: bg1Img })
+    // .addLayer(image2Layer, { url: bg2Img })
+    .addLayer(holeSizeLayer, { wellborePath: wb })
+    .addLayer(casingLayer, { wellborePath: wb });
 
   const seismicOptions = {
     x: seismicInfo.minX,
@@ -239,27 +212,27 @@ export const intersection = () => {
     seismicLayer.onUpdate({ image, options: seismicOptions });
   });
 
-  manager.adjustToSize(width, height);
-  manager.zoomPanHandler.setViewport(1000, 1500, 5000);
+  controller.adjustToSize(width, height);
+  controller.setViewport(1000, 1500, 5000);
 
   const FPSLabel = createFPSLabel();
 
-  const btnCallout = createButton(manager, calloutLayer, 'Callout', { data: annotations });
-  const btnWellbore = createButton(manager, wellboreLayer, 'Wellbore', { data: dataManager.projectedPath });
-  const btnImage1 = createButton(manager, image1Layer, 'Image 1', { url: bg1Img });
-  const btnImage2 = createButton(manager, image2Layer, 'Image 2', { url: bg2Img });
-  const btnGeomodel = createButton(manager, geomodelLayer, 'Geo model', { data: geolayerdata });
-  const btnHoleSize = createButton(manager, holeSizeLayer, 'Hole size', { data: holeSizeData, wellborePath });
-  const btnCasing = createButton(manager, casingLayer, 'Casing', { data: casingData, wellborePath });
-  const btnGeomodelLabels = createButton(manager, geomodelLabelsLayer, 'Geo model labels', { data: geolayerdata });
-  const btnSeismic = createButton(manager, seismicLayer, 'Seismic', {});
+  // const btnCallout = createButton(manager, calloutLayer, 'Callout', { data: annotations });
+  const btnWellbore = createButton(controller, wellboreLayer, 'Wellbore');
+  // const btnImage1 = createButton(manager, image1Layer, 'Image 1', { url: bg1Img });
+  // const btnImage2 = createButton(manager, image2Layer, 'Image 2', { url: bg2Img });
+  const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model');
+  const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size');
+  const btnCasing = createButton(controller, casingLayer, 'Casing');
+  const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
+  const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
   const btnLarger = createButtonWithCb('800x600', () => {
     const w = 800;
     const h = 600;
     container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
     container.setAttribute('height', `${h}`);
     container.setAttribute('width', `${w}`);
-    manager.adjustToSize(w, h);
+    controller.adjustToSize(w, h);
   });
   const btnSmaller = createButtonWithCb('600x400', () => {
     const w = 600;
@@ -267,14 +240,14 @@ export const intersection = () => {
     container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
     container.setAttribute('height', `${h}`);
     container.setAttribute('width', `${w}`);
-    manager.adjustToSize(w, h);
+    controller.adjustToSize(w, h);
 
   });
 
-  btnContainer.appendChild(btnCallout);
+  // btnContainer.appendChild(btnCallout);
   btnContainer.appendChild(btnWellbore);
-  btnContainer.appendChild(btnImage1);
-  btnContainer.appendChild(btnImage2);
+  // btnContainer.appendChild(btnImage1);
+  // btnContainer.appendChild(btnImage2);
   btnContainer.appendChild(btnGeomodel);
   btnContainer.appendChild(btnHoleSize);
   btnContainer.appendChild(btnCasing);
@@ -290,6 +263,16 @@ export const intersection = () => {
   return root;
 };
 
+const generateProjectedWellborePath = (projection: number[][]) => {
+  const offset: number = projection[projection.length - 1][0];
+
+  projection.forEach((p, i) => {
+    projection[i][0] = offset - p[0];
+  });
+
+  return projection;
+}
+
 /**
  * storybook helper button for toggling a layer on and off
  * @param manager
@@ -297,16 +280,16 @@ export const intersection = () => {
  * @param title
  * @param additionalEventParams
  */
-const createButton = (manager: LayerManager, layer: Layer, title: string, additionalEventParams: any) => {
+const createButton = (manager: Controller, layer: Layer, title: string) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
   btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
   let show = false;
   btn.onclick = () => {
     if (show) {
-      manager.addLayer(layer, additionalEventParams);
+      manager.showLayer(layer.id);
     } else {
-      manager.removeLayer(layer.id.toString());
+      manager.hideLayer(layer.id);
     }
     show = !show;
   };

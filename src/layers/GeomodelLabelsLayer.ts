@@ -12,7 +12,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   defaultMaxFontSize: number = 13;
   defaultTextColor: string = 'black';
   defaultFont: string = 'Arial';
-  data: SurfaceData = null;
+  // data: SurfaceData = null;
   leftSide: boolean = true;
   wellborePath: any = null;
   wellborePathBoundingBox: any = null;
@@ -30,9 +30,6 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    if (event.data) {
-      this.data = event.data;
-    }
     if (event.wellborePath !== this.wellborePath) {
       this.wellborePath = event.wellborePath;
       this.wellborePathBoundingBox = this.getWellborePathBBox(this.wellborePath);
@@ -67,11 +64,11 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   drawAreaLabels(): void {
-    this.data.areas.filter(d => d.label).forEach((s: SurfaceArea) => this.drawAreaLabel(s));
+    this.data.areas.filter((d: any) => d.label).forEach((s: SurfaceArea) => this.drawAreaLabel(s));
   }
 
   drawLineLabels(): void {
-    this.data.lines.filter(d => d.label).forEach((s: SurfaceLine) => this.drawLineLabel(s));
+    this.data.lines.filter((d: any) => d.label).forEach((s: SurfaceLine) => this.drawLineLabel(s));
   }
 
   drawAreaLabel = (s: SurfaceArea, flip = true): void => {

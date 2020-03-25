@@ -18,6 +18,14 @@ export abstract class CanvasLayer extends Layer {
     }
   }
 
+  setVisibility(visible: boolean): void {
+    super.setVisibility(visible);
+    if (this.canvas) {
+      const visibility = visible ? 'visible' : 'hidden';
+      this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`);
+    }
+  }
+
   onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm, width, height } = event;

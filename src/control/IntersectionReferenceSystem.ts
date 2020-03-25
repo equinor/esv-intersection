@@ -39,6 +39,16 @@ export class IntersectionReferenceSystem {
   endVector: number[];
 
   constructor(poslog: Position[], options?: ReferenceSystemOptions) {
+    this.setPoslog(poslog, options);
+
+    this.project = this.project.bind(this);
+    this.unproject = this.unproject.bind(this);
+    this.getPosition = this.getPosition.bind(this);
+    this.getProjectedLength = this.getProjectedLength.bind(this);
+    this.getTrajectory = this.getTrajectory.bind(this);
+  }
+
+  private setPoslog(poslog: Position[], options?: ReferenceSystemOptions): void {
     this.options = options || defaultOptions;
     const { arcDivisions, tension, thresholdDirectionDist } = this.options;
 
@@ -61,12 +71,6 @@ export class IntersectionReferenceSystem {
 
     this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - thresholdDirectionDist, 1);
     this.startVector = this.endVector.map((d: number) => d * -1);
-
-    this.project = this.project.bind(this);
-    this.unproject = this.unproject.bind(this);
-    this.getPosition = this.getPosition.bind(this);
-    this.getProjectedLength = this.getProjectedLength.bind(this);
-    this.getTrajectory = this.getTrajectory.bind(this);
   }
 
   /**

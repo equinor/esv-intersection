@@ -21,6 +21,12 @@ export class LayerManager {
 
   private axis: Axis;
 
+  /**
+   * Class for handling layers
+   * @param container root container
+   * @param scaleOptions
+   * @param axisOptions
+   */
   constructor(container: HTMLElement, scaleOptions: ScaleOptions, axisOptions?: AxisOptions) {
     this.container = container;
     this.layerContainer = document.createElement('div');
@@ -36,6 +42,16 @@ export class LayerManager {
     this.rescale = this.rescale.bind(this);
   }
 
+  addLayers(layers: Layer[]): LayerManager {
+    layers.forEach(layer => this.addLayer(layer));
+    return this;
+  }
+
+  /**
+   * adds the layer to the manager, and mounts it
+   * @param layer Layer
+   * @param params extra params to pass to the onUpdate method
+   */
   addLayer(layer: Layer, params?: any): LayerManager {
     this.layers.push(layer);
     this.initLayer(layer, params);
@@ -43,6 +59,10 @@ export class LayerManager {
     return this;
   }
 
+  /**
+   * remove layer from manager, and unmounts it
+   * @param layerId name of layer
+   */
   removeLayer(layerId: string): LayerManager {
     const idx = this.layers.findIndex(l => l.id === layerId);
     if (idx !== -1) {
@@ -51,6 +71,10 @@ export class LayerManager {
     }
 
     return this;
+  }
+
+  getLayer(layerId: string): Layer {
+    return this.layers.find(l => l.id === layerId);
   }
 
   initLayer(layer: Layer, params?: any): LayerManager {

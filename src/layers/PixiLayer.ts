@@ -78,6 +78,14 @@ export abstract class PixiLayer extends Layer {
     return { xRatio, yRatio };
   };
 
+  setVisibility(visible: boolean): void {
+    super.setVisibility(visible);
+    if (this.container) {
+      const visibility = visible ? 'visible' : 'hidden';
+      this.container.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`);
+    }
+  }
+
   onOpacityChanged(opacity: number): void {
     if (this.container) {
       this.container.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${opacity}`);

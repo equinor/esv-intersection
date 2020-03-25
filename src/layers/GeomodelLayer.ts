@@ -7,9 +7,6 @@ export class GeomodelLayer extends PixiLayer {
 
   graphics: Graphics;
 
-  // TODO: create proper interface
-  data: any;
-
   constructor(id: string, options: GeomodelLayerOptions) {
     super(id, options);
     this.render = this.render.bind(this);
@@ -23,7 +20,6 @@ export class GeomodelLayer extends PixiLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.data = event.data;
     this.render();
   }
 
