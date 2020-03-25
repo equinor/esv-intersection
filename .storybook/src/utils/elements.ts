@@ -40,11 +40,11 @@ export const createButton = (layer: Layer, zoomHandler: ZoomPanHandler, title: s
       });
       layer.onUpdate({
         ...additionalEventParams,
-        ...zoomHandler.createEventObject(),
+        ...zoomHandler.currentStateAsEvent(),
       });
       layer.onRescale({
         ...additionalEventParams,
-        ...zoomHandler.createEventObject(),
+        ...zoomHandler.currentStateAsEvent(),
       });
     } else {
       layer.onUnmount();

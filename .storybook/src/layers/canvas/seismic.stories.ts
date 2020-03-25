@@ -1,7 +1,7 @@
 import { scaleLinear } from 'd3-scale';
 import { SeismicCanvasLayer } from '../../../../src/layers';
 
-import { createRootContainer, createLayerContainer } from '../../utils';
+import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
 import { generateProjectedTrajectory } from '../../../../src/datautils';
 import { getSeismicInfo, generateSeismicSliceImage } from '../../../../src/datautils/seismicimage';
 
@@ -115,8 +115,7 @@ export const Seismic = () => {
   const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
   const seismicInfo = getSeismicInfo(seismic, trajectory);
   generateSeismicSliceImage(seismic, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
-    seismicLayer.onUpdate({
-      ...createEventObj(container),
+    seismicLayer.data = {
       image: seismicImage,
       options: {
         x: seismicInfo.minX,
@@ -124,7 +123,7 @@ export const Seismic = () => {
         width: seismicInfo.maxX - seismicInfo.minX,
         height: seismicInfo.maxTvdMsl - seismicInfo.minTvdMsl,
       },
-    });
+    };
   });
 
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
@@ -135,6 +134,7 @@ export const Seismic = () => {
   zoomHandler.setViewport(width / 2, height / 2, width / 2);
 
   root.appendChild(container);
+  root.appendChild(createFPSLabel());
 
   return root;
 };

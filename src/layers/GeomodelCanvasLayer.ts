@@ -25,7 +25,6 @@ export class GeomodelCanvasLayer extends CanvasLayer {
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
 
-    this.data = event.data;
     this.generateSurfaceAreasPaths();
     this.generateSurfaceLinesPaths();
 

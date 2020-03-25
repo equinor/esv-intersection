@@ -25,7 +25,6 @@ export class CalloutCanvasLayer extends CanvasLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.data = event.data;
   }
 
   onRescale(event: OnRescaleEvent): void {

@@ -24,8 +24,10 @@ export class GeomodelLayerV2 extends PixiLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.data = event.data;
     this.cleanUpContainer();
+    if (!this.data) {
+      return;
+    }
 
     this.data.areas.forEach((p: any) => this.generateAreaPolygon(p));
     this.data.lines.forEach((l: any) => this.generateSurfaceLine(l));

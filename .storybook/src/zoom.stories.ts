@@ -2,6 +2,7 @@ import { CanvasLayer } from '../../src/layers/CanvasLayer';
 import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../../src/interfaces';
 import { GridLayer } from '../../src/layers/GridLayer';
 import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
+import { createFPSLabel } from './utils';
 
 const width = 600;
 const height = 400;
@@ -235,6 +236,7 @@ export const Test = () => {
       zoomHandler.setViewport(500, 500, 3000);
     }),
   );
+  root.appendChild(createFPSLabel());
 
   return root;
 };
@@ -262,6 +264,8 @@ export const Grid = () => {
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
   zoomHandler.adjustToSize(width, height);
+
+  root.appendChild(createFPSLabel());
 
   return root;
 };

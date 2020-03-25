@@ -9,10 +9,6 @@ import { ReferenceSystemOptions } from '..';
  * API for controlling data and layers
  */
 export class Controller {
-  private _poslog: Position[];
-
-  private layers: Layer[];
-
   private _referenceSystem: IntersectionReferenceSystem;
 
   private layerManager: LayerManager;
@@ -24,22 +20,19 @@ export class Controller {
    * @param options requires a container, can optionally overwrite reference system with own,
    * setup axis through supplying options for it, or pass in scaleOptions
    */
-  constructor(poslog: Position[], layers: Layer[], options: ControllerOptions) {
-    const { container, axisOptions, scaleOptions, referenceSystem } = options;
+  constructor(options: ControllerOptions) {
+    const { container, axisOptions, scaleOptions, referenceSystem, layers, poslog } = options;
 
-    this._poslog = poslog;
-    this.layers = layers;
-
-    this._referenceSystem = referenceSystem || new IntersectionReferenceSystem(poslog);
+    this._referenceSystem = referenceSystem || (poslog && new IntersectionReferenceSystem(poslog));
     this.layerManager = new LayerManager(container, scaleOptions, axisOptions);
+    if (layers) {
+      this.layerManager.addLayers(layers);
+    }
   }
 
   setReferenceSystem(referenceSystem: IntersectionReferenceSystem): Controller {
     this._referenceSystem = referenceSystem;
-    this.layers.forEach(layer => {
-      layer.referenceSystem = referenceSystem;
-    });
-
+    this.layerManager.setReferenceSystem(referenceSystem);
     return this;
   }
 
@@ -77,8 +70,8 @@ export class Controller {
    * Adjust zoom due to changes in size of target
    * @param  force - force update even if size did not change, defaults to false
    */
-  adjustToSize(width: number, height: number, force?: boolean): Controller {
-    this.zoomPanHandler.adjustToSize(width, height, force);
+  adjustToSize(width: number, height: number): Controller {
+    this.layerManager.adjustToSize(width, height);
     return this;
   }
 
@@ -108,19 +101,6 @@ export class Controller {
   }
 
   get currentStateAsEvent(): any {
-    return this.zoomPanHandler.createEventObject();
-  }
-
-  get poslog(): Position[] {
-    return this._poslog;
-  }
-
-  /**
-   * mounts layers
-   */
-  setup(): Controller {
-    const { layerManager, layers } = this;
-    layerManager.addLayers(layers);
-    return this;
+    return this.zoomPanHandler.currentStateAsEvent();
   }
 }
