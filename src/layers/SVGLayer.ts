@@ -43,14 +43,14 @@ export abstract class SVGLayer extends Layer {
   }
 
   onOpacitChanged(opacity: number): void {
-    this._opacity = opacity;
+    this.opacity = opacity;
     if (this.elm) {
       this.elm.attr('style', `position:absolute; opacity: ${opacity};z-index:${this.order}`);
     }
   }
 
   onOrderChanged(order: number): void {
-    this._order = order;
+    this.order = order;
     if (this.elm) {
       this.elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${order}`);
     }
