@@ -1,0 +1,7 @@
+[
+  { "start": 0, "length": 100, "diameter": 34, "innerDiameter": 33, "hasShoe": false },
+  { "start": 0, "length": 250, "diameter": 30, "innerDiameter": 29, "hasShoe": true },
+  { "start": 250, "length": 350, "diameter": 10, "innerDiameter": 9, "hasShoe": true },
+  { "start": 600, "length": 400, "diameter": 8, "innerDiameter": 7, "hasShoe": true },
+  { "start": 1000, "length": 400, "diameter": 7.5, "innerDiameter": 6.5, "hasShoe": true }
+]
