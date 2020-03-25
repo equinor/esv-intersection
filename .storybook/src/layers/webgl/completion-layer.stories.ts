@@ -17,21 +17,21 @@ const height: number = 600;
 const xbounds: number[] = [0, 1000];
 const ybounds: number[] = [0, 1000];
 
-export const CompletionLayer = () => {
-  const options: CompletionLayerOptions = { order: 1 };
-  const completionLayer = new CompletionLayer('webgl', options);
+// export const CompletionLayerSample = () => {
+//   const options: CompletionLayerOptions = { order: 1 };
+//   const completionLayer = new CompletionLayer('webgl', options);
 
-  const root = createRootContainer(width);
-  const container = createLayerContainer(width, height);
+//   const root = createRootContainer(width);
+//   const container = createLayerContainer(width, height);
 
-  completionLayer.onMount({ elm: container, height, width });
+//   completionLayer.onMount({ elm: container, height, width });
 
-  completionLayer.onUpdate(createEventObj(root, data: wellborePath));
+//   completionLayer.onUpdate(createEventObj(root, wellborePath));
 
-  root.appendChild(container);
+//   root.appendChild(container);
 
-  return root;
-};
+//   return root;
+// };
 
 const createEventObj = (elm: any, inputData?: any): OnUpdateEvent => {
   const xScale = scaleLinear()
@@ -45,9 +45,8 @@ const createEventObj = (elm: any, inputData?: any): OnUpdateEvent => {
     xScale: xScale.copy(),
     yScale: yScale.copy(),
     elm,
+    wellborePath,
   };
-
-  
 
   return event;
 };
@@ -61,7 +60,13 @@ export const CompletionLayerWithSampleData = () => {
   const completionLayer = new CompletionLayer('webgl', options);
   completionLayer.onMount({ elm: container, height, width });
 
-  completionLayer.onUpdate({ data });
+  const data = [
+    { start: 10, end: 90, diameter: 10 },
+    { start: 100, end: 150, diameter: 5 },
+    { start: 280, end: 290, diameter: 5 },
+  ];
+
+  completionLayer.onUpdate({ data, wellborePath });
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     completionLayer.onRescale(event);
   });

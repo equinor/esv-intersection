@@ -28,7 +28,6 @@ export abstract class WebGLLayer extends Layer {
         antialias: true,
         transparent: true,
         clearBeforeRender: true,
-        forceCanvas: true,
       };
 
       this.ctx = new Application(pixiOptions);

@@ -1,9 +1,8 @@
 import { OnMountEvent, OnUpdateEvent, OnRescaleEvent } from '..';
 import { CompletionLayerOptions } from '../interfaces';
 import { WebGLLayer } from './WebGLLayer';
-import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { Graphics } from 'pixi.js';
-import { pointToArray } from '../utils/vectorUtils';
+import { Graphics, Point } from 'pixi.js';
+import { calcDist } from '../utils/vectorUtils';
 
 interface CompletionItem {}
 
@@ -29,12 +28,15 @@ export class CompletionLayer extends WebGLLayer {
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
+    this.ctx.stage.position.set(event.transform.x, event.transform.y);
+    this.ctx.stage.scale.set(event.xRatio, event.yRatio);
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { data, wellborePath } = event;
+    console.log('aaaaaaaaaa', wellborePath);
 
-    const items: CompletionItem[] = data.map(d => this.generateCompletionItem(wellborePath, d));
+    const items: CompletionItem[] = data.map((d: any) => this.generateCompletionItem(wellborePath, d));
 
     items.map((s: any) => this.drawCompletionItem(s));
   }
@@ -51,28 +53,44 @@ export class CompletionLayer extends WebGLLayer {
     }
     return graphics;
   }
-  getScale(type: string, length: number, width: number) {
+  getScale(type: string, length: number, width: number): { scaleX: number; scaleY: number } {
     switch (type) {
       default:
         return { scaleX: 1, scaleY: 1 };
     }
   }
-  getAngle(p1, p2): number {
+
+  getAngle(p1: { y: number; x: number }, p2: { y: number; x: number }): number {
     return Math.atan2(p2.y - p1.y, p2.x - p1.x);
+  }
+
+  getPointAtMd(wbp: any, depth: number): any {
+    let tot = 0;
+    for (let i = 1; i < wbp.length; i++) {
+      tot += calcDist(wbp[i - 1], wbp[i]);
+      if (tot > depth) {
+        return wbp[i];
+      }
+    }
   }
 
   generateCompletionItem(wbp: any, data: any): CompletionItem {
     // const [x,y, dir] = wbp.getPosFromMD(data.start)
-    const pointTop = wbp.getPointAt(data.start);
-    const pointBottom = wbp.getPointAt(data.end);
-    const rotation = this.getAngle(pointTop, pointBottom);
+    const pointTop = this.getPointAtMd(wbp, data.start);
+    const pointBottom = this.getPointAtMd(wbp, data.end);
+    console.log(pointTop, pointBottom, wbp[0]);
+    const rotation = this.getAngle(new Point(pointTop[0], pointTop[1]), new Point(pointBottom[0], pointBottom[1]));
 
     const graphics: Graphics = this.getShape(data.shape);
     const { scaleX, scaleY } = this.getScale(data.shape, data.start - data.end, data.diameter);
-    const { x, y } = pointTop;
+    const [x, y] = pointTop;
 
-    graphics.setTransform(x, y, scaleX, scaleY, rotation); // translate shape to pos in draw?
+    graphics.setTransform(x, y, scaleX, scaleY, rotation * 57.2957795); // translate shape to pos in draw?
 
-    return { x, y, graphics };
+    return { graphics };
+  }
+
+  drawCompletionItem(item: any) {
+    this.ctx.stage.addChild(item.graphics);
   }
 }
