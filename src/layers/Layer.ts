@@ -107,10 +107,12 @@ export abstract class Layer {
 
   setData(data: any): void {
     this._data = data;
+    this.onUpdate({ data });
   }
 
   clearData(): void {
     this._data = null;
+    this.onUpdate({});
   }
 
   setVisibility(visible: boolean): void {
