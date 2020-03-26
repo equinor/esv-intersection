@@ -1,0 +1,5 @@
+[
+  { "start": 0, "length": 400, "diameter": 36 },
+  { "start": 400, "length": 400, "diameter": 22 },
+  { "start": 800, "length": 700, "diameter": 10 }
+]
