@@ -34,6 +34,6 @@ export const SingleAxis = () => {
   const showLabels = true;
 
   const axis = new Axis(mainGroup, showLabels, 'Displacement', 'TVD MSL', 'm');
-  axis.onRescale({xScale: scaleX, yScale: scaleY});
+  axis.onRescale({ xScale: scaleX, yScale: scaleY });
   return div;
 };

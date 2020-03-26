@@ -133,7 +133,7 @@ export class ZoomPanHandler {
     return this._zFactor;
   }
 
- /**
+  /**
    * Set z factor
    * @param  factor
    */

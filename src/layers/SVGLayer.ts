@@ -53,5 +53,4 @@ export abstract class SVGLayer extends Layer {
       this.elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${order}`);
     }
   }
-
 }
