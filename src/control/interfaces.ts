@@ -1,5 +1,6 @@
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
 import { ScaleOptions } from '../interfaces';
+import { Layer } from '../layers';
 
 export interface Position {
   easting: number;
@@ -19,4 +20,6 @@ export interface ControllerOptions {
   axisOptions?: AxisOptions;
   scaleOptions: ScaleOptions;
   referenceSystem?: IntersectionReferenceSystem;
+  layers?: Layer[];
+  poslog?: Position[];
 }

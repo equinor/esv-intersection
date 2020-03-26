@@ -167,7 +167,7 @@ export const intersection = () => {
   // const calloutLayer = new CalloutCanvasLayer('callout', { order: 4 });
   const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
   const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
-  const geomodelLayer = new GeomodelLayer('geomodel', { order: 2, layerOpacity: 0.8});
+  const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8});
   const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red' });
   const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData });
   const casingLayer = new CasingLayer('casing', { order: 5, data: casingData });
@@ -189,8 +189,7 @@ export const intersection = () => {
     referenceSystem,
   };
 
-  const controller = new Controller(poslog, layers, opts);
-  controller.setup();
+  const controller = new Controller({ poslog, layers, ...opts });
   controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
   controller.getLayer('wellborepath').onUpdate({ data: wb || mockedWellborePath });
 
@@ -207,9 +206,9 @@ export const intersection = () => {
     width: seismicInfo.maxX - seismicInfo.minX,
     height: seismicInfo.maxTvdMsl - seismicInfo.minTvdMsl,
   };
+
   generateSeismicSliceImage(seismic, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
-    image = seismicImage;
-    seismicLayer.onUpdate({ image, options: seismicOptions });
+    seismicLayer.data = { image: seismicImage, options: seismicOptions };
   });
 
   controller.adjustToSize(width, height);
@@ -217,6 +216,7 @@ export const intersection = () => {
 
   const FPSLabel = createFPSLabel();
 
+  const btnGrid = createButton(controller, gridLayer, 'Grid');
   // const btnCallout = createButton(manager, calloutLayer, 'Callout', { data: annotations });
   const btnWellbore = createButton(controller, wellboreLayer, 'Wellbore');
   // const btnImage1 = createButton(manager, image1Layer, 'Image 1', { url: bg1Img });
@@ -244,6 +244,7 @@ export const intersection = () => {
 
   });
 
+  btnContainer.appendChild(btnGrid);
   // btnContainer.appendChild(btnCallout);
   btnContainer.appendChild(btnWellbore);
   // btnContainer.appendChild(btnImage1);

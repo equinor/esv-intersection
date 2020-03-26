@@ -7,13 +7,15 @@ export abstract class SVGLayer extends Layer {
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
-    const { elm, width, height } = event;
+    const { elm } = event;
+    const width = event.width || parseInt(elm.getAttribute('width'), 10) || 200;
+    const height = event.height || parseInt(elm.getAttribute('height'), 10) || 300;
     if (!this.elm) {
       this.elm = select(elm).append('svg');
       this.elm.attr('id', `${this.id}`);
       this.elm.attr('class', 'svg-layer');
     }
-    this.elm.attr('height', height || parseInt(elm.getAttribute('height'), 10)).attr('width', width || parseInt(elm.getAttribute('width'), 10));
+    this.elm.attr('height', height).attr('width', width);
     this.elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${this.order}`);
   }
 
@@ -28,12 +30,7 @@ export abstract class SVGLayer extends Layer {
     this.elm.attr('height', event.height).attr('width', event.width);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
-    if (!this.elm) {
-      return;
-    }
-    super.onUpdate(event);
-  }
+
 
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
@@ -53,5 +50,4 @@ export abstract class SVGLayer extends Layer {
       this.elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${order}`);
     }
   }
-
 }

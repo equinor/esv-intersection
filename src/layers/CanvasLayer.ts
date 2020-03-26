@@ -6,15 +6,15 @@ export abstract class CanvasLayer extends Layer {
   elm: HTMLElement;
   canvas: HTMLCanvasElement;
 
-  onOpacityChanged(opacity: number) {
+  onOpacityChanged(opacity: number): void {
     if (this.canvas) {
-      this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
+      this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${opacity}`);
     }
   }
 
-  onOrderChanged(order: number) {
+  onOrderChanged(order: number): void {
     if (this.canvas) {
-      this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
+      this.canvas.setAttribute('style', `position:absolute;z-index:${order};opacity:${this.opacity}`);
     }
   }
 
@@ -28,7 +28,9 @@ export abstract class CanvasLayer extends Layer {
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
-    const { elm, width, height } = event;
+    const { elm } = event;
+    const width = event.width || parseInt(elm.getAttribute('width'), 10) || 200;
+    const height = event.height || parseInt(elm.getAttribute('height'), 10) || 300;
     this.elm = elm;
     let canvas;
     if (!this.canvas) {
@@ -38,8 +40,8 @@ export abstract class CanvasLayer extends Layer {
     }
     this.canvas.setAttribute('id', `${this.id}`);
     this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
-    this.canvas.setAttribute('width', `${width || (this.elm && this.elm.getAttribute('width')) || 300}px`);
-    this.canvas.setAttribute('height', `${height || (this.elm && this.elm.getAttribute('height')) || 150}px`);
+    this.canvas.setAttribute('width', `${width}px`);
+    this.canvas.setAttribute('height', `${height}px`);
     this.canvas.setAttribute('class', 'canvas-layer');
     this.ctx = this.canvas.getContext('2d');
   }

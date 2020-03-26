@@ -79,6 +79,7 @@ export abstract class Layer {
 
   set data(data: any) {
     this._data = data;
+    this.onUpdate({ data });
   }
 
   get isVisible(): boolean {
