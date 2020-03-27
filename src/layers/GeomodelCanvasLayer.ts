@@ -12,7 +12,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
 
   surfaceLinesPaths: any;
 
-  constructor(id: string, options: GeomodelLayerOptions) {
+  constructor(id?: string, options?: GeomodelLayerOptions) {
     super(id, options);
     this.render = this.render.bind(this);
     this.clearScreen = this.clearScreen.bind(this);

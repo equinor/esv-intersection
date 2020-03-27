@@ -4,7 +4,7 @@ import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent } from 
 export class CasingLayer extends WellboreBaseComponentLayer {
   options: CasingLayerOptions;
 
-  constructor(id: string, options: CasingLayerOptions) {
+  constructor(id?: string, options?: CasingLayerOptions) {
     super(id, options);
     this.options = {
       firstColor: '#777788', // maybe not needed, refactor holesizelayer

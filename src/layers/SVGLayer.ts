@@ -26,6 +26,9 @@ export abstract class SVGLayer extends Layer {
   }
 
   onResize(event: OnResizeEvent): void {
+    if (!this.elm) {
+      return;
+    }
     super.onResize(event);
     this.elm.attr('height', event.height).attr('width', event.width);
   }
@@ -34,18 +37,20 @@ export abstract class SVGLayer extends Layer {
 
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
-    this.elm.attr('visibility', visible ? 'visible' : 'hidden');
+    if (this.elm) {
+      this.elm.attr('visibility', visible ? 'visible' : 'hidden');
+    }
   }
 
   onOpacitChanged(opacity: number): void {
-    this._opacity = opacity;
+    this.opacity = opacity;
     if (this.elm) {
       this.elm.attr('style', `position:absolute; opacity: ${opacity};z-index:${this.order}`);
     }
   }
 
   onOrderChanged(order: number): void {
-    this._order = order;
+    this.order = order;
     if (this.elm) {
       this.elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${order}`);
     }

@@ -1,33 +1,36 @@
 import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
 import { IntersectionReferenceSystem } from '../control';
 
-export abstract class Layer {
-  id: string;
-  _order: number;
-  options: LayerOptions;
-  loading: boolean;
-  element?: HTMLElement;
-  _opacity: number;
-  _referenceSystem?: IntersectionReferenceSystem;
-  _data?: any;
-  _visible: boolean;
+const defaultOptions = {
+  order: 1,
+  layerOpacity: 1,
+};
 
-  constructor(id: string, options: LayerOptions) {
-    this.id = id;
-    this._order = options.order;
-    this.options = {
-      ...options,
+export abstract class Layer {
+  private _id: string;
+  private _order: number;
+  private _options: LayerOptions;
+  private loading: boolean;
+  private _element?: HTMLElement;
+  private _opacity: number;
+  private _referenceSystem?: IntersectionReferenceSystem = null;
+  private _data?: any;
+  private _visible: boolean;
+
+  constructor(id?: string, options?: LayerOptions) {
+    this._id = id || `layer-${Math.floor(Math.random() * 1000)}`;
+    const opts = options || defaultOptions;
+    this._order = opts.order || 1;
+    this._options = {
+      ...opts,
     };
     this.loading = false;
-    this.element = null;
-    this._opacity = options.layerOpacity || 1;
+    this._element = null;
+    this._opacity = opts.layerOpacity || 1;
     this._visible = true;
 
-    this._data = options.data;
-
-    if (options.referenceSystem) {
-      this._referenceSystem = options.referenceSystem;
-    }
+    this._data = options && options.data;
+    this._referenceSystem = options && options.referenceSystem;
 
     this.onMount = this.onMount.bind(this);
     this.onUnmount = this.onUnmount.bind(this);
@@ -37,6 +40,22 @@ export abstract class Layer {
     this.onOrderChanged = this.onOrderChanged.bind(this);
     this.onOpacityChanged = this.onOpacityChanged.bind(this);
     this.setVisibility = this.setVisibility.bind(this);
+  }
+
+  get id(): string {
+    return this._id;
+  }
+
+  get element(): HTMLElement {
+    return this._element;
+  }
+
+  get options(): LayerOptions {
+    return this._options;
+  }
+
+  set options(options: LayerOptions) {
+    this._options = options;
   }
 
   set isLoading(loading: boolean) {
@@ -86,26 +105,36 @@ export abstract class Layer {
     return this._visible;
   }
 
+  setData(data: any): void {
+    this._data = data;
+    this.onUpdate({ data });
+  }
+
+  clearData(): void {
+    this._data = null;
+    this.onUpdate({});
+  }
+
   setVisibility(visible: boolean): void {
     this._visible = visible;
   }
 
   onMount(event: OnMountEvent): void {
-    this.element = event.elm;
-    if (this.options.onMount) {
-      this.options.onMount(event, this);
+    this._element = event.elm;
+    if (this._options.onMount) {
+      this._options.onMount(event, this);
     }
   }
 
   onUnmount(event?: OnUnmountEvent): void {
-    if (this.options.onUnmount) {
-      this.options.onUnmount(event, this);
+    if (this._options.onUnmount) {
+      this._options.onUnmount(event, this);
     }
   }
 
   onResize(event: OnResizeEvent): void {
-    if (this.options.onResize) {
-      this.options.onResize(event, this);
+    if (this._options.onResize) {
+      this._options.onResize(event, this);
     }
   }
 
@@ -113,14 +142,14 @@ export abstract class Layer {
     if (event.data) {
       this._data = event.data;
     }
-    if (this.options.onUpdate) {
-      this.options.onUpdate(event, this);
+    if (this._options.onUpdate) {
+      this._options.onUpdate(event, this);
     }
   }
 
   onRescale(event: OnRescaleEvent): void {
-    if (this.options.onRescale) {
-      this.options.onRescale(event, this);
+    if (this._options.onRescale) {
+      this._options.onRescale(event, this);
     }
   }
 
