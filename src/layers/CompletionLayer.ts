@@ -34,7 +34,7 @@ export class CompletionLayer extends PixiLayer {
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { wellborePath } = event;
-    console.log(event);
+
     if (wellborePath == null) {
       return;
     }
@@ -74,23 +74,32 @@ export class CompletionLayer extends PixiLayer {
     return rad * numDegPerRad;
   }
 
-  getPointAtMd(wbp: any, depth: number): any {
+  getPointAtMd(wbp: any, depth: number, offset: number): any {
+    const maxMin = (input: number, max: number): number => {
+      let index = input + offset;
+      index = index > 0 ? index : 0;
+      index = index < max ? index : max;
+      return index;
+    };
+
     let tot = 0;
     for (let i = 1; i < wbp.length; i++) {
       tot += calcDist(wbp[i - 1], wbp[i]);
       if (tot > depth) {
-        return wbp[i];
+        return wbp[maxMin(i, wbp.length)];
       }
     }
-    return wbp[wbp.length - 1];
+
+    return wbp.length - 1;
   }
 
   generateCompletionItem(wbp: any, data: any): CompletionItem {
-    const pointTop = this.getPointAtMd(wbp, data.start);
-    const pointBottom = this.getPointAtMd(wbp, data.end);
+    const offset = 2;
+    const pointTop = this.getPointAtMd(wbp, data.start, offset);
+    const pointBottom = this.getPointAtMd(wbp, data.end, -offset);
     const rotation = this.getAngle(new Point(pointTop[0], pointTop[1]), new Point(pointBottom[0], pointBottom[1]));
 
-    const graphics: Graphics = this.getShape(data.shape);
+    const graphics: Graphics = this.getShape(data.shape); // cache?
     const { scaleX, scaleY } = this.getScale(data.shape, data.start - data.end, data.diameter);
     const [x, y] = pointTop;
 
@@ -99,7 +108,7 @@ export class CompletionLayer extends PixiLayer {
     return { graphics };
   }
 
-  drawCompletionItem(item: any) {
+  drawCompletionItem(item: any): void {
     this.ctx.stage.addChild(item.graphics);
   }
 }
