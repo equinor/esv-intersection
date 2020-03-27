@@ -7,7 +7,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
   constructor(id: string, options: CasingLayerOptions) {
     super(id, options);
     this.options = {
-      firstColor: '#777788', // maybe not needed, refactor holesizelayer
+      firstColor: '#777788',
       secondColor: '#EEEEFF',
       lineColor: 0x575757,
       topBottomLineColor: 0x575757,

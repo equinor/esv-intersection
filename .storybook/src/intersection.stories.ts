@@ -37,6 +37,8 @@ import annotations from './exampledata/annotations.json';
 import mockedWellborePath from './exampledata/wellborepathMock.json';
 import holeSizeData from './exampledata/holesizeData.json';
 import casingData from './exampledata/casingMock.json';
+import completionData from './exampledata/completion.json';
+import { CompletionLayer } from '../../src/layers/CompletionLayer';
 
 const seismicColorMap = [
   '#ffe700',
@@ -159,6 +161,7 @@ export const intersection = () => {
   const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
   const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
   const seismicInfo = getSeismicInfo(seismic, trajectory);
+  const completion = completionData.map(c => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
   const wb = generateProjectedWellborePath(referenceSystem.projectedPath);
 
@@ -173,8 +176,9 @@ export const intersection = () => {
   const casingLayer = new CasingLayer('casing', { order: 5, data: casingData });
   const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
   const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
+  const completionLayer = new CompletionLayer('completion', { order: 5, data: completion });
 
-  const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer];
+  const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, completionLayer];
 
   const opts = {
     scaleOptions,
@@ -193,7 +197,8 @@ export const intersection = () => {
     // .addLayer(image1Layer, { url: bg1Img })
     // .addLayer(image2Layer, { url: bg2Img })
     .addLayer(holeSizeLayer, { wellborePath: wb })
-    .addLayer(casingLayer, { wellborePath: wb });
+    .addLayer(casingLayer, { wellborePath: wb })
+    .addLayer(completionLayer, { wellborePath: wb });
 
   const seismicOptions = {
     x: seismicInfo.minX,
@@ -218,6 +223,7 @@ export const intersection = () => {
   const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model');
   const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size');
   const btnCasing = createButton(controller, casingLayer, 'Casing');
+  const btnCompletion = createButton(controller, completionLayer, 'Completion');
   const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
   const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
   const btnLarger = createButtonWithCb('800x600', () => {
@@ -244,6 +250,7 @@ export const intersection = () => {
   btnContainer.appendChild(btnGeomodel);
   btnContainer.appendChild(btnHoleSize);
   btnContainer.appendChild(btnCasing);
+  btnContainer.appendChild(btnCompletion);
   btnContainer.appendChild(btnGeomodelLabels);
   btnContainer.appendChild(btnSeismic);
   btnContainer.appendChild(btnLarger);

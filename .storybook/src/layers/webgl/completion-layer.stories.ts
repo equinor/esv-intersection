@@ -6,8 +6,9 @@ import { CompletionLayerOptions, OnUpdateEvent, LayerOptions, OnRescaleEvent } f
 import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
 import { generateSurfaceData, generateProjectedTrajectory, SurfaceLine, SurfaceData, generateProjectedWellborePath } from '../../../../src/datautils';
 
-//Data
+// Data
 import poslog from '../../exampledata/poslog.json';
+import completion from '../../exampledata/completion';
 
 const wellborePath = generateProjectedWellborePath(poslog);
 
@@ -60,11 +61,13 @@ export const CompletionLayerWithSampleData = () => {
   const completionLayer = new CompletionLayer('webgl', options);
   completionLayer.onMount({ elm: container, height, width });
 
-  const data = [
-    { start: 10, end: 90, diameter: 10 },
-    { start: 100, end: 150, diameter: 5 },
-    { start: 280, end: 290, diameter: 5 },
-  ];
+  // const data = [
+  //   { start: 10, end: 90, diameter: 10 },
+  //   { start: 100, end: 150, diameter: 5 },
+  //   { start: 280, end: 290, diameter: 5 },
+  // ];
+
+  const data = completion.map(c => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
   completionLayer.onUpdate({ data, wellborePath });
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {

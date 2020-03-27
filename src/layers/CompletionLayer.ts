@@ -1,12 +1,12 @@
 import { OnMountEvent, OnUpdateEvent, OnRescaleEvent } from '..';
 import { CompletionLayerOptions } from '../interfaces';
-import { WebGLLayer } from './WebGLLayer';
+import { PixiLayer } from './PixiLayer';
 import { Graphics, Point } from 'pixi.js';
 import { calcDist } from '../utils/vectorUtils';
 
 interface CompletionItem {}
 
-export class CompletionLayer extends WebGLLayer {
+export class CompletionLayer extends PixiLayer {
   options: CompletionLayerOptions;
 
   constructor(id: string, options: CompletionLayerOptions) {
@@ -33,19 +33,19 @@ export class CompletionLayer extends WebGLLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    const { data, wellborePath } = event;
-    console.log('aaaaaaaaaa', wellborePath);
+    const { wellborePath } = event;
 
-    const items: CompletionItem[] = data.map((d: any) => this.generateCompletionItem(wellborePath, d));
+    const items: CompletionItem[] = this.data.map((d: any) => this.generateCompletionItem(wellborePath, d));
 
     items.map((s: any) => this.drawCompletionItem(s));
   }
+
   getShape(type: string): Graphics {
     const graphics = new Graphics();
     switch (type) {
       default:
         const color = 0x343434;
-        const rSize = 50;
+        const rSize = 10;
         graphics.beginFill(color);
         graphics.drawRect(0, 0, rSize, rSize);
         graphics.endFill();
@@ -53,6 +53,7 @@ export class CompletionLayer extends WebGLLayer {
     }
     return graphics;
   }
+
   getScale(type: string, length: number, width: number): { scaleX: number; scaleY: number } {
     switch (type) {
       default:
@@ -64,6 +65,11 @@ export class CompletionLayer extends WebGLLayer {
     return Math.atan2(p2.y - p1.y, p2.x - p1.x);
   }
 
+  radToDeg(rad: number) {
+    const numDegPerRad = 57.2957795;
+    return rad * numDegPerRad;
+  }
+
   getPointAtMd(wbp: any, depth: number): any {
     let tot = 0;
     for (let i = 1; i < wbp.length; i++) {
@@ -72,20 +78,19 @@ export class CompletionLayer extends WebGLLayer {
         return wbp[i];
       }
     }
+    return wbp[wbp.length - 1];
   }
 
   generateCompletionItem(wbp: any, data: any): CompletionItem {
-    // const [x,y, dir] = wbp.getPosFromMD(data.start)
     const pointTop = this.getPointAtMd(wbp, data.start);
     const pointBottom = this.getPointAtMd(wbp, data.end);
-    console.log(pointTop, pointBottom, wbp[0]);
     const rotation = this.getAngle(new Point(pointTop[0], pointTop[1]), new Point(pointBottom[0], pointBottom[1]));
 
     const graphics: Graphics = this.getShape(data.shape);
     const { scaleX, scaleY } = this.getScale(data.shape, data.start - data.end, data.diameter);
     const [x, y] = pointTop;
 
-    graphics.setTransform(x, y, scaleX, scaleY, rotation * 57.2957795); // translate shape to pos in draw?
+    graphics.setTransform(x, y, scaleX, scaleY, this.radToDeg(rotation)); // translate shape to pos in draw?
 
     return { graphics };
   }
