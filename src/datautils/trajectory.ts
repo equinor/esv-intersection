@@ -44,7 +44,7 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
     return [];
   }
 
-  const points: number[][] = poslog ? poslog.map(p => [p.easting, p.northing, p.tvd, p.md]) : [];
+  const points: number[][] = poslog ? poslog.map((p) => [p.easting, p.northing, p.tvd, p.md]) : [];
 
   const interpolator: any = new CurveInterpolator(points, 0.75, 5000);
   const displacement: number = interpolator.length;
@@ -79,7 +79,7 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
 
   if (extensionLengthStart > 0) {
     // extend from start
-    firstPoints = seqI(Math.ceil(extensionLengthStart * stepSize)).map(t =>
+    firstPoints = seqI(Math.ceil(extensionLengthStart * stepSize)).map((t) =>
       v
         .set(initial)
         .scale(extensionLengthStart * (1 - t))
@@ -92,7 +92,7 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
   trajectory.push(...path);
 
   const endPoints: number[][] = seqI(Math.ceil(extensionLength * stepSize))
-    .map(t =>
+    .map((t) =>
       v
         .set(initial)
         .scale(extensionLength * t)
@@ -152,7 +152,7 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
 function simplify(inputArr: number[][], maxOffset = 0.001, maxDistance = 10): number[][] {
   if (inputArr.length <= 4) return inputArr;
   const [o0, o1] = inputArr[0];
-  const arr = inputArr.map(d => [d[0] - o0, d[1] - o1]);
+  const arr = inputArr.map((d) => [d[0] - o0, d[1] - o1]);
   let [a0, a1] = arr[0];
   const sim: number[][] = [inputArr[0]];
 

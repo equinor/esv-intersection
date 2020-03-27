@@ -35,12 +35,8 @@ const ybounds: number[] = [0, 1000];
 // };
 
 const createEventObj = (elm: any, inputData?: any): OnUpdateEvent => {
-  const xScale = scaleLinear()
-    .domain(xbounds)
-    .range([0, width]);
-  const yScale = scaleLinear()
-    .domain(ybounds)
-    .range([0, height]);
+  const xScale = scaleLinear().domain(xbounds).range([0, width]);
+  const yScale = scaleLinear().domain(ybounds).range([0, height]);
 
   let event = {
     xScale: xScale.copy(),
@@ -67,7 +63,7 @@ export const CompletionLayerWithSampleData = () => {
   //   { start: 280, end: 290, diameter: 5 },
   // ];
 
-  const data = completion.map(c => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
+  const data = completion.map((c) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
   completionLayer.onUpdate({ data, wellborePath });
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {

@@ -175,7 +175,7 @@ describe('callout', () => {
           if (i !== j) {
             const overlapping = checkForOverlap(eli, elj);
             if (overlapping) {
-              const exist = overlap.find(s => s.id === eli.id);
+              const exist = overlap.find((s) => s.id === eli.id);
               if (!exist) {
                 overlap.push(eli);
               }

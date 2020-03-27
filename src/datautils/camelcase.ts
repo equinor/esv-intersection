@@ -7,7 +7,7 @@ import camelCase from 'camelcase';
  */
 export function convertToCamelCase(data: any): any {
   if (Array.isArray(data)) {
-    return data.map(p => {
+    return data.map((p) => {
       if (typeof p === 'object' && p != null) {
         return convertToCamelCase(p);
       }

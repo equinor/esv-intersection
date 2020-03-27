@@ -13,20 +13,10 @@ export const SingleAxis = () => {
   const div = document.createElement('div');
   div.setAttribute('style', `background-color: white; width: ${width}px;`);
 
-  const svg = select(div)
-    .append('svg')
-    .attr('height', `${height}px`)
-    .attr('width', `${width}px`);
+  const svg = select(div).append('svg').attr('height', `${height}px`).attr('width', `${width}px`);
 
   const createScale = (xMin: number, xMax: number, yMin: number, yMax: number, height: number, width: number) => {
-    return [
-      scaleLinear()
-        .domain([xMin, xMax])
-        .range([0, width]),
-      scaleLinear()
-        .domain([yMin, yMax])
-        .range([0, height]),
-    ];
+    return [scaleLinear().domain([xMin, xMax]).range([0, width]), scaleLinear().domain([yMin, yMax]).range([0, height])];
   };
 
   const [scaleX, scaleY] = createScale(0, 250, 0, 300, 500, 600);

@@ -85,7 +85,7 @@ export const positionCallout = (
   if (annotations.length < 2) {
     return;
   }
-  let nodes = annotations.map(a => {
+  let nodes = annotations.map((a) => {
     return {
       ...a,
       ...getBoundingBox(ctx, a, xScale, yScale, calcTextSize(12, 7, 12, xScale), scale),

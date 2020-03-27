@@ -36,7 +36,7 @@ export class Controller {
 
   setReferenceSystem(referenceSystem: IntersectionReferenceSystem): Controller {
     this._referenceSystem = referenceSystem;
-    this.layers.forEach(layer => {
+    this.layers.forEach((layer) => {
       layer.referenceSystem = referenceSystem;
     });
 

@@ -10,12 +10,8 @@ export class ScaleManager {
 
   constructor(scaleOptions: ScaleOptions) {
     const { xMin, xMax, yMin, yMax, width, height } = scaleOptions;
-    this._xScale = scaleLinear()
-      .domain([xMin, xMax])
-      .range([0, width]);
-    this._yScale = scaleLinear()
-      .domain([yMin, yMax])
-      .range([0, height]);
+    this._xScale = scaleLinear().domain([xMin, xMax]).range([0, width]);
+    this._yScale = scaleLinear().domain([yMin, yMax]).range([0, height]);
   }
 
   /**

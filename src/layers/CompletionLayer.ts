@@ -34,6 +34,10 @@ export class CompletionLayer extends PixiLayer {
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { wellborePath } = event;
+    console.log(event);
+    if (wellborePath == null) {
+      return;
+    }
 
     const items: CompletionItem[] = this.data.map((d: any) => this.generateCompletionItem(wellborePath, d));
 
@@ -47,7 +51,7 @@ export class CompletionLayer extends PixiLayer {
         const color = 0x343434;
         const rSize = 10;
         graphics.beginFill(color);
-        graphics.drawRect(0, 0, rSize, rSize);
+        graphics.drawRect(-rSize / 2, -rSize / 2, rSize, rSize);
         graphics.endFill();
         break;
     }

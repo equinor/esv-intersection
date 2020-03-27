@@ -42,12 +42,8 @@ const createButton = (layer: Layer, root: HTMLElement, event: OnUpdateEvent, tit
  * @param elm
  */
 const createEventObj = (elm: any) => {
-  const xscale = scaleLinear()
-    .domain(xbounds)
-    .range([0, width]);
-  const yscale = scaleLinear()
-    .domain(ybounds)
-    .range([0, height]);
+  const xscale = scaleLinear().domain(xbounds).range([0, width]);
+  const yscale = scaleLinear().domain(ybounds).range([0, height]);
   const data = [
     [50, 0],
     [50, 10],

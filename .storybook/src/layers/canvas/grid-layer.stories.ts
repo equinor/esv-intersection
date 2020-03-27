@@ -38,12 +38,8 @@ export const CanvasGrid = () => {
  * @param elm
  */
 const createEventObj = (elm: any) => {
-  const xscale = scaleLinear()
-    .domain(xbounds)
-    .range([0, width]);
-  const yscale = scaleLinear()
-    .domain(ybounds)
-    .range([0, width]);
+  const xscale = scaleLinear().domain(xbounds).range([0, width]);
+  const yscale = scaleLinear().domain(ybounds).range([0, width]);
 
   return {
     xScale: xscale.copy(),

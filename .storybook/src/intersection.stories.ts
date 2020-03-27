@@ -161,7 +161,7 @@ export const intersection = () => {
   const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
   const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
   const seismicInfo = getSeismicInfo(seismic, trajectory);
-  const completion = completionData.map(c => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
+  const completion = completionData.map((c) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
   const wb = generateProjectedWellborePath(referenceSystem.projectedPath);
 
