@@ -10,6 +10,8 @@ export class SeismicCanvasLayer extends CanvasLayer {
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
 
+    this.clearCanvas();
+
     this.render();
   }
 
@@ -20,14 +22,11 @@ export class SeismicCanvasLayer extends CanvasLayer {
   }
 
   render(): void {
-    if (!this.data) {
+    if (!this.data || !this.ctx || !this.data.image) {
       return;
     }
     const { ctx } = this;
     const { options, image } = this.data;
-    if (!ctx || !image) {
-      return;
-    }
 
     this.clearCanvas();
 
