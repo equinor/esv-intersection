@@ -40,7 +40,6 @@ export class CompletionLayer extends PixiLayer {
     }
 
     const items: CompletionItem[] = this.data.map((d: any) => this.generateCompletionItem(wellborePath, d));
-
     items.map((s: any) => this.drawCompletionItem(s));
   }
 
@@ -97,6 +96,7 @@ export class CompletionLayer extends PixiLayer {
     const offset = 2;
     const pointTop = this.getPointAtMd(wbp, data.start, offset);
     const pointBottom = this.getPointAtMd(wbp, data.end, -offset);
+    console.log(pointTop, pointBottom);
     const rotation = this.getAngle(new Point(pointTop[0], pointTop[1]), new Point(pointBottom[0], pointBottom[1]));
 
     const graphics: Graphics = this.getShape(data.shape); // cache?
