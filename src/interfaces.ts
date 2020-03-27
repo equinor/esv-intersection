@@ -34,7 +34,7 @@ export interface OnRescaleEvent extends LayerEvent {
 export interface OnUpdateEvent extends LayerEvent {}
 
 export interface LayerOptions {
-  order: number;
+  order?: number;
   layerOpacity?: number;
   referenceSystem?: IntersectionReferenceSystem;
   data?: any;

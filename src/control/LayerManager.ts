@@ -3,6 +3,7 @@ import { ZoomPanHandler } from './ZoomPanHandler';
 import { Layer } from '../layers';
 import { ScaleOptions, OnMountEvent, OnRescaleEvent } from '../interfaces';
 import { Axis } from '../components';
+import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
 
 interface AxisOptions {
   xLabel: string;
@@ -82,7 +83,7 @@ export class LayerManager {
       elm: this.layerContainer,
     };
     layer.onMount(event);
-    const rescaleEvent = this.zoomPanHandler.createEventObject();
+    const rescaleEvent = this.zoomPanHandler.currentStateAsEvent();
     layer.onUpdate({ ...rescaleEvent, ...params });
     layer.onRescale(rescaleEvent);
 
@@ -143,4 +144,8 @@ export class LayerManager {
 
     return axis;
   };
+
+  setReferenceSystem(irs: IntersectionReferenceSystem): void {
+    this.layers.forEach((layer) => (layer.referenceSystem = irs));
+  }
 }

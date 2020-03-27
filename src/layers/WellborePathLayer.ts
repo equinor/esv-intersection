@@ -1,12 +1,11 @@
 import { line, curveCatmullRom } from 'd3-shape';
-import { ScaleLinear } from 'd3-scale';
 import { SVGLayer } from './SVGLayer';
 import { WellborepathLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 export class WellborepathLayer extends SVGLayer {
   options: WellborepathLayerOptions;
 
-  constructor(id: string, options: WellborepathLayerOptions) {
+  constructor(id?: string, options?: WellborepathLayerOptions) {
     super(id, options);
     this.options = {
       ...options,
@@ -38,13 +37,17 @@ export class WellborepathLayer extends SVGLayer {
     }
     const { data } = this;
 
+    if (!data) {
+      return;
+    }
+
     this.elm
       .append('g')
       .attr('class', 'well-path')
       .append('path')
       .attr('d', this.renderWellborePath(data))
-      .attr('stroke-width', this.options.strokeWidth)
-      .attr('stroke', this.options.stroke)
+      .attr('stroke-width', this.options.strokeWidth || '2px')
+      .attr('stroke', this.options.stroke || 'red')
       .attr('fill', 'none');
   }
 

@@ -12,12 +12,11 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   defaultMaxFontSize: number = 13;
   defaultTextColor: string = 'black';
   defaultFont: string = 'Arial';
-  // data: SurfaceData = null;
   leftSide: boolean = true;
   wellborePath: any = null;
   wellborePathBoundingBox: any = null;
 
-  constructor(id: string, options: GeomodelLayerLabelsOptions) {
+  constructor(id?: string, options?: GeomodelLayerLabelsOptions) {
     super(id, options);
     this.render = this.render.bind(this);
     this.calcPos = this.calcPos.bind(this);

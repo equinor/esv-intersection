@@ -63,7 +63,7 @@ export class IntersectionReferenceSystem {
     this.interpolators = {
       curve: new CurveInterpolator(path),
       trajectory: new CurveInterpolator(
-        path.map((d: number[]) => [d[0], d[2]]),
+        path.map((d: number[]) => [d[0], d[1]]),
         { tension, arcDivisions },
       ),
       curtain: new CurveInterpolator(this.projectedPath, { tension, arcDivisions }),

@@ -12,7 +12,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
 
   surfaceLinesPaths: any;
 
-  constructor(id: string, options: GeomodelLayerOptions) {
+  constructor(id?: string, options?: GeomodelLayerOptions) {
     super(id, options);
     this.render = this.render.bind(this);
     this.clearScreen = this.clearScreen.bind(this);
@@ -25,7 +25,6 @@ export class GeomodelCanvasLayer extends CanvasLayer {
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
 
-    this.data = event.data;
     this.generateSurfaceAreasPaths();
     this.generateSurfaceLinesPaths();
 

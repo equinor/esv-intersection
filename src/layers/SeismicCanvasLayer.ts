@@ -2,26 +2,13 @@ import { CanvasLayer } from './CanvasLayer';
 import { OnUpdateEvent, OnMountEvent, OnRescaleEvent } from '../interfaces';
 
 export class SeismicCanvasLayer extends CanvasLayer {
-  seismicImage: ImageBitmap;
-  imageOptions: {
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-  };
-
   onMount(event: OnMountEvent): void {
     super.onMount(event);
   }
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    if (event.image) {
-      this.seismicImage = event.image;
-    }
-    if (event.options) {
-      this.imageOptions = event.options;
-    }
+
     this.render();
   }
 
@@ -32,13 +19,17 @@ export class SeismicCanvasLayer extends CanvasLayer {
   }
 
   render(): void {
-    const { ctx, imageOptions: options, seismicImage } = this;
-    if (!ctx || !seismicImage) {
+    if (!this.data) {
+      return;
+    }
+    const { ctx } = this;
+    const { options, image } = this.data;
+    if (!ctx || !image) {
       return;
     }
 
     this.clearCanvas();
 
-    ctx.drawImage(seismicImage, options.x, options.y, options.width, options.height);
+    ctx.drawImage(image, options.x, options.y, options.width, options.height);
   }
 }

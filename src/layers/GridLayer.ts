@@ -7,13 +7,20 @@ const MAJORCOLOR: string = 'gray';
 const MINORWIDTH: number = 0.25;
 const MAJORWIDTH: number = 0.75;
 
+const defaultOptions = {
+  minorColor: MINORCOLOR,
+  majorColor: MAJORCOLOR,
+  minorWidth: MINORWIDTH,
+  majorWidth: MAJORWIDTH,
+};
+
 export class GridLayer extends CanvasLayer {
   options: GridLayerOptions;
 
-  constructor(id: string, options: GridLayerOptions = { order: 1 }) {
+  constructor(id?: string, options?: GridLayerOptions) {
     super(id, options);
     this.options = {
-      ...options,
+      ...(options || defaultOptions),
     };
     this.render = this.render.bind(this);
   }

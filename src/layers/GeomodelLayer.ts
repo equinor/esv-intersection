@@ -7,7 +7,7 @@ export class GeomodelLayer extends PixiLayer {
 
   graphics: Graphics;
 
-  constructor(id: string, options: GeomodelLayerOptions) {
+  constructor(id?: string, options?: GeomodelLayerOptions) {
     super(id, options);
     this.render = this.render.bind(this);
   }

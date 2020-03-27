@@ -46,7 +46,7 @@ export class ZoomPanHandler {
     this.adjustToSize = this.adjustToSize.bind(this);
     this.setViewport = this.setViewport.bind(this);
 
-    this.createEventObject = this.createEventObject.bind(this);
+    this.currentStateAsEvent = this.currentStateAsEvent.bind(this);
 
     this.updateTranslateExtent = this.updateTranslateExtent.bind(this);
 
@@ -202,7 +202,7 @@ export class ZoomPanHandler {
   /**
    * Create an event object from current state
    */
-  createEventObject(): OnRescaleEvent {
+  currentStateAsEvent(): OnRescaleEvent {
     const { scaleX, scaleY, xBounds, yBounds, zFactor, viewportRatio, currentTransform, xRatio, yRatio } = this;
 
     return {
@@ -222,9 +222,9 @@ export class ZoomPanHandler {
    * Update scale
    */
   rescale(): void {
-    const { createEventObject } = this;
+    const { currentStateAsEvent } = this;
 
-    this.onRescale(createEventObject());
+    this.onRescale(currentStateAsEvent());
   }
 
   /**
@@ -367,7 +367,7 @@ export class ZoomPanHandler {
     scaleY.range([0, newHeight]);
 
     recalculateZoomTransform();
-    this.onRescale(this.createEventObject());
+    this.onRescale(this.currentStateAsEvent());
   }
 
   /**

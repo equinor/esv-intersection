@@ -113,7 +113,6 @@ export async function generateSeismicSliceImage(
     }
     pos += step;
   }
-
   const imageData = new ImageData(d, width, height);
   const image = await createImageBitmap(imageData, 0, 0, width, height);
 

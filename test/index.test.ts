@@ -1,5 +1,7 @@
 import { GridLayer, WellborepathLayer } from '../src/index';
 
+const wellborePath = [0, 0, 0, 12, 4, 12];
+
 describe('Layer', () => {
   let elm: HTMLElement;
   beforeEach(() => {
@@ -9,6 +11,17 @@ describe('Layer', () => {
     elm.remove();
   });
   describe('SVG', () => {
+    it('should instantiate a layer without needing to supply any input', () => {
+      const layer = new WellborepathLayer();
+      expect(layer.id).toBeTruthy();
+    });
+    it('should set and remove data on demand', () => {
+      const layer = new WellborepathLayer();
+      layer.setData(wellborePath);
+      expect(layer.data).toBeTruthy();
+      layer.clearData();
+      expect(layer.data).toBeFalsy();
+    });
     it('should not remount new elements on same layer', () => {
       const layer = new WellborepathLayer('well', {
         order: 1,
