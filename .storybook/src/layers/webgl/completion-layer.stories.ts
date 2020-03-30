@@ -69,7 +69,7 @@ export const CompletionLayerWithSampleData = () => {
   const completionLayer = new CompletionLayer('webgl', options);
   completionLayer.onMount({ elm: container, height, width });
 
-  const data = completion.map((c) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
+  const data = completion.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter((d: any) => d.start > 400 && d.end < 1800); //.filter(c => c.diameter != 0 && c.start > 0);
 
   completionLayer.onUpdate({ data, wellborePath });
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
