@@ -57,12 +57,8 @@ export const MultipleCanvasLayers = () => {
  * @param elm
  */
 const createEventObj = (elm: any) => {
-  const xscale = scaleLinear()
-    .domain(xbounds)
-    .range([0, 400]);
-  const yscale = scaleLinear()
-    .domain(ybounds)
-    .range([0, 500]);
+  const xscale = scaleLinear().domain(xbounds).range([0, 400]);
+  const yscale = scaleLinear().domain(ybounds).range([0, 500]);
 
   return {
     xScale: xscale.copy(),

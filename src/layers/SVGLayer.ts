@@ -33,8 +33,6 @@ export abstract class SVGLayer extends Layer {
     this.elm.attr('height', event.height).attr('width', event.width);
   }
 
-
-
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
     if (this.elm) {

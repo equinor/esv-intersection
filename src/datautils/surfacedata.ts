@@ -12,9 +12,9 @@ import { StratUnit, SurfaceMetaAndValues, SurfaceLine, SurfaceArea, SurfaceData 
  * @return  Surface areas ready for rendering in geolayer
  */
 export function generateSurfaceData(trajectory: number[][], stratColumn: StratUnit[], surfaceData: SurfaceMetaAndValues[]): SurfaceData {
-  const firstUnit = stratColumn && stratColumn.find(d => d.stratUnitLevel === 1);
+  const firstUnit = stratColumn && stratColumn.find((d) => d.stratUnitLevel === 1);
   const defaultGroupName: string = firstUnit ? firstUnit.identifier : 'SEABED';
-  const filteredSurfaces: SurfaceMetaAndValues[] = surfaceData.filter(s => s.data.values);
+  const filteredSurfaces: SurfaceMetaAndValues[] = surfaceData.filter((s) => s.data.values);
   const mappedSurfaces: any = mapSurfaceData(filteredSurfaces);
   const stratGroups = new Map();
   const lines: SurfaceLine[] = getSurfaceLines(mappedSurfaces, trajectory);

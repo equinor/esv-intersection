@@ -153,9 +153,7 @@ export abstract class Layer {
     }
   }
 
-  onOpacityChanged(opacity: number): void {
-  }
+  onOpacityChanged(opacity: number): void {}
 
-  onOrderChanged(order: number): void {
-  }
+  onOrderChanged(order: number): void {}
 }

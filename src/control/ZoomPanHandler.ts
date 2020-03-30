@@ -50,12 +50,8 @@ export class ZoomPanHandler {
 
     this.updateTranslateExtent = this.updateTranslateExtent.bind(this);
 
-    this.scaleX = scaleLinear()
-      .domain(this.xBounds)
-      .range([0, 1]);
-    this.scaleY = scaleLinear()
-      .domain(this.yBounds)
-      .range([0, 1]);
+    this.scaleX = scaleLinear().domain(this.xBounds).range([0, 1]);
+    this.scaleY = scaleLinear().domain(this.yBounds).range([0, 1]);
 
     this.init();
   }
@@ -133,7 +129,7 @@ export class ZoomPanHandler {
     return this._zFactor;
   }
 
- /**
+  /**
    * Set z factor
    * @param  factor
    */
@@ -235,9 +231,7 @@ export class ZoomPanHandler {
    * Initialized handler
    */
   init(): void {
-    this.zoom = zoom()
-      .scaleExtent([0.1, this.options.maxZoomLevel])
-      .on('zoom', this.onZoom);
+    this.zoom = zoom().scaleExtent([0.1, this.options.maxZoomLevel]).on('zoom', this.onZoom);
 
     this.container.call(this.zoom);
   }

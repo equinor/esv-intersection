@@ -61,6 +61,8 @@ export interface WellborepathLayerOptions extends LayerOptions {
 
 export interface GeomodelLayerOptions extends LayerOptions {}
 
+export interface CompletionLayerOptions extends LayerOptions {}
+
 export interface GeomodelLayerLabelsOptions extends LayerOptions {
   margins?: number;
   minFontSize?: number;

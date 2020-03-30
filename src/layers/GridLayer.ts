@@ -12,7 +12,7 @@ const defaultOptions = {
   majorColor: MAJORCOLOR,
   minorWidth: MINORWIDTH,
   majorWidth: MAJORWIDTH,
-}
+};
 
 export class GridLayer extends CanvasLayer {
   options: GridLayerOptions;

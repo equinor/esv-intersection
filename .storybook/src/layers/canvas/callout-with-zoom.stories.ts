@@ -94,12 +94,8 @@ const ybounds: [number, number] = [0, 500];
 const xRange = 500;
 const yRange = 500;
 
-const xscale = scaleLinear()
-  .domain(xbounds)
-  .range([0, 500]);
-const yscale = scaleLinear()
-  .domain(ybounds)
-  .range([0, 500]);
+const xscale = scaleLinear().domain(xbounds).range([0, 500]);
+const yscale = scaleLinear().domain(ybounds).range([0, 500]);
 
 const width = 500;
 const height = 500;
@@ -110,7 +106,7 @@ export const CalloutCanvasWithZoom = () => {
 
   const layer = new CalloutCanvasLayer('callout', { order: 1 });
   layer.onMount(createEventObj(container));
-  layer.onUpdate({data: annotations});
+  layer.onUpdate({ data: annotations });
 
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     layer.onRescale({

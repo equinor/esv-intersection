@@ -127,7 +127,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     const dirStep = (labelLength / dirSteps) * (leftSide ? 1 : -1);
 
     // Sample points from top and calculate position and direction vector
-    const topData = data.map(d => [d[0], d[1]]);
+    const topData = data.map((d) => [d[0], d[1]]);
     const topPos: Vector2 = this.calcPos(topData, startPos, posSteps, posStep, topEdge);
     const topDir: Vector2 = this.calcDir(topData, startPos, dirSteps, dirStep, leftSide ? Vector2.right : Vector2.left, topEdge);
     if (!topPos || !topDir) {
@@ -135,7 +135,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     }
 
     // Sample points from bottom and calculate position and direction vector
-    const bottomData = data.map(d => [d[0], d[2]]);
+    const bottomData = data.map((d) => [d[0], d[2]]);
     let bottomPos: Vector2 = this.calcPos(bottomData, startPos, posSteps, posStep, null, bottomEdge);
     let bottomDir: Vector2 = this.calcDir(bottomData, startPos, dirSteps, dirStep, leftSide ? Vector2.right : Vector2.left, null, bottomEdge);
     if (!bottomPos) {

@@ -2,7 +2,6 @@ import { CanvasLayer } from './CanvasLayer';
 import { OnUpdateEvent, OnMountEvent, OnRescaleEvent } from '../interfaces';
 
 export class SeismicCanvasLayer extends CanvasLayer {
-
   onMount(event: OnMountEvent): void {
     super.onMount(event);
   }

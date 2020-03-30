@@ -37,6 +37,8 @@ import annotations from './exampledata/annotations.json';
 import mockedWellborePath from './exampledata/wellborepathMock.json';
 import holeSizeData from './exampledata/holesizeData.json';
 import casingData from './exampledata/casingMock.json';
+import completionData from './exampledata/completion.json';
+import { CompletionLayer } from '../../src/layers/CompletionLayer';
 
 const seismicColorMap = [
   '#ffe700',
@@ -159,6 +161,7 @@ export const intersection = () => {
   const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
   const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
   const seismicInfo = getSeismicInfo(seismic, trajectory);
+  const completion = completionData.map((c) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
   const wb = generateProjectedWellborePath(referenceSystem.projectedPath);
 
@@ -167,20 +170,15 @@ export const intersection = () => {
   // const calloutLayer = new CalloutCanvasLayer('callout', { order: 4 });
   const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
   const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
-  const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8});
+  const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8 });
   const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red' });
   const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData });
   const casingLayer = new CasingLayer('casing', { order: 5, data: casingData });
   const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
   const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
+  const completionLayer = new CompletionLayer('completion', { order: 5, data: completion });
 
-  const layers = [
-    gridLayer,
-    geomodelLayer,
-    wellboreLayer,
-    geomodelLabelsLayer,
-    seismicLayer
-  ];
+  const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, completionLayer];
 
   const opts = {
     scaleOptions,
@@ -198,7 +196,8 @@ export const intersection = () => {
     // .addLayer(image1Layer, { url: bg1Img })
     // .addLayer(image2Layer, { url: bg2Img })
     .addLayer(holeSizeLayer, { wellborePath: wb })
-    .addLayer(casingLayer, { wellborePath: wb });
+    .addLayer(casingLayer, { wellborePath: wb })
+    .addLayer(completionLayer, { wellborePath: wb });
 
   const seismicOptions = {
     x: seismicInfo.minX,
@@ -224,6 +223,7 @@ export const intersection = () => {
   const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model');
   const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size');
   const btnCasing = createButton(controller, casingLayer, 'Casing');
+  const btnCompletion = createButton(controller, completionLayer, 'Completion');
   const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
   const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
   const btnLarger = createButtonWithCb('800x600', () => {
@@ -241,7 +241,6 @@ export const intersection = () => {
     container.setAttribute('height', `${h}`);
     container.setAttribute('width', `${w}`);
     controller.adjustToSize(w, h);
-
   });
 
   btnContainer.appendChild(btnGrid);
@@ -252,6 +251,7 @@ export const intersection = () => {
   btnContainer.appendChild(btnGeomodel);
   btnContainer.appendChild(btnHoleSize);
   btnContainer.appendChild(btnCasing);
+  btnContainer.appendChild(btnCompletion);
   btnContainer.appendChild(btnGeomodelLabels);
   btnContainer.appendChild(btnSeismic);
   btnContainer.appendChild(btnLarger);
@@ -272,7 +272,7 @@ const generateProjectedWellborePath = (projection: number[][]) => {
   });
 
   return projection;
-}
+};
 
 /**
  * storybook helper button for toggling a layer on and off
@@ -304,4 +304,3 @@ function createButtonWithCb(label: string, cb: any) {
   btn.onclick = cb;
   return btn;
 }
-

@@ -14,12 +14,8 @@ const xbounds = [0, 200];
 const ybounds = [0, 200];
 
 const createEventObj = (elm: any) => {
-  const xscale = scaleLinear()
-    .domain(xbounds)
-    .range([0, width]);
-  const yscale = scaleLinear()
-    .domain(ybounds)
-    .range([0, height]);
+  const xscale = scaleLinear().domain(xbounds).range([0, width]);
+  const yscale = scaleLinear().domain(ybounds).range([0, height]);
   const data = [
     [50, 0],
     [50, 10],

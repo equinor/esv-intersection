@@ -29,7 +29,6 @@ export abstract class PixiLayer extends Layer {
         antialias: true,
         transparent: true,
         clearBeforeRender: true,
-        forceCanvas: true,
         autoResize: true,
       };
 
@@ -97,5 +96,4 @@ export abstract class PixiLayer extends Layer {
       this.container.setAttribute('style', `position:absolute;z-index:${order};opacity:${this.opacity}`);
     }
   }
-
 }

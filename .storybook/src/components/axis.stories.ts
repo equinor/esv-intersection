@@ -15,10 +15,7 @@ export const SingleAxis = () => {
   const div = document.createElement('div');
   div.setAttribute('style', `background-color: white; width: ${width}px;`);
 
-  const svg = select(div)
-    .append('svg')
-    .attr('height', `${height}px`)
-    .attr('width', `${width}px`);
+  const svg = select(div).append('svg').attr('height', `${height}px`).attr('width', `${width}px`);
 
   const mainGroup = svg;
   const showLabels = true;
@@ -31,7 +28,7 @@ export const SingleAxis = () => {
     axis.onRescale(event);
   });
   zoomHandler.setBounds([0, 1000], [0, 1000]);
-  zoomHandler.adjustToSize(width-40, height-30);
+  zoomHandler.adjustToSize(width - 40, height - 30);
 
   div.appendChild(createFPSLabel());
 

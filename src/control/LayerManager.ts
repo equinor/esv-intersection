@@ -33,7 +33,7 @@ export class LayerManager {
     this.layerContainer = document.createElement('div');
     this.container.appendChild(this.layerContainer);
     this.adjustToSize(+this.container.getAttribute('width'), +this.container.getAttribute('height'));
-    this._zoomPanHandler = new ZoomPanHandler(container, event => this.rescale(event));
+    this._zoomPanHandler = new ZoomPanHandler(container, (event) => this.rescale(event));
     this._zoomPanHandler.setBounds([scaleOptions.xMin, scaleOptions.xMax], [scaleOptions.yMin, scaleOptions.yMax]);
 
     if (axisOptions) {
@@ -44,7 +44,7 @@ export class LayerManager {
   }
 
   addLayers(layers: Layer[]): LayerManager {
-    layers.forEach(layer => this.addLayer(layer));
+    layers.forEach((layer) => this.addLayer(layer));
     return this;
   }
 
@@ -65,7 +65,7 @@ export class LayerManager {
    * @param layerId name of layer
    */
   removeLayer(layerId: string): LayerManager {
-    const idx = this.layers.findIndex(l => l.id === layerId);
+    const idx = this.layers.findIndex((l) => l.id === layerId);
     if (idx !== -1) {
       this.layers[idx].onUnmount();
       this.layers.splice(idx, 1);
@@ -75,7 +75,7 @@ export class LayerManager {
   }
 
   getLayer(layerId: string): Layer {
-    return this.layers.find(l => l.id === layerId);
+    return this.layers.find((l) => l.id === layerId);
   }
 
   initLayer(layer: Layer, params?: any): LayerManager {
@@ -106,7 +106,7 @@ export class LayerManager {
     }
     if (this.layers) {
       const resizeEvent = { width: layersWidth, height: layersHeight };
-      this.layers.forEach(layer => layer.onResize(resizeEvent));
+      this.layers.forEach((layer) => layer.onResize(resizeEvent));
     }
     if (this._zoomPanHandler) {
       this._zoomPanHandler.adjustToSize(layersWidth, layersHeight, true);
@@ -122,7 +122,7 @@ export class LayerManager {
       this.axis.onRescale(event);
     }
     if (this.layers) {
-      this.layers.forEach(layer => layer.onRescale(event));
+      this.layers.forEach((layer) => layer.onRescale(event));
     }
   }
 
@@ -146,6 +146,6 @@ export class LayerManager {
   };
 
   setReferenceSystem(irs: IntersectionReferenceSystem): void {
-    this.layers.forEach(layer => (layer.referenceSystem = irs));
+    this.layers.forEach((layer) => (layer.referenceSystem = irs));
   }
 }

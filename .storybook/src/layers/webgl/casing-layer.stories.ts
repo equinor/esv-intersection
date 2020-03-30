@@ -49,12 +49,8 @@ export const CasingLayerWithSampleData = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  const xScale = scaleLinear()
-    .domain(xbounds)
-    .range([0, width]);
-  const yScale = scaleLinear()
-    .domain(ybounds)
-    .range([0, height]);
+  const xScale = scaleLinear().domain(xbounds).range([0, width]);
+  const yScale = scaleLinear().domain(ybounds).range([0, height]);
 
   casingLayer.onMount({ elm: root, height, width, xScale: xScale.copy(), yScale: yScale.copy() });
 
@@ -125,12 +121,8 @@ const createEventObj = (elm: any) => {
   const wbpInterp = new CurveInterpolator(wellborePathCoords, tension);
   const wellborePath = wbpInterp.getPoints(numPoints);
 
-  const xScale = scaleLinear()
-    .domain(xbounds)
-    .range([0, width]);
-  const yScale = scaleLinear()
-    .domain(ybounds)
-    .range([0, height]);
+  const xScale = scaleLinear().domain(xbounds).range([0, width]);
+  const yScale = scaleLinear().domain(ybounds).range([0, height]);
   return {
     xScale: xScale.copy(),
     yScale: yScale.copy(),

@@ -49,12 +49,8 @@ function transformData(inData: [number[], number[], number[]]) {
 }
 
 const createEventObj = (elm: any, inputData?: any): OnUpdateEvent => {
-  const xScale = scaleLinear()
-    .domain(xbounds)
-    .range([0, width]);
-  const yScale = scaleLinear()
-    .domain(ybounds)
-    .range([0, height]);
+  const xScale = scaleLinear().domain(xbounds).range([0, width]);
+  const yScale = scaleLinear().domain(ybounds).range([0, height]);
 
   let event = {
     xScale: xScale.copy(),
