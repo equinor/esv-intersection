@@ -64,6 +64,7 @@
     "eslint-config-prettier": "^6.10.1",
     "jest": "^25.2.3",
     "jest-canvas-mock": "^2.2.0",
+    "pixi.js": "^5.2.1",
     "prettier": "^2.0.2",
     "rimraf": "^3.0.2",
     "rollup": "^2.2.0",
@@ -88,6 +89,9 @@
       "ts",
       "tsx",
       "js"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/node_modules/pixi.js"
     ]
   },
   "peerDependencies": {
