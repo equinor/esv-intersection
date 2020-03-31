@@ -67,40 +67,12 @@ export class CompletionLayer extends PixiLayer {
   getAngle(p1: { y: number; x: number }, p2: { y: number; x: number }): number {
     return Math.atan2(p2.y - p1.y, p2.x - p1.x);
   }
-  // getPointAtMd(wbp: any, depth: number, offset: number): any {
-  //   const maxMin = (input: number, max: number): number => {
-  //     let index = input + offset;
-  //     index = index > 0 ? index : 0;
-  //     index = index < max ? index : max;
-  //     return index;
-  //   };
-
-  //   let tot = 0;
-  //   for (let i = 1; i < wbp.length; i++) {
-  //     tot += calcDist(wbp[i - 1], wbp[i]);
-  //     if (tot > depth) {
-  //       return wbp[maxMin(i, wbp.length)];
-  //     }
-  //   }
-
-  //   return wbp[wbp.length - 1];
-  // }
-
-  // dbgPt(point: Point, point2: Point, c: any = 0x4ff545) {
-  //   const line = new Graphics();
-  //   line.lineStyle(2, c, undefined, 1).moveTo(point.x, point.y);
-  //   line.lineTo(point2.x, point2.y);
-
-  //   this.ctx.stage.addChild(line);
-  // }
 
   generateCompletionItem(wbp: any, data: any): CompletionItem {
     const offset = 1;
-    const pointTop = this.referenceSystem.project(data.start); // this.getPointAtMd(wbp, data.start, offset);
-    const pointBottom = this.referenceSystem.project(data.end); //this.getPointAtMd(wbp, data.end, -offset);
+    const pointTop = this.referenceSystem.project(data.start);
+    const pointBottom = this.referenceSystem.project(data.end);
     const rotation = this.getAngle(new Point(pointTop[0], pointTop[1]), new Point(pointBottom[0], pointBottom[1]));
-    console.log(data, pointTop, rotation);
-    // this.dbgPt(new Point(pointTop[0], pointTop[1]), new Point(pointBottom[0], pointBottom[1]));
 
     const graphics: Graphics = this.getShape(data.shape); // cache?
     const { scaleX, scaleY } = this.getScale(data.shape, data.start - data.end, data.diameter);

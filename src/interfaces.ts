@@ -118,6 +118,7 @@ export interface HoleSize {
   diameter: number;
   length: number;
   start: number;
+  end: number;
   hasShoe?: boolean;
   innerDiameter?: number;
 }
@@ -126,6 +127,7 @@ export interface Casing {
   diameter: number;
   length: number;
   start: number;
+  end: number;
   hasShoe: boolean;
   innerDiameter: number;
 }
