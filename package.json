@@ -89,9 +89,6 @@
       "ts",
       "tsx",
       "js"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/node_modules/pixi.js"
     ]
   },
   "peerDependencies": {
