@@ -43,8 +43,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
     const { data } = this;
-    // TODO: get this from the reference system instead
-    const { wellborePath } = event;
+    const wellborePath = this.referenceSystem.projectedPath as [number, number][];
     if (data == null) {
       return;
     }

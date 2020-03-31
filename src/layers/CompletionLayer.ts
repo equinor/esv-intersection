@@ -33,7 +33,7 @@ export class CompletionLayer extends PixiLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    const { wellborePath } = event;
+    const wellborePath = this.referenceSystem.projectedPath as [number, number][];
 
     if (wellborePath == null) {
       return;
