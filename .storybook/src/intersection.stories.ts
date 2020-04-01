@@ -1,6 +1,4 @@
-import { CurveInterpolator } from 'curve-interpolator';
-import { WellborepathLayerOptions, Annotation, HoleSize, Casing } from '../../src/interfaces';
-import { LayerManager, IntersectionReferenceSystem, Controller } from '../../src/control';
+import { IntersectionReferenceSystem, Controller } from '../../src/control';
 import {
   GridLayer,
   WellborepathLayer,
@@ -188,6 +186,11 @@ export const intersection = () => {
   };
 
   const controller = new Controller({ poslog, layers, ...opts });
+
+  requestAnimationFrame(() => {
+    addMDOverlay(controller);
+  });
+
   controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
   controller.getLayer('wellborepath').onUpdate({ data: wb || mockedWellborePath });
 
@@ -263,6 +266,46 @@ export const intersection = () => {
 
   return root;
 };
+
+function addMDOverlay(instance) {
+  const elm = instance.overlay.create('md', {
+    onMouseMove: event => {
+      const {
+        target,
+        caller,
+        x,
+      } = event;
+
+      const newX = caller.currentStateAsEvent.xScale.invert(x);
+      const {
+        referenceSystem,
+      } = caller;
+
+      const md = referenceSystem.unproject(newX);
+      target.textContent = Number.isFinite(md)
+      ? `MD: ${md.toFixed(1)}`
+      : '-';
+      if (md < 0 || referenceSystem.length < md) {
+        target.style.visibility = 'hidden';
+      } else {
+        target.style.visibility = 'visible';
+      }
+    },
+    onMouseExit: event => {
+      event.target.style.visibility = 'hidden';
+    }
+  });
+  elm.style.visibility = 'hidden';
+  elm.style.display = 'inline-block';
+  elm.style.padding = '2px';
+  elm.style.borderRadius = '4px';
+  elm.style.textAlign = 'right';
+  elm.style.position = 'absolute';
+  elm.style.backgroundColor = 'rgba(0,0,0,0.5)';
+  elm.style.color = 'white';
+  elm.style.right = '5px';
+  elm.style.bottom = '5px';
+}
 
 const generateProjectedWellborePath = (projection: number[][]) => {
   const offset: number = projection[projection.length - 1][0];

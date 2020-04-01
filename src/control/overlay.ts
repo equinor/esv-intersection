@@ -4,12 +4,13 @@ import { OverlayCallbacks } from './interfaces';
 class Overlay {
   elm: Selection<Element, unknown, null, undefined>;
   source: Element;
-  elements: { [propName: string]: Element };
-  listeners: { [propName: string]: OverlayCallbacks };
+  elements: { [propName: string]: Element } = {};
+  listeners: { [propName: string]: OverlayCallbacks } = {};
   enabled = true;
 
   constructor(caller: any, container: HTMLElement) {
-    this.elm = select(container).append('div').classed('overlay', true).style('z-index', '2000');
+    const con = select(container);
+    this.elm = con.append('div').attr('id', 'overlay').style('z-index', '2000').style('position', 'absolute');
 
     this.source = this.elm.node();
 
@@ -37,10 +38,10 @@ class Overlay {
       });
     });
 
-    this.elm.on('mousemove', () => {
+    elm.on('mousemove', () => {
       if (!this.enabled) return;
 
-      const [mx, my] = mouse(container);
+      const [mx, my] = mouse(document.getElementById('overlay'));
       Object.keys(this.listeners).forEach((key: string) => {
         const target = this.elements[key] || null;
         const ops = this.listeners[key];
@@ -59,7 +60,7 @@ class Overlay {
       });
     });
 
-    this.elm.on('mouseout', () => {
+    elm.on('mouseout', () => {
       if (!this.enabled) return;
       Object.keys(this.listeners).forEach((key: string) => {
         const target = this.elements[key] || null;
