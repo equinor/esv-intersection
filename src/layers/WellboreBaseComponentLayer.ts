@@ -192,9 +192,11 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     // Add distance to points
     points = points.map((p: number[]) => {
       mdOld += calcDist(prev, p);
-      md += (this.referenceSystem.getProjectedLength(this.referenceSystem.unproject(p[0])) / 100) * this.referenceSystem.length;
-      prev = p;
+      md = this.referenceSystem.unproject(p[0]);
 
+      md = p[0] != 0 && md != null ? md : 0;
+      prev = p;
+      console.log(p, md, mdOld);
       return {
         point: new Point(p[0], p[1]),
         md,
