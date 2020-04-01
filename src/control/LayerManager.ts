@@ -129,7 +129,7 @@ export class LayerManager {
   private createAxis = (options: AxisOptions): Axis => {
     const { container } = this;
     const svgContainer = document.createElement('div');
-    svgContainer.setAttribute('style', 'position: absolute; z-index: 9999;');
+    svgContainer.setAttribute('style', 'position: absolute; z-index: 1999;');
     svgContainer.setAttribute('class', 'axis');
     container.appendChild(svgContainer);
 
