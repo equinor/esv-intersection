@@ -5,18 +5,29 @@ import { createRootContainer, createLayerContainer } from '../../utils';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { generateProjectedWellborePath } from '../../../../src/datautils';
 import { CurveInterpolator } from 'curve-interpolator';
+import { IntersectionReferenceSystem } from '../../../../src';
 
 import poslog from '../../exampledata/poslog.json';
+import mockWellborePath from '../../exampledata/wellborepathMock.json';
 
 const width = 400;
 const height = 800;
 
 const xbounds = [0, 300];
 const ybounds = [0, 800];
+const defaultOptions = {
+  defaultIntersectionAngle: 135,
+  tension: 0.75,
+  arcDivisions: 5000,
+  thresholdDirectionDist: 0.001,
+};
 
 export const Holes = () => {
-  const options = {
+  const referenceSystem = new IntersectionReferenceSystem(poslog || mockWellborePath, defaultOptions);
+
+  const options: HoleSizeLayerOptions = {
     order: 1,
+    referenceSystem,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 
@@ -37,8 +48,11 @@ export const Holes = () => {
 };
 
 export const HoleSizeLayerWithSampleData = () => {
+  const referenceSystem = new IntersectionReferenceSystem(poslog || mockWellborePath, defaultOptions);
+
   const options: HoleSizeLayerOptions = {
     order: 1,
+    referenceSystem,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 

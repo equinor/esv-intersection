@@ -186,18 +186,26 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   generateHoleSizeData = (wbp: number[][], data: HoleSize | Casing): HoleObjectData => {
     let points: any = wbp;
     let md = 0;
+    let mdOld = 0;
     let prev = points[0];
 
     // Add distance to points
     points = points.map((p: number[]) => {
-      md += calcDist(prev, p);
+      mdOld += calcDist(prev, p);
+      md += (this.referenceSystem.getProjectedLength(this.referenceSystem.unproject(p[0])) / 100) * this.referenceSystem.length;
       prev = p;
+      // console.log(p, mdOld, md);
+      //
+      // WellboreBaseComponentLayer.ts:197 (2) [155.4311719586999, 1841.05] 4395.675345110222 4501.736688562196
+      // WellboreBaseComponentLayer.ts:197 (2) [117.94469254016303, 1840.9] 4433.162124635762 4503.88614203469
+      // WellboreBaseComponentLayer.ts:197 (2) [79.46997132935849, 1840.76] 4471.63710055842 4505.334422598691
+      // WellboreBaseComponentLayer.ts:197 (2) [41.48096770248094, 1840.72] 4509.626125244017 4506.090382092504
+      // WellboreBaseComponentLayer.ts:197 (2) [13.290988449537508, 1840.74] 4537.816111591679 4506.332600378554
       return {
         point: new Point(p[0], p[1]),
         md,
       };
     });
-
     return { data: { ...data, diameter: data.diameter }, points, hasShoe: data.hasShoe, innerDiameter: data.innerDiameter };
   };
 
