@@ -1,63 +1,59 @@
-import { scaleLinear } from 'd3-scale';
-
 import { CompletionLayer } from '../../../../src/layers/CompletionLayer';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
-import { CompletionLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../../../../src/interfaces';
+import { CompletionLayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
 import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
-import { generateProjectedWellborePath } from '../../../../src/datautils';
-import { CurveInterpolator } from 'curve-interpolator';
+import { IntersectionReferenceSystem } from '../../../../src';
 
 // Data
 import poslog from '../../exampledata/poslog.json';
 import completion from '../../exampledata/completion';
-import mockedWellborePath from '../../exampledata/wellborepathMock.json';
+import mockWellborePath from '../../exampledata/wellborepathMock.json';
 
-const wellborePath = generateProjectedWellborePath(poslog);
-
-const width: number = 800;
-const height: number = 600;
-
-const xbounds: number[] = [0, 1000];
-const ybounds: number[] = [0, 1000];
+const defaultOptions = {
+  defaultIntersectionAngle: 135,
+  tension: 0.75,
+  arcDivisions: 5000,
+  thresholdDirectionDist: 0.001,
+};
 
 export const CompletionLayerSample = () => {
   const data = [
-    { start: 50, end: 90, diameter: 1 },
-    { start: 100, end: 150, diameter: 0.2 },
-    { start: 280, end: 290, diameter: 0.6 },
+    { start: 500, end: 520, diameter: 1 },
+    { start: 700, end: 720, diameter: 0.2 },
+    { start: 790, end: 800, diameter: 0.6 },
   ];
-  const tension = 0.2;
-  const numPoints = 999;
-  const wbpInterp = new CurveInterpolator(mockedWellborePath, tension);
-  const wellborePath = wbpInterp.getPoints(numPoints);
 
-  const options: CompletionLayerOptions = { order: 1, data };
+  const referenceSystem = new IntersectionReferenceSystem(poslog || mockWellborePath, defaultOptions);
+
+  const options: CompletionLayerOptions = {
+    order: 1,
+    data,
+    referenceSystem,
+  };
+
   const completionLayer = new CompletionLayer('webgl', options);
 
+  const width: number = 800;
+  const height: number = 600;
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
   completionLayer.onMount({ elm: container, height, width });
 
-  completionLayer.onUpdate(createEventObj(root, { data, wellborePath }));
+  completionLayer.onUpdate({ data });
+  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
+    completionLayer.onRescale(event);
+  });
+  zoomHandler.setBounds([0, 1000], [0, 1000]);
+  zoomHandler.adjustToSize(width, height);
+  zoomHandler.zFactor = 1;
+  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+  zoomHandler.enableTranslateExtent = false;
+  zoomHandler.setViewport(1000, 1000, 5000);
 
   root.appendChild(container);
 
   return root;
-};
-
-const createEventObj = (elm: any, inputData?: any): OnUpdateEvent => {
-  const xScale = scaleLinear().domain(xbounds).range([0, width]);
-  const yScale = scaleLinear().domain(ybounds).range([0, height]);
-
-  let event = {
-    xScale: xScale.copy(),
-    yScale: yScale.copy(),
-    elm,
-    wellborePath,
-  };
-
-  return event;
 };
 
 export const CompletionLayerWithSampleData = () => {
@@ -65,13 +61,18 @@ export const CompletionLayerWithSampleData = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: CompletionLayerOptions = { order: 1 };
+  const referenceSystem = new IntersectionReferenceSystem(poslog || mockWellborePath, defaultOptions);
+
+  const options: CompletionLayerOptions = {
+    order: 1,
+    referenceSystem,
+  };
   const completionLayer = new CompletionLayer('webgl', options);
   completionLayer.onMount({ elm: container, height, width });
 
   const data = completion.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter((d: any) => d.start > 400 && d.end < 1800); //.filter(c => c.diameter != 0 && c.start > 0);
 
-  completionLayer.onUpdate({ data, wellborePath });
+  completionLayer.onUpdate({ data });
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     completionLayer.onRescale(event);
   });
