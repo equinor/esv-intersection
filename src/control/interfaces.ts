@@ -26,8 +26,8 @@ export interface ControllerOptions {
 }
 
 interface OverlayEvent {
-  target?: HTMLElement;
-  source: HTMLElement;
+  target?: Element;
+  source: Element;
   caller: any;
 }
 
@@ -47,14 +47,4 @@ export interface OverlayCallbacks {
   onMouseMove?(event: OverlayMouseMoveEvent): void;
   onMouseExit?(event: OverlayMouseExitEvent): void;
   onResize?(event: OverlayResizeEvent): void;
-}
-
-export interface Overlay {
-  create(key: string, callbacks?: OverlayCallbacks): HTMLElement;
-  register(key: string, callbacks: OverlayCallbacks): void;
-  remove(key: string): void;
-  elm: Selection<SVGElement, unknown, null, undefined>;
-  elements: { [propName: string]: HTMLElement };
-  listeners: { [propName: string]: OverlayCallbacks };
-  enabled: boolean;
 }

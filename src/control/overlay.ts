@@ -4,8 +4,8 @@ import { OverlayCallbacks } from './interfaces';
 class Overlay {
   elm: Selection<Element, unknown, null, undefined>;
   source: Element;
-  elements: any;
-  listeners: any;
+  elements: { [propName: string]: Element };
+  listeners: { [propName: string]: OverlayCallbacks };
   enabled = true;
 
   constructor(caller: any, container: HTMLElement) {
