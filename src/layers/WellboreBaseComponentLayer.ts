@@ -14,6 +14,8 @@ import {
   OnMountEvent,
 } from '../interfaces';
 
+const staticWellboreBaseComponentIncrement = 0.1;
+
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;
 
@@ -43,12 +45,12 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
     const { data } = this;
-    const wellborePath = this.referenceSystem.projectedPath as [number, number][];
+
     if (data == null) {
       return;
     }
 
-    const sizes: HoleObjectData[] = data.map((d: HoleSize | Casing) => this.generateHoleSizeData(wellborePath, d));
+    const sizes: HoleObjectData[] = data.map((d: HoleSize | Casing) => this.generateHoleSizeData(d));
 
     const maxDiameter = Math.max(...sizes.map((s: HoleObjectData) => s.data.diameter));
     const texture = this.createTexure(maxDiameter * maxTextureDiameterScale, firstColor, secondColor);
@@ -83,6 +85,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     const polygonCoords = [...normalOffsetCoordsUp, ...normalOffsetCoordsDown.map((d: Point) => d.clone()).reverse()];
     const casingTopLineCoords = [normalOffsetCoordsUp[0], normalOffsetCoordsDown[0]];
     const casingBottomLineCoords = [normalOffsetCoordsUp[normalOffsetCoordsUp.length - 1], normalOffsetCoordsDown[normalOffsetCoordsDown.length - 1]];
+
     const mask = this.drawBigPolygon(polygonCoords);
     let texture = defaultTexture;
     let casingWallWidth = 1;
@@ -92,7 +95,9 @@ export class WellboreBaseComponentLayer extends PixiLayer {
       texture = this.createTexure(holeObject.data.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
       casingWallWidth = Math.abs(holeObject.data.diameter - holeObject.innerDiameter);
     }
+
     this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
+
     this.drawLine(polygonCoords, lineColor, casingWallWidth);
     this.drawLine(casingTopLineCoords, topBottomLineColor, 1);
     this.drawLine(casingBottomLineCoords, topBottomLineColor, 1);
@@ -103,7 +108,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
       const newPoints: Point[] = [];
 
       for (let i = 0; tot < meters && i > points.length - lastMeterPoint; i++) {
-        tot += calcDistPoint(points[points.length - 1 - i], points[points.length - lastMeterPoint - i]);
+        tot += staticWellboreBaseComponentIncrement;
         newPoints.push(points[points.length - 1 - i].clone());
       }
 
@@ -183,20 +188,15 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     return Texture.from(canvas);
   };
 
-  generateHoleSizeData = (wbp: number[][], data: HoleSize | Casing): HoleObjectData => {
-    let points: any = wbp;
-    let md = 0;
+  generateHoleSizeData = (data: HoleSize | Casing): HoleObjectData => {
+    const points: any = [];
 
     // Add distance to points
-    points = points.map((p: number[]) => {
-      md = this.referenceSystem.unproject(p[0]);
-      md = p[0] != 0 && md != null ? md : 0;
+    for (let i = data.start; i < data.start + data.length; i += staticWellboreBaseComponentIncrement) {
+      const p = this.referenceSystem.project(i);
+      points.push({ point: new Point(p[0], p[1]), md: i });
+    }
 
-      return {
-        point: new Point(p[0], p[1]),
-        md,
-      };
-    });
     return { data: { ...data, diameter: data.diameter }, points, hasShoe: data.hasShoe, innerDiameter: data.innerDiameter };
   };
 
