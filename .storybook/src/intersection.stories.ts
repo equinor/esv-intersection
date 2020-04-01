@@ -164,7 +164,7 @@ export const intersection = () => {
   const completion = completionData.map((c) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
   // set wb offset in reference system
-  generateProjectedWellborePath(referenceSystem.projectedPath);
+  // generateProjectedWellborePath(referenceSystem.projectedPath);
 
   // Instantiate layers
   const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1 });

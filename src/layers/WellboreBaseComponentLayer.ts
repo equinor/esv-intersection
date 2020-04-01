@@ -186,17 +186,12 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   generateHoleSizeData = (wbp: number[][], data: HoleSize | Casing): HoleObjectData => {
     let points: any = wbp;
     let md = 0;
-    let mdOld = 0;
-    let prev = points[0];
 
     // Add distance to points
     points = points.map((p: number[]) => {
-      mdOld += calcDist(prev, p);
       md = this.referenceSystem.unproject(p[0]);
-
       md = p[0] != 0 && md != null ? md : 0;
-      prev = p;
-      console.log(p, md, mdOld);
+
       return {
         point: new Point(p[0], p[1]),
         md,
