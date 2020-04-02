@@ -52,7 +52,7 @@ export class IntersectionReferenceSystem {
     this.options = options || defaultOptions;
     const { arcDivisions, tension, thresholdDirectionDist } = this.options;
 
-    const path = poslog.map((p: Position) => [p.easting, p.northing, p.tvd, p.md]) || [];
+    const path = poslog.map((p: Position) => [p.easting, p.northing, p.tvd]) || [];
     this.path = path;
 
     this.projectedPath = IntersectionReferenceSystem.toDisplacement(path);
