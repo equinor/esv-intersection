@@ -8,7 +8,7 @@ import { SurfaceGenerator } from '../../utils/surfaceGenerator';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { GeomodelLayerOptions, OnUpdateEvent, LayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
 import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
-import { generateSurfaceData, generateProjectedTrajectory, SurfaceLine, SurfaceData, generateProjectedWellborePath } from '../../../../src/datautils';
+import { generateSurfaceData, generateProjectedTrajectory, SurfaceData, generateProjectedWellborePath } from '../../../../src/datautils';
 
 //Data
 import poslog from '../../exampledata/poslog.json';

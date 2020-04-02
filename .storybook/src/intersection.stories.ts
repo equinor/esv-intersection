@@ -161,7 +161,8 @@ export const intersection = () => {
   const seismicInfo = getSeismicInfo(seismic, trajectory);
   const completion = completionData.map((c) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
-  const wb = generateProjectedWellborePath(referenceSystem.projectedPath);
+  // set wb offset in reference system
+  generateProjectedWellborePath(referenceSystem.projectedPath);
 
   // Instantiate layers
   const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1 });
@@ -169,14 +170,14 @@ export const intersection = () => {
   const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
   const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
   const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8 });
-  const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red' });
-  const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData });
-  const casingLayer = new CasingLayer('casing', { order: 5, data: casingData });
+  const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red', referenceSystem });
+  const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData, referenceSystem });
+  const casingLayer = new CasingLayer('casing', { order: 5, data: casingData, referenceSystem });
   const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
   const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
-  const completionLayer = new CompletionLayer('completion', { order: 5, data: completion });
+  const completionLayer = new CompletionLayer('completion', { order: 5, data: completion, referenceSystem });
 
-  const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, completionLayer];
+  const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, completionLayer, holeSizeLayer, casingLayer];
 
   const opts = {
     scaleOptions,
@@ -192,15 +193,11 @@ export const intersection = () => {
   });
 
   controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
-  controller.getLayer('wellborepath').onUpdate({ data: wb || mockedWellborePath });
 
-  controller
-    // .addLayer(calloutLayer, { annotations })
-    // .addLayer(image1Layer, { url: bg1Img })
-    // .addLayer(image2Layer, { url: bg2Img })
-    .addLayer(holeSizeLayer, { wellborePath: wb })
-    .addLayer(casingLayer, { wellborePath: wb })
-    .addLayer(completionLayer, { wellborePath: wb });
+  controller;
+  // .addLayer(calloutLayer, { annotations })
+  // .addLayer(image1Layer, { url: bg1Img })
+  // .addLayer(image2Layer, { url: bg2Img })
 
   const seismicOptions = {
     x: seismicInfo.minX,

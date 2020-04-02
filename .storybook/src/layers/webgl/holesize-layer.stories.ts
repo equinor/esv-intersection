@@ -1,62 +1,35 @@
 import { HoleSizeLayer } from '../../../../src/layers/HoleSizeLayer';
-import { scaleLinear } from 'd3-scale';
 import { HoleSize, HoleSizeLayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
-import { generateProjectedWellborePath } from '../../../../src/datautils';
-import { CurveInterpolator } from 'curve-interpolator';
+import { IntersectionReferenceSystem } from '../../../../src';
 
 import poslog from '../../exampledata/poslog.json';
+import mockWellborePath from '../../exampledata/wellborepathMock.json';
 
-const width = 400;
-const height = 800;
-
-const xbounds = [0, 300];
-const ybounds = [0, 800];
-
-export const Holes = () => {
-  const options = {
-    order: 1,
-  };
-  const holeSizeLayer = new HoleSizeLayer('webgl', options);
-
-  const root = document.createElement('div');
-  root.className = 'grid-container';
-  root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
-  root.setAttribute('height', `${height}`);
-  root.setAttribute('width', `${width}`);
-
-  const xScale = scaleLinear().domain(xbounds).range([0, width]);
-  const yScale = scaleLinear().domain(ybounds).range([0, height]);
-
-  holeSizeLayer.onMount({ elm: root, height, width, xScale: xScale.copy(), yScale: yScale.copy() });
-
-  holeSizeLayer.onUpdate(createEventObj(root));
-
-  return root;
+const defaultOptions = {
+  defaultIntersectionAngle: 135,
+  tension: 0.75,
+  arcDivisions: 5000,
+  thresholdDirectionDist: 0.001,
 };
 
-export const HoleSizeLayerWithSampleData = () => {
+export const Holes = () => {
+  const referenceSystem = new IntersectionReferenceSystem(poslog || mockWellborePath, defaultOptions);
+
   const options: HoleSizeLayerOptions = {
     order: 1,
+    referenceSystem,
   };
   const holeSizeLayer = new HoleSizeLayer('webgl', options);
 
-  const width: number = 1280;
-  const height: number = 1024;
-
-  const xbounds: number[] = [0, 1000];
-  const ybounds: number[] = [-500, 4000];
-
+  const width = 400;
+  const height = 800;
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  const xScale = scaleLinear().domain(xbounds).range([0, width]);
-  const yScale = scaleLinear().domain(ybounds).range([0, height]);
-
-  holeSizeLayer.onMount({ elm: root, height, width, xScale: xScale.copy(), yScale: yScale.copy() });
-
-  holeSizeLayer.onUpdate(createEventWithSampleDataObj(root));
+  holeSizeLayer.onMount({ elm: container, height, width });
+  holeSizeLayer.onUpdate({ elm: root, data: getData() });
 
   const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
     holeSizeLayer.onRescale(event);
@@ -73,7 +46,41 @@ export const HoleSizeLayerWithSampleData = () => {
   return root;
 };
 
-const createEventWithSampleDataObj = (elm: any) => {
+export const HoleSizeLayerWithSampleData = () => {
+  const referenceSystem = new IntersectionReferenceSystem(poslog || mockWellborePath, defaultOptions);
+
+  const options: HoleSizeLayerOptions = {
+    order: 1,
+    referenceSystem,
+  };
+  const holeSizeLayer = new HoleSizeLayer('webgl', options);
+
+  const width: number = 1280;
+  const height: number = 1024;
+
+  const root = createRootContainer(width);
+  const container = createLayerContainer(width, height);
+
+  holeSizeLayer.onMount({ elm: container, height, width });
+
+  holeSizeLayer.onUpdate({ elm: root, data: getSampleDataData() });
+
+  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
+    holeSizeLayer.onRescale(event);
+  });
+  zoomHandler.setBounds([0, 1000], [0, 1000]);
+  zoomHandler.adjustToSize(width, height);
+  zoomHandler.zFactor = 1;
+  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+  zoomHandler.enableTranslateExtent = false;
+  zoomHandler.setViewport(1000, 1000, 5000);
+
+  root.appendChild(container);
+
+  return root;
+};
+
+const getSampleDataData = () => {
   const data: HoleSize[] = [
     { diameter: 36, start: 0, length: 100 },
     { diameter: 28, start: 100, length: 100 },
@@ -83,16 +90,12 @@ const createEventWithSampleDataObj = (elm: any) => {
     { diameter: 8.5, start: 1200, length: 600 },
     { diameter: 7.5, start: 1600, length: 600 },
   ];
-  const wellborePath: [number, number][] = generateProjectedWellborePath(poslog) as [number, number][];
+  data.forEach((x) => (x.end = x.start + x.length));
 
-  return {
-    elm,
-    data,
-    wellborePath,
-  };
+  return data;
 };
 
-const createEventObj = (elm: any) => {
+const getData = () => {
   const data: HoleSize[] = [
     { diameter: 30 + 0, start: 0, length: 50 },
     { diameter: 20 + 0, start: 50, length: 70 },
@@ -104,30 +107,6 @@ const createEventObj = (elm: any) => {
     { diameter: 8 + 0, start: 660, length: 50 },
     { diameter: 6.5 + 0, start: 710, length: 50 },
   ];
-
-  const wellborePathCoords: [number, number][] = [
-    [50, 50],
-    [50, 100],
-    [100, 150],
-    [150, 190],
-    [200, 160],
-    [250, 150],
-    [300, 350],
-    [150, 450],
-    [120, 450],
-  ];
-  const tension = 0.2;
-  const numPoints = 999;
-  const wbpInterp = new CurveInterpolator(wellborePathCoords, tension);
-  const wellborePath = wbpInterp.getPoints(numPoints);
-
-  const xScale = scaleLinear().domain(xbounds).range([0, width]);
-  const yScale = scaleLinear().domain(ybounds).range([0, height]);
-  return {
-    xScale: xScale.copy(),
-    yScale: yScale.copy(),
-    elm,
-    data,
-    wellborePath,
-  };
+  data.forEach((x) => (x.end = x.start + x.length));
+  return data;
 };
