@@ -133,10 +133,7 @@ export class LayerManager {
     svgContainer.setAttribute('class', 'axis');
     container.appendChild(svgContainer);
 
-    const svg = select(svgContainer)
-      .append('svg')
-      .attr('height', `${container.getAttribute('height')}px`)
-      .attr('width', `${container.getAttribute('width')}px`);
+    const svg = select(svgContainer).append('svg').attr('height', `${container.offsetHeight}px`).attr('width', `${container.offsetWidth}px`);
 
     const showLabels = true;
 
