@@ -4,6 +4,10 @@ import { Layer } from '../layers';
 import { ControllerOptions, Position } from './interfaces';
 import { ZoomPanHandler } from './ZoomPanHandler';
 import { ReferenceSystemOptions } from '..';
+import { overlay, Overlay } from './overlay';
+
+const HORIZONTALAXISMARGIN = 40;
+const VERTICALAXISMARGIN = 30;
 
 /**
  * API for controlling data and layers
@@ -12,6 +16,7 @@ export class Controller {
   private _referenceSystem: IntersectionReferenceSystem;
 
   private layerManager: LayerManager;
+  private _overlay: Overlay;
 
   /**
    *
@@ -28,6 +33,8 @@ export class Controller {
     if (layers) {
       this.layerManager.addLayers(layers);
     }
+
+    this._overlay = overlay(this, container);
   }
 
   setReferenceSystem(referenceSystem: IntersectionReferenceSystem): Controller {
@@ -72,6 +79,10 @@ export class Controller {
    */
   adjustToSize(width: number, height: number): Controller {
     this.layerManager.adjustToSize(width, height);
+
+    const dimensions = { width: width - HORIZONTALAXISMARGIN, height: height - VERTICALAXISMARGIN };
+    this.overlay.elm.dispatch('resize', { detail: dimensions, bubbles: true, cancelable: true });
+
     return this;
   }
 
@@ -90,6 +101,10 @@ export class Controller {
   setBounds(xBounds: [number, number], yBounds: [number, number]): Controller {
     this.zoomPanHandler.setBounds(xBounds, yBounds);
     return this;
+  }
+
+  get overlay(): Overlay {
+    return this._overlay;
   }
 
   get referenceSystem(): IntersectionReferenceSystem {
