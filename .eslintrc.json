@@ -6,7 +6,7 @@
     "node": true,
     "browser": true
   },
-  "extends": ["plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": ["plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
@@ -28,6 +28,8 @@
     "no-underscore-dangle": "off",
     "no-explicit-any": "off",
     "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/no-explicit-any": "off"
+    "@typescript-eslint/no-explicit-any": "off",
+    "newline-per-chained-call": ["off", { "ignoreChainWithDepth": 1 }],
+    "@typescript-eslint/no-inferrable-types": "off"
   }
 }
