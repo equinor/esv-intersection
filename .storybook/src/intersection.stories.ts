@@ -266,31 +266,23 @@ export const intersection = () => {
 
 function addMDOverlay(instance) {
   const elm = instance.overlay.create('md', {
-    onMouseMove: event => {
-      const {
-        target,
-        caller,
-        x,
-      } = event;
+    onMouseMove: (event) => {
+      const { target, caller, x } = event;
 
       const newX = caller.currentStateAsEvent.xScale.invert(x);
-      const {
-        referenceSystem,
-      } = caller;
+      const { referenceSystem } = caller;
 
       const md = referenceSystem.unproject(newX);
-      target.textContent = Number.isFinite(md)
-      ? `MD: ${md.toFixed(1)}`
-      : '-';
+      target.textContent = Number.isFinite(md) ? `MD: ${md.toFixed(1)}` : '-';
       if (md < 0 || referenceSystem.length < md) {
         target.style.visibility = 'hidden';
       } else {
         target.style.visibility = 'visible';
       }
     },
-    onMouseExit: event => {
+    onMouseExit: (event) => {
       event.target.style.visibility = 'hidden';
-    }
+    },
   });
   elm.style.visibility = 'hidden';
   elm.style.display = 'inline-block';
