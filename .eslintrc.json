@@ -26,10 +26,15 @@
     "no-magic-numbers": ["error", { "ignore": [0, 1, -1, 2] }],
     "object-curly-newline": "off",
     "no-underscore-dangle": "off",
-    "no-explicit-any": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/no-explicit-any": "off",
     "newline-per-chained-call": ["off", { "ignoreChainWithDepth": 1 }],
-    "@typescript-eslint/no-inferrable-types": "off"
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "curly": "error",
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "indent": ["error", 2],
+    "quotes": ["error", "double"],
+    "comma-dangle": ["error", "always"]
   }
 }
