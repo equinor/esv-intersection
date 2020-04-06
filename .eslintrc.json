@@ -27,7 +27,6 @@
     "curly": "error",
     "no-continue": "off",
     "no-plusplus": "off",
-    "indent": ["error", 2],
     "no-param-reassign": "off",
     "object-curly-newline": "off",
     "no-underscore-dangle": "off",
