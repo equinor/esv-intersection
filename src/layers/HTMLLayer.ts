@@ -1,0 +1,57 @@
+import { select, Selection } from 'd3-selection';
+import { Layer } from './Layer';
+import { OnMountEvent, OnResizeEvent } from '../interfaces';
+
+const DEFAULTWIDTH = 200;
+const DEFUALTHEIGHT = 300;
+export abstract class HTMLLayer extends Layer {
+  elm: Selection<HTMLElement, any, null, undefined>;
+
+  onMount(event: OnMountEvent): void {
+    super.onMount(event);
+    const { elm } = event;
+    const width = event.width || parseInt(elm.getAttribute('width'), 10) || DEFAULTWIDTH;
+    const height = event.height || parseInt(elm.getAttribute('height'), 10) || DEFUALTHEIGHT;
+    if (!this.elm) {
+      this.elm = select(elm).append('div');
+      this.elm.attr('id', `${this.id}`);
+      this.elm.attr('class', 'html-layer');
+    }
+    this.elm.style('position', 'absolute').style('height', height).style('width', width).style('opacity', this.opacity).style('z-index', this.order);
+  }
+
+  onUnmount(): void {
+    super.onUnmount();
+    this.elm.remove();
+    this.elm = null;
+  }
+
+  onResize(event: OnResizeEvent): void {
+    if (!this.elm) {
+      return;
+    }
+    super.onResize(event);
+    this.elm.style('height', event.height).style('width', event.width);
+  }
+
+  setVisibility(visible: boolean): void {
+    super.setVisibility(visible);
+    if (this.elm) {
+      this.elm.attr('visibility', visible ? 'visible' : 'hidden');
+    }
+  }
+
+  onOpacitChanged(opacity: number): void {
+    this.opacity = opacity;
+    if (this.elm) {
+      this.elm.style('opacity', opacity);
+    }
+  }
+
+  onOrderChanged(order: number): void {
+    this.order = order;
+    if (this.elm) {
+      this.elm.style('z-index', order);
+    }
+  }
+}
