@@ -12,12 +12,18 @@ export abstract class HTMLLayer extends Layer {
     const { elm } = event;
     const width = event.width || parseInt(elm.getAttribute('width'), 10) || DEFAULTWIDTH;
     const height = event.height || parseInt(elm.getAttribute('height'), 10) || DEFUALTHEIGHT;
+
     if (!this.elm) {
       this.elm = select(elm).append('div');
       this.elm.attr('id', `${this.id}`);
       this.elm.attr('class', 'html-layer');
     }
-    this.elm.style('position', 'absolute').style('height', height).style('width', width).style('opacity', this.opacity).style('z-index', this.order);
+    this.elm
+      .style('position', 'absolute')
+      .style('height', `${height}px`)
+      .style('width', `${width}px`)
+      .style('opacity', this.opacity)
+      .attr('z-index', this.order);
   }
 
   onUnmount(): void {
@@ -31,7 +37,7 @@ export abstract class HTMLLayer extends Layer {
       return;
     }
     super.onResize(event);
-    this.elm.style('height', event.height).style('width', event.width);
+    this.elm.style('height', `${event.height}px`).style('width', `${event.width}px`);
   }
 
   setVisibility(visible: boolean): void {
