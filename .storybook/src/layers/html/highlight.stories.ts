@@ -9,6 +9,8 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 
 import poslog from '../../exampledata/poslog.json';
 
+const POINTOFFSET = 5;
+
 const width = 700;
 const height = 600;
 
@@ -100,8 +102,7 @@ export const HighlightWellborepathWithController = () => {
   controller.adjustToSize(width, height);
   controller.setViewport(1000, 1000, 5000);
 
-  highlightLayer.onRescale(controller.currentStateAsEvent);
-
+  // external event that calls the rescale event the highlighting should change
   const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: controller.currentStateAsEvent, layer: highlightLayer }), { width, min: 0, max: controller.referenceSystem.length});
 
   root.appendChild(container);
@@ -123,13 +124,16 @@ class HighlightLayer extends HTMLLayer {
     super.onRescale(event);
     const elm = this.elements[0];
     if (this.referenceSystem) {
+
+      // returns coords in [displacement, tvd]
       const coords = this.referenceSystem.project(event.md || 0);
 
+      // screen coords inside the container
       const newX = event.xScale(coords[0]);
       const newY = event.yScale(coords[1]);
 
-      elm.style('left', `${newX - 5}px`);
-      elm.style('top', `${newY - 5}px`);
+      elm.style('left', `${newX - POINTOFFSET}px`);
+      elm.style('top', `${newY - POINTOFFSET}px`);
     }
   }
 
