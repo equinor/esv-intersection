@@ -21,4 +21,4 @@ else if (os.type() === 'Darwin')
 else if (os.type() === 'Windows_NT')
   exec("prettier --write --config .prettierrc **/*.ts ", func);
 else
-  throw new Error("Unsupported OS found: " + os.type());
+  exec("prettier --write --config .prettierrc **/*.ts ", func);
