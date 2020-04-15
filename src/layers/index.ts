@@ -2,6 +2,7 @@ export * from './Layer';
 export * from './CanvasLayer';
 export * from './GridLayer';
 export * from './SVGLayer';
+export * from './HTMLLayer';
 export * from './WellborePathLayer';
 export * from './GeomodelLayer';
 export * from './GeomodelCanvasLayer';
