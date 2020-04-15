@@ -23,6 +23,7 @@ export abstract class HTMLLayer extends Layer {
       .style('height', `${height}px`)
       .style('width', `${width}px`)
       .style('opacity', this.opacity)
+      .style('overflow', 'hidden')
       .attr('z-index', this.order);
   }
 
