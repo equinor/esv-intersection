@@ -9,7 +9,11 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 
 import poslog from '../../exampledata/poslog.json';
 
-const POINTOFFSET = 5;
+const POINTHEIGHT = 5;
+const POINTWIDTH = 5;
+const POINTPADDING = 2;
+const POINTOFFSETX = (POINTWIDTH + POINTPADDING) / 2;
+const POINTOFFSETY = (POINTHEIGHT + POINTPADDING) / 2;
 
 const width = 700;
 const height = 600;
@@ -48,13 +52,13 @@ export const HighlightWellborepath = () => {
     order: 105,
     referenceSystem,
     layerOpacity: 0.5,
-  })
+  });
 
   highlightLayer.onMount({ elm: container, width, height });
 
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     layer.onRescale({ ...event });
-    highlightLayer.onRescale({ ...event })
+    highlightLayer.onRescale({ ...event });
   });
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
@@ -66,7 +70,11 @@ export const HighlightWellborepath = () => {
 
   highlightLayer.onRescale(zoomHandler.currentStateAsEvent());
 
-  const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: zoomHandler.currentStateAsEvent(), layer: highlightLayer }), { width, min: 0, max: referenceSystem.length});
+  const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: zoomHandler.currentStateAsEvent(), layer: highlightLayer }), {
+    width,
+    min: 0,
+    max: referenceSystem.length,
+  });
 
   root.appendChild(container);
   root.appendChild(slider);
@@ -94,7 +102,7 @@ export const HighlightWellborepathWithController = () => {
     order: 105,
     referenceSystem,
     layerOpacity: 0.5,
-  })
+  });
 
   controller.addLayer(layer).addLayer(highlightLayer);
 
@@ -103,7 +111,11 @@ export const HighlightWellborepathWithController = () => {
   controller.setViewport(1000, 1000, 5000);
 
   // external event that calls the rescale event the highlighting should change
-  const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: controller.currentStateAsEvent, layer: highlightLayer }), { width, min: 0, max: controller.referenceSystem.length});
+  const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: controller.currentStateAsEvent, layer: highlightLayer }), {
+    width,
+    min: 0,
+    max: controller.referenceSystem.length,
+  });
 
   root.appendChild(container);
   root.appendChild(slider);
@@ -124,26 +136,24 @@ class HighlightLayer extends HTMLLayer {
     super.onRescale(event);
     const elm = this.elements[0];
     if (this.referenceSystem) {
-
       // returns coords in [displacement, tvd]
       const coords = this.referenceSystem.project(event.md || 0);
 
       // screen coords inside the container
       const newX = event.xScale(coords[0]);
       const newY = event.yScale(coords[1]);
-
-      elm.style('left', `${newX - POINTOFFSET}px`);
-      elm.style('top', `${newY - POINTOFFSET}px`);
+      elm.style('left', `${newX - POINTOFFSETX}px`);
+      elm.style('top', `${newY - POINTOFFSETY}px`);
     }
   }
 
   addHighlightElement(id: string): HighlightLayer {
     const elm = this.elm.append('div').attr('id', `${id}-highlight`);
     elm.style('visibility', 'visible');
-    elm.style('height', '5px');
-    elm.style('width', '5px');
+    elm.style('height', `${POINTHEIGHT}px`);
+    elm.style('width', `${POINTWIDTH}px`);
     elm.style('display', 'inline-block');
-    elm.style('padding', '2px');
+    elm.style('padding', `${POINTPADDING}px`);
     elm.style('border-radius', '4px');
     elm.style('position', 'absolute');
     elm.style('background-color', 'red');
@@ -154,12 +164,11 @@ class HighlightLayer extends HTMLLayer {
   getElement(id: string): Selection<HTMLElement, any, null, undefined> {
     return this.elm.select(id);
   }
-
 }
 
 const onUpdate = (event: InputEvent, obj: any) => {
   obj.layer.onRescale({ ...obj.rescaleEvent, md: event.target.valueAsNumber });
-}
+};
 
 const createSlider = (cb: any, opts: any) => {
   const slider = document.createElement('input');
