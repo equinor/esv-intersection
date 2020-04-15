@@ -40,6 +40,17 @@ import {
 } from './exampledata/exampledata';
 
 //Data
+import {
+  poslog,
+  stratColumn,
+  surfaceValues,
+  seismic,
+  annotations,
+  mockedWellborePath,
+  holeSizeData,
+  casingData,
+  completionData,
+} from './exampledata/exampledata';
 
 const seismicColorMap = [
   '#ffe700',

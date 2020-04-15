@@ -75,6 +75,11 @@ export interface HoleSizeLayerOptions extends WellComponentBaseOptions {}
 
 export interface CasingLayerOptions extends WellComponentBaseOptions {}
 
+export interface CementLayerOptions extends WellComponentBaseOptions {
+  percentFirstColor?: number;
+  rotation?: number;
+}
+
 export interface WellComponentBaseOptions extends LayerOptions {
   firstColor?: string;
   secondColor?: string;
@@ -131,6 +136,8 @@ export interface Casing {
   hasShoe: boolean;
   innerDiameter: number;
 }
+
+export interface Cement {}
 
 export interface MDPoint {
   point: Point;
