@@ -1,17 +1,16 @@
 import { select, Selection } from 'd3-selection';
 import { Layer } from './Layer';
 import { OnMountEvent, OnResizeEvent } from '../interfaces';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../constants';
 
-const DEFAULTWIDTH = 200;
-const DEFUALTHEIGHT = 300;
 export abstract class HTMLLayer extends Layer {
   elm: Selection<HTMLElement, any, null, undefined>;
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm } = event;
-    const width = event.width || parseInt(elm.getAttribute('width'), 10) || DEFAULTWIDTH;
-    const height = event.height || parseInt(elm.getAttribute('height'), 10) || DEFUALTHEIGHT;
+    const width = event.width || parseInt(elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH;
+    const height = event.height || parseInt(elm.getAttribute('height'), 10) || DEFAULT_LAYER_HEIGHT;
 
     if (!this.elm) {
       this.elm = select(elm).append('div');

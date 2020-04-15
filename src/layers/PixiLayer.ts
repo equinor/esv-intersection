@@ -1,6 +1,7 @@
 import { Application, Transform } from 'pixi.js';
 import { Layer } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../constants';
 
 export abstract class PixiLayer extends Layer {
   elm: HTMLElement;
@@ -24,8 +25,8 @@ export abstract class PixiLayer extends Layer {
       this.elm = elm;
 
       const pixiOptions = {
-        width: width || parseInt(this.elm.getAttribute('width'), 10) || 300,
-        height: height || parseInt(this.elm.getAttribute('height'), 10) || 100,
+        width: width || parseInt(this.elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH,
+        height: height || parseInt(this.elm.getAttribute('height'), 10) || DEFAULT_LAYER_HEIGHT,
         antialias: true,
         transparent: true,
         clearBeforeRender: true,
