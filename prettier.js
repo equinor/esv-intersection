@@ -15,9 +15,9 @@ var func = (error, stdout, stderr) => {
 }
 
 if (os.type() === 'Linux')
-  exec("prettier --write --config .prettierrc '**/*.ts' ", func);
+  exec("prettier --write --config .prettierrc \"**/*.ts\" ", func);
 else if (os.type() === 'Darwin')
-  exec("prettier --write --config .prettierrc '**/*.ts' ", func);
+  exec("prettier --write --config .prettierrc \"**/*.ts\" ", func);
 else if (os.type() === 'Windows_NT')
   exec("prettier --write --config .prettierrc **/*.ts ", func);
 else
