@@ -11,5 +11,6 @@ export * from './CalloutCanvasLayer';
 export * from './ImageCanvasLayer';
 export * from './HoleSizeLayer';
 export * from './CasingLayer';
+export * from './CompletionLayer';
 export * from './SeismicCanvasLayer';
 export * from './PixiLayer';
