@@ -22,7 +22,7 @@
     "postdocs": "copyfiles images/* docs && copyfiles .nojekyll docs",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "prettier": "prettier --write --config .prettierrc **/*.ts "
+    "prettier": "prettier --write --config .prettierrc \"**/*.ts\" "
   },
   "repository": {
     "type": "git",
