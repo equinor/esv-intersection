@@ -6,7 +6,7 @@
     "node": true,
     "browser": true
   },
-  "extends": ["plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": ["plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
@@ -17,17 +17,26 @@
     "project": "./tsconfig.json"
   },
   "rules": {
+    "prettier/prettier": "error",
+
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+
+    "curly": "error",
     "no-continue": "off",
     "no-plusplus": "off",
     "no-param-reassign": "off",
-    "prettier/prettier": "error",
-    "import/prefer-default-export": "off",
-    "max-len": ["error", { "code": 150 }],
-    "no-magic-numbers": ["error", { "ignore": [0, 1, -1, 2] }],
     "object-curly-newline": "off",
     "no-underscore-dangle": "off",
-    "no-explicit-any": "off",
-    "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/no-explicit-any": "off"
+    "quotes": ["error", "single"],
+    "import/prefer-default-export": "off",
+    "max-len": ["error", { "code": 150 }],
+    "comma-dangle": ["error", "always-multiline"],
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "no-magic-numbers": ["error", { "ignore": [-1, 0, 1, 2] }],
+    "newline-per-chained-call": ["off", { "ignoreChainWithDepth": 1 }],
+    "no-warning-comments": [0, { "terms": ["todo", "fixme"], "location": "start" }]
   }
 }

@@ -12,6 +12,7 @@ import {
   SeismicCanvasLayer,
   HoleSizeLayer,
   CasingLayer,
+  CompletionLayer,
 } from '../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
@@ -26,17 +27,19 @@ export default {
 const bg1Img = require('./resources/bg1.jpeg');
 const bg2Img = require('./resources/bg2.jpg');
 
+import {
+  poslog,
+  stratColumn,
+  surfaceValues,
+  seismic,
+  annotations,
+  mockedWellborePath,
+  holeSizeData,
+  casingData,
+  completionData,
+} from './exampledata/exampledata';
+
 //Data
-import poslog from './exampledata/poslog.json';
-import stratColumn from './exampledata/stratcolumn.json';
-import surfaceValues from './exampledata/surfaces.json';
-import seismic from './exampledata/seismic.json';
-import annotations from './exampledata/annotations.json';
-import mockedWellborePath from './exampledata/wellborepathMock.json';
-import holeSizeData from './exampledata/holesizeData.json';
-import casingData from './exampledata/casingMock.json';
-import completionData from './exampledata/completion.json';
-import { CompletionLayer } from '../../src/layers/CompletionLayer';
 
 const seismicColorMap = [
   '#ffe700',
@@ -266,31 +269,23 @@ export const intersection = () => {
 
 function addMDOverlay(instance) {
   const elm = instance.overlay.create('md', {
-    onMouseMove: event => {
-      const {
-        target,
-        caller,
-        x,
-      } = event;
+    onMouseMove: (event) => {
+      const { target, caller, x } = event;
 
       const newX = caller.currentStateAsEvent.xScale.invert(x);
-      const {
-        referenceSystem,
-      } = caller;
+      const { referenceSystem } = caller;
 
       const md = referenceSystem.unproject(newX);
-      target.textContent = Number.isFinite(md)
-      ? `MD: ${md.toFixed(1)}`
-      : '-';
+      target.textContent = Number.isFinite(md) ? `MD: ${md.toFixed(1)}` : '-';
       if (md < 0 || referenceSystem.length < md) {
         target.style.visibility = 'hidden';
       } else {
         target.style.visibility = 'visible';
       }
     },
-    onMouseExit: event => {
+    onMouseExit: (event) => {
       event.target.style.visibility = 'hidden';
-    }
+    },
   });
   elm.style.visibility = 'hidden';
   elm.style.display = 'inline-block';
