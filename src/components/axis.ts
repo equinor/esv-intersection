@@ -128,8 +128,13 @@ export class Axis {
   }
 
   onRescale(event: OnRescaleEvent): void {
-    this.scaleX = event.xScale;
-    this.scaleY = event.yScale;
+    this.scaleX = event.xScale.copy();
+    this.scaleY = event.yScale.copy();
+
+    const xBounds = this.scaleX.domain();
+    this.scaleX.domain([xBounds[0] - this._offsetX, xBounds[1] - this._offsetX]);
+    const yBounds = this.scaleY.domain();
+    this.scaleY.domain([yBounds[0] - this._offsetY, yBounds[1] - this._offsetY]);
 
     this.render();
   }
@@ -140,8 +145,6 @@ export class Axis {
 
   set offsetX(offset: number) {
     this._offsetX = offset;
-    const xBounds = this.scaleX.domain();
-    this.scaleX.domain([xBounds[0] + this._offsetX, xBounds[1] + this._offsetX]);
   }
 
   get offsetY(): number {
@@ -150,7 +153,5 @@ export class Axis {
 
   set offsetY(offset: number) {
     this._offsetY = offset;
-    const yBounds = this.scaleY.domain();
-    this.scaleY.domain([yBounds[0] + this._offsetY, yBounds[1] + this._offsetY]);
   }
 }
