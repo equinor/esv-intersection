@@ -5,7 +5,8 @@ import { BaseType } from 'd3';
 import { OnResizeEvent, OnRescaleEvent } from '../interfaces';
 
 type Options = {
-  offset: number;
+  offsetX: number;
+  offsetY: number;
 };
 
 export class Axis {
@@ -16,7 +17,8 @@ export class Axis {
   labelXDesc: string;
   labelYDesc: string;
   measurement: string;
-  private _offset: number = 0;
+  private _offsetX: number = 0;
+  private _offsetY: number = 0;
 
   constructor(
     mainGroup: Selection<SVGElement, any, null, undefined>,
@@ -31,8 +33,11 @@ export class Axis {
     this.labelXDesc = labelXDesc;
     this.labelYDesc = labelYDesc;
     this.measurement = measurement;
-    if (options && options.offset) {
-      this._offset = options.offset;
+    if (options && options.offsetX) {
+      this._offsetX = options.offsetX;
+    }
+    if (options && options.offsetX) {
+      this._offsetY = options.offsetY;
     }
   }
 
@@ -129,13 +134,23 @@ export class Axis {
     this.render();
   }
 
-  get offset(): number {
-    return this._offset;
+  get offsetX(): number {
+    return this._offsetX;
   }
 
-  set offset(offset: number) {
-    this._offset = offset;
+  set offsetX(offset: number) {
+    this._offsetX = offset;
+    const xBounds = this.scaleX.domain();
+    this.scaleX.domain([xBounds[0] + this._offsetX, xBounds[1] + this._offsetX]);
+  }
+
+  get offsetY(): number {
+    return this._offsetY;
+  }
+
+  set offsetY(offset: number) {
+    this._offsetY = offset;
     const yBounds = this.scaleY.domain();
-    this.scaleY.domain([yBounds[0] + this._offset, yBounds[1] + this._offset]);
+    this.scaleY.domain([yBounds[0] + this._offsetY, yBounds[1] + this._offsetY]);
   }
 }
