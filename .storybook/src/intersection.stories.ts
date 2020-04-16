@@ -27,17 +27,15 @@ export default {
 const bg1Img = require('./resources/bg1.jpeg');
 const bg2Img = require('./resources/bg2.jpg');
 
-import {
-  poslog,
-  stratColumn,
-  surfaceValues,
-  seismic,
-  annotations,
-  mockedWellborePath,
-  holeSizeData,
-  casingData,
-  completionData,
-} from './exampledata/exampledata';
+import poslog from './exampledata/poslog.json';
+import stratColumn from './exampledata/stratcolumn.json';
+import surfaceValues from './exampledata/surfaces.json';
+import seismic from './exampledata/seismic.json';
+import annotations from './exampledata/annotations.json';
+import mockedWellborePath from './exampledata/wellborepathMock.json';
+import holeSizeData from './exampledata/holesizeData.json';
+import casingData from './exampledata/casingMock.json';
+import completionData from './exampledata/completion.json';
 
 //Data
 
