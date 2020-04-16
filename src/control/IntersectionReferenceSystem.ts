@@ -20,7 +20,7 @@ export class IntersectionReferenceSystem {
 
   projectedTrajectory: number[][];
 
-  offset: number;
+  private _offset: number = 0;
 
   displacement: number;
 
@@ -78,7 +78,7 @@ export class IntersectionReferenceSystem {
    */
   project(length: number): number[] {
     const { curtain } = this.interpolators;
-    const l = length / this.length;
+    const l = (length + this._offset) / this.length;
     // TODO handle points outside
     if (l < 0 || l > 1) {
       return [0, 0];
@@ -111,8 +111,12 @@ export class IntersectionReferenceSystem {
     const { curtain } = this.interpolators;
     const pl = this.project(length);
     const l = pl[0] / curtain.maxX;
-    if (Number.isNaN(l) || l < 0) return 0;
-    if (l > 1) return 1;
+    if (Number.isNaN(l) || l < 0) {
+      return 0;
+    }
+    if (l > 1) {
+      return 1;
+    }
     return l;
   }
 
@@ -211,5 +215,13 @@ export class IntersectionReferenceSystem {
 
   get length(): number {
     return this.interpolators.curve.length;
+  }
+
+  get offset(): number {
+    return this._offset;
+  }
+
+  set offset(offset: number) {
+    this._offset = offset;
   }
 }
