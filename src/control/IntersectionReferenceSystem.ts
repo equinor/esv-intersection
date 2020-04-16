@@ -78,7 +78,7 @@ export class IntersectionReferenceSystem {
    */
   project(length: number): number[] {
     const { curtain } = this.interpolators;
-    const l = (length + this._offset) / this.length;
+    const l = (length - this._offset) / this.length;
     // TODO handle points outside
     if (l < 0 || l > 1) {
       return [0, 0];
