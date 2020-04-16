@@ -44,9 +44,9 @@ export class Axis {
   }
 
   private renderLabelx(): Selection<BaseType, any, null, undefined> {
-    const { labelXDesc, measurement, showLabels, _scaleX: scaleX, renderGx } = this;
+    const { labelXDesc, measurement, showLabels, _scaleX: scaleX } = this;
     const [, width] = scaleX.range();
-    const gx = renderGx();
+    const gx = this.renderGx();
 
     let labelx = gx.select('text.axis-labelx');
     if (showLabels) {
@@ -68,9 +68,9 @@ export class Axis {
   }
 
   private renderLabely(): Selection<BaseType, any, null, undefined> {
-    const { labelYDesc, measurement, showLabels, _scaleY: scaleY, renderGy } = this;
-    const [, height] = scaleY.range();
-    const gy = renderGy();
+    const { labelYDesc, measurement, showLabels, _scaleY } = this;
+    const [, height] = _scaleY.range();
+    const gy = this.renderGy();
 
     let labely = gy.select('text.axis-labely');
     if (showLabels) {
@@ -92,11 +92,11 @@ export class Axis {
   }
 
   private renderGy(): Selection<BaseType, any, null, undefined> {
-    const { _scaleX: scaleX, _scaleY: scaleY, createOrGet } = this;
-    const yAxis = axisRight(scaleY);
-    const [, width] = scaleX.range();
+    const { _scaleX, _scaleY } = this;
+    const yAxis = axisRight(_scaleY);
+    const [, width] = _scaleX.range();
 
-    const gy = createOrGet('y-axis');
+    const gy = this.createOrGet('y-axis');
     gy.call(yAxis);
     gy.attr('transform', `translate(${width},0)`);
 
@@ -104,11 +104,11 @@ export class Axis {
   }
 
   private renderGx(): Selection<BaseType, any, null, undefined> {
-    const { _scaleX: scaleX, _scaleY: scaleY, createOrGet } = this;
-    const xAxis = axisBottom(scaleX);
-    const [, height] = scaleY.range();
+    const { _scaleX, _scaleY } = this;
+    const xAxis = axisBottom(_scaleX);
+    const [, height] = _scaleY.range();
 
-    const gx = createOrGet('x-axis');
+    const gx = this.createOrGet('x-axis');
     gx.attr('transform', `translate(0 ${height})`);
     gx.call(xAxis);
     return gx;
@@ -133,18 +133,18 @@ export class Axis {
   }
 
   onRescale(event: OnRescaleEvent): void {
-    const { _scaleX: scaleX, _scaleY: scaleY, offsetX, offsetY, render } = this;
+    const { _scaleX, _scaleY, offsetX, offsetY } = this;
+    const { xScale, yScale } = event;
+    const xBounds = xScale.domain();
+    const yBounds = yScale.domain();
 
-    const xBounds = event.scaleX.domain();
-    const yBounds = event.scaleY.domain();
+    const xRange = xScale.range();
+    const yRange = yScale.range();
 
-    const xRange = event.scaleX.range();
-    const yRange = event.scaleX.range();
+    _scaleX.domain([xBounds[0] - offsetX, xBounds[1] - offsetX]).range(xRange);
+    _scaleY.domain([yBounds[0] - offsetY, yBounds[1] - offsetY]).range(yRange);
 
-    scaleX.domain([xBounds[0] - offsetX, xBounds[1] - offsetX]).range(xRange);
-    scaleY.domain([yBounds[0] - offsetY, yBounds[1] - offsetY]).range(yRange);
-
-    render();
+    this.render();
   }
 
   get offsetX(): number {
