@@ -2,7 +2,11 @@ import { axisRight, axisBottom } from 'd3-axis';
 import { Selection } from 'd3-selection';
 import { ScaleLinear } from 'd3-scale';
 import { BaseType } from 'd3';
-import { OnResizeEvent } from '../interfaces';
+import { OnResizeEvent, OnRescaleEvent } from '../interfaces';
+
+type Options = {
+  offset: number;
+};
 
 export class Axis {
   mainGroup: Selection<SVGElement, any, null, undefined>;
@@ -12,6 +16,7 @@ export class Axis {
   labelXDesc: string;
   labelYDesc: string;
   measurement: string;
+  private _offset: number = 0;
 
   constructor(
     mainGroup: Selection<SVGElement, any, null, undefined>,
@@ -19,12 +24,16 @@ export class Axis {
     labelXDesc: string,
     labelYDesc: string,
     measurement: string,
+    options?: Options,
   ) {
     this.mainGroup = mainGroup;
     this.showLabels = showLabels;
     this.labelXDesc = labelXDesc;
     this.labelYDesc = labelYDesc;
     this.measurement = measurement;
+    if (options && options.offset) {
+      this._offset = options.offset;
+    }
   }
 
   renderLabelx(gx: Selection<BaseType, any, null, undefined>, showLabels: any, width: any, label: string): Selection<BaseType, any, null, undefined> {
@@ -113,9 +122,20 @@ export class Axis {
     this.mainGroup.attr('height', `${event.height}px`).attr('width', `${event.width}px`);
   }
 
-  onRescale(event: any): void {
+  onRescale(event: OnRescaleEvent): void {
     this.scaleX = event.xScale;
     this.scaleY = event.yScale;
+
     this.render();
+  }
+
+  get offset(): number {
+    return this._offset;
+  }
+
+  set offset(offset: number) {
+    this._offset = offset;
+    const yBounds = this.scaleY.domain();
+    this.scaleY.domain([yBounds[0] + this._offset, yBounds[1] + this._offset]);
   }
 }
