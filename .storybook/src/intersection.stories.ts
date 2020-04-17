@@ -27,19 +27,16 @@ export default {
 const bg1Img = require('./resources/bg1.jpeg');
 const bg2Img = require('./resources/bg2.jpg');
 
+//Data
 import {
-  poslog,
-  stratColumn,
-  surfaceValues,
-  seismic,
-  annotations,
-  mockedWellborePath,
-  holeSizeData,
   casingData,
   completionData,
-} from './exampledata/exampledata';
-
-//Data
+  holeSizeData,
+  poslog,
+  seismic,
+  stratColumn,
+  surfaceValues
+} from './exampledata';
 
 const seismicColorMap = [
   '#ffe700',
