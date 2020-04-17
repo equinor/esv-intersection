@@ -1,7 +1,7 @@
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
 import { LayerManager } from './LayerManager';
 import { Layer } from '../layers';
-import { ControllerOptions, Position } from './interfaces';
+import { ControllerOptions } from './interfaces';
 import { ZoomPanHandler } from './ZoomPanHandler';
 import { ReferenceSystemOptions } from '..';
 import { overlay, Overlay } from './overlay';
@@ -20,15 +20,15 @@ export class Controller {
 
   /**
    *
-   * @param poslog position log
+   * @param path array of 3d coordinates
    * @param layers list of layers
    * @param options requires a container, can optionally overwrite reference system with own,
    * setup axis through supplying options for it, or pass in scaleOptions
    */
   constructor(options: ControllerOptions) {
-    const { container, axisOptions, scaleOptions, referenceSystem, layers, poslog } = options;
+    const { container, axisOptions, scaleOptions, referenceSystem, layers, path } = options;
 
-    this._referenceSystem = referenceSystem || (poslog && new IntersectionReferenceSystem(poslog));
+    this._referenceSystem = referenceSystem || (path && new IntersectionReferenceSystem(path));
     this.layerManager = new LayerManager(container, scaleOptions, axisOptions);
     if (layers) {
       this.layerManager.addLayers(layers);
@@ -43,8 +43,8 @@ export class Controller {
     return this;
   }
 
-  updatePoslog(poslog: Position[], options?: ReferenceSystemOptions): Controller {
-    this.setReferenceSystem(new IntersectionReferenceSystem(poslog, options));
+  updatePath(path: number[][], options?: ReferenceSystemOptions): Controller {
+    this.setReferenceSystem(new IntersectionReferenceSystem(path, options));
 
     return this;
   }

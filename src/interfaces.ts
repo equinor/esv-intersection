@@ -163,13 +163,6 @@ export interface ScaleOptions {
   height: number;
 }
 
-export interface Position {
-  easting: number;
-  northing: number;
-  tvd: number;
-  md: number;
-}
-
 export interface Interpolator {
   trajectory: any;
   curtain: any;
