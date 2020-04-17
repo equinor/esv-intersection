@@ -16,7 +16,7 @@ export class Axis {
   showLabels = true;
   labelXDesc: string;
   labelYDesc: string;
-  measurement: string;
+  unitOfMeasure: string;
   private _offsetX: number = 0;
   private _offsetY: number = 0;
 
@@ -25,14 +25,14 @@ export class Axis {
     showLabels = true,
     labelXDesc: string,
     labelYDesc: string,
-    measurement: string,
+    unitOfMeasure: string,
     options?: Options,
   ) {
     this.mainGroup = mainGroup;
     this.showLabels = showLabels;
     this.labelXDesc = labelXDesc;
     this.labelYDesc = labelYDesc;
-    this.measurement = measurement;
+    this.unitOfMeasure = unitOfMeasure;
     if (options && options.offsetX) {
       this._offsetX = options.offsetX;
     }
@@ -44,7 +44,7 @@ export class Axis {
   }
 
   private renderLabelx(): Selection<BaseType, any, null, undefined> {
-    const { labelXDesc, measurement, showLabels, _scaleX: scaleX } = this;
+    const { labelXDesc, unitOfMeasure, showLabels, _scaleX: scaleX } = this;
     const [, width] = scaleX.range();
     const gx = this.renderGx();
 
@@ -58,7 +58,7 @@ export class Axis {
           .style('text-anchor', 'middle')
           .style('font-weight', '800')
           .style('font-size', '10px')
-          .text(`${labelXDesc} (${measurement})`);
+          .text(`${labelXDesc} (${unitOfMeasure})`);
       }
     } else {
       labelx.remove();
@@ -68,7 +68,7 @@ export class Axis {
   }
 
   private renderLabely(): Selection<BaseType, any, null, undefined> {
-    const { labelYDesc, measurement, showLabels, _scaleY } = this;
+    const { labelYDesc, unitOfMeasure, showLabels, _scaleY } = this;
     const [, height] = _scaleY.range();
     const gy = this.renderGy();
 
@@ -82,7 +82,7 @@ export class Axis {
           .style('text-anchor', 'middle')
           .style('font-weight', '800')
           .style('font-size', '10px')
-          .text(`${labelYDesc} (${measurement})`);
+          .text(`${labelYDesc} (${unitOfMeasure})`);
       }
       labely.attr('transform', `translate(-10,${height / 2})rotate(90)`);
     } else {
