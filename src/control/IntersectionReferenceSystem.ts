@@ -75,22 +75,10 @@ export class IntersectionReferenceSystem {
   /**
    * Map a length along the curve to intersection coordinates
    * @param length length along the curve
-   * @param allowExtension allows for projecting beyond the curve
    */
-  project(length: number, allowExtension: boolean = false): number[] {
+  project(length: number): number[] {
     const { curtain } = this.interpolators;
     const l = (length - this._offset) / this.length;
-    if (allowExtension) {
-      if (l > 1) {
-        const excess = l - 1;
-        const refEnd = curtain.getPointAt(1);
-        return [refEnd[0] + excess * this.length, refEnd[1]];
-      } else if (l < 0) {
-        const excess = Math.abs(l);
-        const refStart = curtain.getPointAt(0);
-        return [refStart[0] - excess * this.length, refStart[1]];
-      }
-    }
     const t = clamp(l, 0, 1);
     const p = curtain.getPointAt(t);
     return p;
