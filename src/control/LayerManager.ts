@@ -90,6 +90,18 @@ export class LayerManager {
     return this;
   }
 
+  showLayer(layerId: string): LayerManager {
+    const layer = this.getLayer(layerId);
+    layer.setVisibility(true);
+    layer.onRescale(this.zoomPanHandler.currentStateAsEvent());
+    return this;
+  }
+
+  hideLayer(layerId: string): LayerManager {
+    this.getLayer(layerId).setVisibility(false);
+    return this;
+  }
+
   adjustToSize(width: number, height: number): void {
     const horizontalAxisMargin = 40;
     const verticalAxisMargin = 30;
@@ -122,7 +134,7 @@ export class LayerManager {
       this.axis.onRescale(event);
     }
     if (this.layers) {
-      this.layers.forEach((layer) => layer.onRescale(event));
+      this.layers.forEach((layer) => (layer.isVisible === true ? layer.onRescale(event) : {}));
     }
   }
 
