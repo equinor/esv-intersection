@@ -1,4 +1,5 @@
 import Vector2 from '@equinor/videx-vector2';
+import { clamp } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
 import { Interpolator, Trajectory, ReferenceSystemOptions } from '../interfaces';
 
@@ -71,18 +72,15 @@ export class IntersectionReferenceSystem {
     this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - thresholdDirectionDist, 1);
     this.startVector = this.endVector.map((d: number) => d * -1);
   }
-
   /**
    * Map a length along the curve to intersection coordinates
+   * @param length length along the curve
    */
   project(length: number): number[] {
     const { curtain } = this.interpolators;
     const l = (length - this._offset) / this.length;
-    // TODO handle points outside
-    if (l < 0 || l > 1) {
-      return [0, 0];
-    }
-    const p = curtain.getPointAt(l);
+    const t = clamp(l, 0, 1);
+    const p = curtain.getPointAt(t);
     return p;
   }
 

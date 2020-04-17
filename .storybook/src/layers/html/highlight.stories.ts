@@ -113,8 +113,8 @@ export const HighlightWellborepathWithController = () => {
   // external event that calls the rescale event the highlighting should change
   const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: controller.currentStateAsEvent, layer: highlightLayer }), {
     width,
-    min: 0,
-    max: controller.referenceSystem.length,
+    min: -1000,
+    max: controller.referenceSystem.length + 1000,
   });
 
   root.appendChild(container);
