@@ -71,16 +71,29 @@ export class IntersectionReferenceSystem {
     this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - thresholdDirectionDist, 1);
     this.startVector = this.endVector.map((d: number) => d * -1);
   }
-
   /**
    * Map a length along the curve to intersection coordinates
+   * @param length length along the curve
+   * @param allowExtension allows for projecting beyond the curve
    */
-  project(length: number): number[] {
+  project(length: number, allowExtension: boolean = false): number[] {
     const { curtain } = this.interpolators;
     const l = (length - this._offset) / this.length;
-    // TODO handle points outside
-    if (l < 0 || l > 1) {
-      return [0, 0];
+    if (allowExtension) {
+      if (l > 1) {
+        const excess = l - 1;
+        const refEnd = curtain.getPointAt(1);
+        return [refEnd[0] + excess * this.length, refEnd[1]];
+      } else if (l < 0) {
+        const excess = Math.abs(l);
+        const refStart = curtain.getPointAt(0);
+        return [refStart[0] - excess * this.length, refStart[1]];
+      }
+    }
+    if (l > 1) {
+      return curtain.getPointAt(1);
+    } else if (l < 0) {
+      return curtain.getPointAt(0);
     }
     const p = curtain.getPointAt(l);
     return p;
