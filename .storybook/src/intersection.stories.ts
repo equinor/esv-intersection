@@ -151,7 +151,9 @@ export const intersection = () => {
   const container = createLayerContainer(width, height);
   const btnContainer = createButtonContainer(width);
 
-  const referenceSystem = new IntersectionReferenceSystem(poslog, defaultOptions);
+  const path = poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]);
+
+  const referenceSystem = new IntersectionReferenceSystem(path, defaultOptions);
   const displacement = referenceSystem.displacement;
   const extend = 1000 / displacement;
   const steps = surfaceValues[0].data.values.length;
@@ -186,7 +188,7 @@ export const intersection = () => {
     referenceSystem,
   };
 
-  const controller = new Controller({ poslog, layers, ...opts });
+  const controller = new Controller({ path, layers, ...opts });
 
   requestAnimationFrame(() => {
     addMDOverlay(controller);
