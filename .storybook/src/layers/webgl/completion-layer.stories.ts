@@ -23,7 +23,7 @@ export const CompletionLayerSample = () => {
     { start: 790, end: 800, diameter: 12 },
   ];
 
-  const referenceSystem = new IntersectionReferenceSystem(poslog || mockWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath, defaultOptions);
 
   const options: CompletionLayerOptions = {
     order: 1,
@@ -63,7 +63,7 @@ export const CompletionLayerWithSampleData = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const referenceSystem = new IntersectionReferenceSystem(poslog || mockWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath, defaultOptions);
 
   const options: CompletionLayerOptions = {
     order: 1,
