@@ -1,4 +1,5 @@
 import Vector2 from '@equinor/videx-vector2';
+import { clamp } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
 import { Interpolator, Trajectory, ReferenceSystemOptions } from '../interfaces';
 
@@ -90,12 +91,8 @@ export class IntersectionReferenceSystem {
         return [refStart[0] - excess * this.length, refStart[1]];
       }
     }
-    if (l > 1) {
-      return curtain.getPointAt(1);
-    } else if (l < 0) {
-      return curtain.getPointAt(0);
-    }
-    const p = curtain.getPointAt(l);
+    const t = clamp(l, 0, 1);
+    const p = curtain.getPointAt(t);
     return p;
   }
 
