@@ -14,4 +14,5 @@ export * from './HoleSizeLayer';
 export * from './CasingLayer';
 export * from './CementLayer';
 export * from './SeismicCanvasLayer';
+export * from './CompletionLayer';
 export * from './PixiLayer';
