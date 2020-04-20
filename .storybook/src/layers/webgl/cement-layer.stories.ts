@@ -5,7 +5,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { poslog, mockedWellborePath } from '../../exampledata/exampledata';
+import { poslog, mockedWellborePath, casingData, holeSizeData } from '../../exampledata/exampledata';
 
 const defaultOptions = {
   defaultIntersectionAngle: 135,
@@ -95,7 +95,9 @@ const getData = () => {
     { start: 700, length: 50, end: 10 },
   ];
   data.forEach((x) => (x.end = x.start + x.length));
-  return data;
+
+  // Cement requires data casing and holes to create cement width
+  return { data, casings: casingData, holes: holeSizeData };
 };
 
 // const getSampleDataData = () => {

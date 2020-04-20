@@ -24,6 +24,8 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   onUpdate(event: OnUpdateEvent): void {
+    this.createCementShapes(null, null, null);
+
     super.onUpdate(event);
     this.render(event);
   }
@@ -34,5 +36,13 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     super.render(event);
+  }
+
+  createCementShapes(cement: any, casings: any, holes: any): any {
+    // foreach cement
+    // find bottom of cement based on connected casing
+    // find all items in the cement range
+    // find outer edge, based on closest item
+    // return polygon
   }
 }
