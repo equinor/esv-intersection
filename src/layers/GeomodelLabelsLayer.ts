@@ -2,25 +2,33 @@ import Vector2 from '@equinor/videx-vector2';
 
 import { CanvasLayer } from './CanvasLayer';
 import { GeomodelLayerLabelsOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
-import { SurfaceData, SurfaceArea, SurfaceLine, findSampleAtPos } from '../datautils';
+import { SurfaceArea, SurfaceLine, findSampleAtPos } from '../datautils';
+
+const DEFAULT_MARGINS = 18;
+const DEFAULT_MIN_FONT_SIZE = 8;
+const DEFAULT_MAX_FONT_SIZE = 13;
+const DEFAULT_TEXT_COLOR = 'black';
+const DEFAULT_FONT = 'Arial';
 
 export class GeomodelLabelsLayer extends CanvasLayer {
+  defaultMargins: number = DEFAULT_MARGINS;
+  defaultMinFontSize: number = DEFAULT_MIN_FONT_SIZE;
+  defaultMaxFontSize: number = DEFAULT_MAX_FONT_SIZE;
+  defaultTextColor: string = DEFAULT_TEXT_COLOR;
+  defaultFont: string = DEFAULT_FONT;
+
   options: GeomodelLayerLabelsOptions;
   rescaleEvent: OnRescaleEvent;
-  defaultMargins: number = 18;
-  defaultMinFontSize: number = 8;
-  defaultMaxFontSize: number = 13;
-  defaultTextColor: string = 'black';
-  defaultFont: string = 'Arial';
-  leftSide: boolean = true;
-  wellborePath: any = null;
-  wellborePathBoundingBox: any = null;
+  isLabelsOnLeftSide: boolean = true;
+  maxFontSizeInWorldCoordinates: number = 70;
+  isXFlipped: boolean = false;
 
   constructor(id?: string, options?: GeomodelLayerLabelsOptions) {
     super(id, options);
     this.render = this.render.bind(this);
-    this.calcPos = this.calcPos.bind(this);
-    this.calcDir = this.calcDir.bind(this);
+    this.getMarginsInWorldCoordinates = this.getMarginsInWorldCoordinates.bind(this);
+    this.getSurfacesAreaEdges = this.getSurfacesAreaEdges.bind(this);
+    this.updateXFlipped = this.updateXFlipped.bind(this);
   }
 
   onMount(event: OnMountEvent): void {
@@ -29,16 +37,13 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    if (event.wellborePath !== this.wellborePath) {
-      this.wellborePath = event.wellborePath;
-      this.wellborePathBoundingBox = this.getWellborePathBBox(this.wellborePath);
-    }
     this.render();
   }
 
   onRescale(event: OnRescaleEvent): void {
     this.rescaleEvent = event;
-    this.setTransform(event);
+    this.updateXFlipped();
+    this.resetTransform();
     this.render();
   }
 
@@ -49,13 +54,8 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     this.clearCanvas();
 
-    const { data } = this;
-    if (!data) {
+    if (!this.data) {
       return;
-    }
-
-    if (this.wellborePath) {
-      this.leftSide = this.checkDrawLabelsOnLeftSide();
     }
 
     this.drawAreaLabels();
@@ -70,104 +70,119 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     this.data.lines.filter((d: any) => d.label).forEach((s: SurfaceLine) => this.drawLineLabel(s));
   }
 
-  drawAreaLabel = (s: SurfaceArea, flip = true): void => {
+  drawAreaLabel = (s: SurfaceArea): void => {
     const { data } = s;
-    const { ctx } = this;
-    const { xScale, yScale, xRatio, yRatio } = this.rescaleEvent;
-    const maxX = flip ? data[data.length - 1][0] : data[0][0];
-    const minX = flip ? data[0][0] : data[data.length - 1][0];
-    let { leftSide } = this;
-    const margins = this.options.margins || this.defaultMargins;
+    const { ctx, maxFontSizeInWorldCoordinates, isXFlipped } = this;
+    const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
+    let isLabelsOnLeftSide = this.checkDrawLabelsOnLeftSide();
+    const margins = (this.options.margins || this.defaultMargins) * (isXFlipped ? -1 : 1);
+    const marginsInWorldCoords = margins / xRatio;
     const minFontSize = this.options.minFontSize || this.defaultMinFontSize;
     const maxFontSize = this.options.maxFontSize || this.defaultMaxFontSize;
 
-    let fontSize = maxFontSize / yRatio;
-    if (fontSize > 70) {
-      fontSize = 70;
-      if (fontSize * yRatio < minFontSize) {
-        fontSize = minFontSize / yRatio;
+    let fontSizeInWorldCoords = maxFontSize / yRatio;
+    if (fontSizeInWorldCoords > maxFontSizeInWorldCoordinates) {
+      fontSizeInWorldCoords = maxFontSizeInWorldCoordinates;
+      if (fontSizeInWorldCoords * yRatio < minFontSize) {
+        fontSizeInWorldCoords = minFontSize / yRatio;
       }
     }
 
-    const leftEdge = xScale.invert(xScale.range()[0]);
-    const rightEdge = xScale.invert(xScale.range()[1]);
+    const leftEdge = xScale.invert(xScale.range()[0]) + marginsInWorldCoords;
+    const rightEdge = xScale.invert(xScale.range()[1]) - marginsInWorldCoords;
+    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges();
 
-    // Check if label will fit
+    // Get label metrics
     ctx.save();
-    ctx.font = `${fontSize}px Arial`;
-    const labelMetrics = ctx.measureText(s.label);
-    const labelLength = labelMetrics.width;
-    if (leftSide) {
-      const labelRightEdge = leftEdge + margins / xRatio + labelLength;
-      if (labelRightEdge > maxX - margins / xRatio) {
-        leftSide = false;
+    ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
+    let labelMetrics = ctx.measureText(s.label);
+    let labelLengthInWorldCoords = labelMetrics.width / xRatio;
+
+    // Check if label will fit horizontally
+    if (isLabelsOnLeftSide) {
+      const labelRightEdge = leftEdge + (isXFlipped ? -labelLengthInWorldCoords : labelLengthInWorldCoords);
+      if ((!isXFlipped && labelRightEdge > surfaceAreaRightEdge) || (isXFlipped && labelRightEdge < surfaceAreaRightEdge)) {
+        isLabelsOnLeftSide = false;
       }
     } else {
-      const labelLeftEdge = rightEdge - margins / xRatio - labelLength;
-      if (labelLeftEdge < minX + margins / xRatio) {
-        leftSide = true;
+      const labelLeftEdge = rightEdge + (isXFlipped ? labelLengthInWorldCoords : -labelLengthInWorldCoords);
+      if ((!isXFlipped && labelLeftEdge < surfaceAreaLeftEdge) || (isXFlipped && labelLeftEdge > surfaceAreaLeftEdge)) {
+        isLabelsOnLeftSide = true;
       }
     }
 
     // Find edge where to draw
-    let startPos: number;
-    if (leftSide) {
-      startPos = Math.max(minX, leftEdge) + margins / xRatio;
+    let startPos;
+    const portionOfLabelLengthUsedForPosCalc = 0.07;
+    if (isLabelsOnLeftSide) {
+      startPos = isXFlipped
+        ? Math.min(surfaceAreaLeftEdge, leftEdge) + (portionOfLabelLengthUsedForPosCalc * labelLengthInWorldCoords) / 2
+        : Math.max(surfaceAreaLeftEdge, leftEdge) - (portionOfLabelLengthUsedForPosCalc * labelLengthInWorldCoords) / 2;
     } else {
-      startPos = Math.min(maxX, rightEdge) - margins / xRatio;
+      startPos = isXFlipped
+        ? Math.max(surfaceAreaRightEdge, rightEdge) - (portionOfLabelLengthUsedForPosCalc * labelLengthInWorldCoords) / 2
+        : Math.min(surfaceAreaRightEdge, rightEdge) + (portionOfLabelLengthUsedForPosCalc * labelLengthInWorldCoords) / 2;
     }
 
     const topEdge = yScale.invert(yScale.range()[0]);
     const bottomEdge = yScale.invert(yScale.range()[1]);
 
     // Calculate where to sample points
-    const dirSteps = 7;
-    const posSteps = 5;
-    const posStep = 0.3 * (labelLength / posSteps) * (leftSide ? 1 : -1);
-    const dirStep = (labelLength / dirSteps) * (leftSide ? 1 : -1);
+    const dirSteps = 3;
+    const posSteps = 3;
+    const posStep =
+      portionOfLabelLengthUsedForPosCalc * (labelLengthInWorldCoords / posSteps) * (isLabelsOnLeftSide ? 1 : -1) * (isXFlipped ? -1 : 1);
+    const dirStep = (labelLengthInWorldCoords / dirSteps) * (isLabelsOnLeftSide ? 1 : -1) * (isXFlipped ? -1 : 1);
 
-    // Sample points from top and calculate position and direction vector
+    // Sample points from top and calculate position
     const topData = data.map((d) => [d[0], d[1]]);
-    const topPos: Vector2 = this.calcPos(topData, startPos, posSteps, posStep, topEdge);
-    const topDir: Vector2 = this.calcDir(topData, startPos, dirSteps, dirStep, leftSide ? Vector2.right : Vector2.left, topEdge);
-    if (!topPos || !topDir) {
+    const topPos = this.calcPos(topData, startPos, posSteps, posStep, topEdge);
+    if (!topPos) {
       return;
     }
 
-    // Sample points from bottom and calculate position and direction vector
+    // Sample points from bottom and calculate position
     const bottomData = data.map((d) => [d[0], d[2]]);
-    let bottomPos: Vector2 = this.calcPos(bottomData, startPos, posSteps, posStep, null, bottomEdge);
-    let bottomDir: Vector2 = this.calcDir(bottomData, startPos, dirSteps, dirStep, leftSide ? Vector2.right : Vector2.left, null, bottomEdge);
+    let bottomPos = this.calcPos(bottomData, startPos, posSteps, posStep, null, bottomEdge);
     if (!bottomPos) {
-      bottomPos = Vector2.add(topPos, new Vector2(0, fontSize * 1.5));
-    }
-    if (!bottomDir) {
-      bottomDir = topDir;
+      bottomPos = new Vector2(topPos.x, bottomEdge);
     }
 
-    // Check if there is room for label
+    // Check if there is enough height for label
     const thickness = bottomPos.y - topPos.y;
-    if (thickness < fontSize) {
+    if (thickness < fontSizeInWorldCoords) {
       // Check minimum fontsize
       if (thickness * yRatio < minFontSize) {
         return;
       }
       // Use reduced fontsize
-      fontSize = thickness;
+      fontSizeInWorldCoords = thickness;
+      ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
+      labelMetrics = ctx.measureText(s.label);
+      labelLengthInWorldCoords = labelMetrics.width / xRatio;
+    }
+
+    // Sample points from top and bottom and calculate direction vector
+    const initialDirVec = isLabelsOnLeftSide ? Vector2.right : Vector2.left;
+    let dirVec = this.calcAreaDir(topData, bottomData, startPos, dirSteps, dirStep, zFactor, initialDirVec, topEdge, bottomEdge);
+    if (!dirVec) {
+      return;
     }
 
     // Calculate position and direction for label
     const textX = startPos;
     const textY = (topPos.y + bottomPos.y) / 2;
-    const textVec = Vector2.add(topDir, bottomDir);
-    const textDir = Vector2.angleRight(textVec) - (leftSide ? 0 : Math.PI);
+    if (isXFlipped) {
+      dirVec = new Vector2(-dirVec[0], dirVec[1]);
+    }
+    const textAngle = Vector2.angleRight(dirVec) - (isLabelsOnLeftSide ? 0 : Math.PI);
 
     // Draw label
-    ctx.textAlign = leftSide ? 'left' : 'right';
-    ctx.translate(textX, textY);
-    ctx.rotate(textDir);
+    ctx.textAlign = isLabelsOnLeftSide ? 'left' : 'right';
+    ctx.translate(xScale(textX), yScale(textY));
+    ctx.rotate(textAngle);
     ctx.fillStyle = this.options.textColor || this.defaultTextColor;
-    ctx.font = `${fontSize}px ${this.options.font || this.defaultFont}`;
+    ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
     ctx.textBaseline = 'middle';
     ctx.fillText(s.id, 0, 0);
 
@@ -176,61 +191,64 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
   drawLineLabel = (s: SurfaceLine): void => {
     const { ctx } = this;
-    const { xScale, xRatio, yRatio } = this.rescaleEvent;
-    const maxX = s.data[0][0];
-    const minX = s.data[s.data.length - 1][0];
-    const { leftSide } = this;
-    const margins = this.options.margins || this.defaultMargins;
+    const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
+    const maxX = Math.max(s.data[0][0], s.data[s.data.length - 1][0]);
+    const minX = Math.min(s.data[0][0], s.data[s.data.length - 1][0]);
+    const isLabelsOnLeftSide = this.checkDrawLabelsOnLeftSide();
+    const marginsInWorldCoords = this.getMarginsInWorldCoordinates();
     const maxFontSize = this.options.maxFontSize || this.defaultMaxFontSize;
 
-    const fontSize = maxFontSize / yRatio;
+    const fontSizeInWorldCoords = maxFontSize / yRatio;
 
     ctx.save();
-    ctx.font = `${fontSize}px Arial`;
+    ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
     const labelMetrics = ctx.measureText(s.label);
-    const labelLength = labelMetrics.width;
+    const labelLengthInWorldCoords = labelMetrics.width / xRatio;
 
     // Find edge where to draw
-    let startPos: number;
+    let startPos;
     const steps = 5;
-
-    if (leftSide) {
+    if (isLabelsOnLeftSide) {
       const rightEdge = xScale.invert(xScale.range()[1]);
-      startPos = Math.min(maxX, rightEdge) - margins / xRatio;
+      startPos = Math.min(maxX, rightEdge) - marginsInWorldCoords;
     } else {
       const leftEdge = xScale.invert(xScale.range()[0]);
-      startPos = Math.max(minX, leftEdge) + margins / xRatio;
+      startPos = Math.max(minX, leftEdge) + marginsInWorldCoords;
     }
 
     // Calculate where to sample points
-    const step = (labelLength / steps) * (leftSide ? -1 : 1);
+    const step = (labelLengthInWorldCoords / steps) * (isLabelsOnLeftSide ? -1 : 1);
 
     // Sample points and calculate position and direction vector
     const { data } = s;
-    const pos: Vector2 = this.calcPos(data, startPos, steps, step);
-    const dir: Vector2 = this.calcDir(data, startPos, steps, step, leftSide ? Vector2.left : Vector2.right);
+    const pos = this.calcPos(data, startPos, steps, step);
+    const dir = this.calcLineDir(data, startPos, steps, step, zFactor, isLabelsOnLeftSide ? Vector2.left : Vector2.right);
     if (!pos || !dir) {
       return;
     }
 
     // Calculate position and direction for label
     const textX = pos.x;
-    const textY = pos.y - s.width - fontSize / 2;
-    const textDir = Vector2.angleRight(dir) - (this.leftSide ? Math.PI : 0);
+    const textY = pos.y - s.width - fontSizeInWorldCoords / 2;
+    const textDir = Vector2.angleRight(dir) - (this.isLabelsOnLeftSide ? Math.PI : 0);
 
     // Draw label
     ctx.textAlign = 'center';
-    ctx.translate(textX, textY);
+    ctx.translate(xScale(textX), yScale(textY));
     ctx.rotate(textDir);
-    ctx.fillStyle = `#${s.color.toString(16).padStart(6, '0')}`;
+    ctx.fillStyle = `#${this.colorToHexString(s.color)}`;
     ctx.textBaseline = 'middle';
     ctx.fillText(s.id, 0, 0);
 
     ctx.restore();
   };
 
+  colorToHexString(color: number): string {
+    return color.toString(16).padStart(6, '0');
+  }
+
   calcPos(data: number[][], offset: number, count: number, step: number, topLimit: number = null, bottomLimit: number = null): Vector2 {
-    const pos: Vector2 = Vector2.zero.mutable;
+    const pos = Vector2.zero.mutable;
     let samples = 0;
     for (let i = 0; i < count; i++) {
       const x = offset + i * step;
@@ -249,63 +267,163 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     return Vector2.divide(pos, samples);
   }
 
-  calcDir(
+  calcLineDir(
     data: number[][],
     offset: number,
     count: number,
     step: number,
+    zFactor: number,
     initalVector: Vector2 = Vector2.left,
     topLimit: number = null,
     bottomLimit: number = null,
   ): Vector2 {
-    const dir: Vector2 = initalVector.mutable;
+    const dir = initalVector.mutable;
 
-    const by = findSampleAtPos(data, offset, topLimit, bottomLimit);
-    if (by == null) return null;
-    const vecAtEnd: Vector2 = new Vector2(offset, by);
-    const tmpVec: Vector2 = Vector2.zero.mutable;
-    for (let i = 0; i < count; i++) {
+    const startY = findSampleAtPos(data, offset, topLimit, bottomLimit);
+    if (startY === null) {
+      return dir;
+    }
+
+    const vecAtEnd = new Vector2(offset, startY * zFactor);
+    const tmpVec = Vector2.zero.mutable;
+    for (let i = 1; i <= count; i++) {
       const x = offset + i * step;
-      const y = findSampleAtPos(data, x, topLimit, bottomLimit);
-      if (y === null) continue;
-      tmpVec.set(x, y);
-      tmpVec.sub(vecAtEnd);
-      dir.add(tmpVec);
+      const y = findSampleAtPos(data, offset, topLimit, bottomLimit);
+      if (y !== null) {
+        tmpVec.set(x, y * zFactor);
+        tmpVec.sub(vecAtEnd);
+        dir.add(tmpVec);
+      }
     }
 
     return dir;
   }
 
-  checkDrawLabelsOnLeftSide(): boolean {
-    const { wellborePathBoundingBox } = this;
-    const { xScale } = this.rescaleEvent;
-    const t = 200;
+  calcAreaDir(
+    top: number[][],
+    bottom: number[][],
+    offset: number,
+    count: number,
+    step: number,
+    zFactor: number,
+    initalVector: Vector2 = Vector2.left,
+    topLimit: number = null,
+    bottomLimit: number = null,
+    thicknessThreshold: number = -1,
+    scaleByThickness: boolean = true,
+  ): Vector2 {
+    const dir = initalVector.clone().mutable;
 
-    const [dx1, dx2] = xScale.domain();
-    const [rx1] = xScale.range();
+    const startTopY = findSampleAtPos(top, offset, topLimit, bottomLimit);
+    if (startTopY === null) {
+      return dir;
+    }
+    const startBottomY = findSampleAtPos(bottom, offset, topLimit, bottomLimit) || bottomLimit;
+    const startY = ((startTopY + startBottomY) * zFactor) / 2;
+    const vecAtEnd = new Vector2(offset, startY);
+    const tmpVec = Vector2.zero.mutable;
+    for (let i = 1; i <= count; i++) {
+      const x = offset + i * step;
+      const topY = findSampleAtPos(top, x, topLimit, bottomLimit);
+      const bottomY = findSampleAtPos(bottom, x, topLimit, bottomLimit);
+      if (topY !== null) {
+        if (bottomY !== null) {
+          const thickness = bottomY - topY;
+          if (thickness >= thicknessThreshold) {
+            tmpVec.set(x, ((topY + bottomY) * zFactor) / 2);
+            tmpVec.sub(vecAtEnd);
+            tmpVec.normalize();
+            if (scaleByThickness) {
+              tmpVec.scale(thickness);
+            }
+            dir.add(tmpVec);
+          }
+        } else {
+          tmpVec.set(x, topY * zFactor);
+          tmpVec.sub(offset, startTopY * zFactor);
+          tmpVec.add(initalVector);
+          tmpVec.normalize();
+          dir.add(tmpVec);
+        }
+      }
+    }
 
-    const wbBBox = {
-      left: xScale(wellborePathBoundingBox.left),
-      right: xScale(wellborePathBoundingBox.right),
-    };
-
-    return Math.abs(dx1 - wbBBox.left) > Math.abs(wbBBox.right - dx2) || Math.abs(rx1 - xScale(wbBBox.left)) > t;
+    return dir;
   }
 
-  getWellborePathBBox(wellborePath: any): any {
-    if (!wellborePath || wellborePath.length <= 0) {
-      return null;
-    }
-    const left = wellborePath[wellborePath.length - 1][0];
-    const right = wellborePath[0][0];
-    const top = wellborePath[0][1];
-    const bottom = wellborePath.reduce((acc: number, v: number[]) => (acc > v[1] ? acc : v[1]), -Infinity);
+  updateXFlipped(): void {
+    const { xBounds } = this.rescaleEvent;
+    this.isXFlipped = xBounds[0] > xBounds[1];
+  }
 
-    return {
-      left,
-      right,
-      top,
-      bottom,
+  getMarginsInWorldCoordinates(): number {
+    const { xRatio } = this.rescaleEvent;
+    const margins = (this.options.margins || this.defaultMargins) * (this.isXFlipped ? -1 : 1);
+    const marginsInWorldCoords = margins / xRatio;
+    return marginsInWorldCoords;
+  }
+
+  getSurfacesAreaEdges(): number[] {
+    const data = this.data.areas[0].data;
+    const maxX = Math.max(data[data.length - 1][0], data[0][0]);
+    const minX = Math.min(data[0][0], data[data.length - 1][0]);
+    const marginsInWorldCoords = this.getMarginsInWorldCoordinates();
+    const { isXFlipped } = this;
+    const surfaceAreaLeftEdge = isXFlipped ? maxX + marginsInWorldCoords : minX + marginsInWorldCoords;
+    const surfaceAreaRightEdge = isXFlipped ? minX - marginsInWorldCoords : maxX - marginsInWorldCoords;
+    return [surfaceAreaLeftEdge, surfaceAreaRightEdge];
+  }
+
+  checkDrawLabelsOnLeftSide(): boolean {
+    const { referenceSystem, isXFlipped } = this;
+    if (!referenceSystem) {
+      return true;
+    }
+
+    const { xScale, yScale, xRatio } = this.rescaleEvent;
+    const t = 200; // TODO: Use actual size of largest label or average size of all
+
+    const [dx1, dx2] = xScale.domain();
+    const [dy1, dy2] = yScale.domain();
+
+    let top = referenceSystem.interpolators.curtain.lookup(dy1, 1, 0);
+    if (top.length === 0) {
+      top = [referenceSystem.interpolators.curtain.getPointAt(0.0)];
+    }
+    let bottom = referenceSystem.interpolators.curtain.lookup(dy2, 1, 0);
+    if (bottom.length === 0) {
+      bottom = [referenceSystem.interpolators.curtain.getPointAt(1.0)];
+    }
+
+    const maxX = Math.max(top[0][0], bottom[0][0]);
+    const minX = Math.min(top[0][0], bottom[0][0]);
+
+    const wbBBox = {
+      left: isXFlipped ? maxX : minX,
+      right: isXFlipped ? minX : maxX,
     };
+
+    const margin = this.getMarginsInWorldCoordinates();
+    const screenLeftEdge = dx1 + margin;
+    const screenRightEdge = dx2 - margin;
+
+    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges();
+
+    const leftLimit = isXFlipped ? Math.min(screenLeftEdge, surfaceAreaLeftEdge) : Math.max(screenLeftEdge, surfaceAreaLeftEdge);
+    const rightLimit = isXFlipped ? Math.max(screenRightEdge, surfaceAreaRightEdge) : Math.min(screenRightEdge, surfaceAreaRightEdge);
+
+    const spaceOnLeftSide = Math.max(isXFlipped ? leftLimit - wbBBox.left : wbBBox.left - leftLimit, 0);
+    const spaceOnRightSide = Math.max(isXFlipped ? wbBBox.right - rightLimit : rightLimit - wbBBox.right, 0);
+
+    const spaceOnLeftSideInScreenCoordinates = spaceOnLeftSide * xRatio;
+    const spaceOnRightSideInScreenCoordinates = spaceOnRightSide * xRatio;
+
+    const isLabelsOnLeftSide =
+      spaceOnLeftSide > spaceOnRightSide ||
+      spaceOnLeftSideInScreenCoordinates > t ||
+      (spaceOnLeftSideInScreenCoordinates < t && spaceOnRightSideInScreenCoordinates < t && isXFlipped) ||
+      bottom[1] < dy1;
+
+    return isLabelsOnLeftSide;
   }
 }

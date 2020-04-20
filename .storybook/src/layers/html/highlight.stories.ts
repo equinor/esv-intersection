@@ -40,7 +40,7 @@ const defaultOptions = {
 export const HighlightWellborepath = () => {
   const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
 
-  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red', referenceSystem });
+  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
 
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
@@ -86,7 +86,7 @@ export const HighlightWellborepath = () => {
 export const HighlightWellborepathWithController = () => {
   const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
 
-  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red', referenceSystem });
+  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
 
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);

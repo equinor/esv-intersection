@@ -26,7 +26,7 @@ describe('Layer', () => {
       const layer = new WellborepathLayer('well', {
         order: 1,
         stroke: 'black',
-        strokeWidth: '1',
+        strokeWidth: '2px',
       });
       layer.onMount({ elm });
       layer.onMount({ elm });
@@ -36,7 +36,7 @@ describe('Layer', () => {
       const layer = new WellborepathLayer('well', {
         order: 1,
         stroke: 'black',
-        strokeWidth: '1',
+        strokeWidth: '2px',
       });
       expect(elm.children.length).toEqual(0);
       layer.onMount({ elm });
