@@ -125,6 +125,26 @@ export class LayerManager {
     }
   }
 
+  setReferenceSystem(irs: IntersectionReferenceSystem): void {
+    this.layers.forEach((layer) => (layer.referenceSystem = irs));
+  }
+
+  setAxisOffset(x: number, y: number): LayerManager {
+    this.axis.offsetX = x;
+    this.axis.offsetY = y;
+    return this;
+  }
+
+  setXAxisOffset(x: number): LayerManager {
+    this.axis.offsetX = x;
+    return this;
+  }
+
+  setYAxisOffset(y: number): LayerManager {
+    this.axis.offsetY = y;
+    return this;
+  }
+
   get zoomPanHandler(): ZoomPanHandler {
     return this._zoomPanHandler;
   }
@@ -154,7 +174,4 @@ export class LayerManager {
     return axis;
   };
 
-  setReferenceSystem(irs: IntersectionReferenceSystem): void {
-    this.layers.forEach((layer) => (layer.referenceSystem = irs));
-  }
 }
