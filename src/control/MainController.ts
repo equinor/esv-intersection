@@ -103,6 +103,21 @@ export class Controller {
     return this;
   }
 
+  setAxisOffset(x: number, y: number): Controller {
+    this.layerManager.setAxisOffset(x, y);
+    return this;
+  }
+
+  setXAxisOffset(x: number): Controller {
+    this.layerManager.setXAxisOffset(x);
+    return this;
+  }
+
+  setYAxisOffset(y: number): Controller {
+    this.layerManager.setYAxisOffset(y);
+    return this;
+  }
+
   get overlay(): Overlay {
     return this._overlay;
   }
