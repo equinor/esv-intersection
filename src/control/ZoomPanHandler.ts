@@ -32,7 +32,11 @@ export class ZoomPanHandler {
    * @param  elm, -
    * @param  options - options
    */
-  constructor(elm: HTMLElement, onRescale: RescaleFunction, options: ZoomAndPanOptions = { maxZoomLevel: DEFAULT_MAX_ZOOM_LEVEL }) {
+  constructor(
+    elm: HTMLElement,
+    onRescale: RescaleFunction,
+    options: ZoomAndPanOptions = { maxZoomLevel: DEFAULT_MAX_ZOOM_LEVEL, minZoomLevel: DEFAULT_MIN_ZOOM_LEVEL },
+  ) {
     this.onZoom = this.onZoom.bind(this);
 
     this.container = select(elm);
@@ -414,7 +418,7 @@ export class ZoomPanHandler {
     this.zoom.transform(container, transform);
   }
 
-  setZoomLevel(zoomlevels: [number, number]): ZoomPanHandler {
+  setZoomLevelBoundary(zoomlevels: [number, number]): ZoomPanHandler {
     this.zoom.scaleExtent(zoomlevels);
     return this;
   }

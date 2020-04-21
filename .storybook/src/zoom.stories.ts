@@ -320,7 +320,7 @@ export const GridWithAxis = () => {
   );
   buttons.appendChild(
     createButton('reset', () => {
-      zoomHandler.setZoomLevel([0.1, 256]);
+      zoomHandler.setZoomLevelBoundary([0.1, 256]);
     }),
   );
 

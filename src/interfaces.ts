@@ -96,6 +96,7 @@ export interface GeoModelData {
 
 export interface ZoomAndPanOptions {
   maxZoomLevel: number;
+  minZoomLevel: number;
 }
 
 export interface Connector {
