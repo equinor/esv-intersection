@@ -238,7 +238,7 @@ export class ZoomPanHandler {
    * Initialized handler
    */
   init(): void {
-    this.zoom = zoom().scaleExtent([DEFAULT_MIN_ZOOM_LEVEL, this.options.maxZoomLevel]).on('zoom', this.onZoom);
+    this.zoom = zoom().scaleExtent([this.options.minZoomLevel, this.options.maxZoomLevel]).on('zoom', this.onZoom);
 
     this.container.call(this.zoom);
   }
