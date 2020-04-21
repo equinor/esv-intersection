@@ -118,6 +118,21 @@ export class Controller {
     return this;
   }
 
+  setZoomLevelBoundary(zoomlevels: [number, number]): Controller {
+    this.zoomPanHandler.setZoomLevelBoundary(zoomlevels);
+    return this;
+  }
+
+  setMaxZoomLevel(zoomlevel: number): Controller {
+    this.zoomPanHandler.setMaxZoomLevel(zoomlevel);
+    return this;
+  }
+
+  setMinZoomLevel(zoomlevel: number): Controller {
+    this.zoomPanHandler.setMinZoomLevel(zoomlevel);
+    return this;
+  }
+
   get overlay(): Overlay {
     return this._overlay;
   }
