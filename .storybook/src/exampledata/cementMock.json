@@ -1,1 +1,7 @@
-[{ "toc": 20, "casingId": 0 }, { "toc": 40 }, { "toc": 350 }, { "toc": 600 }, { "toc": 1000 }]
+[
+  { "toc": 20, "casingId": 0 },
+  { "toc": 40, "casingId": 0 },
+  { "toc": 350, "casingId": 0 },
+  { "toc": 600, "casingId": 0 },
+  { "toc": 1000, "casingId": 0 }
+]

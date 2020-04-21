@@ -90,19 +90,24 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     const createSimplePolygonPath = (c: any) => {
       const middle = createMiddlePath(c);
+      const points: { left: any[]; right: any[] } = { left: [], right: [] };
 
-      // create normal for sections
-      const offsetItem = getClosestRelatedItem(c.intersectingItems, c.toc);
-      console.log('offsetItem', offsetItem);
-      const sideLeft = createNormal(
-        middle.map((s) => s.point),
-        -offsetItem.diameter,
-      );
-      const sideRight = createNormal(
-        middle.map((s) => s.point),
-        offsetItem.diameter,
-      );
-      return [...sideLeft, ...sideRight.map((s) => s.clone()).reverse()];
+      for (let md = c.toc; md < c.boc; md += StaticWellboreBaseComponentIncrement) {
+        // create normal for sections
+        const offsetItem = getClosestRelatedItem(c.intersectingItems, md);
+        console.log('offsetItem', offsetItem);
+        const start = md;
+        md = Math.min(c.boc, offsetItem != null ? offsetItem.end : c.boc); // set next calc MD
+        const offset = offsetItem != null ? offsetItem.diameter : 1;
+        const stop = md;
+        const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
+        const sideLeft = createNormal(partPoints, -offset);
+        const sideRight = createNormal(partPoints, offset);
+        points.left.push(...sideLeft);
+        points.right.push(...sideRight);
+      }
+
+      return [...points.left, ...points.right.map((s) => s.clone()).reverse()];
     };
 
     const paths = cementCompiled.map(createSimplePolygonPath);

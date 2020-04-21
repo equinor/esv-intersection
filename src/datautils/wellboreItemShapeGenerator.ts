@@ -53,6 +53,7 @@ export const actualPoints = (s: HoleObjectData): Point[] => {
 };
 
 export const findCasing = (id: string, casings: any) => {
+  console.log('find', id, casings);
   return casings.filter((c: any) => c.casingId === id)[0];
 };
 
