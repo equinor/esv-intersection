@@ -51,3 +51,34 @@ export const actualPoints = (s: HoleObjectData): Point[] => {
   stop = s.points[stopIndex <= s.points.length ? stopIndex : s.points.length - 1].point;
   return [start, ...a.map((b: MDPoint) => b.point), stop];
 };
+
+export const findCasing = (id: string, casings: any) => {
+  return casings.filter((c: any) => c.casingId === id)[0];
+};
+
+export const isBetween = (top: number, bottom: number, itemBottom: number, itemTop: number) => {
+  // item is inside
+  if (itemTop < top && itemBottom > bottom) {
+    return true;
+  }
+
+  // Top half and over
+  if (itemTop > top && itemBottom < top) {
+    return true;
+  }
+
+  // bottom half and below
+  if (itemTop > bottom && itemBottom < bottom) {
+    return true;
+  }
+
+  return false;
+};
+
+export const findIntersectingItems = (cement: any, casings: any, holes: any) => {
+  const { toc: start, end } = cement;
+  const res = [];
+  res.push(...holes.filter((h: any) => isBetween(start, end, h.start, h.end)));
+  res.push(...casings.filter((c: any) => isBetween(start, end, c.start, c.end)));
+  return res;
+};

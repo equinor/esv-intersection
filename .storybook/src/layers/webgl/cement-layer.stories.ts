@@ -5,7 +5,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { poslog, mockedWellborePath, casingData, holeSizeData } from '../../exampledata/exampledata';
+import { poslog, mockedWellborePath, casingData, holeSizeData, cementData } from '../../exampledata/exampledata';
 
 const defaultOptions = {
   defaultIntersectionAngle: 135,
@@ -83,21 +83,16 @@ export const CementLayerBasic = () => {
 // };
 
 const getData = () => {
-  const data: Cement[] = [
-    { start: 0, length: 50, end: 10 },
-    { start: 50, length: 70, end: 10 },
-    { start: 120, length: 150, end: 10 },
-    { start: 270, length: 130, end: 10 },
-    { start: 400, length: 150, end: 10 },
-    { start: 550, length: 50, end: 10 },
-    { start: 600, length: 50, end: 10 },
-    { start: 650, length: 50, end: 10 },
-    { start: 700, length: 50, end: 10 },
-  ];
-  data.forEach((x) => (x.end = x.start + x.length));
-
   // Cement requires data casing and holes to create cement width
-  return { data, casings: casingData, holes: holeSizeData };
+  casingData.forEach((c: any) => {
+    c.end = c.start + c.length;
+    c.casingId = c.end;
+  });
+  holeSizeData.map((h) => (h.end = h.start + h.length));
+  for (let i = 0; i < casingData.length; i++) {
+    cementData[i].casingId = casingData[i].end;
+  }
+  return { cement: cementData, casings: casingData, holes: holeSizeData };
 };
 
 // const getSampleDataData = () => {

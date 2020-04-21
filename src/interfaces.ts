@@ -135,9 +135,17 @@ export interface Casing {
   end: number;
   hasShoe: boolean;
   innerDiameter: number;
+  casingId: string;
 }
-
-export interface Cement {}
+export interface CompiledCement {
+  toc: number;
+  boc: number;
+  intersectingItems: any;
+}
+export interface Cement {
+  toc: number;
+  casingId: string; // TODO find the actual ID
+}
 
 export interface MDPoint {
   point: Point;
