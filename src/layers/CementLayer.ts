@@ -1,7 +1,7 @@
 import { WellboreBaseComponentLayer, StaticWellboreBaseComponentIncrement } from './WellboreBaseComponentLayer';
 import { CementLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, MDPoint } from '..';
 import { isBetween, findCasing, findIntersectingItems } from '../datautils/wellboreItemShapeGenerator';
-import { Point } from 'pixi.js';
+import { Point, Texture } from 'pixi.js';
 import { createNormal, arrayToPoint } from '../utils/vectorUtils';
 
 export class CementLayer extends WellboreBaseComponentLayer {
@@ -13,10 +13,10 @@ export class CementLayer extends WellboreBaseComponentLayer {
   constructor(id?: string, options?: CementLayerOptions) {
     super(id, options);
     this.options = {
-      firstColor: '#777788',
-      secondColor: '#EEEEFF',
-      lineColor: 0x575757,
-      percentFirstColor: 1,
+      firstColor: '#c7b9ab',
+      secondColor: '#5b5b5b',
+      lineColor: 0x5b5b5b,
+      percentFirstColor: 0.05,
       rotation: 45,
       topBottomLineColor: 0x575757,
       maxTextureDiameterScale: 2,
@@ -30,7 +30,11 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   onUpdate(event: OnUpdateEvent): void {
+    if (event.data == null) {
+      return;
+    }
     const { cement, casings, holes } = event.data;
+    console.log('data', event);
     this.createCementShapes(cement, casings, holes);
 
     super.onUpdate(event);
@@ -58,7 +62,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
     const a: any = (c: any) => parseCement(c, casings, holes);
 
     const cementCompiled = cement.map(a);
-    console.log(cementCompiled);
     // foreach cement
     // find bottom of cement based on connected casing
 
@@ -73,7 +76,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
     const getClosestRelatedItem = (related: any[], md: number): HoleSize | Casing => {
       const between = related.filter((r) => r.start <= md && r.end >= md);
       const sorted = between.sort((r) => r.diameter);
-      console.log('getc', related, md, between, sorted);
       const result = sorted[0];
       return result;
     };
@@ -95,7 +97,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
       for (let md = c.toc; md < c.boc; md += StaticWellboreBaseComponentIncrement) {
         // create normal for sections
         const offsetItem = getClosestRelatedItem(c.intersectingItems, md);
-        console.log('offsetItem', offsetItem);
         const start = md;
         md = Math.min(c.boc, offsetItem != null ? offsetItem.end : c.boc); // set next calc MD
         const offset = offsetItem != null ? offsetItem.diameter : 1;
@@ -112,8 +113,39 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     const paths = cementCompiled.map(createSimplePolygonPath);
 
-    console.log(paths);
+    const masks = paths.map((p) => this.drawBigPolygon(p));
+    const path = createMiddlePath({ toc: 0, boc: 1230, intersectingItems: [] }).map((s) => s.point);
+    const t = this.createTex();
 
-    paths.map((p) => this.drawBigPolygon(p));
+    masks.map((m) => this.createRopeTextureBackground(path, t, m)); // null mask
   }
+
+  createTex = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 300;
+    canvas.height = 100; //maxWidth > 0 ? maxWidth : canvas.width; // TODO needs to grow with scale
+    const canvasCtx = canvas.getContext('2d');
+
+    canvasCtx.fillStyle = this.options.firstColor;
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+    canvasCtx.lineWidth = 1;
+    canvasCtx.fillStyle = this.options.secondColor;
+    canvasCtx.beginPath();
+    const nuim = 20;
+    for (let i = 0; i < (canvas.width * 2) / nuim; i++) {
+      canvasCtx.moveTo(-canvas.width + i * nuim, 0);
+      canvasCtx.lineTo(nuim * i, canvas.height * 2);
+      canvasCtx.stroke();
+    }
+
+    // translate context to center of canvas
+    canvasCtx.translate(canvas.width / 2, canvas.height / 2);
+
+    // rotate 45 degrees clockwise
+    canvasCtx.rotate(Math.PI / 4);
+
+    const t = Texture.from(canvas);
+    return t;
+  };
 }

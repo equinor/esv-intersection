@@ -1,5 +1,5 @@
 import { CementLayer } from '../../../../src/layers/CementLayer';
-import { Cement, OnRescaleEvent, CementLayerOptions, HoleSize } from '../../../../src/interfaces';
+import { Cement, OnRescaleEvent, CementLayerOptions, HoleSize, Casing } from '../../../../src/interfaces';
 
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
@@ -84,15 +84,17 @@ export const CementLayerBasic = () => {
 
 const getData = () => {
   // Cement requires data casing and holes to create cement width
-  const casings = casingData.map((c: any) => ({ ...c, end: c.start + c.length, casingId: c.start + c.length }));
-  const holes = holeSizeData.map((h: HoleSize) => (h.end = h.start + h.length));
+  const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: c.start + c.length }));
+  const holes = holeSizeData.map((h: HoleSize) => ({ ...h, end: h.start + h.length }));
   const cement: Cement[] = [];
   for (let i = 0; i < casingData.length; i++) {
-    const c: Cement = cementData[i] as Cement;
-    c.casingId = casings[i].casingId;
+    const c: Cement = (cementData[i] as unknown) as Cement;
+    c.casingId = `${casings[i].casingId}`;
     cement.push(c);
   }
-  return { cement, casings, holes };
+  const d = { cement, casings, holes };
+  console.log(d);
+  return d;
 };
 
 // const getSampleDataData = () => {

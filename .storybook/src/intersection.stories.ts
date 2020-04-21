@@ -13,6 +13,7 @@ import {
   HoleSizeLayer,
   CasingLayer,
   CompletionLayer,
+  CementLayer,
 } from '../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
@@ -38,7 +39,9 @@ import {
   holeSizeData,
   casingData,
   completionData,
+  cementData,
 } from './exampledata/exampledata';
+import { HoleSize, Cement, Casing } from '../../src';
 
 const seismicColorMap = [
   '#ffe700',
@@ -148,6 +151,21 @@ const height = 600;
 
 let image: ImageBitmap = null;
 
+const createCementData = () => {
+  // Cement requires data casing and holes to create cement width
+  const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: c.start + c.length }));
+  const holes = holeSizeData.map((h: HoleSize) => ({ ...h, end: h.start + h.length }));
+  const cement: Cement[] = [];
+  for (let i = 0; i < casingData.length; i++) {
+    const c: Cement = (cementData[i] as unknown) as Cement;
+    c.casingId = `${casings[i].casingId}`;
+    cement.push(c);
+  }
+  const d = { cement, casings, holes };
+  console.log(d);
+  return d;
+};
+
 export const intersection = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
@@ -173,13 +191,24 @@ export const intersection = () => {
   const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
   const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8 });
   const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red', referenceSystem });
-  const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData, referenceSystem });
-  const casingLayer = new CasingLayer('casing', { order: 5, data: casingData, referenceSystem });
+  const holeSizeLayer = new HoleSizeLayer('holesize', { order: 7, data: holeSizeData, referenceSystem });
+  const casingLayer = new CasingLayer('casing', { order: 8, data: casingData, referenceSystem });
   const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
   const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
-  const completionLayer = new CompletionLayer('completion', { order: 5, data: completion, referenceSystem });
+  const completionLayer = new CompletionLayer('completion', { order: 4, data: completion, referenceSystem });
+  const cementLayer = new CementLayer('cement', { order: 99, data: createCementData(), referenceSystem });
 
-  const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, completionLayer, holeSizeLayer, casingLayer];
+  const layers = [
+    gridLayer,
+    geomodelLayer,
+    wellboreLayer,
+    geomodelLabelsLayer,
+    seismicLayer,
+    completionLayer,
+    holeSizeLayer,
+    casingLayer,
+    cementLayer,
+  ];
 
   const opts = {
     scaleOptions,
@@ -226,6 +255,7 @@ export const intersection = () => {
   const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size');
   const btnCasing = createButton(controller, casingLayer, 'Casing');
   const btnCompletion = createButton(controller, completionLayer, 'Completion');
+  const btnCement = createButton(controller, cementLayer, 'Cement');
   const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
   const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
   const btnLarger = createButtonWithCb('800x600', () => {
@@ -254,6 +284,7 @@ export const intersection = () => {
   btnContainer.appendChild(btnHoleSize);
   btnContainer.appendChild(btnCasing);
   btnContainer.appendChild(btnCompletion);
+  btnContainer.appendChild(btnCement);
   btnContainer.appendChild(btnGeomodelLabels);
   btnContainer.appendChild(btnSeismic);
   btnContainer.appendChild(btnLarger);

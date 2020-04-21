@@ -1,4 +1,4 @@
-import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
+import { Graphics, Texture, Point, SimpleRope, Rectangle } from 'pixi.js';
 import { PixiLayer } from './PixiLayer';
 import { createNormal } from '../utils/vectorUtils';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, HoleObjectData, HoleSize, Casing, OnMountEvent } from '../interfaces';
@@ -46,8 +46,8 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     return polygon;
   };
 
-  createRopeTextureBackground = (coods: Point[], texture: Texture, mask: Graphics): SimpleRope => {
-    const rope: SimpleRope = new SimpleRope(texture, coods);
+  createRopeTextureBackground = (coords: Point[], texture: Texture, mask: Graphics): SimpleRope => {
+    const rope: SimpleRope = new SimpleRope(texture, coords);
     rope.mask = mask;
     this.ctx.stage.addChild(rope);
 
@@ -71,6 +71,10 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     canvas.height = maxWidth > 0 ? maxWidth : canvas.width; // TODO needs to grow with scale
     const canvasCtx = canvas.getContext('2d');
 
+    // canvasCtx.rotate(1);
+
+    // container.pivot.x = container.width / 2;
+    // container.pivot.y = container.height / 2;
     const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, firstColor);
     gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
@@ -80,7 +84,17 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     canvasCtx.fillStyle = gradient;
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-    return Texture.from(canvas);
+    const t = Texture.from(canvas);
+    return t;
+    // const h = t.frame.heigh t;
+    // const w = t.frame.width;
+    // const frame = t.frame;
+    // const crop = new Rectangle(t.frame.x, t.frame.y, w, h);
+    // const trim = crop;
+    // const rotate = 0; //11 - 1;
+    // const rotatedTexture = new Texture(t.baseTexture, frame, crop, trim, rotate);
+
+    // return rotatedTexture;
   };
 
   generateHoleSizeData = (data: HoleSize | Casing): HoleObjectData => {
