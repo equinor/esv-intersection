@@ -145,7 +145,7 @@ export class LayerManager {
     return this;
   }
 
-  setZoomLevel(zoomlevels: [number, number]): LayerManager {
+  setZoomLevelBoundary(zoomlevels: [number, number]): LayerManager {
     this._zoomPanHandler.setZoomLevelBoundary(zoomlevels);
     return this;
   }

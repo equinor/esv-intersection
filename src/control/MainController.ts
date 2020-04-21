@@ -118,7 +118,7 @@ export class Controller {
     return this;
   }
 
-  setZoomLevel(zoomlevels: [number, number]): Controller {
+  setZoomLevelBoundary(zoomlevels: [number, number]): Controller {
     this.zoomPanHandler.setZoomLevelBoundary(zoomlevels);
     return this;
   }
