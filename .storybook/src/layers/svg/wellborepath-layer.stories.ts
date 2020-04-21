@@ -31,7 +31,7 @@ export const Wellborepath = () => {
   const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
   const options: WellborepathLayerOptions = {
     order: 1,
-    strokeWidth: '5px',
+    strokeWidth: '2px',
     stroke: 'black',
     referenceSystem,
   };
@@ -57,7 +57,7 @@ export const WellborepathWithSampleDataAndZoom = () => {
 
   const options: WellborepathLayerOptions = {
     order: 1,
-    strokeWidth: '5px',
+    strokeWidth: '2px',
     stroke: 'black',
     referenceSystem,
   };
