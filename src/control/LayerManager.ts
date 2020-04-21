@@ -145,6 +145,21 @@ export class LayerManager {
     return this;
   }
 
+  setZoomLevel(zoomlevels: [number, number]): LayerManager {
+    this._zoomPanHandler.setZoomLevel(zoomlevels);
+    return this;
+  }
+
+  setMaxZoomLevel(zoomlevel: number): LayerManager {
+    this._zoomPanHandler.setMaxZoomLevel(zoomlevel);
+    return this;
+  }
+
+  setMinZoomLevel(zoomlevel: number): LayerManager {
+    this._zoomPanHandler.setMinZoomLevel(zoomlevel);
+    return this;
+  }
+
   get zoomPanHandler(): ZoomPanHandler {
     return this._zoomPanHandler;
   }

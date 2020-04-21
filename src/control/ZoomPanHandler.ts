@@ -4,6 +4,9 @@ import { zoom, zoomIdentity, ZoomBehavior, ZoomTransform } from 'd3-zoom';
 
 import { ZoomAndPanOptions, OnRescaleEvent, OnUpdateEvent } from '../interfaces';
 
+const DEFAULT_MIN_ZOOM_LEVEL = 0.1;
+const DEFAULT_MAX_ZOOM_LEVEL = 256;
+
 type RescaleFunction = (event: OnRescaleEvent) => void;
 /**
  * Handle zoom and pan for intersection layers
@@ -29,7 +32,7 @@ export class ZoomPanHandler {
    * @param  elm, -
    * @param  options - options
    */
-  constructor(elm: HTMLElement, onRescale: RescaleFunction, options: ZoomAndPanOptions = { maxZoomLevel: 256 }) {
+  constructor(elm: HTMLElement, onRescale: RescaleFunction, options: ZoomAndPanOptions = { maxZoomLevel: DEFAULT_MAX_ZOOM_LEVEL }) {
     this.onZoom = this.onZoom.bind(this);
 
     this.container = select(elm);
@@ -231,7 +234,7 @@ export class ZoomPanHandler {
    * Initialized handler
    */
   init(): void {
-    this.zoom = zoom().scaleExtent([0.1, this.options.maxZoomLevel]).on('zoom', this.onZoom);
+    this.zoom = zoom().scaleExtent([DEFAULT_MIN_ZOOM_LEVEL, this.options.maxZoomLevel]).on('zoom', this.onZoom);
 
     this.container.call(this.zoom);
   }
@@ -396,7 +399,7 @@ export class ZoomPanHandler {
   /**
    * Recalcualate the transform
    */
-  recalculateZoomTransform() {
+  recalculateZoomTransform(): void {
     const { scaleX, scaleY, container, calculateTransform, updateTranslateExtent } = this;
 
     const [dx0, dx1] = scaleX.domain();
@@ -409,5 +412,22 @@ export class ZoomPanHandler {
     updateTranslateExtent();
 
     this.zoom.transform(container, transform);
+  }
+
+  setZoomLevel(zoomlevels: [number, number]): ZoomPanHandler {
+    this.zoom.scaleExtent(zoomlevels);
+    return this;
+  }
+
+  setMaxZoomLevel(zoomlevel: number): ZoomPanHandler {
+    const zoomLevels = this.zoom.scaleExtent();
+    this.zoom.scaleExtent([zoomLevels[0], zoomlevel]);
+    return this;
+  }
+
+  setMinZoomLevel(zoomlevel: number): ZoomPanHandler {
+    const zoomLevels = this.zoom.scaleExtent();
+    this.zoom.scaleExtent([zoomlevel, zoomLevels[1]]);
+    return this;
   }
 }
