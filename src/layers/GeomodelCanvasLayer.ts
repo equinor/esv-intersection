@@ -1,21 +1,24 @@
 import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 import { CanvasLayer } from './CanvasLayer';
 
-export class GeomodelCanvasLayer extends CanvasLayer {
-  options: GeomodelLayerOptions;
-  // TODO: create proper interface
-  data: any;
+const DEFAULT_MAX_DEPTH = 10000;
 
+export class GeomodelCanvasLayer extends CanvasLayer {
   rescaleEvent: OnRescaleEvent;
 
-  surfaceAreasPaths: any;
+  surfaceAreasPaths: any[] = [];
 
-  surfaceLinesPaths: any;
+  surfaceLinesPaths: any[] = [];
+
+  maxDepth: number = DEFAULT_MAX_DEPTH;
 
   constructor(id?: string, options?: GeomodelLayerOptions) {
     super(id, options);
     this.render = this.render.bind(this);
-    this.clearScreen = this.clearScreen.bind(this);
+    this.generateSurfaceAreasPaths = this.generateSurfaceAreasPaths.bind(this);
+    this.generateSurfaceLinesPaths = this.generateSurfaceLinesPaths.bind(this);
+    this.drawPolygonPath = this.drawPolygonPath.bind(this);
+    this.drawLinePath = this.drawLinePath.bind(this);
   }
 
   onMount(event: OnMountEvent): void {
@@ -24,51 +27,41 @@ export class GeomodelCanvasLayer extends CanvasLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-
-    this.generateSurfaceAreasPaths();
-    this.generateSurfaceLinesPaths();
-
+    if (!this.data) {
+      this.surfaceAreasPaths = [];
+      this.surfaceLinesPaths = [];
+    } else {
+      this.generateSurfaceAreasPaths();
+      this.generateSurfaceLinesPaths();
+    }
     this.render();
   }
 
   onRescale(event: OnRescaleEvent): void {
-    this.ctx.resetTransform();
-    this.ctx.translate(event.transform.x, event.transform.y);
-    this.ctx.scale(event.xRatio, event.yRatio);
     this.rescaleEvent = event;
+    this.setTransform(this.rescaleEvent);
     this.render();
   }
 
-  clearScreen(): void {
-    const { xScale, yScale } = this.rescaleEvent;
-    this.ctx.save();
-    this.ctx.resetTransform();
-    this.ctx.clearRect(0, 0, xScale.range()[1], yScale.range()[1]);
-    this.ctx.restore();
-  }
-
   render(): void {
-    if (!this.rescaleEvent) {
-      return;
-    }
-    if (!this.ctx) {
-      return;
-    }
-    const { data } = this;
-    if (!data) {
+    if (!this.ctx || !this.rescaleEvent) {
       return;
     }
 
-    this.clearScreen();
+    this.clearCanvas();
     this.surfaceAreasPaths.forEach((p: any) => this.drawPolygonPath(p.color, p.path));
     this.surfaceLinesPaths.forEach((l: any) => this.drawLinePath(l.color, l.path));
+  }
+
+  colorToHexString(color: number): string {
+    return color.toString(16).padStart(6, '0');
   }
 
   generateSurfaceAreasPaths(): void {
     this.surfaceAreasPaths = this.data.areas.reduce((acc: any, s: GeoModelData) => {
       const polygons = this.createPolygons(s.data);
       const mapped = polygons.map((polygon: any) => ({
-        color: `#${s.color.toString(16).padStart(6, '0')}`,
+        color: `#${this.colorToHexString(s.color)}`,
         path: this.generatePolygonPath(polygon),
       }));
       return [...acc, ...mapped];
@@ -78,7 +71,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
   generateSurfaceLinesPaths(): void {
     this.surfaceLinesPaths = this.data.lines.reduce((acc: any, l: any) => {
       const lines = this.generateLinePaths(l);
-      const mapped = lines.map((path: Path2D) => ({ color: `#${l.color.toString(16).padStart(6, '0')}`, path }));
+      const mapped = lines.map((path: Path2D) => ({ color: `#${this.colorToHexString(l.color)}`, path }));
       return [...acc, ...mapped];
     }, []);
   }
@@ -115,8 +108,10 @@ export class GeomodelCanvasLayer extends CanvasLayer {
         if (polygon) {
           // Generate bottom of polygon
           for (let j: number = !topIsValid ? i - 1 : i; j >= 0; j--) {
-            if (!data[j][1]) break;
-            polygon.push(data[j][0], data[j][2] || 10000);
+            if (!data[j][1]) {
+              break;
+            }
+            polygon.push(data[j][0], data[j][2] || this.maxDepth);
           }
           polygons.push(polygon);
           polygon = null;
