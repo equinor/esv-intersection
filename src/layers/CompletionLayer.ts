@@ -1,6 +1,6 @@
 import { OnMountEvent, OnUpdateEvent, OnRescaleEvent } from '..';
 import { CompletionLayerOptions } from '../interfaces';
-import { PixiLayer } from './PixiLayer';
+import { PixiLayer } from './base/PixiLayer';
 import { Graphics, Point } from 'pixi.js';
 import { calcDist } from '../utils/vectorUtils';
 

@@ -1,7 +1,7 @@
 import { select, Selection } from 'd3-selection';
 import { Layer } from './Layer';
-import { OnMountEvent, OnResizeEvent } from '../interfaces';
-import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../constants';
+import { OnMountEvent, OnResizeEvent } from '../../interfaces';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class SVGLayer extends Layer {
   elm: Selection<SVGElement, any, null, undefined>;

@@ -1,6 +1,6 @@
 import { CurveInterpolator } from 'curve-interpolator';
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
-import { PixiLayer } from './PixiLayer';
+import { PixiLayer } from './base/PixiLayer';
 import { calcDist, calcDistPoint, createNormal, arrayToPoint, pointToArray } from '../utils/vectorUtils';
 import {
   HoleSizeLayerOptions,

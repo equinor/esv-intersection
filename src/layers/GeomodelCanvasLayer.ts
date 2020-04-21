@@ -1,5 +1,5 @@
 import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
-import { CanvasLayer } from './CanvasLayer';
+import { CanvasLayer } from './base/CanvasLayer';
 
 const DEFAULT_MAX_DEPTH = 10000;
 

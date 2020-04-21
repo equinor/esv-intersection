@@ -1,6 +1,6 @@
 import Vector2 from '@equinor/videx-vector2';
 
-import { CanvasLayer } from './CanvasLayer';
+import { CanvasLayer } from './base/CanvasLayer';
 import { GeomodelLayerLabelsOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 import { SurfaceArea, SurfaceLine, findSampleAtPos } from '../datautils';
 
