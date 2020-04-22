@@ -1,5 +1,5 @@
 import { line, curveCatmullRom } from 'd3-shape';
-import { SVGLayer } from './SVGLayer';
+import { SVGLayer } from './base/SVGLayer';
 import { WellborepathLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 export class WellborepathLayer extends SVGLayer {

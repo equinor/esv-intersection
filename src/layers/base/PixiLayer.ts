@@ -1,7 +1,7 @@
 import { Application, Transform } from 'pixi.js';
 import { Layer } from './Layer';
-import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
-import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../constants';
+import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class PixiLayer extends Layer {
   elm: HTMLElement;

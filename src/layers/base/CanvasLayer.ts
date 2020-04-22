@@ -1,6 +1,6 @@
 import { Layer } from './Layer';
-import { OnMountEvent, OnUpdateEvent, OnResizeEvent, OnRescaleEvent } from '../interfaces';
-import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../constants';
+import { OnMountEvent, OnUpdateEvent, OnResizeEvent, OnRescaleEvent } from '../../interfaces';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class CanvasLayer extends Layer {
   ctx: CanvasRenderingContext2D;

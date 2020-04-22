@@ -1,5 +1,5 @@
-import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
-import { IntersectionReferenceSystem } from '../control';
+import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import { IntersectionReferenceSystem } from '../../control';
 
 const defaultOptions = {
   order: 1,

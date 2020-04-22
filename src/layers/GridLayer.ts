@@ -1,4 +1,4 @@
-import { CanvasLayer } from './CanvasLayer';
+import { CanvasLayer } from './base/CanvasLayer';
 import { GridLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 // constants

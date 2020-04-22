@@ -1,5 +1,5 @@
 import { Graphics, Container } from 'pixi.js';
-import { PixiLayer } from './PixiLayer';
+import { PixiLayer } from './base/PixiLayer';
 import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 
 export class GeomodelLayerV2 extends PixiLayer {

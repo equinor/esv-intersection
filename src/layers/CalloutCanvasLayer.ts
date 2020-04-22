@@ -1,5 +1,5 @@
 import { round } from '@equinor/videx-math';
-import { CanvasLayer } from './CanvasLayer';
+import { CanvasLayer } from './base/CanvasLayer';
 import { OnUpdateEvent, Annotation, OnRescaleEvent } from '../interfaces';
 
 import { calcTextSize, positionCallout } from '../utils';
