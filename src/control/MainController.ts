@@ -29,12 +29,13 @@ export class Controller {
     const { container, axisOptions, scaleOptions, referenceSystem, layers, path } = options;
 
     this._referenceSystem = referenceSystem || (path && new IntersectionReferenceSystem(path));
-    this.layerManager = new LayerManager(container, scaleOptions, axisOptions);
+
+    this._overlay = overlay(this, container);
+
+    this.layerManager = new LayerManager(this._overlay.elm.node() as HTMLElement, scaleOptions, axisOptions);
     if (layers) {
       this.layerManager.addLayers(layers);
     }
-
-    this._overlay = overlay(this, container);
   }
 
   setReferenceSystem(referenceSystem: IntersectionReferenceSystem): Controller {
