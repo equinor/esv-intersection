@@ -16,6 +16,8 @@ const defaultOptions = {
 
 export class GridLayer extends CanvasLayer {
   options: GridLayerOptions;
+  private _offsetX: number = 0;
+  private _offsetY: number = 0;
 
   constructor(id?: string, options?: GridLayerOptions) {
     super(id, options);
@@ -44,7 +46,17 @@ export class GridLayer extends CanvasLayer {
 
     this.clearCanvas();
 
-    const { xScale, yScale } = event;
+    const xScale = event.xScale.copy();
+    const yScale = event.yScale.copy();
+
+    const xDomain = xScale.domain();
+    const yDomain = yScale.domain();
+
+    const offsetX = this.offsetX;
+    const offsetY = this.offsetY;
+
+    xScale.domain([xDomain[0] - offsetX, xDomain[1] - offsetX]);
+    yScale.domain([yDomain[0] - offsetY, yDomain[1] - offsetY]);
 
     const [rx1, rx2] = xScale.range();
     const [ry1, ry2] = yScale.range();
@@ -94,5 +106,21 @@ export class GridLayer extends CanvasLayer {
       xminticks.pop();
     }
     return xminticks;
+  }
+
+  get offsetX(): number {
+    return this._offsetX;
+  }
+
+  set offsetX(offset: number) {
+    this._offsetX = offset;
+  }
+
+  get offsetY(): number {
+    return this._offsetY;
+  }
+
+  set offsetY(offset: number) {
+    this._offsetY = offset;
   }
 }
