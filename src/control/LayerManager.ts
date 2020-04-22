@@ -127,6 +127,16 @@ export class LayerManager {
     this.layers.forEach((layer) => (layer.referenceSystem = irs));
   }
 
+  showAxis(): LayerManager {
+    this.axis.show();
+    return this;
+  }
+
+  hideAxis(): LayerManager {
+    this.axis.hide();
+    return this;
+  }
+
   setAxisOffset(x: number, y: number): LayerManager {
     this.axis.offsetX = x;
     this.axis.offsetY = y;

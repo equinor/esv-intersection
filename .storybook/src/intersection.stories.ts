@@ -233,6 +233,16 @@ export const intersection = () => {
   const btnCompletion = createButton(controller, completionLayer, 'Completion');
   const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
   const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
+  let show = true;
+  const toggleAxis = createButtonWithCb('Toggle axis', () => {
+    if (show) {
+      controller.hideAxis();
+      show = false;
+    } else {
+      controller.showAxis();
+      show = true;
+    }
+  });
   const btnLarger = createButtonWithCb('800x600', () => {
     const w = 800;
     const h = 600;
@@ -263,6 +273,7 @@ export const intersection = () => {
   btnContainer.appendChild(btnSeismic);
   btnContainer.appendChild(btnLarger);
   btnContainer.appendChild(btnSmaller);
+  btnContainer.appendChild(toggleAxis);
 
   root.appendChild(container);
   root.appendChild(btnContainer);

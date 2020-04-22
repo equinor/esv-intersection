@@ -104,6 +104,16 @@ export class Controller {
     return this;
   }
 
+  showAxis(): Controller {
+    this.layerManager.showAxis();
+    return this;
+  }
+
+  hideAxis(): Controller {
+    this.layerManager.hideAxis();
+    return this;
+  }
+
   setAxisOffset(x: number, y: number): Controller {
     this.layerManager.setAxisOffset(x, y);
     return this;
