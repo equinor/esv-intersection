@@ -8,6 +8,7 @@
   "files": [
     "dist"
   ],
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rimraf dist",
