@@ -19,7 +19,7 @@ export abstract class PixiLayer extends Layer {
       this.container = document.createElement('div');
       this.container.setAttribute('id', `${this.id}`);
       this.container.setAttribute('class', 'webgl-layer');
-      this.setStyle();
+      this.updateStyle();
 
       const { elm, height, width } = event;
       this.elm = elm;
@@ -78,7 +78,7 @@ export abstract class PixiLayer extends Layer {
     return { xRatio, yRatio };
   };
 
-  setStyle(visible?: boolean): void {
+  updateStyle(visible?: boolean): void {
     const isVisible = visible || this.isVisible;
     const visibility = isVisible ? 'visible' : 'hidden';
     const interactive = this.interactive ? 'auto' : 'none';
@@ -91,25 +91,25 @@ export abstract class PixiLayer extends Layer {
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
     if (this.container) {
-      this.setStyle(visible);
+      this.updateStyle(visible);
     }
   }
 
   onOpacityChanged(opacity: number): void {
     if (this.container) {
-      this.setStyle();
+      this.updateStyle();
     }
   }
 
   onOrderChanged(order: number): void {
     if (this.container) {
-      this.setStyle();
+      this.updateStyle();
     }
   }
 
   onInteractivityChanged(interactive: boolean): void {
     if (this.container) {
-      this.setStyle();
+      this.updateStyle();
     }
   }
 }
