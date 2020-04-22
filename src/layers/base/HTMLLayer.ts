@@ -23,6 +23,7 @@ export abstract class HTMLLayer extends Layer {
       .style('width', `${width}px`)
       .style('opacity', this.opacity)
       .style('overflow', 'hidden')
+      .style('pointer-events', this.interactive)
       .attr('z-index', this.order);
   }
 
@@ -58,6 +59,14 @@ export abstract class HTMLLayer extends Layer {
     this.order = order;
     if (this.elm) {
       this.elm.style('z-index', order);
+    }
+  }
+
+  onInteractivityChanged(shouldBeInteractive: boolean): void {
+    this.interactive = shouldBeInteractive;
+    if (this.elm) {
+      const interactive = shouldBeInteractive ? 'auto' : 'none';
+      this.elm.style('pointer-events', interactive);
     }
   }
 }

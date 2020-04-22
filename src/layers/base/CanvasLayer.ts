@@ -9,26 +9,37 @@ export abstract class CanvasLayer extends Layer {
 
   onOpacityChanged(opacity: number): void {
     if (this.canvas) {
-      this.setStyle(this.order, opacity, this.isVisible);
+      this.updateStyle();
     }
   }
 
   onOrderChanged(order: number): void {
     if (this.canvas) {
-      this.setStyle(order, this.opacity, this.isVisible);
+      this.updateStyle();
+    }
+  }
+
+  onInteractivityChanged(interactive: boolean): void {
+    if (this.canvas) {
+      this.updateStyle();
     }
   }
 
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
     if (this.canvas) {
-      this.setStyle(this.order, this.opacity, visible);
+      this.updateStyle(visible);
     }
   }
 
-  setStyle(opacity: number, order: number, visible: boolean = true): void {
-    const visibility = visible ? 'visible' : 'hidden';
-    this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`);
+  updateStyle(visible?: boolean): void {
+    const isVisible = visible || this.isVisible;
+    const visibility = isVisible ? 'visible' : 'hidden';
+    const interactive = this.interactive ? 'auto' : 'none';
+    this.canvas.setAttribute(
+      'style',
+      `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`,
+    );
   }
 
   onMount(event: OnMountEvent): void {
@@ -47,7 +58,7 @@ export abstract class CanvasLayer extends Layer {
     this.canvas.setAttribute('width', `${width}px`);
     this.canvas.setAttribute('height', `${height}px`);
     this.canvas.setAttribute('class', 'canvas-layer');
-    this.setStyle(this.order, this.opacity);
+    this.updateStyle();
     this.ctx = this.canvas.getContext('2d');
   }
 

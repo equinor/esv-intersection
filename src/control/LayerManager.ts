@@ -31,6 +31,7 @@ export class LayerManager {
   constructor(container: HTMLElement, scaleOptions: ScaleOptions, axisOptions?: AxisOptions) {
     this.container = container;
     this.layerContainer = document.createElement('div');
+    this.layerContainer.className = 'layer-container';
     this.container.appendChild(this.layerContainer);
     this.adjustToSize(+this.container.getAttribute('width'), +this.container.getAttribute('height'));
     this._zoomPanHandler = new ZoomPanHandler(container, (event) => this.rescale(event));
@@ -108,9 +109,6 @@ export class LayerManager {
 
     const layersWidth = this.axis ? width - horizontalAxisMargin : width;
     const layersHeight = this.axis ? height - verticalAxisMargin : height;
-
-    this.layerContainer.setAttribute('width', `${layersWidth}px`);
-    this.layerContainer.setAttribute('height', `${layersHeight}px`);
 
     if (this.axis) {
       const resizeEvent = { width, height };
