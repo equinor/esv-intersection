@@ -6,7 +6,7 @@ import { createNormal, arrayToPoint } from '../utils/vectorUtils';
 
 export class CementLayer extends WellboreBaseComponentLayer {
   options: CementLayerOptions;
-  data: Cement[];
+  cement: Cement[];
   casings: Casing[];
   holes: HoleSize[];
 
@@ -22,6 +22,9 @@ export class CementLayer extends WellboreBaseComponentLayer {
       maxTextureDiameterScale: 2,
       ...options,
     };
+    this.cement = options.data.cement;
+    this.casings = options.data.casings;
+    this.holes = options.data.holes;
     this.render = this.render.bind(this);
   }
 
@@ -30,13 +33,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   onUpdate(event: OnUpdateEvent): void {
-    if (event.data == null) {
-      return;
-    }
-    const { cement, casings, holes } = event.data;
-    console.log('data', event);
-    this.createCementShapes(cement, casings, holes);
-
     super.onUpdate(event);
     this.render(event);
   }
@@ -47,6 +43,9 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     super.render(event);
+
+    const { cement, casings, holes } = this;
+    this.createCementShapes(cement, casings, holes);
   }
 
   createCementShapes(cement: Cement[], casings: any, holes: any): any {
@@ -59,9 +58,9 @@ export class CementLayer extends WellboreBaseComponentLayer {
       return res;
     };
 
-    const a: any = (c: any) => parseCement(c, casings, holes);
+    const cementCompiled = cement.map((c: any) => parseCement(c, casings, holes));
 
-    const cementCompiled = cement.map(a);
+    console.log('compiled', cementCompiled);
     // foreach cement
     // find bottom of cement based on connected casing
 
@@ -90,7 +89,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
       return points;
     };
 
-    const createSimplePolygonPath = (c: any) => {
+    const createSimplePolygonPath = (c: any, t: Texture): any => {
       const middle = createMiddlePath(c);
       const points: { left: any[]; right: any[] } = { left: [], right: [] };
 
@@ -104,23 +103,36 @@ export class CementLayer extends WellboreBaseComponentLayer {
         const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
         const sideLeft = createNormal(partPoints, -offset);
         const sideRight = createNormal(partPoints, offset);
+        // subtract center piece with diameter from c.casingId
         points.left.push(...sideLeft);
         points.right.push(...sideRight);
       }
 
-      return [...points.left, ...points.right.map((s) => s.clone()).reverse()];
+      const centerPiece = findCasing(c.casingId, this.casings);
+      const wholeMiddlePoints = middle.map((s) => s.point);
+      const sideLeftMiddle = createNormal(wholeMiddlePoints, -centerPiece.diameter);
+      const sideRightMiddle = createNormal(wholeMiddlePoints, +centerPiece.diameter);
+
+      const a = [
+        ...points.left,
+        ...sideLeftMiddle.map((s) => s.clone()).reverse(),
+        ...sideRightMiddle,
+        ...points.right.map((s) => s.clone()).reverse(),
+      ];
+      // console.log(a);
+      return a;
     };
 
-    const paths = cementCompiled.map(createSimplePolygonPath);
+    const t = this.createTex();
+    const paths = cementCompiled.map((c) => createSimplePolygonPath(c, t));
 
     const masks = paths.map((p) => this.drawBigPolygon(p));
-    const path = createMiddlePath({ toc: 0, boc: 1230, intersectingItems: [] }).map((s) => s.point);
-    const t = this.createTex();
+    const path = createMiddlePath({ toc: 0, boc: 3230, intersectingItems: [] }).map((s) => s.point);
 
     masks.map((m) => this.createRopeTextureBackground(path, t, m)); // null mask
   }
 
-  createTex = () => {
+  createTex = (): Texture => {
     const canvas = document.createElement('canvas');
     canvas.width = 300;
     canvas.height = 100; //maxWidth > 0 ? maxWidth : canvas.width; // TODO needs to grow with scale
@@ -140,10 +152,10 @@ export class CementLayer extends WellboreBaseComponentLayer {
     }
 
     // translate context to center of canvas
-    canvasCtx.translate(canvas.width / 2, canvas.height / 2);
+    // canvasCtx.translate(canvas.width / 2, canvas.height / 2);
 
-    // rotate 45 degrees clockwise
-    canvasCtx.rotate(Math.PI / 4);
+    // // rotate 45 degrees clockwise
+    // canvasCtx.rotate(Math.PI / 4);
 
     const t = Texture.from(canvas);
     return t;

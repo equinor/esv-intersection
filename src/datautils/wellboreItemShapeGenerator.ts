@@ -53,7 +53,8 @@ export const actualPoints = (s: HoleObjectData): Point[] => {
 };
 
 export const findCasing = (id: string, casings: any) => {
-  return casings.filter((c: any) => c.casingId === id)[0];
+  const res = casings.filter((c: any) => c.casingId === id);
+  return res.length > 0 ? res[0] : {};
 };
 
 export const isBetween = (top: number, bottom: number, itemBottom: number, itemTop: number) => {
@@ -79,6 +80,6 @@ export const findIntersectingItems = (cement: any, casings: any, holes: any) => 
   const { toc: start, end } = cement;
   const res = [];
   res.push(...holes.filter((h: any) => isBetween(start, end, h.start, h.end)));
-  res.push(...casings.filter((c: any) => isBetween(start, end, c.start, c.end)));
+  res.push(...casings.filter((c: any) => c.casingId !== cement.casingId && isBetween(start, end, c.start, c.end)));
   return res;
 };

@@ -153,7 +153,7 @@ let image: ImageBitmap = null;
 
 const createCementData = () => {
   // Cement requires data casing and holes to create cement width
-  const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: c.start + c.length }));
+  const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: `${c.start + c.length}` }));
   const holes = holeSizeData.map((h: HoleSize) => ({ ...h, end: h.start + h.length }));
   const cement: Cement[] = [];
   for (let i = 0; i < casingData.length; i++) {
@@ -162,7 +162,6 @@ const createCementData = () => {
     cement.push(c);
   }
   const d = { cement, casings, holes };
-  console.log(d);
   return d;
 };
 
@@ -237,7 +236,7 @@ export const intersection = () => {
     height: seismicInfo.maxTvdMsl - seismicInfo.minTvdMsl,
   };
 
-  generateSeismicSliceImage(seismic, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
+  generateSeismicSliceImage(seismic as any, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
     seismicLayer.data = { image: seismicImage, options: seismicOptions };
   });
 
@@ -297,9 +296,9 @@ export const intersection = () => {
   return root;
 };
 
-function addMDOverlay(instance) {
+function addMDOverlay(instance: any) {
   const elm = instance.overlay.create('md', {
-    onMouseMove: (event) => {
+    onMouseMove: (event: any) => {
       const { target, caller, x } = event;
 
       const newX = caller.currentStateAsEvent.xScale.invert(x);
@@ -313,7 +312,7 @@ function addMDOverlay(instance) {
         target.style.visibility = 'visible';
       }
     },
-    onMouseExit: (event) => {
+    onMouseExit: (event: any) => {
       event.target.style.visibility = 'hidden';
     },
   });

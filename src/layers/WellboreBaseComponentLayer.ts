@@ -4,7 +4,7 @@ import { createNormal } from '../utils/vectorUtils';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, HoleObjectData, HoleSize, Casing, OnMountEvent } from '../interfaces';
 import { createNormalCoords, generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';
 
-export const StaticWellboreBaseComponentIncrement = 0.1;
+export const StaticWellboreBaseComponentIncrement = 1;
 
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;

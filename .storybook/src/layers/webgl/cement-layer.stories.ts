@@ -15,11 +15,12 @@ const defaultOptions = {
 };
 
 export const CementLayerBasic = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog || mockedWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem((poslog || mockedWellborePath) as any, defaultOptions);
 
   const options: CementLayerOptions = {
     order: 1,
     referenceSystem,
+    data: getData(),
   };
   const cementLayer = new CementLayer('webgl', options);
 
@@ -31,7 +32,7 @@ export const CementLayerBasic = () => {
 
   cementLayer.onMount({ elm: root, height, width });
 
-  cementLayer.onUpdate({ elm: root, data: getData() });
+  cementLayer.onUpdate({ elm: root });
 
   const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
     cementLayer.onRescale(event);
@@ -84,7 +85,7 @@ export const CementLayerBasic = () => {
 
 const getData = () => {
   // Cement requires data casing and holes to create cement width
-  const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: c.start + c.length }));
+  const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: `${c.start + c.length}` }));
   const holes = holeSizeData.map((h: HoleSize) => ({ ...h, end: h.start + h.length }));
   const cement: Cement[] = [];
   for (let i = 0; i < casingData.length; i++) {
@@ -93,7 +94,6 @@ const getData = () => {
     cement.push(c);
   }
   const d = { cement, casings, holes };
-  console.log(d);
   return d;
 };
 
