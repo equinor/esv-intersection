@@ -7,6 +7,7 @@ import { OnResizeEvent, OnRescaleEvent } from '../interfaces';
 type Options = {
   offsetX: number;
   offsetY: number;
+  visible: boolean;
 };
 
 export class Axis {
@@ -19,6 +20,7 @@ export class Axis {
   unitOfMeasure: string;
   private _offsetX: number = 0;
   private _offsetY: number = 0;
+  private visible: boolean = true;
 
   constructor(
     mainGroup: Selection<SVGElement, any, null, undefined>,
@@ -38,6 +40,9 @@ export class Axis {
     }
     if (options && options.offsetX) {
       this._offsetY = options.offsetY;
+    }
+    if (options && options.visible) {
+      this.visible = options.visible;
     }
     this._scaleX = scaleLinear().domain([0, 1]).range([0, 1]);
     this._scaleY = scaleLinear().domain([0, 1]).range([0, 1]);
@@ -144,7 +149,22 @@ export class Axis {
     _scaleX.domain([xBounds[0] - offsetX, xBounds[1] - offsetX]).range(xRange);
     _scaleY.domain([yBounds[0] - offsetY, yBounds[1] - offsetY]).range(yRange);
 
+    if (this.visible) {
+      this.render();
+    }
+  }
+
+  show(): Axis {
+    this.visible = true;
+    this.mainGroup.attr('visibility', 'visible');
     this.render();
+    return this;
+  }
+
+  hide(): Axis {
+    this.visible = false;
+    this.mainGroup.attr('visibility', 'hidden');
+    return this;
   }
 
   get offsetX(): number {
