@@ -38,6 +38,7 @@ export interface LayerOptions {
   layerOpacity?: number;
   referenceSystem?: IntersectionReferenceSystem;
   data?: any;
+  interactive?: boolean;
 
   onMount?(event: OnMountEvent, layer: Layer): void;
   onUnmount?(event: OnUnmountEvent, layer: Layer): void;
