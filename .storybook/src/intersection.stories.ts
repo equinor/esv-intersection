@@ -167,7 +167,7 @@ export const intersection = () => {
   generateProjectedWellborePath(referenceSystem.projectedPath);
 
   // Instantiate layers
-  const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1 });
+  const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
   // const calloutLayer = new CalloutCanvasLayer('callout', { order: 4 });
   const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
   const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
@@ -193,6 +193,11 @@ export const intersection = () => {
   requestAnimationFrame(() => {
     addMDOverlay(controller);
   });
+
+  referenceSystem.offset = referenceSystem.project(0)[1];
+  const offset = controller.referenceSystem.offset
+  gridLayer.offsetY = offset;
+  controller.setYAxisOffset(offset);
 
   controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
 
