@@ -1,5 +1,5 @@
 import { Point } from 'pixi.js';
-import { HoleObjectData, NormalCoordsObject, MDPoint } from '..';
+import { HoleObjectData, NormalCoordsObject, MDPoint, Cement, Casing, HoleSize, CompiledCement } from '..';
 import { createNormal, pointToArray, arrayToPoint } from '../utils/vectorUtils';
 import { CurveInterpolator } from 'curve-interpolator';
 
@@ -76,10 +76,10 @@ export const isBetween = (top: number, bottom: number, itemBottom: number, itemT
   return false;
 };
 
-export const findIntersectingItems = (cement: any, casings: any, holes: any) => {
-  const { toc: start, end } = cement;
+export const findIntersectingItems = (cement: Cement, bottomOfCement: number, casings: Casing[], holes: HoleSize[]) => {
+  const { toc: start } = cement;
   const res = [];
-  res.push(...holes.filter((h: any) => isBetween(start, end, h.start, h.end)));
-  res.push(...casings.filter((c: any) => c.casingId !== cement.casingId && isBetween(start, end, c.start, c.end)));
+  res.push(...holes.filter((h: HoleSize) => isBetween(start, bottomOfCement, h.start, h.end)));
+  res.push(...casings.filter((c: Casing) => c.casingId !== cement.casingId && isBetween(start, bottomOfCement, c.start, c.end)));
   return res;
 };

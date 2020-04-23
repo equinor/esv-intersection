@@ -88,7 +88,7 @@ const getData = () => {
   const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: `${c.start + c.length}` }));
   const holes = holeSizeData.map((h: HoleSize) => ({ ...h, end: h.start + h.length }));
   const cement: Cement[] = [];
-  for (let i = 0; i < casingData.length; i++) {
+  for (let i = 0; i < casingData.length && i < cementData.length; i++) {
     const c: Cement = (cementData[i] as unknown) as Cement;
     c.casingId = `${casings[i].casingId}`;
     cement.push(c);

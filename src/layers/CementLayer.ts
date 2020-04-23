@@ -1,8 +1,8 @@
 import { WellboreBaseComponentLayer, StaticWellboreBaseComponentIncrement } from './WellboreBaseComponentLayer';
 import { CementLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, MDPoint } from '..';
-import { isBetween, findCasing, findIntersectingItems } from '../datautils/wellboreItemShapeGenerator';
+import { findCasing, findIntersectingItems } from '../datautils/wellboreItemShapeGenerator';
 import { Point, Texture } from 'pixi.js';
-import { createNormal, arrayToPoint } from '../utils/vectorUtils';
+import { createNormal } from '../utils/vectorUtils';
 
 export class CementLayer extends WellboreBaseComponentLayer {
   options: CementLayerOptions;
@@ -50,27 +50,16 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
   createCementShapes(cement: Cement[], casings: any, holes: any): any {
     const parseCement = (cement: Cement, casings: any, holes: any) => {
+      const attachedCasing = findCasing(cement.casingId, casings);
       const res: CompiledCement = {
-        toc: cement.toc,
-        boc: findCasing(cement.casingId, casings).end,
-        intersectingItems: findIntersectingItems(cement, casings, holes),
+        ...cement,
+        boc: attachedCasing.end,
+        intersectingItems: findIntersectingItems(cement, attachedCasing.end, casings, holes),
       };
       return res;
     };
 
     const cementCompiled = cement.map((c: any) => parseCement(c, casings, holes));
-
-    console.log('compiled', cementCompiled);
-    // foreach cement
-    // find bottom of cement based on connected casing
-
-    // find all items in the cement range
-
-    // find outer edge, based on closest item
-    // order related items by diameter
-    // for every staicincrement, find corresponding item.
-    // find top of current item || cement stop
-    // create shape.. use right edge
 
     const getClosestRelatedItem = (related: any[], md: number): HoleSize | Casing => {
       const between = related.filter((r) => r.start <= md && r.end >= md);
@@ -89,16 +78,16 @@ export class CementLayer extends WellboreBaseComponentLayer {
       return points;
     };
 
-    const createSimplePolygonPath = (c: any, t: Texture): any => {
+    const createSimplePolygonPath = (c: CompiledCement): Point[] => {
       const middle = createMiddlePath(c);
-      const points: { left: any[]; right: any[] } = { left: [], right: [] };
+      const points: { left: Point[]; right: Point[] } = { left: [], right: [] };
 
       for (let md = c.toc; md < c.boc; md += StaticWellboreBaseComponentIncrement) {
         // create normal for sections
         const offsetItem = getClosestRelatedItem(c.intersectingItems, md);
         const start = md;
         md = Math.min(c.boc, offsetItem != null ? offsetItem.end : c.boc); // set next calc MD
-        const offset = offsetItem != null ? offsetItem.diameter : 1;
+        const offset = offsetItem != null ? offsetItem.diameter : 100; // Default to flow cement outside to seabed to show error in data
         const stop = md;
         const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
         const sideLeft = createNormal(partPoints, -offset);
@@ -114,28 +103,31 @@ export class CementLayer extends WellboreBaseComponentLayer {
       const sideRightMiddle = createNormal(wholeMiddlePoints, +centerPiece.diameter);
 
       const a = [
-        ...points.left,
         ...sideLeftMiddle.map((s) => s.clone()).reverse(),
-        ...sideRightMiddle,
+        ...points.left,
+        points.left[points.left.length - 1], // Start drawing next rect from the previouis bottom
         ...points.right.map((s) => s.clone()).reverse(),
+        ...sideRightMiddle,
       ];
-      // console.log(a);
       return a;
     };
 
-    const t = this.createTex();
-    const paths = cementCompiled.map((c) => createSimplePolygonPath(c, t));
+    const t = this.createTexture();
+    const paths = cementCompiled.map((c) => createSimplePolygonPath(c));
 
-    const masks = paths.map((p) => this.drawBigPolygon(p));
-    const path = createMiddlePath({ toc: 0, boc: 3230, intersectingItems: [] }).map((s) => s.point);
+    // const bigSquareBackgroundTest = new Graphics();
+    // bigSquareBackgroundTest.beginTextureFill({ texture: t });
+    // bigSquareBackgroundTest.drawRect(-1000, -1000, 2000, 2000);
+    // bigSquareBackgroundTest.endFill();
+    // this.ctx.stage.addChild(bigSquareBackgroundTest);
 
-    masks.map((m) => this.createRopeTextureBackground(path, t, m)); // null mask
+    paths.map((p) => this.drawBigPolygon(p, t));
   }
 
-  createTex = (): Texture => {
+  createTexture = (): Texture => {
     const canvas = document.createElement('canvas');
-    canvas.width = 300;
-    canvas.height = 100; //maxWidth > 0 ? maxWidth : canvas.width; // TODO needs to grow with scale
+    canvas.width = 150;
+    canvas.height = 150;
     const canvasCtx = canvas.getContext('2d');
 
     canvasCtx.fillStyle = this.options.firstColor;
@@ -143,21 +135,18 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     canvasCtx.lineWidth = 1;
     canvasCtx.fillStyle = this.options.secondColor;
+
     canvasCtx.beginPath();
-    const nuim = 20;
-    for (let i = 0; i < (canvas.width * 2) / nuim; i++) {
-      canvasCtx.moveTo(-canvas.width + i * nuim, 0);
-      canvasCtx.lineTo(nuim * i, canvas.height * 2);
-      canvasCtx.stroke();
+
+    const num = 10;
+    for (let i = -canvas.width; i < canvas.width; i++) {
+      canvasCtx.moveTo(-canvas.width + num * i, -canvas.height);
+      canvasCtx.lineTo(canvas.width + num * i, canvas.height);
     }
-
-    // translate context to center of canvas
-    // canvasCtx.translate(canvas.width / 2, canvas.height / 2);
-
-    // // rotate 45 degrees clockwise
-    // canvasCtx.rotate(Math.PI / 4);
+    canvasCtx.stroke();
 
     const t = Texture.from(canvas);
+
     return t;
   };
 }

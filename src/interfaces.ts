@@ -140,6 +140,7 @@ export interface Casing {
 export interface CompiledCement {
   toc: number;
   boc: number;
+  casingId: string;
   intersectingItems: any;
 }
 export interface Cement {
