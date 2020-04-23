@@ -49,21 +49,21 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   createCementShapes(cement: Cement[], casings: any, holes: any): any {
-    const parseCement = (cement: Cement, casings: any, holes: any) => {
+    const parseCement = (cement: Cement, casings: Casing[], holes: HoleSize[]) => {
       const attachedCasing = findCasing(cement.casingId, casings);
       const res: CompiledCement = {
         ...cement,
         boc: attachedCasing.end,
-        intersectingItems: findIntersectingItems(cement, attachedCasing.end, casings, holes),
+        intersectingItems: findIntersectingItems(cement, attachedCasing, casings, holes),
       };
       return res;
     };
 
-    const cementCompiled = cement.map((c: any) => parseCement(c, casings, holes));
+    const cementCompiled = cement.map((c: Cement) => parseCement(c, casings, holes));
 
-    const getClosestRelatedItem = (related: any[], md: number): HoleSize | Casing => {
+    const getClosestRelatedItem = (related: (Casing | HoleSize)[], md: number): HoleSize | Casing => {
       const between = related.filter((r) => r.start <= md && r.end >= md);
-      const sorted = between.sort((r) => r.diameter);
+      const sorted = between.sort((a, b) => (a.diameter < b.diameter ? -1 : 1));
       const result = sorted[0];
       return result;
     };
@@ -87,7 +87,9 @@ export class CementLayer extends WellboreBaseComponentLayer {
         const offsetItem = getClosestRelatedItem(c.intersectingItems, md);
         const start = md;
         md = Math.min(c.boc, offsetItem != null ? offsetItem.end : c.boc); // set next calc MD
-        const offset = offsetItem != null ? offsetItem.diameter : 100; // Default to flow cement outside to seabed to show error in data
+        console.log('offset', md, c, offsetItem);
+        // Subtract casing thickness / holesize edge
+        const offset = offsetItem != null ? offsetItem.diameter - 1 : 100; // Default to flow cement outside to seabed to show error in data
         const stop = md;
         const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
         const sideLeft = createNormal(partPoints, -offset);

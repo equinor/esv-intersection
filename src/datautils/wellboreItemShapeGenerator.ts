@@ -76,10 +76,15 @@ export const isBetween = (top: number, bottom: number, itemBottom: number, itemT
   return false;
 };
 
-export const findIntersectingItems = (cement: Cement, bottomOfCement: number, casings: Casing[], holes: HoleSize[]) => {
+export const findIntersectingItems = (cement: Cement, parentCasing: Casing, casings: Casing[], holes: HoleSize[]) => {
   const { toc: start } = cement;
+
   const res = [];
-  res.push(...holes.filter((h: HoleSize) => isBetween(start, bottomOfCement, h.start, h.end)));
-  res.push(...casings.filter((c: Casing) => c.casingId !== cement.casingId && isBetween(start, bottomOfCement, c.start, c.end)));
+  res.push(...holes.filter((h: HoleSize) => isBetween(start, parentCasing.end, h.start, h.end) && h.diameter > parentCasing.diameter));
+  res.push(
+    ...casings.filter(
+      (c: Casing) => c.casingId !== cement.casingId && isBetween(start, parentCasing.end, c.start, c.end) && c.diameter > parentCasing.diameter,
+    ),
+  );
   return res;
 };
