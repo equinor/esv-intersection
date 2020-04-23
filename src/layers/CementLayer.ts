@@ -81,20 +81,30 @@ export class CementLayer extends WellboreBaseComponentLayer {
     const createSimplePolygonPath = (c: CompiledCement): Point[] => {
       const middle = createMiddlePath(c);
       const points: { left: Point[]; right: Point[] } = { left: [], right: [] };
+      let prevPoint = null;
 
       for (let md = c.toc; md < c.boc; md += StaticWellboreBaseComponentIncrement) {
         // create normal for sections
         const offsetItem = getClosestRelatedItem(c.intersectingItems, md);
         const start = md;
         md = Math.min(c.boc, offsetItem != null ? offsetItem.end : c.boc); // set next calc MD
-        console.log('offset', md, c, offsetItem);
+
         // Subtract casing thickness / holesize edge
-        const offset = offsetItem != null ? offsetItem.diameter - 1 : 100; // Default to flow cement outside to seabed to show error in data
+        const offsetDimDiff = offsetItem.diameter - offsetItem.innerDiameter || 1;
+        const defaultCementWidth = 100; // Default to flow cement outside to seabed to show error in data
+        const offset = offsetItem != null ? offsetItem.diameter - offsetDimDiff : defaultCementWidth;
         const stop = md;
-        const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
+        let partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
+
+        if (prevPoint != null) {
+          partPoints = [prevPoint, ...partPoints];
+        }
+
         const sideLeft = createNormal(partPoints, -offset);
         const sideRight = createNormal(partPoints, offset);
-        // subtract center piece with diameter from c.casingId
+
+        prevPoint = partPoints[partPoints.length - 2];
+
         points.left.push(...sideLeft);
         points.right.push(...sideRight);
       }
@@ -104,14 +114,13 @@ export class CementLayer extends WellboreBaseComponentLayer {
       const sideLeftMiddle = createNormal(wholeMiddlePoints, -centerPiece.diameter);
       const sideRightMiddle = createNormal(wholeMiddlePoints, +centerPiece.diameter);
 
-      const a = [
-        ...sideLeftMiddle.map((s) => s.clone()).reverse(),
-        ...points.left,
-        points.left[points.left.length - 1], // Start drawing next rect from the previouis bottom
-        ...points.right.map((s) => s.clone()).reverse(),
-        ...sideRightMiddle,
-      ];
-      return a;
+      const sideLeftMiddleR = sideLeftMiddle.map((s) => s.clone()).reverse();
+      const rightR = points.right.map((s) => s.clone()).reverse();
+      const cementRectCoords = [...sideLeftMiddleR, ...points.left, sideLeftMiddleR[0], ...rightR, ...sideRightMiddle];
+
+      // const line = [...sideLeftMiddleR, ...points.left];
+      // this.drawLine(line, 0xff0000);
+      return cementRectCoords;
     };
 
     const t = this.createTexture();
@@ -140,10 +149,10 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     canvasCtx.beginPath();
 
-    const num = 10;
+    const distanceBetweenLines = 10;
     for (let i = -canvas.width; i < canvas.width; i++) {
-      canvasCtx.moveTo(-canvas.width + num * i, -canvas.height);
-      canvasCtx.lineTo(canvas.width + num * i, canvas.height);
+      canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
     }
     canvasCtx.stroke();
 
