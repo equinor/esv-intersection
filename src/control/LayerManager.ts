@@ -37,9 +37,10 @@ export class LayerManager {
     this._zoomPanHandler = new ZoomPanHandler(container, (event) => this.rescale(event));
     if (scaleOptions) {
       const { xMin, xMax, yMin, yMax, xBounds, yBounds } = scaleOptions;
-      if (xMin && xMax && yMin && yMax) {
+      if (xMin !== undefined && xMax !== undefined && yMin !== undefined && yMax !== undefined) {
         this._zoomPanHandler.setBounds([xMin, xMax], [yMin, yMax]);
-      } else if (xBounds && yBounds) {
+      }
+      if (xBounds && yBounds) {
         this._zoomPanHandler.setBounds(xBounds, yBounds);
       }
     } else {

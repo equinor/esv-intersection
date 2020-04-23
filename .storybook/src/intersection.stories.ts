@@ -35,10 +35,7 @@ import {
 const xbounds: [number, number] = [0, 1000];
 const ybounds: [number, number] = [0, 1000];
 
-const xRange = 600;
-const yRange = 500;
-
-const scaleOptions = { xMin: xbounds[0], xMax: xbounds[1], yMin: ybounds[0], yMax: ybounds[1], height: yRange, width: xRange };
+const scaleOptions = { xMin: xbounds[0], xMax: xbounds[1], yMin: ybounds[0], yMax: ybounds[1] };
 const axisOptions = {
   xLabel: 'Displacement',
   yLabel: 'TVD MSL',
