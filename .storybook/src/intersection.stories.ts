@@ -2,10 +2,6 @@ import { IntersectionReferenceSystem, Controller } from '../../src/control';
 import {
   GridLayer,
   WellborepathLayer,
-  CalloutCanvasLayer,
-  ImageLayer,
-  GeomodelLayer,
-  GeomodelCanvasLayer,
   GeomodelLayerV2,
   GeomodelLabelsLayer,
   Layer,
@@ -17,7 +13,7 @@ import {
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
 
-import { generateSurfaceData, generateProjectedTrajectory, SurfaceData } from '../../src/datautils';
+import { generateSurfaceData, SurfaceData } from '../../src/datautils';
 import { getSeismicInfo, generateSeismicSliceImage } from '../../src/datautils/seismicimage';
 
 export default {
@@ -144,8 +140,6 @@ const defaultOptions = {
 const width = 700;
 const height = 600;
 
-let image: ImageBitmap = null;
-
 export const intersection = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
@@ -163,14 +157,8 @@ export const intersection = () => {
   const seismicInfo = getSeismicInfo(seismic, trajectory);
   const completion = completionData.map((c) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
-  // set wb offset in reference system
-  generateProjectedWellborePath(referenceSystem.projectedPath);
-
   // Instantiate layers
   const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
-  // const calloutLayer = new CalloutCanvasLayer('callout', { order: 4 });
-  const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
-  const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
   const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8 });
   const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
   const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData, referenceSystem });
@@ -194,16 +182,7 @@ export const intersection = () => {
     addMDOverlay(controller);
   });
 
-  // referenceSystem.offset = referenceSystem.project(0)[1];
-  // const offset = controller.referenceSystem.displacement;
-  // controller.setXAxisOffset(offset);
-  // controller.axis.flipX(false);
-
   controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
-
-  // .addLayer(calloutLayer, { annotations })
-  // .addLayer(image1Layer, { url: bg1Img })
-  // .addLayer(image2Layer, { url: bg2Img })
 
   const seismicOptions = {
     x: seismicInfo.minX,
@@ -222,10 +201,7 @@ export const intersection = () => {
   const FPSLabel = createFPSLabel();
 
   const btnGrid = createButton(controller, gridLayer, 'Grid');
-  // const btnCallout = createButton(manager, calloutLayer, 'Callout', { data: annotations });
   const btnWellbore = createButton(controller, wellboreLayer, 'Wellbore');
-  // const btnImage1 = createButton(manager, image1Layer, 'Image 1', { url: bg1Img });
-  // const btnImage2 = createButton(manager, image2Layer, 'Image 2', { url: bg2Img });
   const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model');
   const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size');
   const btnCasing = createButton(controller, casingLayer, 'Casing');
@@ -260,10 +236,7 @@ export const intersection = () => {
   });
 
   btnContainer.appendChild(btnGrid);
-  // btnContainer.appendChild(btnCallout);
   btnContainer.appendChild(btnWellbore);
-  // btnContainer.appendChild(btnImage1);
-  // btnContainer.appendChild(btnImage2);
   btnContainer.appendChild(btnGeomodel);
   btnContainer.appendChild(btnHoleSize);
   btnContainer.appendChild(btnCasing);
