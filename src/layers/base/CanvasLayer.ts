@@ -1,6 +1,6 @@
 import { Layer } from './Layer';
-import { OnMountEvent, OnUpdateEvent, OnResizeEvent, OnRescaleEvent } from '../interfaces';
-import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../constants';
+import { OnMountEvent, OnUpdateEvent, OnResizeEvent, OnRescaleEvent } from '../../interfaces';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class CanvasLayer extends Layer {
   ctx: CanvasRenderingContext2D;
@@ -9,22 +9,37 @@ export abstract class CanvasLayer extends Layer {
 
   onOpacityChanged(opacity: number): void {
     if (this.canvas) {
-      this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${opacity}`);
+      this.updateStyle();
     }
   }
 
   onOrderChanged(order: number): void {
     if (this.canvas) {
-      this.canvas.setAttribute('style', `position:absolute;z-index:${order};opacity:${this.opacity}`);
+      this.updateStyle();
+    }
+  }
+
+  onInteractivityChanged(interactive: boolean): void {
+    if (this.canvas) {
+      this.updateStyle();
     }
   }
 
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
     if (this.canvas) {
-      const visibility = visible ? 'visible' : 'hidden';
-      this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`);
+      this.updateStyle(visible);
     }
+  }
+
+  updateStyle(visible?: boolean): void {
+    const isVisible = visible || this.isVisible;
+    const visibility = isVisible ? 'visible' : 'hidden';
+    const interactive = this.interactive ? 'auto' : 'none';
+    this.canvas.setAttribute(
+      'style',
+      `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`,
+    );
   }
 
   onMount(event: OnMountEvent): void {
@@ -40,10 +55,10 @@ export abstract class CanvasLayer extends Layer {
       event.elm.appendChild(canvas);
     }
     this.canvas.setAttribute('id', `${this.id}`);
-    this.canvas.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
     this.canvas.setAttribute('width', `${width}px`);
     this.canvas.setAttribute('height', `${height}px`);
     this.canvas.setAttribute('class', 'canvas-layer');
+    this.updateStyle();
     this.ctx = this.canvas.getContext('2d');
   }
 
@@ -63,10 +78,6 @@ export abstract class CanvasLayer extends Layer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    const { ctx } = this;
-    if (!ctx) {
-      return;
-    }
   }
 
   resetTransform(): void {
@@ -75,8 +86,10 @@ export abstract class CanvasLayer extends Layer {
 
   setTransform(event: OnRescaleEvent): void {
     this.resetTransform();
-    this.ctx.translate(event.transform.x, event.transform.y);
-    this.ctx.scale(event.xRatio, event.yRatio);
+    const flippedX = event.xBounds[0] > event.xBounds[1];
+    const flippedY = event.yBounds[0] > event.yBounds[1];
+    this.ctx.translate(event.xScale(0), event.yScale(0));
+    this.ctx.scale(event.xRatio * (flippedX ? -1 : 1), event.yRatio * (flippedY ? -1 : 1));
   }
 
   clearCanvas(): void {

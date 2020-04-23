@@ -1,7 +1,7 @@
 import { Application, Transform } from 'pixi.js';
 import { Layer } from './Layer';
-import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
-import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../constants';
+import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class PixiLayer extends Layer {
   elm: HTMLElement;
@@ -18,8 +18,8 @@ export abstract class PixiLayer extends Layer {
     if (!this.container) {
       this.container = document.createElement('div');
       this.container.setAttribute('id', `${this.id}`);
-      this.container.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity}`);
       this.container.setAttribute('class', 'webgl-layer');
+      this.updateStyle();
 
       const { elm, height, width } = event;
       this.elm = elm;
@@ -78,23 +78,38 @@ export abstract class PixiLayer extends Layer {
     return { xRatio, yRatio };
   };
 
+  updateStyle(visible?: boolean): void {
+    const isVisible = visible || this.isVisible;
+    const visibility = isVisible ? 'visible' : 'hidden';
+    const interactive = this.interactive ? 'auto' : 'none';
+    this.container.setAttribute(
+      'style',
+      `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`,
+    );
+  }
+
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
     if (this.container) {
-      const visibility = visible ? 'visible' : 'hidden';
-      this.container.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`);
+      this.updateStyle(visible);
     }
   }
 
   onOpacityChanged(opacity: number): void {
     if (this.container) {
-      this.container.setAttribute('style', `position:absolute;z-index:${this.order};opacity:${opacity}`);
+      this.updateStyle();
     }
   }
 
   onOrderChanged(order: number): void {
     if (this.container) {
-      this.container.setAttribute('style', `position:absolute;z-index:${order};opacity:${this.opacity}`);
+      this.updateStyle();
+    }
+  }
+
+  onInteractivityChanged(interactive: boolean): void {
+    if (this.container) {
+      this.updateStyle();
     }
   }
 }

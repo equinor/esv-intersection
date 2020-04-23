@@ -1,14 +1,6 @@
-import { Selection } from 'd3-selection';
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
 import { ScaleOptions } from '../interfaces';
 import { Layer } from '../layers';
-
-export interface Position {
-  easting: number;
-  northing: number;
-  tvd: number;
-  md: number;
-}
 
 export interface AxisOptions {
   xLabel: string;
@@ -22,7 +14,7 @@ export interface ControllerOptions {
   scaleOptions: ScaleOptions;
   referenceSystem?: IntersectionReferenceSystem;
   layers?: Layer[];
-  poslog?: Position[];
+  path?: number[][];
 }
 
 interface OverlayEvent {

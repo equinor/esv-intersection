@@ -1,8 +1,18 @@
-import { Graphics, Texture, Point, SimpleRope, Rectangle } from 'pixi.js';
-import { PixiLayer } from './PixiLayer';
-import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, HoleObjectData, HoleSize, Casing, OnMountEvent } from '../interfaces';
+import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
+import { PixiLayer } from './base/PixiLayer';
+import {
+  HoleSizeLayerOptions,
+  OnUpdateEvent,
+  OnRescaleEvent,
+  MDPoint,
+  HoleObjectData,
+  NormalCoordsObject,
+  HoleSize,
+  Casing,
+  OnMountEvent,
+} from '../interfaces';
 
-export const StaticWellboreBaseComponentIncrement = 0.2;
+const StaticWellboreBaseComponentIncrement = 0.1;
 
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;

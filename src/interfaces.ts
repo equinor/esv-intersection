@@ -1,6 +1,6 @@
 import { ZoomTransform } from 'd3-zoom';
 import { Point, Graphics } from 'pixi.js';
-import { Layer } from './layers/Layer';
+import { Layer } from './layers/base/Layer';
 import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
 
 interface LayerEvent {
@@ -38,6 +38,7 @@ export interface LayerOptions {
   layerOpacity?: number;
   referenceSystem?: IntersectionReferenceSystem;
   data?: any;
+  interactive?: boolean;
 
   onMount?(event: OnMountEvent, layer: Layer): void;
   onUnmount?(event: OnUnmountEvent, layer: Layer): void;
@@ -101,6 +102,7 @@ export interface GeoModelData {
 
 export interface ZoomAndPanOptions {
   maxZoomLevel: number;
+  minZoomLevel: number;
 }
 
 export interface Connector {
@@ -177,13 +179,6 @@ export interface ScaleOptions {
   yMax: number;
   width: number;
   height: number;
-}
-
-export interface Position {
-  easting: number;
-  northing: number;
-  tvd: number;
-  md: number;
 }
 
 export interface Interpolator {

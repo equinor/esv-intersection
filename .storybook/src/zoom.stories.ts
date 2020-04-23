@@ -1,8 +1,10 @@
-import { CanvasLayer } from '../../src/layers/CanvasLayer';
+import { select } from 'd3-selection';
+import { CanvasLayer } from '../../src/layers';
 import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../../src/interfaces';
-import { GridLayer } from '../../src/layers/GridLayer';
-import { ZoomPanHandler } from '../../src/control/ZoomPanHandler';
-import { createFPSLabel } from './utils';
+import { GridLayer } from '../../src/layers';
+import { ZoomPanHandler } from '../../src/control';
+import { Axis } from '../../src/components';
+import { createFPSLabel, createRootContainer, createLayerContainer } from './utils';
 
 const width = 600;
 const height = 400;
@@ -269,3 +271,62 @@ export const Grid = () => {
 
   return root;
 };
+
+export const GridWithAxis = () => {
+  const root = createRootContainer(width);
+  const container = createLayerContainer(width, height);
+  const buttons = document.createElement('div');
+
+  const marginXAxis = 40;
+  const marginYAxis = 30;
+
+  const svg = select(container).append('svg').attr('height', `${height}px`).attr('width', `${width}px`).style('position', 'absolute');
+
+  const mainGroup = svg;
+  const showLabels = true;
+
+  const axis = new Axis(mainGroup, showLabels, 'Displacement', 'TVD MSL', 'm');
+
+  const gridLayer = new GridLayer('grid', {
+    majorColor: 'black',
+    minorColor: 'black',
+    majorWidth: 0.5,
+    minorWidth: 0.5,
+    order: 1,
+  });
+
+  gridLayer.onMount({ elm: container, width, height });
+
+  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
+    axis.onRescale(event);
+    gridLayer.onRescale(event);
+  });
+
+  zoomHandler.setMinZoomLevel(0.1);
+  zoomHandler.setMaxZoomLevel(10);
+
+  zoomHandler.setBounds([0, 1000], [0, 1000]);
+  zoomHandler.adjustToSize(width - marginXAxis, height - marginYAxis);
+
+  buttons.appendChild(
+    createButton('min zoom 1', () => {
+      zoomHandler.setMinZoomLevel(1);
+    }),
+  );
+  buttons.appendChild(
+    createButton('max zoom 100', () => {
+      zoomHandler.setMaxZoomLevel(100);
+    }),
+  );
+  buttons.appendChild(
+    createButton('reset', () => {
+      zoomHandler.setZoomLevelBoundary([0.1, 256]);
+    }),
+  );
+
+  root.appendChild(container);
+  root.appendChild(buttons);
+  root.appendChild(createFPSLabel());
+
+  return root;
+}

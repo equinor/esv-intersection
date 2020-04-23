@@ -29,19 +29,7 @@ const bg1Img = require('./resources/bg1.jpeg');
 const bg2Img = require('./resources/bg2.jpg');
 
 //Data
-import {
-  poslog,
-  stratColumn,
-  surfaceValues,
-  seismic,
-  annotations,
-  mockedWellborePath,
-  holeSizeData,
-  casingData,
-  completionData,
-  cementData,
-} from './exampledata/exampledata';
-import { HoleSize, Cement, Casing } from '../../src';
+import { casingData, completionData, holeSizeData, cementData, poslog, seismic, stratColumn, surfaceValues } from './exampledata';
 
 const seismicColorMap = [
   '#ffe700',
@@ -170,7 +158,9 @@ export const intersection = () => {
   const container = createLayerContainer(width, height);
   const btnContainer = createButtonContainer(width);
 
-  const referenceSystem = new IntersectionReferenceSystem(poslog, defaultOptions);
+  const path = poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]);
+
+  const referenceSystem = new IntersectionReferenceSystem(path, defaultOptions);
   const displacement = referenceSystem.displacement;
   const extend = 1000 / displacement;
   const steps = surfaceValues[0].data.values.length;
@@ -184,14 +174,14 @@ export const intersection = () => {
   generateProjectedWellborePath(referenceSystem.projectedPath);
 
   // Instantiate layers
-  const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1 });
+  const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
   // const calloutLayer = new CalloutCanvasLayer('callout', { order: 4 });
   const image1Layer = new ImageLayer('bg1Img', { order: 1, layerOpacity: 0.5 });
   const image2Layer = new ImageLayer('bg2Img', { order: 2, layerOpacity: 0.5 });
   const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8 });
-  const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red', referenceSystem });
-  const holeSizeLayer = new HoleSizeLayer('holesize', { order: 7, data: holeSizeData, referenceSystem });
-  const casingLayer = new CasingLayer('casing', { order: 8, data: casingData, referenceSystem });
+  const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
+  const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData, referenceSystem });
+  const casingLayer = new CasingLayer('casing', { order: 5, data: casingData, referenceSystem });
   const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
   const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
   const completionLayer = new CompletionLayer('completion', { order: 4, data: completion, referenceSystem });
@@ -216,11 +206,16 @@ export const intersection = () => {
     referenceSystem,
   };
 
-  const controller = new Controller({ poslog, layers, ...opts });
+  const controller = new Controller({ path, layers, ...opts });
 
   requestAnimationFrame(() => {
     addMDOverlay(controller);
   });
+
+  referenceSystem.offset = referenceSystem.project(0)[1];
+  const offset = controller.referenceSystem.offset;
+  gridLayer.offsetY = offset;
+  controller.setYAxisOffset(offset);
 
   controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
 
@@ -257,6 +252,16 @@ export const intersection = () => {
   const btnCement = createButton(controller, cementLayer, 'Cement');
   const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
   const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
+  let show = true;
+  const toggleAxis = createButtonWithCb('Toggle axis', () => {
+    if (show) {
+      controller.hideAxis();
+      show = false;
+    } else {
+      controller.showAxis();
+      show = true;
+    }
+  });
   const btnLarger = createButtonWithCb('800x600', () => {
     const w = 800;
     const h = 600;
@@ -288,6 +293,7 @@ export const intersection = () => {
   btnContainer.appendChild(btnSeismic);
   btnContainer.appendChild(btnLarger);
   btnContainer.appendChild(btnSmaller);
+  btnContainer.appendChild(toggleAxis);
 
   root.appendChild(container);
   root.appendChild(btnContainer);

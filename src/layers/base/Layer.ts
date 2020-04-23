@@ -1,9 +1,10 @@
-import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../interfaces';
-import { IntersectionReferenceSystem } from '../control';
+import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import { IntersectionReferenceSystem } from '../../control';
 
 const defaultOptions = {
   order: 1,
   layerOpacity: 1,
+  interactive: false,
 };
 
 export abstract class Layer {
@@ -16,6 +17,7 @@ export abstract class Layer {
   private _referenceSystem?: IntersectionReferenceSystem = null;
   private _data?: any;
   private _visible: boolean;
+  private _interactive: boolean = false;
 
   constructor(id?: string, options?: LayerOptions) {
     this._id = id || `layer-${Math.floor(Math.random() * 1000)}`;
@@ -28,6 +30,7 @@ export abstract class Layer {
     this._element = null;
     this._opacity = opts.layerOpacity || 1;
     this._visible = true;
+    this._interactive = opts.interactive || false;
 
     this._data = options && options.data;
     this._referenceSystem = options && options.referenceSystem;
@@ -82,6 +85,15 @@ export abstract class Layer {
 
   get order(): number {
     return this._order;
+  }
+
+  set interactive(shouldBeInteractive: boolean) {
+    this._interactive = shouldBeInteractive;
+    this.onInteractivityChanged(shouldBeInteractive);
+  }
+
+  get interactive(): boolean {
+    return this._interactive;
   }
 
   get referenceSystem(): IntersectionReferenceSystem {
@@ -156,4 +168,6 @@ export abstract class Layer {
   onOpacityChanged(opacity: number): void {}
 
   onOrderChanged(order: number): void {}
+
+  onInteractivityChanged(interactive: boolean): void {}
 }

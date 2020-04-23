@@ -1,7 +1,7 @@
 import { select, Selection } from 'd3-selection';
 import { Layer } from './Layer';
-import { OnMountEvent, OnResizeEvent } from '../interfaces';
-import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../constants';
+import { OnMountEvent, OnResizeEvent } from '../../interfaces';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class SVGLayer extends Layer {
   elm: Selection<SVGElement, any, null, undefined>;
@@ -17,7 +17,8 @@ export abstract class SVGLayer extends Layer {
       this.elm.attr('class', 'svg-layer');
     }
     this.elm.attr('height', height).attr('width', width);
-    this.elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${this.order}`);
+    const interactive = this.interactive ? 'auto' : 'none';
+    this.elm.style('position', 'absolute').style('pointer-events', interactive).style('opacity', this.opacity).style('z-index', this.order);
   }
 
   onUnmount(): void {
@@ -41,17 +42,25 @@ export abstract class SVGLayer extends Layer {
     }
   }
 
-  onOpacitChanged(opacity: number): void {
+  onOpacityChanged(opacity: number): void {
     this.opacity = opacity;
     if (this.elm) {
-      this.elm.attr('style', `position:absolute; opacity: ${opacity};z-index:${this.order}`);
+      this.elm.style('opacity', opacity);
     }
   }
 
   onOrderChanged(order: number): void {
     this.order = order;
     if (this.elm) {
-      this.elm.attr('style', `position:absolute; opacity: ${this.opacity};z-index:${order}`);
+      this.elm.style('z-index', order);
+    }
+  }
+
+  onInteractivityChanged(shouldBeInteractive: boolean): void {
+    this.interactive = shouldBeInteractive;
+    if (this.elm) {
+      const interactive = shouldBeInteractive ? 'auto' : 'none';
+      this.elm.style('pointer-events', interactive);
     }
   }
 }

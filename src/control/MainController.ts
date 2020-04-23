@@ -1,7 +1,7 @@
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
 import { LayerManager } from './LayerManager';
 import { Layer } from '../layers';
-import { ControllerOptions, Position } from './interfaces';
+import { ControllerOptions } from './interfaces';
 import { ZoomPanHandler } from './ZoomPanHandler';
 import { ReferenceSystemOptions } from '..';
 import { overlay, Overlay } from './overlay';
@@ -20,21 +20,22 @@ export class Controller {
 
   /**
    *
-   * @param poslog position log
+   * @param path array of 3d coordinates
    * @param layers list of layers
    * @param options requires a container, can optionally overwrite reference system with own,
    * setup axis through supplying options for it, or pass in scaleOptions
    */
   constructor(options: ControllerOptions) {
-    const { container, axisOptions, scaleOptions, referenceSystem, layers, poslog } = options;
+    const { container, axisOptions, scaleOptions, referenceSystem, layers, path } = options;
 
-    this._referenceSystem = referenceSystem || (poslog && new IntersectionReferenceSystem(poslog));
-    this.layerManager = new LayerManager(container, scaleOptions, axisOptions);
+    this._referenceSystem = referenceSystem || (path && new IntersectionReferenceSystem(path));
+
+    this._overlay = overlay(this, container);
+
+    this.layerManager = new LayerManager(this._overlay.elm.node() as HTMLElement, scaleOptions, axisOptions);
     if (layers) {
       this.layerManager.addLayers(layers);
     }
-
-    this._overlay = overlay(this, container);
   }
 
   setReferenceSystem(referenceSystem: IntersectionReferenceSystem): Controller {
@@ -43,8 +44,8 @@ export class Controller {
     return this;
   }
 
-  updatePoslog(poslog: Position[], options?: ReferenceSystemOptions): Controller {
-    this.setReferenceSystem(new IntersectionReferenceSystem(poslog, options));
+  updatePath(path: number[][], options?: ReferenceSystemOptions): Controller {
+    this.setReferenceSystem(new IntersectionReferenceSystem(path, options));
 
     return this;
   }
@@ -64,12 +65,12 @@ export class Controller {
   }
 
   showLayer(layerId: string): Controller {
-    this.getLayer(layerId).setVisibility(true);
+    this.layerManager.showLayer(layerId);
     return this;
   }
 
   hideLayer(layerId: string): Controller {
-    this.getLayer(layerId).setVisibility(false);
+    this.layerManager.hideLayer(layerId);
     return this;
   }
 
@@ -100,6 +101,46 @@ export class Controller {
 
   setBounds(xBounds: [number, number], yBounds: [number, number]): Controller {
     this.zoomPanHandler.setBounds(xBounds, yBounds);
+    return this;
+  }
+
+  showAxis(): Controller {
+    this.layerManager.showAxis();
+    return this;
+  }
+
+  hideAxis(): Controller {
+    this.layerManager.hideAxis();
+    return this;
+  }
+
+  setAxisOffset(x: number, y: number): Controller {
+    this.layerManager.setAxisOffset(x, y);
+    return this;
+  }
+
+  setXAxisOffset(x: number): Controller {
+    this.layerManager.setXAxisOffset(x);
+    return this;
+  }
+
+  setYAxisOffset(y: number): Controller {
+    this.layerManager.setYAxisOffset(y);
+    return this;
+  }
+
+  setZoomLevelBoundary(zoomlevels: [number, number]): Controller {
+    this.zoomPanHandler.setZoomLevelBoundary(zoomlevels);
+    return this;
+  }
+
+  setMaxZoomLevel(zoomlevel: number): Controller {
+    this.zoomPanHandler.setMaxZoomLevel(zoomlevel);
+    return this;
+  }
+
+  setMinZoomLevel(zoomlevel: number): Controller {
+    this.zoomPanHandler.setMinZoomLevel(zoomlevel);
     return this;
   }
 

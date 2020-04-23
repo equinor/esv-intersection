@@ -15,7 +15,10 @@ const defaultOptions = {
 };
 
 export const CasingLayerBasic = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog || mockedWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
+    defaultOptions,
+  );
 
   const options: CasingLayerOptions = {
     order: 1,
@@ -48,7 +51,10 @@ export const CasingLayerBasic = () => {
 };
 
 export const CasingLayerWithSampleData = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog || mockedWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
+    defaultOptions,
+  );
 
   const options: CasingLayerOptions = {
     order: 1,

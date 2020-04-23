@@ -38,9 +38,9 @@ const defaultOptions = {
 };
 
 export const HighlightWellborepath = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
 
-  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red', referenceSystem });
+  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
 
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
@@ -84,9 +84,9 @@ export const HighlightWellborepath = () => {
 };
 
 export const HighlightWellborepathWithController = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
 
-  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '5px', stroke: 'red', referenceSystem });
+  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
 
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
@@ -113,8 +113,8 @@ export const HighlightWellborepathWithController = () => {
   // external event that calls the rescale event the highlighting should change
   const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: controller.currentStateAsEvent, layer: highlightLayer }), {
     width,
-    min: 0,
-    max: controller.referenceSystem.length,
+    min: -1000,
+    max: controller.referenceSystem.length + 1000,
   });
 
   root.appendChild(container);

@@ -1,6 +1,7 @@
 import Vector2 from '@equinor/videx-vector2';
+import { clamp } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
-import { Position, Interpolator, Trajectory, ReferenceSystemOptions } from '../interfaces';
+import { Interpolator, Trajectory, ReferenceSystemOptions } from '../interfaces';
 
 const defaultOptions = {
   defaultIntersectionAngle: 45,
@@ -20,7 +21,7 @@ export class IntersectionReferenceSystem {
 
   projectedTrajectory: number[][];
 
-  offset: number;
+  private _offset: number = 0;
 
   displacement: number;
 
@@ -38,8 +39,8 @@ export class IntersectionReferenceSystem {
 
   endVector: number[];
 
-  constructor(poslog: Position[], options?: ReferenceSystemOptions) {
-    this.setPoslog(poslog, options);
+  constructor(path: number[][], options?: ReferenceSystemOptions) {
+    this.setPath(path, options);
 
     this.project = this.project.bind(this);
     this.unproject = this.unproject.bind(this);
@@ -48,11 +49,10 @@ export class IntersectionReferenceSystem {
     this.getTrajectory = this.getTrajectory.bind(this);
   }
 
-  private setPoslog(poslog: Position[], options?: ReferenceSystemOptions): void {
+  private setPath(path: number[][], options?: ReferenceSystemOptions): void {
     this.options = options || defaultOptions;
     const { arcDivisions, tension, thresholdDirectionDist } = this.options;
 
-    const path = poslog.map((p: Position) => [p.easting, p.northing, p.tvd]) || [];
     this.path = path;
 
     this.projectedPath = IntersectionReferenceSystem.toDisplacement(path);
@@ -72,18 +72,15 @@ export class IntersectionReferenceSystem {
     this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - thresholdDirectionDist, 1);
     this.startVector = this.endVector.map((d: number) => d * -1);
   }
-
   /**
    * Map a length along the curve to intersection coordinates
+   * @param length length along the curve
    */
   project(length: number): number[] {
     const { curtain } = this.interpolators;
-    const l = length / this.length;
-    // TODO handle points outside
-    if (l < 0 || l > 1) {
-      return [0, 0];
-    }
-    const p = curtain.getPointAt(l);
+    const l = (length - this._offset) / this.length;
+    const t = clamp(l, 0, 1);
+    const p = curtain.getPointAt(t);
     return p;
   }
 
@@ -99,7 +96,7 @@ export class IntersectionReferenceSystem {
     }
     const ls = this.interpolators.curtain.lookupPositions(displacement, 0, 1);
     if (ls && ls.length) {
-      return ls[0] * this.length;
+      return ls[0] * this.length + this._offset;
     }
     return null;
   }
@@ -111,8 +108,12 @@ export class IntersectionReferenceSystem {
     const { curtain } = this.interpolators;
     const pl = this.project(length);
     const l = pl[0] / curtain.maxX;
-    if (Number.isNaN(l) || l < 0) return 0;
-    if (l > 1) return 1;
+    if (Number.isNaN(l) || l < 0) {
+      return 0;
+    }
+    if (l > 1) {
+      return 1;
+    }
     return l;
   }
 
@@ -211,5 +212,13 @@ export class IntersectionReferenceSystem {
 
   get length(): number {
     return this.interpolators.curve.length;
+  }
+
+  get offset(): number {
+    return this._offset;
+  }
+
+  set offset(offset: number) {
+    this._offset = offset;
   }
 }

@@ -77,7 +77,7 @@ export const ToggleCanvasLayer = () => {
 
   const options: WellborepathLayerOptions = {
     order: 1,
-    strokeWidth: '5px',
+    strokeWidth: '2px',
     stroke: 'black',
   };
 

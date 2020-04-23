@@ -31,6 +31,7 @@ export class LayerManager {
   constructor(container: HTMLElement, scaleOptions: ScaleOptions, axisOptions?: AxisOptions) {
     this.container = container;
     this.layerContainer = document.createElement('div');
+    this.layerContainer.className = 'layer-container';
     this.container.appendChild(this.layerContainer);
     this.adjustToSize(+this.container.getAttribute('width'), +this.container.getAttribute('height'));
     this._zoomPanHandler = new ZoomPanHandler(container, (event) => this.rescale(event));
@@ -90,15 +91,24 @@ export class LayerManager {
     return this;
   }
 
+  showLayer(layerId: string): LayerManager {
+    const layer = this.getLayer(layerId);
+    layer.setVisibility(true);
+    layer.onRescale(this.zoomPanHandler.currentStateAsEvent());
+    return this;
+  }
+
+  hideLayer(layerId: string): LayerManager {
+    this.getLayer(layerId).setVisibility(false);
+    return this;
+  }
+
   adjustToSize(width: number, height: number): void {
     const horizontalAxisMargin = 40;
     const verticalAxisMargin = 30;
 
     const layersWidth = this.axis ? width - horizontalAxisMargin : width;
     const layersHeight = this.axis ? height - verticalAxisMargin : height;
-
-    this.layerContainer.setAttribute('width', `${layersWidth}px`);
-    this.layerContainer.setAttribute('height', `${layersHeight}px`);
 
     if (this.axis) {
       const resizeEvent = { width, height };
@@ -113,6 +123,51 @@ export class LayerManager {
     }
   }
 
+  setReferenceSystem(irs: IntersectionReferenceSystem): void {
+    this.layers.forEach((layer) => (layer.referenceSystem = irs));
+  }
+
+  showAxis(): LayerManager {
+    this.axis.show();
+    return this;
+  }
+
+  hideAxis(): LayerManager {
+    this.axis.hide();
+    return this;
+  }
+
+  setAxisOffset(x: number, y: number): LayerManager {
+    this.axis.offsetX = x;
+    this.axis.offsetY = y;
+    return this;
+  }
+
+  setXAxisOffset(x: number): LayerManager {
+    this.axis.offsetX = x;
+    return this;
+  }
+
+  setYAxisOffset(y: number): LayerManager {
+    this.axis.offsetY = y;
+    return this;
+  }
+
+  setZoomLevelBoundary(zoomlevels: [number, number]): LayerManager {
+    this._zoomPanHandler.setZoomLevelBoundary(zoomlevels);
+    return this;
+  }
+
+  setMaxZoomLevel(zoomlevel: number): LayerManager {
+    this._zoomPanHandler.setMaxZoomLevel(zoomlevel);
+    return this;
+  }
+
+  setMinZoomLevel(zoomlevel: number): LayerManager {
+    this._zoomPanHandler.setMinZoomLevel(zoomlevel);
+    return this;
+  }
+
   get zoomPanHandler(): ZoomPanHandler {
     return this._zoomPanHandler;
   }
@@ -122,7 +177,7 @@ export class LayerManager {
       this.axis.onRescale(event);
     }
     if (this.layers) {
-      this.layers.forEach((layer) => layer.onRescale(event));
+      this.layers.forEach((layer) => (layer.isVisible === true ? layer.onRescale(event) : {}));
     }
   }
 
@@ -142,7 +197,4 @@ export class LayerManager {
     return axis;
   };
 
-  setReferenceSystem(irs: IntersectionReferenceSystem): void {
-    this.layers.forEach((layer) => (layer.referenceSystem = irs));
-  }
 }

@@ -7,6 +7,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
 
 import poslog from '../../exampledata/poslog.json';
+import { IntersectionReferenceSystem } from '../../../../src/control';
 
 const width = 400;
 const height = 500;
@@ -14,39 +15,25 @@ const xbounds = [0, 200];
 const ybounds = [0, 200];
 
 const createEventObj = (elm: any) => {
-  const xscale = scaleLinear().domain(xbounds).range([0, width]);
-  const yscale = scaleLinear().domain(ybounds).range([0, height]);
-  const data = [
-    [50, 0],
-    [50, 10],
-    [50, 20],
-    [50, 30],
-    [50, 40],
-    [50, 50],
-    [55, 60],
-    [60, 70],
-    [65, 80],
-    [65, 90],
-    [85, 100],
-    [95, 110],
-    [115, 110],
-    [115, 110],
-    [120, 110],
-  ];
-
   return {
-    xScale: xscale.copy(),
-    yScale: yscale.copy(),
     elm,
-    data,
   };
 };
 
+const defaultOptions = {
+  defaultIntersectionAngle: 135,
+  tension: 0.75,
+  arcDivisions: 5000,
+  thresholdDirectionDist: 0.001,
+};
+
 export const Wellborepath = () => {
+  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
   const options: WellborepathLayerOptions = {
     order: 1,
-    strokeWidth: '5px',
+    strokeWidth: '2px',
     stroke: 'black',
+    referenceSystem,
   };
   const layer = new WellborepathLayer('wellborepath', options);
 
@@ -65,19 +52,21 @@ export const WellborepathWithSampleDataAndZoom = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
-  const wellborePath = generateProjectedWellborePath(poslog);
+
+  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
 
   const options: WellborepathLayerOptions = {
     order: 1,
-    strokeWidth: '5px',
+    strokeWidth: '2px',
     stroke: 'black',
+    referenceSystem,
   };
   const wellborePathLayer = new WellborepathLayer('wellborepath', options);
   wellborePathLayer.onMount({ elm: container, width, height });
-  wellborePathLayer.onUpdate({ ...createEventObj(container), data: wellborePath });
+  wellborePathLayer.onUpdate({ ...createEventObj(container) });
 
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
-    wellborePathLayer.onRescale({ ...event, data: wellborePath });
+    wellborePathLayer.onRescale({ ...event });
   });
   zoomHandler.setBounds([0, 1000], [0, 1000]);
   zoomHandler.adjustToSize(width, height);
