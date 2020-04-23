@@ -157,12 +157,12 @@ export interface NormalCoordsObject {
 }
 
 export interface ScaleOptions {
-  xMin: number;
-  xMax: number;
-  yMin: number;
-  yMax: number;
-  width: number;
-  height: number;
+  xMin?: number;
+  xMax?: number;
+  yMin?: number;
+  yMax?: number;
+  xBounds?: [number, number];
+  yBounds?: [number, number];
 }
 
 export interface Interpolator {
