@@ -5,7 +5,7 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 import { IntersectionReferenceSystem } from '../../../../src';
 
 // Data
-import { poslog, mockedWellborePath, completionData } from '../../exampledata/exampledata';
+import { poslog, mockedWellborePath, completionData } from '../../exampledata';
 
 const defaultOptions = {
   defaultIntersectionAngle: 135,

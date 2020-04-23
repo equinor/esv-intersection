@@ -12,7 +12,7 @@ import {
   OnMountEvent,
 } from '../interfaces';
 
-const StaticWellboreBaseComponentIncrement = 0.1;
+export const StaticWellboreBaseComponentIncrement = 0.1;
 
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;

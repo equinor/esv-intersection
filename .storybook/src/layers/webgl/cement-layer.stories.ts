@@ -5,7 +5,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { poslog, mockedWellborePath, casingData, holeSizeData, cementData } from '../../exampledata/exampledata';
+import { poslog, mockedWellborePath, casingData, holeSizeData, cementData } from '../../exampledata';
 
 const defaultOptions = {
   defaultIntersectionAngle: 135,
