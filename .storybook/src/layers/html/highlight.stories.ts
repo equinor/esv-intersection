@@ -38,7 +38,10 @@ const defaultOptions = {
 };
 
 export const HighlightWellborepath = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
+    defaultOptions,
+  );
 
   const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
 
@@ -84,7 +87,10 @@ export const HighlightWellborepath = () => {
 };
 
 export const HighlightWellborepathWithController = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
+    defaultOptions,
+  );
 
   const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
 

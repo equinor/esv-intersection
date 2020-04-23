@@ -196,5 +196,4 @@ export class LayerManager {
 
     return axis;
   };
-
 }

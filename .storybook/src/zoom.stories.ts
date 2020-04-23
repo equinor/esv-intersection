@@ -329,4 +329,4 @@ export const GridWithAxis = () => {
   root.appendChild(createFPSLabel());
 
   return root;
-}
+};
