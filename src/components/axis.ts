@@ -14,12 +14,14 @@ export class Axis {
   private mainGroup: Selection<SVGElement, any, null, undefined>;
   private _scaleX: ScaleLinear<number, number>;
   private _scaleY: ScaleLinear<number, number>;
-  showLabels = true;
-  labelXDesc: string;
-  labelYDesc: string;
-  unitOfMeasure: string;
+  private _showLabels = true;
+  private _labelXDesc: string;
+  private _labelYDesc: string;
+  private _unitOfMeasure: string;
   private _offsetX: number = 0;
   private _offsetY: number = 0;
+  private _flipX = false;
+  private _flipY = false;
   private visible: boolean = true;
 
   constructor(
@@ -31,10 +33,10 @@ export class Axis {
     options?: Options,
   ) {
     this.mainGroup = mainGroup;
-    this.showLabels = showLabels;
-    this.labelXDesc = labelXDesc;
-    this.labelYDesc = labelYDesc;
-    this.unitOfMeasure = unitOfMeasure;
+    this._showLabels = showLabels;
+    this._labelXDesc = labelXDesc;
+    this._labelYDesc = labelYDesc;
+    this._unitOfMeasure = unitOfMeasure;
     if (options && options.offsetX) {
       this._offsetX = options.offsetX;
     }
@@ -44,17 +46,19 @@ export class Axis {
     if (options && options.visible) {
       this.visible = options.visible;
     }
+    this.mainGroup.style('pointer-events', 'none');
+
     this._scaleX = scaleLinear().domain([0, 1]).range([0, 1]);
     this._scaleY = scaleLinear().domain([0, 1]).range([0, 1]);
   }
 
   private renderLabelx(): Selection<BaseType, any, null, undefined> {
-    const { labelXDesc, unitOfMeasure, showLabels, _scaleX: scaleX } = this;
+    const { _labelXDesc: labelXDesc, _unitOfMeasure: unitOfMeasure, _showLabels, _scaleX: scaleX } = this;
     const [, width] = scaleX.range();
     const gx = this.renderGx();
 
     let labelx = gx.select('text.axis-labelx');
-    if (showLabels) {
+    if (_showLabels) {
       if (labelx.empty()) {
         labelx = gx
           .append('text')
@@ -73,12 +77,12 @@ export class Axis {
   }
 
   private renderLabely(): Selection<BaseType, any, null, undefined> {
-    const { labelYDesc, unitOfMeasure, showLabels, _scaleY } = this;
+    const { _labelYDesc: labelYDesc, _unitOfMeasure: unitOfMeasure, _showLabels, _scaleY } = this;
     const [, height] = _scaleY.range();
     const gy = this.renderGy();
 
     let labely = gy.select('text.axis-labely');
-    if (showLabels) {
+    if (_showLabels) {
       if (labely.empty()) {
         labely = gy
           .append('text')
@@ -148,6 +152,8 @@ export class Axis {
 
     _scaleX.domain([xBounds[0] - offsetX, xBounds[1] - offsetX]).range(xRange);
     _scaleY.domain([yBounds[0] - offsetY, yBounds[1] - offsetY]).range(yRange);
+    this.flipX(this._flipX);
+    this.flipY(this._flipY);
 
     if (this.visible) {
       this.render();
@@ -164,6 +170,56 @@ export class Axis {
   hide(): Axis {
     this.visible = false;
     this.mainGroup.attr('visibility', 'hidden');
+    return this;
+  }
+
+  flipX(flipX: boolean): Axis {
+    this._flipX = flipX;
+    const domain = this._scaleX.domain();
+    const flip = flipX ? -1 : 1;
+    this._scaleX.domain([flip * domain[0], flip * domain[1]]);
+    return this;
+  }
+
+  flipY(flipY: boolean): Axis {
+    this._flipY = flipY;
+    const domain = this._scaleY.domain();
+    const flip = flipY ? -1 : 1;
+    this._scaleY.domain([flip * domain[0], flip * domain[1]]);
+    return this;
+  }
+
+  showLabels(): Axis {
+    this._showLabels = true;
+    this.render();
+    return this;
+  }
+
+  hideLabels(): Axis {
+    this._showLabels = false;
+    this.render();
+    return this;
+  }
+
+  setLabelX(label: string): Axis {
+    this._labelXDesc = label;
+    return this;
+  }
+
+  setLabelY(label: string): Axis {
+    this._labelYDesc = label;
+    return this;
+  }
+
+  setUnitOfMeasure(uom: string): Axis {
+    this._unitOfMeasure = uom;
+    return this;
+  }
+
+  setLabels(labelX: string, labelY: string, unitOfMeasure: string): Axis {
+    this._labelXDesc = labelX;
+    this._labelYDesc = labelY;
+    this._unitOfMeasure = unitOfMeasure;
     return this;
   }
 

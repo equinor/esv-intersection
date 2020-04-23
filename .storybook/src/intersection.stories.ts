@@ -194,14 +194,13 @@ export const intersection = () => {
     addMDOverlay(controller);
   });
 
-  referenceSystem.offset = referenceSystem.project(0)[1];
-  const offset = controller.referenceSystem.offset
-  gridLayer.offsetY = offset;
-  controller.setYAxisOffset(offset);
+  // referenceSystem.offset = referenceSystem.project(0)[1];
+  // const offset = controller.referenceSystem.displacement;
+  // controller.setXAxisOffset(offset);
+  // controller.axis.flipX(false);
 
   controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
 
-  controller;
   // .addLayer(calloutLayer, { annotations })
   // .addLayer(image1Layer, { url: bg1Img })
   // .addLayer(image2Layer, { url: bg2Img })
@@ -234,12 +233,12 @@ export const intersection = () => {
   const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
   const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
   let show = true;
-  const toggleAxis = createButtonWithCb('Toggle axis', () => {
+  const toggleAxis = createButtonWithCb('Toggle axis labels', () => {
     if (show) {
-      controller.hideAxis();
+      controller.hideAxisLabels();
       show = false;
     } else {
-      controller.showAxis();
+      controller.showAxisLabels();
       show = true;
     }
   });

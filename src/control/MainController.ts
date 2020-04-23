@@ -4,6 +4,7 @@ import { Layer } from '../layers';
 import { ControllerOptions } from './interfaces';
 import { ZoomPanHandler } from './ZoomPanHandler';
 import { ReferenceSystemOptions } from '..';
+import { Axis } from '../components';
 import { overlay, Overlay } from './overlay';
 
 const HORIZONTALAXISMARGIN = 40;
@@ -114,6 +115,16 @@ export class Controller {
     return this;
   }
 
+  showAxisLabels(): Controller {
+    this.layerManager.showAxisLabels();
+    return this;
+  }
+
+  hideAxisLabels(): Controller {
+    this.layerManager.hideAxisLabels();
+    return this;
+  }
+
   setAxisOffset(x: number, y: number): Controller {
     this.layerManager.setAxisOffset(x, y);
     return this;
@@ -154,6 +165,10 @@ export class Controller {
 
   get zoomPanHandler(): ZoomPanHandler {
     return this.layerManager.zoomPanHandler;
+  }
+
+  get axis(): Axis {
+    return this.layerManager.axis;
   }
 
   get currentStateAsEvent(): any {
