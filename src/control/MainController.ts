@@ -41,6 +41,7 @@ export class Controller {
     this.layerManager = new LayerManager(this._overlay.elm.node() as HTMLElement, scaleOptions, axisOptions);
     if (layers) {
       this.layerManager.addLayers(layers);
+      this.setOverlayZIndex(layers);
     }
   }
 
@@ -58,6 +59,7 @@ export class Controller {
 
   addLayer(layer: Layer, params?: any): Controller {
     this.layerManager.addLayer(layer, params);
+    this.setOverlayZIndex(this.layerManager.getLayers());
     return this;
   }
 
@@ -158,6 +160,17 @@ export class Controller {
   setMinZoomLevel(zoomlevel: number): Controller {
     this.zoomPanHandler.setMinZoomLevel(zoomlevel);
     return this;
+  }
+
+  private getHighestZIndex(layers: Layer[]): number {
+    // eslint-disable-next-line no-magic-numbers
+    const highestZIndex = layers.length > 0 ? layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 10;
+    return highestZIndex;
+  }
+
+  private setOverlayZIndex(layers: Layer[]): void {
+    const highestZIndex = this.getHighestZIndex(layers);
+    this.overlay.setZIndex(highestZIndex + 2);
   }
 
   get overlay(): Overlay {

@@ -1,4 +1,4 @@
-import { select } from 'd3-selection';
+import { select, Selection } from 'd3-selection';
 import { ZoomPanHandler } from './ZoomPanHandler';
 import { Layer, GridLayer } from '../layers';
 import { ScaleOptions, OnMountEvent, OnRescaleEvent } from '../interfaces';
@@ -21,6 +21,7 @@ export class LayerManager {
   private layers: Layer[] = [];
 
   private _axis: Axis;
+  private _svgContainer: Selection<HTMLElement, unknown, null, undefined>;
 
   /**
    * Class for handling layers
@@ -101,6 +102,10 @@ export class LayerManager {
     const rescaleEvent = this.zoomPanHandler.currentStateAsEvent();
     layer.onUpdate({ ...rescaleEvent, ...params });
     layer.onRescale(rescaleEvent);
+
+    // eslint-disable-next-line no-magic-numbers
+    const highestZIndex = this.layers.length > 0 ? this.layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 10;
+    this._svgContainer.style('z-index', `${highestZIndex + 1}`);
 
     return this;
   }
@@ -224,12 +229,14 @@ export class LayerManager {
 
   private createAxis = (options: AxisOptions): Axis => {
     const { container } = this;
-    const svgContainer = document.createElement('div');
-    svgContainer.setAttribute('style', 'position: absolute; z-index: 1999;');
-    svgContainer.setAttribute('class', 'axis');
-    container.appendChild(svgContainer);
+    this._svgContainer = select(container)
+      .append('div')
+      .attr('class', 'axis')
+      .style('position', 'absolute')
+      .style('z-index', '10')
+      .style('pointer-events', 'none');
 
-    const svg = select(svgContainer).append('svg').attr('height', `${container.offsetHeight}px`).attr('width', `${container.offsetWidth}px`);
+    const svg = this._svgContainer.append('svg').attr('height', `${container.offsetHeight}px`).attr('width', `${container.offsetWidth}px`);
 
     const showLabels = true;
 

@@ -10,7 +10,7 @@ class Overlay {
 
   constructor(caller: any, container: HTMLElement) {
     const con = select(container);
-    this.elm = con.append('div').attr('id', 'overlay').style('z-index', '2000').style('position', 'absolute');
+    this.elm = con.append('div').attr('id', 'overlay').style('z-index', '11').style('position', 'absolute');
 
     this.source = this.elm.node();
 
@@ -19,7 +19,9 @@ class Overlay {
       const { width, height } = event.detail;
       elm.style('width', `${width}px`).style('height', `${height}px`);
 
-      if (!this.enabled) return;
+      if (!this.enabled) {
+        return;
+      }
 
       Object.keys(this.listeners).forEach((key: string) => {
         const target = this.elements[key] || null;
@@ -39,7 +41,9 @@ class Overlay {
     });
 
     elm.on('mousemove', () => {
-      if (!this.enabled) return;
+      if (!this.enabled) {
+        return;
+      }
 
       const [mx, my] = mouse(document.getElementById('overlay'));
       Object.keys(this.listeners).forEach((key: string) => {
@@ -61,7 +65,9 @@ class Overlay {
     });
 
     elm.on('mouseout', () => {
-      if (!this.enabled) return;
+      if (!this.enabled) {
+        return;
+      }
       Object.keys(this.listeners).forEach((key: string) => {
         const target = this.elements[key] || null;
         const ops = this.listeners[key];
@@ -98,6 +104,10 @@ class Overlay {
       delete this.elements[key];
     }
     delete this.listeners[key];
+  }
+
+  setZIndex(zIndex: number): void {
+    this.elm.style('z-index', zIndex);
   }
 }
 
