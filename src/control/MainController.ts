@@ -163,8 +163,7 @@ export class Controller {
   }
 
   private getHighestZIndex(layers: Layer[]): number {
-    // eslint-disable-next-line no-magic-numbers
-    const highestZIndex = layers.length > 0 ? layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 10;
+    const highestZIndex = layers.length > 0 ? layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 1;
     return highestZIndex;
   }
 

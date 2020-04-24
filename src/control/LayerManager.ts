@@ -103,8 +103,7 @@ export class LayerManager {
     layer.onUpdate({ ...rescaleEvent, ...params });
     layer.onRescale(rescaleEvent);
 
-    // eslint-disable-next-line no-magic-numbers
-    const highestZIndex = this.layers.length > 0 ? this.layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 10;
+    const highestZIndex = this.layers.length > 0 ? this.layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 1;
     this._svgContainer.style('z-index', `${highestZIndex + 1}`);
 
     return this;
