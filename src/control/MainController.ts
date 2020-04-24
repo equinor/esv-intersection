@@ -20,11 +20,16 @@ export class Controller {
   private _overlay: Overlay;
 
   /**
-   *
-   * @param path array of 3d coordinates
-   * @param layers list of layers
-   * @param options requires a container, can optionally overwrite reference system with own,
-   * setup axis through supplying options for it, or pass in scaleOptions
+   * Interface to control layers, reference system, axis and overlay. overlay is created on instantiation, does not currently support opt-out.
+   * @param options
+   * @param options.container (required) Currently only supports HTMLElement
+   * @param options.scaleOptions (optional) currently supports formats listed in examples below
+   * @example scaleOptions = { xMin: 0, xMax: 100, yMin: 0, yMax: 100 }
+   * @example scaleOptions = { xBounds: [0 , 100], yBounds: [0, 100] }
+   * @param options.axisOptions (optional) creates axis with supplied labels, currently only supports creating axis on instantiation
+   * @param options.layers (optional) list of layers
+   * @param options.path (optional) creates a reference system based on an array of 3d coordinates
+   * @param options.referenceSystem (optional) sets reference system, takes priority over path if both are supplied
    */
   constructor(options: ControllerOptions) {
     const { container, axisOptions, scaleOptions, referenceSystem, layers, path } = options;

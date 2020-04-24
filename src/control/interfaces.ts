@@ -11,7 +11,7 @@ export interface AxisOptions {
 export interface ControllerOptions {
   container: HTMLElement;
   axisOptions?: AxisOptions;
-  scaleOptions: ScaleOptions;
+  scaleOptions?: ScaleOptions;
   referenceSystem?: IntersectionReferenceSystem;
   layers?: Layer[];
   path?: number[][];

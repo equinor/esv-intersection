@@ -8,4 +8,5 @@ export * as mockedWellborePath from './wellborepathMock.json';
 export * as holeSizeData from './holesizeData.json';
 export * as casingData from './casingMock.json';
 export * as completionData from './completion.json';
+export * as seismicColorMap from './seismicColorMap.json';
 

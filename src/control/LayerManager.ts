@@ -28,14 +28,24 @@ export class LayerManager {
    * @param scaleOptions
    * @param axisOptions
    */
-  constructor(container: HTMLElement, scaleOptions: ScaleOptions, axisOptions?: AxisOptions) {
+  constructor(container: HTMLElement, scaleOptions?: ScaleOptions, axisOptions?: AxisOptions) {
     this.container = container;
     this.layerContainer = document.createElement('div');
     this.layerContainer.className = 'layer-container';
     this.container.appendChild(this.layerContainer);
     this.adjustToSize(+this.container.getAttribute('width'), +this.container.getAttribute('height'));
     this._zoomPanHandler = new ZoomPanHandler(container, (event) => this.rescale(event));
-    this._zoomPanHandler.setBounds([scaleOptions.xMin, scaleOptions.xMax], [scaleOptions.yMin, scaleOptions.yMax]);
+    if (scaleOptions) {
+      const { xMin, xMax, yMin, yMax, xBounds, yBounds } = scaleOptions;
+      if (xMin !== undefined && xMax !== undefined && yMin !== undefined && yMax !== undefined) {
+        this._zoomPanHandler.setBounds([xMin, xMax], [yMin, yMax]);
+      }
+      if (xBounds && yBounds) {
+        this._zoomPanHandler.setBounds(xBounds, yBounds);
+      }
+    } else {
+      this._zoomPanHandler.setBounds([0, 1], [0, 1]);
+    }
 
     if (axisOptions) {
       this._axis = this.createAxis(axisOptions);
@@ -227,5 +237,4 @@ export class LayerManager {
 
     return axis;
   };
-
 }
