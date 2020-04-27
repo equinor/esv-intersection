@@ -103,10 +103,8 @@ export class LayerManager {
     layer.onUpdate({ ...rescaleEvent, ...params });
     layer.onRescale(rescaleEvent);
 
-    if (this._svgContainer) {
-      const highestZIndex = this.layers.length > 0 ? this.layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 1;
-      this._svgContainer.style('z-index', `${highestZIndex + 1}`);
-    }
+    const highestZIndex = this.layers.length > 0 ? this.layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 1;
+    this._svgContainer.style('z-index', `${highestZIndex + 1}`);
 
     return this;
   }
