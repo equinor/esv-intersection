@@ -1,4 +1,4 @@
-import { GridLayer, WellborepathLayer, Layer } from '../src/index';
+import { WellborepathLayer } from '../src/index';
 
 const wellborePath = [0, 0, 0, 12, 4, 12];
 
