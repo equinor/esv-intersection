@@ -117,6 +117,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#addlayer" class="tsd-kind-icon">add<wbr>Layer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#adjusttosize" class="tsd-kind-icon">adjust<wbr>ToSize</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_control_maincontroller_.controller.html#gethighestzindex" class="tsd-kind-icon">get<wbr>HighestZIndex</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#getlayer" class="tsd-kind-icon">get<wbr>Layer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#hideaxis" class="tsd-kind-icon">hide<wbr>Axis</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#hideaxislabels" class="tsd-kind-icon">hide<wbr>Axis<wbr>Labels</a></li>
@@ -126,6 +127,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#setbounds" class="tsd-kind-icon">set<wbr>Bounds</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#setmaxzoomlevel" class="tsd-kind-icon">set<wbr>Max<wbr>Zoom<wbr>Level</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#setminzoomlevel" class="tsd-kind-icon">set<wbr>Min<wbr>Zoom<wbr>Level</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_control_maincontroller_.controller.html#setoverlayzindex" class="tsd-kind-icon">set<wbr>OverlayZIndex</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#setreferencesystem" class="tsd-kind-icon">set<wbr>Reference<wbr>System</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#setviewport" class="tsd-kind-icon">set<wbr>Viewport</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_control_maincontroller_.controller.html#setxaxisoffset" class="tsd-kind-icon">setXAxis<wbr>Offset</a></li>
@@ -152,21 +154,26 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L20">control/MainController.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L20">control/MainController.ts:20</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Interface to control layers, reference system, axis and overlay. overlay is created on instantiation, does not currently support opt-out.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><p>scaleOptions = { xMin: 0, xMax: 100, yMin: 0, yMax: 100 }</p>
+									</dd>
+									<dt>example</dt>
+									<dd><p>scaleOptions = { xBounds: [0 , 100], yBounds: [0, 100] }</p>
+									</dd>
+								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>options: <a href="../interfaces/_control_interfaces_.controlleroptions.html" class="tsd-signature-type">ControllerOptions</a></h5>
-									<div class="tsd-comment tsd-typography">
-										<div class="lead">
-											<p>requires a container, can optionally overwrite reference system with own,
-											setup axis through supplying options for it, or pass in scaleOptions</p>
-										</div>
-									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_control_maincontroller_.controller.html" class="tsd-signature-type">Controller</a></h4>
@@ -182,7 +189,7 @@
 					<div class="tsd-signature tsd-kind-icon">_overlay<span class="tsd-signature-symbol">:</span> <a href="_control_overlay_.overlay.html" class="tsd-signature-type">Overlay</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L20">control/MainController.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L20">control/MainController.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -192,7 +199,7 @@
 					<div class="tsd-signature tsd-kind-icon">_reference<wbr>System<span class="tsd-signature-symbol">:</span> <a href="_control_intersectionreferencesystem_.intersectionreferencesystem.html" class="tsd-signature-type">IntersectionReferenceSystem</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L17">control/MainController.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L17">control/MainController.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -202,7 +209,7 @@
 					<div class="tsd-signature tsd-kind-icon">layer<wbr>Manager<span class="tsd-signature-symbol">:</span> <a href="_control_layermanager_.layermanager.html" class="tsd-signature-type">LayerManager</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L19">control/MainController.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L19">control/MainController.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -219,7 +226,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L170">control/MainController.ts:170</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L187">control/MainController.ts:187</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_components_axis_.axis.html" class="tsd-signature-type">Axis</a></h4>
@@ -236,7 +243,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L174">control/MainController.ts:174</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L191">control/MainController.ts:191</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
@@ -253,7 +260,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L158">control/MainController.ts:158</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L175">control/MainController.ts:175</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_overlay_.overlay.html" class="tsd-signature-type">Overlay</a></h4>
@@ -270,7 +277,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L162">control/MainController.ts:162</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L179">control/MainController.ts:179</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_intersectionreferencesystem_.intersectionreferencesystem.html" class="tsd-signature-type">IntersectionReferenceSystem</a></h4>
@@ -287,7 +294,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L166">control/MainController.ts:166</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L183">control/MainController.ts:183</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_zoompanhandler_.zoompanhandler.html" class="tsd-signature-type">ZoomPanHandler</a></h4>
@@ -307,7 +314,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L54">control/MainController.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L60">control/MainController.ts:60</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -333,7 +340,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L82">control/MainController.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L89">control/MainController.ts:89</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -354,6 +361,29 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="gethighestzindex" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>HighestZIndex</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>HighestZIndex<span class="tsd-signature-symbol">(</span>layers<span class="tsd-signature-symbol">: </span><a href="_layers_base_layer_.layer.html" class="tsd-signature-type">Layer</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L165">control/MainController.ts:165</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>layers: <a href="_layers_base_layer_.layer.html" class="tsd-signature-type">Layer</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="getlayer" class="tsd-anchor"></a>
 					<h3>get<wbr>Layer</h3>
@@ -364,7 +394,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L64">control/MainController.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L71">control/MainController.ts:71</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -387,7 +417,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L113">control/MainController.ts:113</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L120">control/MainController.ts:120</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_maincontroller_.controller.html" class="tsd-signature-type">Controller</a></h4>
@@ -404,7 +434,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L123">control/MainController.ts:123</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L130">control/MainController.ts:130</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_maincontroller_.controller.html" class="tsd-signature-type">Controller</a></h4>
@@ -421,7 +451,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L73">control/MainController.ts:73</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L80">control/MainController.ts:80</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -444,7 +474,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L59">control/MainController.ts:59</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L66">control/MainController.ts:66</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -467,7 +497,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L128">control/MainController.ts:128</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L135">control/MainController.ts:135</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -493,7 +523,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L103">control/MainController.ts:103</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L110">control/MainController.ts:110</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -519,7 +549,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L148">control/MainController.ts:148</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L155">control/MainController.ts:155</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -542,7 +572,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L153">control/MainController.ts:153</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L160">control/MainController.ts:160</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -552,6 +582,29 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_control_maincontroller_.controller.html" class="tsd-signature-type">Controller</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="setoverlayzindex" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> set<wbr>OverlayZIndex</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>OverlayZIndex<span class="tsd-signature-symbol">(</span>layers<span class="tsd-signature-symbol">: </span><a href="_layers_base_layer_.layer.html" class="tsd-signature-type">Layer</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L170">control/MainController.ts:170</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>layers: <a href="_layers_base_layer_.layer.html" class="tsd-signature-type">Layer</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -565,7 +618,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L42">control/MainController.ts:42</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L48">control/MainController.ts:48</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -588,7 +641,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L98">control/MainController.ts:98</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L105">control/MainController.ts:105</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -634,7 +687,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L133">control/MainController.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L140">control/MainController.ts:140</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -657,7 +710,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L138">control/MainController.ts:138</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L145">control/MainController.ts:145</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -680,7 +733,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L143">control/MainController.ts:143</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L150">control/MainController.ts:150</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -703,7 +756,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L108">control/MainController.ts:108</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L115">control/MainController.ts:115</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_maincontroller_.controller.html" class="tsd-signature-type">Controller</a></h4>
@@ -720,7 +773,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L118">control/MainController.ts:118</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L125">control/MainController.ts:125</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_maincontroller_.controller.html" class="tsd-signature-type">Controller</a></h4>
@@ -737,7 +790,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L68">control/MainController.ts:68</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L75">control/MainController.ts:75</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -760,7 +813,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/MainController.ts#L48">control/MainController.ts:48</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/MainController.ts#L54">control/MainController.ts:54</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -829,6 +882,9 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_control_maincontroller_.controller.html#adjusttosize" class="tsd-kind-icon">adjust<wbr>ToSize</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_control_maincontroller_.controller.html#gethighestzindex" class="tsd-kind-icon">get<wbr>HighestZIndex</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_control_maincontroller_.controller.html#getlayer" class="tsd-kind-icon">get<wbr>Layer</a>
 							</li>
@@ -855,6 +911,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_control_maincontroller_.controller.html#setminzoomlevel" class="tsd-kind-icon">set<wbr>Min<wbr>Zoom<wbr>Level</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_control_maincontroller_.controller.html#setoverlayzindex" class="tsd-kind-icon">set<wbr>OverlayZIndex</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_control_maincontroller_.controller.html#setreferencesystem" class="tsd-kind-icon">set<wbr>Reference<wbr>System</a>
@@ -914,10 +973,11 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 			</ul>
 		</div>
 	</div>

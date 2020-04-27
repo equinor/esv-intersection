@@ -91,6 +91,7 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_control_layermanager_.layermanager.html#_axis" class="tsd-kind-icon">_axis</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_control_layermanager_.layermanager.html#_svgcontainer" class="tsd-kind-icon">_svg<wbr>Container</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_control_layermanager_.layermanager.html#_zoompanhandler" class="tsd-kind-icon">_zoom<wbr>Pan<wbr>Handler</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_control_layermanager_.layermanager.html#container" class="tsd-kind-icon">container</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_control_layermanager_.layermanager.html#layercontainer" class="tsd-kind-icon">layer<wbr>Container</a></li>
@@ -140,13 +141,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Layer<wbr>Manager<span class="tsd-signature-symbol">(</span>container<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLElement</span>, scaleOptions<span class="tsd-signature-symbol">: </span><a href="../interfaces/_interfaces_.scaleoptions.html" class="tsd-signature-type">ScaleOptions</a>, axisOptions<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_control_layermanager_.axisoptions.html" class="tsd-signature-type">AxisOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_control_layermanager_.layermanager.html" class="tsd-signature-type">LayerManager</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Layer<wbr>Manager<span class="tsd-signature-symbol">(</span>container<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLElement</span>, scaleOptions<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_interfaces_.scaleoptions.html" class="tsd-signature-type">ScaleOptions</a>, axisOptions<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_control_layermanager_.axisoptions.html" class="tsd-signature-type">AxisOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_control_layermanager_.layermanager.html" class="tsd-signature-type">LayerManager</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L23">control/LayerManager.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L24">control/LayerManager.ts:24</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -165,7 +166,7 @@
 									</div>
 								</li>
 								<li>
-									<h5>scaleOptions: <a href="../interfaces/_interfaces_.scaleoptions.html" class="tsd-signature-type">ScaleOptions</a></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> scaleOptions: <a href="../interfaces/_interfaces_.scaleoptions.html" class="tsd-signature-type">ScaleOptions</a></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> axisOptions: <a href="../interfaces/_control_layermanager_.axisoptions.html" class="tsd-signature-type">AxisOptions</a></h5>
@@ -188,7 +189,17 @@
 					<div class="tsd-signature tsd-kind-icon">_axis<span class="tsd-signature-symbol">:</span> <a href="_components_axis_.axis.html" class="tsd-signature-type">Axis</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L23">control/LayerManager.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L23">control/LayerManager.ts:23</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_svgcontainer" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _svg<wbr>Container</h3>
+					<div class="tsd-signature tsd-kind-icon">_svg<wbr>Container<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Selection</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">HTMLElement</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L24">control/LayerManager.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -198,7 +209,7 @@
 					<div class="tsd-signature tsd-kind-icon">_zoom<wbr>Pan<wbr>Handler<span class="tsd-signature-symbol">:</span> <a href="_control_zoompanhandler_.zoompanhandler.html" class="tsd-signature-type">ZoomPanHandler</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L19">control/LayerManager.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L19">control/LayerManager.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -208,7 +219,7 @@
 					<div class="tsd-signature tsd-kind-icon">container<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLElement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L15">control/LayerManager.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L15">control/LayerManager.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -218,7 +229,7 @@
 					<div class="tsd-signature tsd-kind-icon">layer<wbr>Container<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLElement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L17">control/LayerManager.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L17">control/LayerManager.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -228,7 +239,7 @@
 					<div class="tsd-signature tsd-kind-icon">layers<span class="tsd-signature-symbol">:</span> <a href="_layers_base_layer_.layer.html" class="tsd-signature-type">Layer</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L21">control/LayerManager.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L21">control/LayerManager.ts:21</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -245,7 +256,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L202">control/LayerManager.ts:202</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L216">control/LayerManager.ts:216</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_components_axis_.axis.html" class="tsd-signature-type">Axis</a></h4>
@@ -262,7 +273,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L198">control/LayerManager.ts:198</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L212">control/LayerManager.ts:212</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_zoompanhandler_.zoompanhandler.html" class="tsd-signature-type">ZoomPanHandler</a></h4>
@@ -282,7 +293,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L61">control/LayerManager.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L72">control/LayerManager.ts:72</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -319,7 +330,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L47">control/LayerManager.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L58">control/LayerManager.ts:58</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -342,7 +353,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L110">control/LayerManager.ts:110</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L124">control/LayerManager.ts:124</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -368,7 +379,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L215">control/LayerManager.ts:215</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L229">control/LayerManager.ts:229</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -391,7 +402,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L82">control/LayerManager.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L93">control/LayerManager.ts:93</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -414,7 +425,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L52">control/LayerManager.ts:52</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L63">control/LayerManager.ts:63</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_layers_base_layer_.layer.html" class="tsd-signature-type">Layer</a><span class="tsd-signature-symbol">[]</span></h4>
@@ -431,7 +442,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L139">control/LayerManager.ts:139</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L153">control/LayerManager.ts:153</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_layermanager_.layermanager.html" class="tsd-signature-type">LayerManager</a></h4>
@@ -448,7 +459,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L149">control/LayerManager.ts:149</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L163">control/LayerManager.ts:163</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_layermanager_.layermanager.html" class="tsd-signature-type">LayerManager</a></h4>
@@ -465,7 +476,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L105">control/LayerManager.ts:105</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L119">control/LayerManager.ts:119</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -488,7 +499,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L86">control/LayerManager.ts:86</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L97">control/LayerManager.ts:97</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -514,7 +525,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L72">control/LayerManager.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L83">control/LayerManager.ts:83</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -545,7 +556,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L206">control/LayerManager.ts:206</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L220">control/LayerManager.ts:220</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -568,7 +579,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L154">control/LayerManager.ts:154</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L168">control/LayerManager.ts:168</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -594,7 +605,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L188">control/LayerManager.ts:188</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L202">control/LayerManager.ts:202</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -617,7 +628,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L193">control/LayerManager.ts:193</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L207">control/LayerManager.ts:207</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -640,7 +651,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L130">control/LayerManager.ts:130</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L144">control/LayerManager.ts:144</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -663,7 +674,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L165">control/LayerManager.ts:165</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L179">control/LayerManager.ts:179</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -686,7 +697,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L174">control/LayerManager.ts:174</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L188">control/LayerManager.ts:188</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -709,7 +720,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L183">control/LayerManager.ts:183</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L197">control/LayerManager.ts:197</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -732,7 +743,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L134">control/LayerManager.ts:134</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L148">control/LayerManager.ts:148</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_layermanager_.layermanager.html" class="tsd-signature-type">LayerManager</a></h4>
@@ -749,7 +760,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L144">control/LayerManager.ts:144</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L158">control/LayerManager.ts:158</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_control_layermanager_.layermanager.html" class="tsd-signature-type">LayerManager</a></h4>
@@ -766,7 +777,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/e9ceb4a/src/control/LayerManager.ts#L98">control/LayerManager.ts:98</a></li>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/control/LayerManager.ts#L112">control/LayerManager.ts:112</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -804,6 +815,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_control_layermanager_.layermanager.html#_axis" class="tsd-kind-icon">_axis</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_control_layermanager_.layermanager.html#_svgcontainer" class="tsd-kind-icon">_svg<wbr>Container</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_control_layermanager_.layermanager.html#_zoompanhandler" class="tsd-kind-icon">_zoom<wbr>Pan<wbr>Handler</a>
