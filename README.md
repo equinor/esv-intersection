@@ -9,6 +9,7 @@ Part of the [Equinor Subsurface Visualization project](https://github.com/equino
 - **Repository**: https://github.com/equinor/esv-intersection
 - **Storybook**: https://intersection-component.app.radix.equinor.com
 - **NPM Package**: https://www.npmjs.com/package/@equinor/esv-intersection
+- **Documentation**: https://equinor.github.io/esv-intersection/
 
 ## Getting started
 
