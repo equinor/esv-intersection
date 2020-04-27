@@ -34,16 +34,8 @@ const controller = new Controller(container);
 controller.adjustToSize(400, 400);
 
 controller.addLayer(new GridLayer('grid'));
-
-const grid = controller.getLayer('grid');
-
-controller.showLayer(grid.id);
-
-controller.hideLayer(grid.id)
-
-controller.removeLayer(grid.id);
-
 ```
+For more examples, check out our stories in our online [storybook](https://intersection-component.app.radix.equinor.com).
 
 ## Technical choices
 
