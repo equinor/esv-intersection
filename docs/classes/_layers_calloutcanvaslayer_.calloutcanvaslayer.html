@@ -1,0 +1,1277 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>CalloutCanvasLayer | @equinor/esv-intersection</title>
+	<meta name="description" content="Documentation for @equinor/esv-intersection">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@equinor/esv-intersection</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/_layers_calloutcanvaslayer_.html">&quot;layers/CalloutCanvasLayer&quot;</a>
+				</li>
+				<li>
+					<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html">CalloutCanvasLayer</a>
+				</li>
+			</ul>
+			<h1>Class CalloutCanvasLayer</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<a href="_layers_base_canvaslayer_.canvaslayer.html" class="tsd-signature-type">CanvasLayer</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">CalloutCanvasLayer</span>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section tsd-is-inherited">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#canvas" class="tsd-kind-icon">canvas</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#ctx" class="tsd-kind-icon">ctx</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#data" class="tsd-kind-icon">data</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#elm" class="tsd-kind-icon">elm</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#ispanning" class="tsd-kind-icon">is<wbr>Panning</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#overlapped" class="tsd-kind-icon">overlapped</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#xratio" class="tsd-kind-icon">x<wbr>Ratio</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-inherited">
+							<h3>Accessors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#element" class="tsd-kind-icon">element</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#interactive" class="tsd-kind-icon">interactive</a></li>
+								<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#isloading" class="tsd-kind-icon">is<wbr>Loading</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#isvisible" class="tsd-kind-icon">is<wbr>Visible</a></li>
+								<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#opacity" class="tsd-kind-icon">opacity</a></li>
+								<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#options" class="tsd-kind-icon">options</a></li>
+								<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#order" class="tsd-kind-icon">order</a></li>
+								<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#referencesystem" class="tsd-kind-icon">reference<wbr>System</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#clearcanvas" class="tsd-kind-icon">clear<wbr>Canvas</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#cleardata" class="tsd-kind-icon">clear<wbr>Data</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#getposition" class="tsd-kind-icon">get<wbr>Position</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#oninteractivitychanged" class="tsd-kind-icon">on<wbr>Interactivity<wbr>Changed</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onmount" class="tsd-kind-icon">on<wbr>Mount</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onopacitychanged" class="tsd-kind-icon">on<wbr>Opacity<wbr>Changed</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onorderchanged" class="tsd-kind-icon">on<wbr>Order<wbr>Changed</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onrescale" class="tsd-kind-icon">on<wbr>Rescale</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onresize" class="tsd-kind-icon">on<wbr>Resize</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onunmount" class="tsd-kind-icon">on<wbr>Unmount</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onupdate" class="tsd-kind-icon">on<wbr>Update</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#render" class="tsd-kind-icon">render</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#renderannotation" class="tsd-kind-icon">render<wbr>Annotation</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#rendercallout" class="tsd-kind-icon">render<wbr>Callout</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#renderline" class="tsd-kind-icon">render<wbr>Line</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#renderpoint" class="tsd-kind-icon">render<wbr>Point</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#rendertext" class="tsd-kind-icon">render<wbr>Text</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#resettransform" class="tsd-kind-icon">reset<wbr>Transform</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#setdata" class="tsd-kind-icon">set<wbr>Data</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#settransform" class="tsd-kind-icon">set<wbr>Transform</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#setvisibility" class="tsd-kind-icon">set<wbr>Visibility</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#updatestyle" class="tsd-kind-icon">update<wbr>Style</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-inherited">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Callout<wbr>Canvas<wbr>Layer<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_interfaces_.layeroptions.html" class="tsd-signature-type">LayerOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html" class="tsd-signature-type">CalloutCanvasLayer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#constructor">constructor</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L20">layers/base/Layer.ts:20</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> id: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/_interfaces_.layeroptions.html" class="tsd-signature-type">LayerOptions</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html" class="tsd-signature-type">CalloutCanvasLayer</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="canvas" class="tsd-anchor"></a>
+					<h3>canvas</h3>
+					<div class="tsd-signature tsd-kind-icon">canvas<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLCanvasElement</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#canvas">canvas</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L8">layers/base/CanvasLayer.ts:8</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="ctx" class="tsd-anchor"></a>
+					<h3>ctx</h3>
+					<div class="tsd-signature tsd-kind-icon">ctx<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CanvasRenderingContext2D</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#ctx">ctx</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L6">layers/base/CanvasLayer.ts:6</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
+					<a name="data" class="tsd-anchor"></a>
+					<h3>data</h3>
+					<div class="tsd-signature tsd-kind-icon">data<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_interfaces_.annotation.html" class="tsd-signature-type">Annotation</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
+					<aside class="tsd-sources">
+						<p>Overrides <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#data">data</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L21">layers/CalloutCanvasLayer.ts:21</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="elm" class="tsd-anchor"></a>
+					<h3>elm</h3>
+					<div class="tsd-signature tsd-kind-icon">elm<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLElement</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#elm">elm</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L7">layers/base/CanvasLayer.ts:7</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="ispanning" class="tsd-anchor"></a>
+					<h3>is<wbr>Panning</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Panning<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L22">layers/CalloutCanvasLayer.ts:22</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="overlapped" class="tsd-anchor"></a>
+					<h3>overlapped</h3>
+					<div class="tsd-signature tsd-kind-icon">overlapped<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L24">layers/CalloutCanvasLayer.ts:24</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="xratio" class="tsd-anchor"></a>
+					<h3>x<wbr>Ratio</h3>
+					<div class="tsd-signature tsd-kind-icon">x<wbr>Ratio<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L23">layers/CalloutCanvasLayer.ts:23</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-inherited">
+				<h2>Accessors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="element" class="tsd-anchor"></a>
+					<h3>element</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> element<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLElement</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#element">element</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L52">layers/base/Layer.ts:52</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">HTMLElement</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="id" class="tsd-anchor"></a>
+					<h3>id</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> id<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#id">id</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L48">layers/base/Layer.ts:48</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+					<a name="interactive" class="tsd-anchor"></a>
+					<h3>interactive</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> interactive<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> interactive<span class="tsd-signature-symbol">(</span>shouldBeInteractive<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#interactive">interactive</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L95">layers/base/Layer.ts:95</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#interactive">interactive</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L90">layers/base/Layer.ts:90</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>shouldBeInteractive: <span class="tsd-signature-type">boolean</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+					<a name="isloading" class="tsd-anchor"></a>
+					<h3>is<wbr>Loading</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> isLoading<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> isLoading<span class="tsd-signature-symbol">(</span>loading<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#isloading">isLoading</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L68">layers/base/Layer.ts:68</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#isloading">isLoading</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L64">layers/base/Layer.ts:64</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>loading: <span class="tsd-signature-type">boolean</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="isvisible" class="tsd-anchor"></a>
+					<h3>is<wbr>Visible</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> isVisible<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#isvisible">isVisible</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L116">layers/base/Layer.ts:116</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+					<a name="opacity" class="tsd-anchor"></a>
+					<h3>opacity</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> opacity<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> opacity<span class="tsd-signature-symbol">(</span>opacity<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#opacity">opacity</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L77">layers/base/Layer.ts:77</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#opacity">opacity</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L72">layers/base/Layer.ts:72</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>opacity: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+					<a name="options" class="tsd-anchor"></a>
+					<h3>options</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> options<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_interfaces_.layeroptions.html" class="tsd-signature-type">LayerOptions</a></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> options<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><a href="../interfaces/_interfaces_.layeroptions.html" class="tsd-signature-type">LayerOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#options">options</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L56">layers/base/Layer.ts:56</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_interfaces_.layeroptions.html" class="tsd-signature-type">LayerOptions</a></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#options">options</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L60">layers/base/Layer.ts:60</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>options: <a href="../interfaces/_interfaces_.layeroptions.html" class="tsd-signature-type">LayerOptions</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+					<a name="order" class="tsd-anchor"></a>
+					<h3>order</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> order<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> order<span class="tsd-signature-symbol">(</span>order<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#order">order</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L86">layers/base/Layer.ts:86</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#order">order</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L81">layers/base/Layer.ts:81</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>order: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+					<a name="referencesystem" class="tsd-anchor"></a>
+					<h3>reference<wbr>System</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> referenceSystem<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_control_intersectionreferencesystem_.intersectionreferencesystem.html" class="tsd-signature-type">IntersectionReferenceSystem</a></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> referenceSystem<span class="tsd-signature-symbol">(</span>referenceSystem<span class="tsd-signature-symbol">: </span><a href="_control_intersectionreferencesystem_.intersectionreferencesystem.html" class="tsd-signature-type">IntersectionReferenceSystem</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#referencesystem">referenceSystem</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L99">layers/base/Layer.ts:99</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_control_intersectionreferencesystem_.intersectionreferencesystem.html" class="tsd-signature-type">IntersectionReferenceSystem</a></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#referencesystem">referenceSystem</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L103">layers/base/Layer.ts:103</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>referenceSystem: <a href="_control_intersectionreferencesystem_.intersectionreferencesystem.html" class="tsd-signature-type">IntersectionReferenceSystem</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="clearcanvas" class="tsd-anchor"></a>
+					<h3>clear<wbr>Canvas</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">clear<wbr>Canvas<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#clearcanvas">clearCanvas</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L95">layers/base/CanvasLayer.ts:95</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="cleardata" class="tsd-anchor"></a>
+					<h3>clear<wbr>Data</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">clear<wbr>Data<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#cleardata">clearData</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L125">layers/base/Layer.ts:125</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="getposition" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>Position</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Position<span class="tsd-signature-symbol">(</span>bb<span class="tsd-signature-symbol">: </span><a href="../modules/_layers_calloutcanvaslayer_.html#boundingbox" class="tsd-signature-type">BoundingBox</a>, pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L128">layers/CalloutCanvasLayer.ts:128</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>bb: <a href="../modules/_layers_calloutcanvaslayer_.html#boundingbox" class="tsd-signature-type">BoundingBox</a></h5>
+								</li>
+								<li>
+									<h5>pos: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+					<a name="oninteractivitychanged" class="tsd-anchor"></a>
+					<h3>on<wbr>Interactivity<wbr>Changed</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Interactivity<wbr>Changed<span class="tsd-signature-symbol">(</span>interactive<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#oninteractivitychanged">onInteractivityChanged</a></p>
+								<p>Overrides <a href="_layers_base_layer_.layer.html">Layer</a>.<a href="_layers_base_layer_.layer.html#oninteractivitychanged">onInteractivityChanged</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L22">layers/base/CanvasLayer.ts:22</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>interactive: <span class="tsd-signature-type">boolean</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+					<a name="onmount" class="tsd-anchor"></a>
+					<h3>on<wbr>Mount</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Mount<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../interfaces/_interfaces_.onmountevent.html" class="tsd-signature-type">OnMountEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#onmount">onMount</a></p>
+								<p>Overrides <a href="_layers_base_layer_.layer.html">Layer</a>.<a href="_layers_base_layer_.layer.html#onmount">onMount</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L45">layers/base/CanvasLayer.ts:45</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <a href="../interfaces/_interfaces_.onmountevent.html" class="tsd-signature-type">OnMountEvent</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+					<a name="onopacitychanged" class="tsd-anchor"></a>
+					<h3>on<wbr>Opacity<wbr>Changed</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Opacity<wbr>Changed<span class="tsd-signature-symbol">(</span>opacity<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#onopacitychanged">onOpacityChanged</a></p>
+								<p>Overrides <a href="_layers_base_htmllayer_.htmllayer.html">HTMLLayer</a>.<a href="_layers_base_htmllayer_.htmllayer.html#onopacitychanged">onOpacityChanged</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L10">layers/base/CanvasLayer.ts:10</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>opacity: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+					<a name="onorderchanged" class="tsd-anchor"></a>
+					<h3>on<wbr>Order<wbr>Changed</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Order<wbr>Changed<span class="tsd-signature-symbol">(</span>order<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#onorderchanged">onOrderChanged</a></p>
+								<p>Overrides <a href="_layers_base_layer_.layer.html">Layer</a>.<a href="_layers_base_layer_.layer.html#onorderchanged">onOrderChanged</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L16">layers/base/CanvasLayer.ts:16</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>order: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="onrescale" class="tsd-anchor"></a>
+					<h3>on<wbr>Rescale</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Rescale<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../interfaces/_interfaces_.onrescaleevent.html" class="tsd-signature-type">OnRescaleEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#onrescale">onRescale</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L30">layers/CalloutCanvasLayer.ts:30</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <a href="../interfaces/_interfaces_.onrescaleevent.html" class="tsd-signature-type">OnRescaleEvent</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+					<a name="onresize" class="tsd-anchor"></a>
+					<h3>on<wbr>Resize</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Resize<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../interfaces/_interfaces_.onresizeevent.html" class="tsd-signature-type">OnResizeEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#onresize">onResize</a></p>
+								<p>Overrides <a href="_layers_base_layer_.layer.html">Layer</a>.<a href="_layers_base_layer_.layer.html#onresize">onResize</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L71">layers/base/CanvasLayer.ts:71</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <a href="../interfaces/_interfaces_.onresizeevent.html" class="tsd-signature-type">OnResizeEvent</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+					<a name="onunmount" class="tsd-anchor"></a>
+					<h3>on<wbr>Unmount</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Unmount<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#onunmount">onUnmount</a></p>
+								<p>Overrides <a href="_layers_base_layer_.layer.html">Layer</a>.<a href="_layers_base_layer_.layer.html#onunmount">onUnmount</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L65">layers/base/CanvasLayer.ts:65</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="onupdate" class="tsd-anchor"></a>
+					<h3>on<wbr>Update</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Update<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../interfaces/_interfaces_.onupdateevent.html" class="tsd-signature-type">OnUpdateEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#onupdate">onUpdate</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L26">layers/CalloutCanvasLayer.ts:26</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <a href="../interfaces/_interfaces_.onupdateevent.html" class="tsd-signature-type">OnUpdateEvent</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="render" class="tsd-anchor"></a>
+					<h3>render</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">render<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../interfaces/_interfaces_.onrescaleevent.html" class="tsd-signature-type">OnRescaleEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L41">layers/CalloutCanvasLayer.ts:41</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <a href="../interfaces/_interfaces_.onrescaleevent.html" class="tsd-signature-type">OnRescaleEvent</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="renderannotation" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> render<wbr>Annotation</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">render<wbr>Annotation<span class="tsd-signature-symbol">(</span>title<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, label<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, height<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, color<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L79">layers/CalloutCanvasLayer.ts:79</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>title: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>label: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>x: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>y: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>height: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>color: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="rendercallout" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> render<wbr>Callout</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">render<wbr>Callout<span class="tsd-signature-symbol">(</span>title<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, label<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, bb<span class="tsd-signature-symbol">: </span><a href="../modules/_layers_calloutcanvaslayer_.html#boundingbox" class="tsd-signature-type">BoundingBox</a>, color<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, position<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L98">layers/CalloutCanvasLayer.ts:98</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>title: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>label: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>bb: <a href="../modules/_layers_calloutcanvaslayer_.html#boundingbox" class="tsd-signature-type">BoundingBox</a></h5>
+								</li>
+								<li>
+									<h5>color: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>position: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="renderline" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> render<wbr>Line</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">render<wbr>Line<span class="tsd-signature-symbol">(</span>bb<span class="tsd-signature-symbol">: </span><a href="../modules/_layers_calloutcanvaslayer_.html#boundingbox" class="tsd-signature-type">BoundingBox</a>, dotX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, dotY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, color<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, placeLeft<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L108">layers/CalloutCanvasLayer.ts:108</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>bb: <a href="../modules/_layers_calloutcanvaslayer_.html#boundingbox" class="tsd-signature-type">BoundingBox</a></h5>
+								</li>
+								<li>
+									<h5>dotX: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>dotY: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>color: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> placeLeft: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="renderpoint" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> render<wbr>Point</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">render<wbr>Point<span class="tsd-signature-symbol">(</span>x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L90">layers/CalloutCanvasLayer.ts:90</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>x: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>y: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="rendertext" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> render<wbr>Text</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">render<wbr>Text<span class="tsd-signature-symbol">(</span>title<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, height<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, color<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/CalloutCanvasLayer.ts#L84">layers/CalloutCanvasLayer.ts:84</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>title: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>x: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>y: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>height: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>color: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="resettransform" class="tsd-anchor"></a>
+					<h3>reset<wbr>Transform</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">reset<wbr>Transform<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#resettransform">resetTransform</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L83">layers/base/CanvasLayer.ts:83</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="setdata" class="tsd-anchor"></a>
+					<h3>set<wbr>Data</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Data<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#setdata">setData</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/Layer.ts#L120">layers/base/Layer.ts:120</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>data: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="settransform" class="tsd-anchor"></a>
+					<h3>set<wbr>Transform</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Transform<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../interfaces/_interfaces_.onrescaleevent.html" class="tsd-signature-type">OnRescaleEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#settransform">setTransform</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L87">layers/base/CanvasLayer.ts:87</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <a href="../interfaces/_interfaces_.onrescaleevent.html" class="tsd-signature-type">OnRescaleEvent</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+					<a name="setvisibility" class="tsd-anchor"></a>
+					<h3>set<wbr>Visibility</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Visibility<span class="tsd-signature-symbol">(</span>visible<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#setvisibility">setVisibility</a></p>
+								<p>Overrides <a href="_layers_base_layer_.layer.html">Layer</a>.<a href="_layers_base_layer_.layer.html#setvisibility">setVisibility</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L28">layers/base/CanvasLayer.ts:28</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>visible: <span class="tsd-signature-type">boolean</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="updatestyle" class="tsd-anchor"></a>
+					<h3>update<wbr>Style</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">update<wbr>Style<span class="tsd-signature-symbol">(</span>visible<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_layers_base_canvaslayer_.canvaslayer.html">CanvasLayer</a>.<a href="_layers_base_canvaslayer_.canvaslayer.html#updatestyle">updateStyle</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/equinor/esv-intersection/blob/89a28be/src/layers/base/CanvasLayer.ts#L35">layers/base/CanvasLayer.ts:35</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> visible: <span class="tsd-signature-type">boolean</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/_layers_calloutcanvaslayer_.html">&quot;layers/<wbr>Callout<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-module">
+						<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html" class="tsd-kind-icon">Callout<wbr>Canvas<wbr>Layer</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#canvas" class="tsd-kind-icon">canvas</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#ctx" class="tsd-kind-icon">ctx</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#data" class="tsd-kind-icon">data</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#elm" class="tsd-kind-icon">elm</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#ispanning" class="tsd-kind-icon">is<wbr>Panning</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#overlapped" class="tsd-kind-icon">overlapped</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#xratio" class="tsd-kind-icon">x<wbr>Ratio</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#element" class="tsd-kind-icon">element</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#id" class="tsd-kind-icon">id</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#interactive" class="tsd-kind-icon">interactive</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#isloading" class="tsd-kind-icon">is<wbr>Loading</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#isvisible" class="tsd-kind-icon">is<wbr>Visible</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#opacity" class="tsd-kind-icon">opacity</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#options" class="tsd-kind-icon">options</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#order" class="tsd-kind-icon">order</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#referencesystem" class="tsd-kind-icon">reference<wbr>System</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#clearcanvas" class="tsd-kind-icon">clear<wbr>Canvas</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#cleardata" class="tsd-kind-icon">clear<wbr>Data</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#getposition" class="tsd-kind-icon">get<wbr>Position</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#oninteractivitychanged" class="tsd-kind-icon">on<wbr>Interactivity<wbr>Changed</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onmount" class="tsd-kind-icon">on<wbr>Mount</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onopacitychanged" class="tsd-kind-icon">on<wbr>Opacity<wbr>Changed</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onorderchanged" class="tsd-kind-icon">on<wbr>Order<wbr>Changed</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onrescale" class="tsd-kind-icon">on<wbr>Rescale</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onresize" class="tsd-kind-icon">on<wbr>Resize</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onunmount" class="tsd-kind-icon">on<wbr>Unmount</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#onupdate" class="tsd-kind-icon">on<wbr>Update</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#render" class="tsd-kind-icon">render</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#renderannotation" class="tsd-kind-icon">render<wbr>Annotation</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#rendercallout" class="tsd-kind-icon">render<wbr>Callout</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#renderline" class="tsd-kind-icon">render<wbr>Line</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#renderpoint" class="tsd-kind-icon">render<wbr>Point</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#rendertext" class="tsd-kind-icon">render<wbr>Text</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#resettransform" class="tsd-kind-icon">reset<wbr>Transform</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#setdata" class="tsd-kind-icon">set<wbr>Data</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#settransform" class="tsd-kind-icon">set<wbr>Transform</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#setvisibility" class="tsd-kind-icon">set<wbr>Visibility</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_layers_calloutcanvaslayer_.calloutcanvaslayer.html#updatestyle" class="tsd-kind-icon">update<wbr>Style</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
+						<a href="../modules/_layers_calloutcanvaslayer_.html#boundingbox" class="tsd-kind-icon">Bounding<wbr>Box</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+						<a href="../modules/_layers_calloutcanvaslayer_.html#max_font_size" class="tsd-kind-icon">MAX_<wbr>FONT_<wbr>SIZE</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+						<a href="../modules/_layers_calloutcanvaslayer_.html#min_font_size" class="tsd-kind-icon">MIN_<wbr>FONT_<wbr>SIZE</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+						<a href="../modules/_layers_calloutcanvaslayer_.html#offset" class="tsd-kind-icon">OFFSET</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

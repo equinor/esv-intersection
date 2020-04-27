@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>@equinor/videx-npm-template</title>
-	<meta name="description" content="">
+	<title>@equinor/esv-intersection</title>
+	<meta name="description" content="Documentation for @equinor/esv-intersection">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -13,7 +13,7 @@
 	<div class="tsd-page-toolbar">
 		<div class="container">
 			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
 					<div class="field">
 						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
 						<input id="tsd-search-field" type="text" />
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">@equinor/videx-npm-template</a>
+					<a href="index.html" class="title">@equinor/esv-intersection</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -56,7 +56,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> @equinor/videx-npm-template</h1>
+			<h1>@equinor/esv-intersection</h1>
 		</div>
 	</div>
 </header>
@@ -64,23 +64,72 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<a href="#videx-npm-template" id="videx-npm-template" style="color: inherit; text-decoration: none;">
-					<h1>Videx npm template</h1>
+				<p><a href="https://badge.fury.io/js/%40equinor%2Fesv-intersection"><img src="https://badge.fury.io/js/%40equinor%2Fesv-intersection.svg" alt="npm version"></a>
+					<img src="https://github.com/equinor/esv-intersection/workflows/Publish%20Package/badge.svg" alt="Publish Package">
+				<img src="https://github.com/equinor/esv-intersection/workflows/Unit%20tests/badge.svg" alt="Unit tests"></p>
+				<a href="#esv-intersection-component" id="esv-intersection-component" style="color: inherit; text-decoration: none;">
+					<h1>ESV Intersection component</h1>
 				</a>
-				<p>Typescript template for npm packages with testing and automatic documentation.</p>
+				<p>A reusable component to create intersection visualizations for wells</p>
+				<p>Part of the <a href="https://github.com/equinor/esv">Equinor Subsurface Visualization project</a></p>
+				<ul>
+					<li><strong>Repository</strong>: <a href="https://github.com/equinor/esv-intersection">https://github.com/equinor/esv-intersection</a></li>
+					<li><strong>Storybook</strong>: <a href="https://intersection-component.app.radix.equinor.com">https://intersection-component.app.radix.equinor.com</a></li>
+					<li><strong>NPM Package</strong>: <a href="https://www.npmjs.com/package/@equinor/esv-intersection">https://www.npmjs.com/package/@equinor/esv-intersection</a></li>
+				</ul>
+				<a href="#technical-choices" id="technical-choices" style="color: inherit; text-decoration: none;">
+					<h2>Technical choices</h2>
+				</a>
 				<ul>
 					<li><strong>Compiler</strong>: <a href="https://www.npmjs.com/package/typescript">Typescript</a></li>
 					<li><strong>Module bundler</strong>: <a href="https://www.npmjs.com/package/rollup">Rollup</a></li>
 					<li><strong>Testing</strong>: <a href="https://www.npmjs.com/package/jest">Jest</a></li>
 					<li><strong>Documentation</strong>: <a href="https://www.npmjs.com/package/typedoc">TypeDoc</a></li>
 					<li><strong>Code compressor</strong>: <a href="https://www.npmjs.com/package/terser">Terser</a></li>
+					<li><strong>Miscellaneous</strong>:<ul>
+							<li>Architecture: A container component that holds several layers, specialized for the type of data and visualization they address (analogous to the VidEx-map component <a href="https://github.com/equinor/videx-map">https://github.com/equinor/videx-map</a>)</li>
+							<li>Browser support: Target Edge, Chrome, Firefox, Safari</li>
+							<li>Styling: To be defined. Possibly SCSS or Emotion</li>
+							<li>Testing:<ul>
+									<li>linting and unit tests, with test coverage - run automatically on Github Actions</li>
+									<li>possibly snapshot tests at a later stage</li>
+									<li>later on simulation tests, depending on resources and requirements</li>
+								</ul>
+							</li>
+							<li>Dependencies: <ul>
+									<li><em>d3</em></li>
+									<li>each layer can include additional dependencies</li>
+								</ul>
+							</li>
+							<li>Accessibility: investigate compliance with WCAG2.1 (poossibly automatically)</li>
+							<li>Publishing:<ul>
+									<li>automated</li>
+									<li>both tagged releases (semantic versioning) and nightly</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
 				</ul>
-				<a href="#repository" id="repository" style="color: inherit; text-decoration: none;">
-					<h2>Repository</h2>
+				<a href="#development-methodology" id="development-methodology" style="color: inherit; text-decoration: none;">
+					<h2>Development methodology</h2>
 				</a>
 				<ul>
-					<li><a href="https://github.com/equinor/videx-npm-template">GitHub</a></li>
+					<li>The <em>Product Owners</em> of the Intersection component are @farzadfz and @thuve </li>
+					<li>Development is driven by <em>user stories</em>, created and prioritized by developers and POs together</li>
+					<li>User stories can be grouped into <em>milestones</em>. A milestone represents what is expected to be achieved in about 2 months of development</li>
+					<li>The development team has <em>planning meetings</em> with the POs once a week</li>
+					<li>The development team has <em>daily standups</em>, POs participation is optional but very much encouraged</li>
+					<li>Development relies on a <em>project board</em> hosted on github (<a href="https://github.com/equinor/intersection/projects/1">https://github.com/equinor/intersection/projects/1</a>)</li>
+					<li>During planning meetings, the <code>To do</code> column of the board is populated with user stories and tasks</li>
+					<li>What is placed in the <code>To do</code> column is expected to be completed in 1 week of normal work</li>
+					<li>At the developers discretion, a <em>technical planning meeting</em> can be held after the planning</li>
+					<li>During a <em>technical planning meeting</em>, current user stories and tasks can be discussed and potentially split into smaller tasks</li>
+					<li>A <em>demo</em> for the stakeholders will be held approximately every 4 weeks<ul>
+							<li>Stakeholders for the <em>WellX</em> and <em>REP</em> projects (including the <em>REP reference user group</em>) should be invited to the demo </li>
+						</ul>
+					</li>
 				</ul>
+				<p>--- The following part comes from the template and needs to be revised further ---</p>
 				<a href="#setup-guide" id="setup-guide" style="color: inherit; text-decoration: none;">
 					<h2>Setup guide</h2>
 				</a>
@@ -171,8 +220,134 @@
 					<li class="globals  ">
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_index_.html">"index"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_components_axis_.html">&quot;components/axis&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_components_index_.html">&quot;components/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_constants_.html">&quot;constants&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_intersectionreferencesystem_.html">&quot;control/<wbr>Intersection<wbr>Reference<wbr>System&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_layermanager_.html">&quot;control/<wbr>Layer<wbr>Manager&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_maincontroller_.html">&quot;control/<wbr>Main<wbr>Controller&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_zoompanhandler_.html">&quot;control/<wbr>Zoom<wbr>Pan<wbr>Handler&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_index_.html">&quot;control/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_interfaces_.html">&quot;control/interfaces&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_overlay_.html">&quot;control/overlay&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_camelcase_.html">&quot;datautils/camelcase&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_colortable_.html">&quot;datautils/colortable&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_findsample_.html">&quot;datautils/findsample&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_index_.html">&quot;datautils/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_interfaces_.html">&quot;datautils/interfaces&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_seismicimage_.html">&quot;datautils/seismicimage&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_surfacedata_.html">&quot;datautils/surfacedata&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_trajectory_.html">&quot;datautils/trajectory&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_index_.html">&quot;index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_interfaces_.html">&quot;interfaces&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_calloutcanvaslayer_.html">&quot;layers/<wbr>Callout<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_casinglayer_.html">&quot;layers/<wbr>Casing<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_completionlayer_.html">&quot;layers/<wbr>Completion<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_geomodelcanvaslayer_.html">&quot;layers/<wbr>Geomodel<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_geomodellabelslayer_.html">&quot;layers/<wbr>Geomodel<wbr>Labels<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_geomodellayer_.html">&quot;layers/<wbr>Geomodel<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_geomodellayerv2_.html">&quot;layers/<wbr>Geomodel<wbr>Layer<wbr>V2&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_gridlayer_.html">&quot;layers/<wbr>Grid<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_holesizelayer_.html">&quot;layers/<wbr>Hole<wbr>Size<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_imagecanvaslayer_.html">&quot;layers/<wbr>Image<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_seismiccanvaslayer_.html">&quot;layers/<wbr>Seismic<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_wellborebasecomponentlayer_.html">&quot;layers/<wbr>Wellbore<wbr>Base<wbr>Component<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_wellborepathlayer_.html">&quot;layers/<wbr>Wellbore<wbr>Path<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_canvaslayer_.html">&quot;layers/base/<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_htmllayer_.html">&quot;layers/base/HTMLLayer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_layer_.html">&quot;layers/base/<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_pixilayer_.html">&quot;layers/base/<wbr>Pixi<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_svglayer_.html">&quot;layers/base/SVGLayer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_index_.html">&quot;layers/base/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_index_.html">&quot;layers/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_utils_index_.html">&quot;utils/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_utils_text_.html">&quot;utils/text&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_utils_vectorutils_.html">&quot;utils/vector<wbr>Utils&quot;</a>
 					</li>
 				</ul>
 			</nav>
@@ -188,57 +363,16 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
 				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
-				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
-				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
-				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
-				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
-				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
 			</ul>
 		</div>
 	</div>
