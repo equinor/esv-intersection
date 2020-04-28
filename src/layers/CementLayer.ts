@@ -6,10 +6,6 @@ import { createNormal } from '../utils/vectorUtils';
 
 export class CementLayer extends WellboreBaseComponentLayer {
   options: CementLayerOptions;
-  cement: Cement[];
-  casings: Casing[];
-  holes: HoleSize[];
-
   constructor(id?: string, options?: CementLayerOptions) {
     super(id, options);
     this.options = {
@@ -22,14 +18,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
       maxTextureDiameterScale: 2,
       ...options,
     };
-    this.cement = options.data.cement;
-    this.casings = options.data.casings;
-    this.holes = options.data.holes;
     this.render = this.render.bind(this);
-  }
-
-  onMount(event: OnMountEvent): void {
-    super.onMount(event);
   }
 
   onUpdate(event: OnUpdateEvent): void {
@@ -37,14 +26,12 @@ export class CementLayer extends WellboreBaseComponentLayer {
     this.render(event);
   }
 
-  onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-  }
-
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    super.render(event);
+    if (this.data == null) {
+      return;
+    }
 
-    const { cement, casings, holes } = this;
+    const { cement, casings, holes } = this.data;
     this.createCementShapes(cement, casings, holes);
   }
 
@@ -109,7 +96,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
         points.right.push(...sideRight);
       }
 
-      const centerPiece = findCasing(c.casingId, this.casings);
+      const centerPiece = findCasing(c.casingId, this.data.casings);
       const wholeMiddlePoints = middle.map((s) => s.point);
       const sideLeftMiddle = createNormal(wholeMiddlePoints, -centerPiece.diameter);
       const sideRightMiddle = createNormal(wholeMiddlePoints, +centerPiece.diameter);

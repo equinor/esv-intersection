@@ -15,7 +15,10 @@ const defaultOptions = {
 };
 
 export const CementLayerBasic = () => {
-  const referenceSystem = new IntersectionReferenceSystem((poslog || mockedWellborePath) as any, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
+    defaultOptions,
+  );
 
   const options: CementLayerOptions = {
     order: 1,
