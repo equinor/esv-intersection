@@ -77,29 +77,15 @@ For more examples, check out our stories in our online [storybook](https://inter
   - Stakeholders for the _WellX_ and _REP_ projects (including the _REP reference user group_) should be invited to the demo
 
 
-
---- The following part comes from the template and needs to be revised further ---
 ## Setup guide
 
 ### Cloning repository
 
-Start by cloning the template repository to desired directory.
+Start by cloning the repository to desired directory.
 
 ```
-git clone https://github.com/equinor/videx-npm-template.git
+git clone https://github.com/equinor/esv-intersection.git
 ```
-
-### Modify package.json
-
-Fields that need to be modified are:
-
-- **name**: The name of the npm package.
-- **description**: The description of the npm package.
-- **repository.url**: Should point to the GitHub repository.
-- **keywords**: Keywords to make it easier to find the package on npm.
-- **author**: Package author. For multiple authors, consider using '[contributors](https://docs.npmjs.com/files/package.json#people-fields-author-contributors)'.
-- **bugs.url**: Should point to "GitHub repository"/issues.
-- **homepage**: Could point to "GitHub repository"#readme.
 
 ### Install dependencies
 
@@ -110,11 +96,6 @@ npm install
 ```
 
 ## Usage
-
-### Creating package
-
-The entry point for the actual npm package is defined as 'src/index.ts'. This can be changed within 'rollup.config.js'.
-Any public variables, functions and classes should be exported within this file.
 
 ### Document generation
 
