@@ -37,8 +37,8 @@ export const MultipleCanvasLayers = () => {
   backgroundLayer2.onMount({ ...ev, url: bgImg2 });
 
   gridLayer.onUpdate(createEventObj(container));
-  backgroundLayer1.onUpdate(createEventObj(container));
-  backgroundLayer2.onUpdate(createEventObj(container));
+  backgroundLayer1.onUpdate({ ...createEventObj(container), url: bgImg1 });
+  backgroundLayer2.onUpdate({ ...createEventObj(container), url: bgImg2 });
 
   const helpText = createHelpText('set opacity of the images');
   const bg1Slider = createSlider(backgroundLayer1, createEventObj(container), width);

@@ -92,7 +92,6 @@ export const createSlider = (layer: Layer, event: OnUpdateEvent, width: number) 
   slider.setAttribute('style', `width:${width}px`);
   slider.oninput = () => {
     layer.opacity = parseInt(slider.value) / 10;
-    layer.onUpdate(event);
   };
   return slider;
 };
