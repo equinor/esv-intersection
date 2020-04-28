@@ -9,7 +9,34 @@ Part of the [Equinor Subsurface Visualization project](https://github.com/equino
 - **Repository**: https://github.com/equinor/esv-intersection
 - **Storybook**: https://intersection-component.app.radix.equinor.com
 - **NPM Package**: https://www.npmjs.com/package/@equinor/esv-intersection
+- **Documentation**: https://equinor.github.io/esv-intersection/
 
+## Getting started
+
+#### Installation
+Using npm:
+```bash
+npm install --save @equinor/esv-intersection
+```
+Using yarn:
+```bash
+yarn add @equinor/esv-intersection
+```
+
+#### Usage
+
+```javascript
+import { Controller, GridLayer } from '@equinor/esv-intersection';
+
+const container = document.createElement('div');
+const controller = new Controller(container);
+
+// the controller initially has zero height
+controller.adjustToSize(400, 400);
+
+controller.addLayer(new GridLayer('grid'));
+```
+For more examples, check out our stories in our online [storybook](https://intersection-component.app.radix.equinor.com).
 
 ## Technical choices
 
@@ -26,7 +53,7 @@ Part of the [Equinor Subsurface Visualization project](https://github.com/equino
     - linting and unit tests, with test coverage - run automatically on Github Actions
     - possibly snapshot tests at a later stage
     - later on simulation tests, depending on resources and requirements
-  - Dependencies: 
+  - Dependencies:
     - _d3_
     - each layer can include additional dependencies
   - Accessibility: investigate compliance with WCAG2.1 (poossibly automatically)
@@ -36,7 +63,7 @@ Part of the [Equinor Subsurface Visualization project](https://github.com/equino
 
 
 ## Development methodology
-- The _Product Owners_ of the Intersection component are @farzadfz and @thuve 
+- The _Product Owners_ of the Intersection component are @farzadfz and @thuve
 - Development is driven by _user stories_, created and prioritized by developers and POs together
 - User stories can be grouped into _milestones_. A milestone represents what is expected to be achieved in about 2 months of development
 - The development team has _planning meetings_ with the POs once a week
@@ -47,7 +74,7 @@ Part of the [Equinor Subsurface Visualization project](https://github.com/equino
 - At the developers discretion, a _technical planning meeting_ can be held after the planning
 - During a _technical planning meeting_, current user stories and tasks can be discussed and potentially split into smaller tasks
 - A _demo_ for the stakeholders will be held approximately every 4 weeks
-  - Stakeholders for the _WellX_ and _REP_ projects (including the _REP reference user group_) should be invited to the demo 
+  - Stakeholders for the _WellX_ and _REP_ projects (including the _REP reference user group_) should be invited to the demo
 
 
 
@@ -130,39 +157,5 @@ npm run build
 ```
 
 Compiles the code found within the src-folder. Build is outputted to a new dist-folder.
-
-### Publication
-
-```
-npm run pub
-```
-
-Attemps to publish the package to npm. As part of the publishing process, the source code is re-compiled.
-
-## Publish documentation
-
-GitHub pages is used to show documentation. To set up GitHub pages, start by navigating to the settings tab within the GitHub repository.
-
-![Settings Tab](images/settings-tab.png)
-
-Scroll down and set GitHub pages source to the docs-folder of the master branch.
-
-![Settings Tab](images/github-pages.png)
-
-Publishing the documentation will produce a link. This link can be included in the README for easy navigation.
-
-![Settings Tab](images/github-pages-published.png)
-
-Sample documentation can be found [here](https://equinor.github.io/videx-npm-template/).
-
-## Sample function
-
-<table style="width:auto;">
-  <tr>
-    <td><a href="https://equinor.github.io/videx-npm-template/modules/_index_.html#hello">hello</a></td>
-  </tr>
-</table>
-
-<br/>
 
 ![Equinor Logo](images/equinor-logo.png)

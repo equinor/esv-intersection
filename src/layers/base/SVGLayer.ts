@@ -43,21 +43,18 @@ export abstract class SVGLayer extends Layer {
   }
 
   onOpacityChanged(opacity: number): void {
-    this.opacity = opacity;
     if (this.elm) {
       this.elm.style('opacity', opacity);
     }
   }
 
   onOrderChanged(order: number): void {
-    this.order = order;
     if (this.elm) {
       this.elm.style('z-index', order);
     }
   }
 
   onInteractivityChanged(shouldBeInteractive: boolean): void {
-    this.interactive = shouldBeInteractive;
     if (this.elm) {
       const interactive = shouldBeInteractive ? 'auto' : 'none';
       this.elm.style('pointer-events', interactive);

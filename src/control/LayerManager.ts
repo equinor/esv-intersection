@@ -1,6 +1,6 @@
-import { select } from 'd3-selection';
+import { select, Selection } from 'd3-selection';
 import { ZoomPanHandler } from './ZoomPanHandler';
-import { Layer } from '../layers';
+import { Layer, GridLayer } from '../layers';
 import { ScaleOptions, OnMountEvent, OnRescaleEvent } from '../interfaces';
 import { Axis } from '../components';
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
@@ -20,7 +20,8 @@ export class LayerManager {
 
   private layers: Layer[] = [];
 
-  private axis: Axis;
+  private _axis: Axis;
+  private _svgContainer: Selection<HTMLElement, unknown, null, undefined>;
 
   /**
    * Class for handling layers
@@ -28,17 +29,27 @@ export class LayerManager {
    * @param scaleOptions
    * @param axisOptions
    */
-  constructor(container: HTMLElement, scaleOptions: ScaleOptions, axisOptions?: AxisOptions) {
+  constructor(container: HTMLElement, scaleOptions?: ScaleOptions, axisOptions?: AxisOptions) {
     this.container = container;
     this.layerContainer = document.createElement('div');
     this.layerContainer.className = 'layer-container';
     this.container.appendChild(this.layerContainer);
     this.adjustToSize(+this.container.getAttribute('width'), +this.container.getAttribute('height'));
     this._zoomPanHandler = new ZoomPanHandler(container, (event) => this.rescale(event));
-    this._zoomPanHandler.setBounds([scaleOptions.xMin, scaleOptions.xMax], [scaleOptions.yMin, scaleOptions.yMax]);
+    if (scaleOptions) {
+      const { xMin, xMax, yMin, yMax, xBounds, yBounds } = scaleOptions;
+      if (xMin !== undefined && xMax !== undefined && yMin !== undefined && yMax !== undefined) {
+        this._zoomPanHandler.setBounds([xMin, xMax], [yMin, yMax]);
+      }
+      if (xBounds && yBounds) {
+        this._zoomPanHandler.setBounds(xBounds, yBounds);
+      }
+    } else {
+      this._zoomPanHandler.setBounds([0, 1], [0, 1]);
+    }
 
     if (axisOptions) {
-      this.axis = this.createAxis(axisOptions);
+      this._axis = this.createAxis(axisOptions);
     }
 
     this.rescale = this.rescale.bind(this);
@@ -47,6 +58,10 @@ export class LayerManager {
   addLayers(layers: Layer[]): LayerManager {
     layers.forEach((layer) => this.addLayer(layer));
     return this;
+  }
+
+  getLayers(): Layer[] {
+    return this.layers;
   }
 
   /**
@@ -88,6 +103,11 @@ export class LayerManager {
     layer.onUpdate({ ...rescaleEvent, ...params });
     layer.onRescale(rescaleEvent);
 
+    if (this._svgContainer) {
+      const highestZIndex = this.layers.length > 0 ? this.layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 1;
+      this._svgContainer.style('z-index', `${highestZIndex + 1}`);
+    }
+
     return this;
   }
 
@@ -107,12 +127,12 @@ export class LayerManager {
     const horizontalAxisMargin = 40;
     const verticalAxisMargin = 30;
 
-    const layersWidth = this.axis ? width - horizontalAxisMargin : width;
-    const layersHeight = this.axis ? height - verticalAxisMargin : height;
+    const layersWidth = this._axis ? width - horizontalAxisMargin : width;
+    const layersHeight = this._axis ? height - verticalAxisMargin : height;
 
-    if (this.axis) {
+    if (this._axis) {
       const resizeEvent = { width, height };
-      this.axis.onResize(resizeEvent);
+      this._axis.onResize(resizeEvent);
     }
     if (this.layers) {
       const resizeEvent = { width: layersWidth, height: layersHeight };
@@ -128,28 +148,51 @@ export class LayerManager {
   }
 
   showAxis(): LayerManager {
-    this.axis.show();
+    this._axis.show();
     return this;
   }
 
   hideAxis(): LayerManager {
-    this.axis.hide();
+    this._axis.hide();
+    return this;
+  }
+
+  showAxisLabels(): LayerManager {
+    this._axis.showLabels();
+    return this;
+  }
+
+  hideAxisLabels(): LayerManager {
+    this._axis.hideLabels();
     return this;
   }
 
   setAxisOffset(x: number, y: number): LayerManager {
-    this.axis.offsetX = x;
-    this.axis.offsetY = y;
+    this._axis.offsetX = x;
+    this._axis.offsetY = y;
+    const gridLayers = this.layers.filter((l: Layer) => l instanceof GridLayer);
+    gridLayers.forEach((l: GridLayer) => {
+      l.offsetX = x;
+      l.offsetY = y;
+    });
     return this;
   }
 
   setXAxisOffset(x: number): LayerManager {
-    this.axis.offsetX = x;
+    this._axis.offsetX = x;
+    const gridLayers = this.layers.filter((l: Layer) => l instanceof GridLayer);
+    gridLayers.forEach((l: GridLayer) => {
+      l.offsetX = x;
+    });
     return this;
   }
 
   setYAxisOffset(y: number): LayerManager {
-    this.axis.offsetY = y;
+    this._axis.offsetY = y;
+    const gridLayers = this.layers.filter((l: Layer) => l instanceof GridLayer);
+    gridLayers.forEach((l: GridLayer) => {
+      l.offsetY = y;
+    });
     return this;
   }
 
@@ -172,9 +215,13 @@ export class LayerManager {
     return this._zoomPanHandler;
   }
 
+  get axis(): Axis {
+    return this._axis;
+  }
+
   private rescale(event: OnRescaleEvent): void {
-    if (this.axis) {
-      this.axis.onRescale(event);
+    if (this._axis) {
+      this._axis.onRescale(event);
     }
     if (this.layers) {
       this.layers.forEach((layer) => (layer.isVisible === true ? layer.onRescale(event) : {}));
@@ -183,12 +230,14 @@ export class LayerManager {
 
   private createAxis = (options: AxisOptions): Axis => {
     const { container } = this;
-    const svgContainer = document.createElement('div');
-    svgContainer.setAttribute('style', 'position: absolute; z-index: 1999;');
-    svgContainer.setAttribute('class', 'axis');
-    container.appendChild(svgContainer);
+    this._svgContainer = select(container)
+      .append('div')
+      .attr('class', 'axis')
+      .style('position', 'absolute')
+      .style('z-index', '10')
+      .style('pointer-events', 'none');
 
-    const svg = select(svgContainer).append('svg').attr('height', `${container.offsetHeight}px`).attr('width', `${container.offsetWidth}px`);
+    const svg = this._svgContainer.append('svg').attr('height', `${container.offsetHeight}px`).attr('width', `${container.offsetWidth}px`);
 
     const showLabels = true;
 

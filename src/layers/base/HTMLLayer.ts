@@ -17,13 +17,14 @@ export abstract class HTMLLayer extends Layer {
       this.elm.attr('id', `${this.id}`);
       this.elm.attr('class', 'html-layer');
     }
+    const interactive = this.interactive ? 'auto' : 'none';
     this.elm
       .style('position', 'absolute')
       .style('height', `${height}px`)
       .style('width', `${width}px`)
       .style('opacity', this.opacity)
       .style('overflow', 'hidden')
-      .style('pointer-events', this.interactive)
+      .style('pointer-events', interactive)
       .attr('z-index', this.order);
   }
 
@@ -48,22 +49,19 @@ export abstract class HTMLLayer extends Layer {
     }
   }
 
-  onOpacitChanged(opacity: number): void {
-    this.opacity = opacity;
+  onOpacityChanged(opacity: number): void {
     if (this.elm) {
       this.elm.style('opacity', opacity);
     }
   }
 
   onOrderChanged(order: number): void {
-    this.order = order;
     if (this.elm) {
-      this.elm.style('z-index', order);
+      this.elm.attr('z-index', order);
     }
   }
 
   onInteractivityChanged(shouldBeInteractive: boolean): void {
-    this.interactive = shouldBeInteractive;
     if (this.elm) {
       const interactive = shouldBeInteractive ? 'auto' : 'none';
       this.elm.style('pointer-events', interactive);
