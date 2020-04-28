@@ -4,8 +4,7 @@ import { createRootContainer, createLayerContainer } from '../../utils';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import poslog from '../../exampledata/poslog.json';
-import mockWellborePath from '../../exampledata/wellborepathMock.json';
+import { poslog, mockedWellborePath } from '../../exampledata';
 
 const defaultOptions = {
   defaultIntersectionAngle: 135,
@@ -15,7 +14,10 @@ const defaultOptions = {
 };
 
 export const Holes = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
+    defaultOptions,
+  );
 
   const options: HoleSizeLayerOptions = {
     order: 1,
@@ -47,7 +49,10 @@ export const Holes = () => {
 };
 
 export const HoleSizeLayerWithSampleData = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
+    defaultOptions,
+  );
 
   const options: HoleSizeLayerOptions = {
     order: 1,

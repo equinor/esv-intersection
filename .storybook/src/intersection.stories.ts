@@ -9,6 +9,7 @@ import {
   HoleSizeLayer,
   CasingLayer,
   CompletionLayer,
+  CementLayer,
 } from '../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
@@ -21,16 +22,7 @@ export default {
 };
 
 //Data
-import {
-  casingData,
-  completionData,
-  holeSizeData,
-  poslog,
-  seismic,
-  stratColumn,
-  surfaceValues,
-  seismicColorMap,
-} from './exampledata';
+import { casingData, completionData, holeSizeData, cementData, poslog, seismic, stratColumn, surfaceValues, seismicColorMap } from './exampledata';
 
 const xbounds: [number, number] = [0, 1000];
 const ybounds: [number, number] = [0, 1000];
@@ -51,6 +43,20 @@ const defaultOptions = {
 
 const width = 700;
 const height = 600;
+
+const createCementData = () => {
+  // Cement requires data casing and holes to create cement width
+  const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: `${c.start + c.length}` }));
+  const holes = holeSizeData.map((h: HoleSize) => ({ ...h, end: h.start + h.length }));
+  const cement: Cement[] = [];
+  for (let i = 0; i < casingData.length && i < cementData.length; i++) {
+    const c: Cement = (cementData[i] as unknown) as Cement;
+    c.casingId = `${casings[i].casingId}`;
+    cement.push(c);
+  }
+  const d = { cement, casings, holes };
+  return d;
+};
 
 export const intersection = () => {
   const root = createRootContainer(width);
@@ -77,9 +83,20 @@ export const intersection = () => {
   const casingLayer = new CasingLayer('casing', { order: 5, data: casingData, referenceSystem });
   const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
   const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
-  const completionLayer = new CompletionLayer('completion', { order: 5, data: completion, referenceSystem });
+  const completionLayer = new CompletionLayer('completion', { order: 4, data: completion, referenceSystem });
+  const cementLayer = new CementLayer('cement', { order: 99, data: createCementData(), referenceSystem });
 
-  const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, completionLayer, holeSizeLayer, casingLayer];
+  const layers = [
+    gridLayer,
+    geomodelLayer,
+    wellboreLayer,
+    geomodelLabelsLayer,
+    seismicLayer,
+    completionLayer,
+    holeSizeLayer,
+    casingLayer,
+    cementLayer,
+  ];
 
   const opts = {
     scaleOptions,
@@ -103,7 +120,7 @@ export const intersection = () => {
     height: seismicInfo.maxTvdMsl - seismicInfo.minTvdMsl,
   };
 
-  generateSeismicSliceImage(seismic, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
+  generateSeismicSliceImage(seismic as any, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
     seismicLayer.data = { image: seismicImage, options: seismicOptions };
   });
 
@@ -118,6 +135,7 @@ export const intersection = () => {
   const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size');
   const btnCasing = createButton(controller, casingLayer, 'Casing');
   const btnCompletion = createButton(controller, completionLayer, 'Completion');
+  const btnCement = createButton(controller, cementLayer, 'Cement');
   const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
   const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
   let show = true;
@@ -153,6 +171,7 @@ export const intersection = () => {
   btnContainer.appendChild(btnHoleSize);
   btnContainer.appendChild(btnCasing);
   btnContainer.appendChild(btnCompletion);
+  btnContainer.appendChild(btnCement);
   btnContainer.appendChild(btnGeomodelLabels);
   btnContainer.appendChild(btnSeismic);
   btnContainer.appendChild(btnLarger);
@@ -166,9 +185,9 @@ export const intersection = () => {
   return root;
 };
 
-function addMDOverlay(instance) {
+function addMDOverlay(instance: any) {
   const elm = instance.overlay.create('md', {
-    onMouseMove: (event) => {
+    onMouseMove: (event: any) => {
       const { target, caller, x } = event;
 
       const newX = caller.currentStateAsEvent.xScale.invert(x);
@@ -182,7 +201,7 @@ function addMDOverlay(instance) {
         target.style.visibility = 'visible';
       }
     },
-    onMouseExit: (event) => {
+    onMouseExit: (event: any) => {
       event.target.style.visibility = 'hidden';
     },
   });

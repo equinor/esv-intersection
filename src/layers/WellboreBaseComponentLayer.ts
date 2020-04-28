@@ -1,7 +1,5 @@
-import { CurveInterpolator } from 'curve-interpolator';
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { calcDist, calcDistPoint, createNormal, arrayToPoint, pointToArray } from '../utils/vectorUtils';
 import {
   HoleSizeLayerOptions,
   OnUpdateEvent,
@@ -14,7 +12,7 @@ import {
   OnMountEvent,
 } from '../interfaces';
 
-const staticWellboreBaseComponentIncrement = 0.1;
+export const StaticWellboreBaseComponentIncrement = 0.1;
 
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;
@@ -43,107 +41,16 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
-    const { data } = this;
-
-    if (data == null) {
-      return;
-    }
-
-    const sizes: HoleObjectData[] = data.map((d: HoleSize | Casing) => this.generateHoleSizeData(d));
-
-    const maxDiameter = Math.max(...sizes.map((s: HoleObjectData) => s.data.diameter));
-    const texture = this.createTexure(maxDiameter * maxTextureDiameterScale, firstColor, secondColor);
-    sizes
-      .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1)) // draw smaller casings and holes inside bigger ones if overlapping
-      .map((s: any) => this.drawHoleSize(s, texture));
+    // drawholesize ...
   }
 
-  createNormalCoords = (s: HoleObjectData): NormalCoordsObject => {
-    const wellBorePathCoords = this.actualPoints(s);
-    const normalOffsetCoordsUpOrig = createNormal(wellBorePathCoords, s.data.diameter);
-    const normalOffsetCoordsDownOrig = createNormal(wellBorePathCoords, -s.data.diameter);
-
-    if (normalOffsetCoordsUpOrig.length <= 2) {
-      return { wellBorePathCoords, normalOffsetCoordsDown: wellBorePathCoords, normalOffsetCoordsUp: wellBorePathCoords };
-    }
-
-    const tension = 0.2;
-    const numPoints = 999;
-    const normalOffsetCoordsUpInterpolator = new CurveInterpolator(normalOffsetCoordsUpOrig.map(pointToArray), tension);
-    const normalOffsetCoordsDownInterpolator = new CurveInterpolator(normalOffsetCoordsDownOrig.map(pointToArray), tension);
-    const normalOffsetCoordsUp = normalOffsetCoordsUpInterpolator.getPoints(numPoints).map(arrayToPoint);
-    const normalOffsetCoordsDown = normalOffsetCoordsDownInterpolator.getPoints(numPoints).map(arrayToPoint);
-
-    return { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp };
-  };
-
-  drawHoleSize = (holeObject: HoleObjectData, defaultTexture: Texture): void => {
-    const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
-    const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = this.createNormalCoords(holeObject);
-
-    const polygonCoords = [...normalOffsetCoordsUp, ...normalOffsetCoordsDown.map((d: Point) => d.clone()).reverse()];
-    const casingTopLineCoords = [normalOffsetCoordsUp[0], normalOffsetCoordsDown[0]];
-    const casingBottomLineCoords = [normalOffsetCoordsUp[normalOffsetCoordsUp.length - 1], normalOffsetCoordsDown[normalOffsetCoordsDown.length - 1]];
-
-    const mask = this.drawBigPolygon(polygonCoords);
-    let texture = defaultTexture;
-    let casingWallWidth = 1;
-
-    if (holeObject.hasShoe != null) {
-      const pctOffset = 0.35;
-      texture = this.createTexure(holeObject.data.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
-      casingWallWidth = Math.abs(holeObject.data.diameter - holeObject.innerDiameter);
-    }
-
-    this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
-
-    this.drawLine(polygonCoords, lineColor, casingWallWidth);
-    this.drawLine(casingTopLineCoords, topBottomLineColor, 1);
-    this.drawLine(casingBottomLineCoords, topBottomLineColor, 1);
-
-    const takeMeters = (points: Point[], meters: number): Point[] => {
-      let tot = 0;
-      const lastMeterPoint = 2;
-      const newPoints: Point[] = [];
-
-      for (let i = 0; tot < meters && i > points.length - lastMeterPoint; i++) {
-        tot += staticWellboreBaseComponentIncrement;
-        newPoints.push(points[points.length - 1 - i].clone());
-      }
-
-      return newPoints.reverse();
-    };
-
-    if (holeObject.hasShoe === true) {
-      const shoeWidth = 5;
-      const meters = 10;
-      const shoeHeightCoords = takeMeters(normalOffsetCoordsDown, meters);
-      const shoeCoords = this.generateShoe(shoeHeightCoords, -shoeWidth);
-      this.drawBigPolygon(shoeCoords);
-
-      const shoeHeightCoords2 = takeMeters(normalOffsetCoordsUp, meters);
-      const shoeCoords2 = this.generateShoe(shoeHeightCoords2, shoeWidth);
-      this.drawBigPolygon(shoeCoords2);
-    }
-  };
-
-  generateShoe = (triangleSideShoe: Point[], offset: number): Point[] => {
-    if (triangleSideShoe.length < 1) {
-      return [];
-    }
-    const normalOffset = createNormal(
-      [triangleSideShoe[0], triangleSideShoe[1], triangleSideShoe[triangleSideShoe.length - 1], triangleSideShoe[triangleSideShoe.length - 1]],
-      offset,
-    );
-
-    const a = [triangleSideShoe[0], triangleSideShoe[triangleSideShoe.length - 1], normalOffset[normalOffset.length - 1], triangleSideShoe[0]];
-    return a;
-  };
-
-  drawBigPolygon = (coords: Point[]): Graphics => {
+  drawBigPolygon = (coords: Point[], t?: Texture): Graphics => {
     const polygon = new Graphics();
-    polygon.beginFill(0);
+    if (t != null) {
+      polygon.beginTextureFill({ texture: t });
+    } else {
+      polygon.beginFill(0);
+    }
     polygon.drawPolygon(coords);
     polygon.endFill();
     this.ctx.stage.addChild(polygon);
@@ -151,8 +58,8 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     return polygon;
   };
 
-  createRopeTextureBackground = (coods: Point[], texture: Texture, mask: Graphics): SimpleRope => {
-    const rope: SimpleRope = new SimpleRope(texture, coods);
+  createRopeTextureBackground = (coords: Point[], texture: Texture, mask: Graphics): SimpleRope => {
+    const rope: SimpleRope = new SimpleRope(texture, coords);
     rope.mask = mask;
     this.ctx.stage.addChild(rope);
 
@@ -185,39 +92,19 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     canvasCtx.fillStyle = gradient;
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-    return Texture.from(canvas);
+    const t = Texture.from(canvas);
+    return t;
   };
 
   generateHoleSizeData = (data: HoleSize | Casing): HoleObjectData => {
     const points: any = [];
 
     // Add distance to points
-    for (let i = data.start; i < data.start + data.length; i += staticWellboreBaseComponentIncrement) {
+    for (let i = data.start; i < data.start + data.length; i += StaticWellboreBaseComponentIncrement) {
       const p = this.referenceSystem.project(i);
       points.push({ point: new Point(p[0], p[1]), md: i });
     }
 
     return { data: { ...data, diameter: data.diameter }, points, hasShoe: data.hasShoe, innerDiameter: data.innerDiameter };
-  };
-
-  actualPoints = (s: HoleObjectData): Point[] => {
-    let start = new Point();
-    let stop = new Point();
-    let startIndex = 0;
-    let stopIndex = 0;
-    const a = s.points.filter((p: MDPoint, index: number) => {
-      if (s.data.start > p.md) {
-        startIndex = index;
-      }
-      if (s.data.start + s.data.length >= p.md) {
-        stopIndex = index;
-      }
-      return p.md > s.data.start && p.md < s.data.start + s.data.length;
-    });
-    startIndex -= 0;
-    stopIndex += 0;
-    start = s.points[startIndex >= 0 ? startIndex : 0].point;
-    stop = s.points[stopIndex <= s.points.length ? stopIndex : s.points.length - 1].point;
-    return [start, ...a.map((b: MDPoint) => b.point), stop];
   };
 }

@@ -28,7 +28,10 @@ const defaultOptions = {
 };
 
 export const Wellborepath = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
+    defaultOptions,
+  );
   const options: WellborepathLayerOptions = {
     order: 1,
     strokeWidth: '2px',
@@ -53,7 +56,10 @@ export const WellborepathWithSampleDataAndZoom = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]), defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
+    defaultOptions,
+  );
 
   const options: WellborepathLayerOptions = {
     order: 1,

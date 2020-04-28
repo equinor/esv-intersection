@@ -5,8 +5,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import poslog from '../../exampledata/poslog.json';
-import mockWellborePath from '../../exampledata/wellborepathMock.json';
+import { poslog, mockedWellborePath } from '../../exampledata';
 
 const defaultOptions = {
   defaultIntersectionAngle: 135,
@@ -16,7 +15,10 @@ const defaultOptions = {
 };
 
 export const CasingLayerBasic = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
+    defaultOptions,
+  );
 
   const options: CasingLayerOptions = {
     order: 1,
@@ -49,7 +51,10 @@ export const CasingLayerBasic = () => {
 };
 
 export const CasingLayerWithSampleData = () => {
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
+    defaultOptions,
+  );
 
   const options: CasingLayerOptions = {
     order: 1,

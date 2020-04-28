@@ -5,9 +5,7 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 import { IntersectionReferenceSystem } from '../../../../src';
 
 // Data
-import poslog from '../../exampledata/poslog.json';
-import completion from '../../exampledata/completion';
-import mockWellborePath from '../../exampledata/wellborepathMock.json';
+import { poslog, mockedWellborePath, completionData } from '../../exampledata';
 
 const defaultOptions = {
   defaultIntersectionAngle: 135,
@@ -23,7 +21,10 @@ export const CompletionLayerSample = () => {
     { start: 790, end: 800, diameter: 12 },
   ];
 
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
+    defaultOptions,
+  );
 
   const options: CompletionLayerOptions = {
     order: 1,
@@ -63,7 +64,10 @@ export const CompletionLayerWithSampleData = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const referenceSystem = new IntersectionReferenceSystem(poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
+    defaultOptions,
+  );
 
   const options: CompletionLayerOptions = {
     order: 1,
@@ -72,7 +76,7 @@ export const CompletionLayerWithSampleData = () => {
   const completionLayer = new CompletionLayer('webgl', options);
   completionLayer.onMount({ elm: container, height, width });
 
-  const data = completion.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter((d: any) => d.start > 400 && d.end < 1800); //.filter(c => c.diameter != 0 && c.start > 0);
+  const data = completionData.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter((d: any) => d.start > 400 && d.end < 1800); //.filter(c => c.diameter != 0 && c.start > 0);
 
   completionLayer.onUpdate({ data });
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
