@@ -76,7 +76,31 @@
 					<li><strong>Repository</strong>: <a href="https://github.com/equinor/esv-intersection">https://github.com/equinor/esv-intersection</a></li>
 					<li><strong>Storybook</strong>: <a href="https://intersection-component.app.radix.equinor.com">https://intersection-component.app.radix.equinor.com</a></li>
 					<li><strong>NPM Package</strong>: <a href="https://www.npmjs.com/package/@equinor/esv-intersection">https://www.npmjs.com/package/@equinor/esv-intersection</a></li>
+					<li><strong>Documentation</strong>: <a href="https://equinor.github.io/esv-intersection/">https://equinor.github.io/esv-intersection/</a></li>
 				</ul>
+				<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
+					<h2>Getting started</h2>
+				</a>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h4>Installation</h4>
+				</a>
+				<p>Using npm:</p>
+				<pre><code class="language-bash">npm install --save @equinor/esv-intersection</code></pre>
+				<p>Using yarn:</p>
+				<pre><code class="language-bash">yarn add @equinor/esv-intersection</code></pre>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { Controller, GridLayer } <span class="hljs-keyword">from</span> <span class="hljs-string">'@equinor/esv-intersection'</span>;
+
+<span class="hljs-keyword">const</span> container = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+<span class="hljs-keyword">const</span> controller = <span class="hljs-keyword">new</span> Controller(container);
+
+<span class="hljs-comment">// the controller initially has zero height</span>
+controller.adjustToSize(<span class="hljs-number">400</span>, <span class="hljs-number">400</span>);
+
+controller.addLayer(<span class="hljs-keyword">new</span> GridLayer(<span class="hljs-string">'grid'</span>));</code></pre>
+				<p>For more examples, check out our stories in our online <a href="https://intersection-component.app.radix.equinor.com">storybook</a>.</p>
 				<a href="#technical-choices" id="technical-choices" style="color: inherit; text-decoration: none;">
 					<h2>Technical choices</h2>
 				</a>
@@ -96,7 +120,7 @@
 									<li>later on simulation tests, depending on resources and requirements</li>
 								</ul>
 							</li>
-							<li>Dependencies: <ul>
+							<li>Dependencies:<ul>
 									<li><em>d3</em></li>
 									<li>each layer can include additional dependencies</li>
 								</ul>
@@ -114,7 +138,7 @@
 					<h2>Development methodology</h2>
 				</a>
 				<ul>
-					<li>The <em>Product Owners</em> of the Intersection component are @farzadfz and @thuve </li>
+					<li>The <em>Product Owners</em> of the Intersection component are @farzadfz and @thuve</li>
 					<li>Development is driven by <em>user stories</em>, created and prioritized by developers and POs together</li>
 					<li>User stories can be grouped into <em>milestones</em>. A milestone represents what is expected to be achieved in about 2 months of development</li>
 					<li>The development team has <em>planning meetings</em> with the POs once a week</li>
@@ -125,7 +149,7 @@
 					<li>At the developers discretion, a <em>technical planning meeting</em> can be held after the planning</li>
 					<li>During a <em>technical planning meeting</em>, current user stories and tasks can be discussed and potentially split into smaller tasks</li>
 					<li>A <em>demo</em> for the stakeholders will be held approximately every 4 weeks<ul>
-							<li>Stakeholders for the <em>WellX</em> and <em>REP</em> projects (including the <em>REP reference user group</em>) should be invited to the demo </li>
+							<li>Stakeholders for the <em>WellX</em> and <em>REP</em> projects (including the <em>REP reference user group</em>) should be invited to the demo</li>
 						</ul>
 					</li>
 				</ul>
@@ -156,7 +180,7 @@
 				</a>
 				<p>Install all dev dependencies defined in package.json using node.</p>
 				<pre><code>npm <span class="hljs-keyword">install</span></code></pre>
-				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+				<a href="#usage-1" id="usage-1" style="color: inherit; text-decoration: none;">
 					<h2>Usage</h2>
 				</a>
 				<a href="#creating-package" id="creating-package" style="color: inherit; text-decoration: none;">
@@ -188,29 +212,6 @@
 					<h3>Building/Compiling</h3>
 				</a>
 				<pre><code>npm <span class="hljs-keyword">run</span><span class="bash"> build</span></code></pre><p>Compiles the code found within the src-folder. Build is outputted to a new dist-folder.</p>
-				<a href="#publication" id="publication" style="color: inherit; text-decoration: none;">
-					<h3>Publication</h3>
-				</a>
-				<pre><code>npm <span class="hljs-keyword">run</span><span class="bash"> pub</span></code></pre><p>Attemps to publish the package to npm. As part of the publishing process, the source code is re-compiled.</p>
-				<a href="#publish-documentation" id="publish-documentation" style="color: inherit; text-decoration: none;">
-					<h2>Publish documentation</h2>
-				</a>
-				<p>GitHub pages is used to show documentation. To set up GitHub pages, start by navigating to the settings tab within the GitHub repository.</p>
-				<p><img src="images/settings-tab.png" alt="Settings Tab"></p>
-				<p>Scroll down and set GitHub pages source to the docs-folder of the master branch.</p>
-				<p><img src="images/github-pages.png" alt="Settings Tab"></p>
-				<p>Publishing the documentation will produce a link. This link can be included in the README for easy navigation.</p>
-				<p><img src="images/github-pages-published.png" alt="Settings Tab"></p>
-				<p>Sample documentation can be found <a href="https://equinor.github.io/videx-npm-template/">here</a>.</p>
-				<a href="#sample-function" id="sample-function" style="color: inherit; text-decoration: none;">
-					<h2>Sample function</h2>
-				</a>
-				<table style="width:auto;">
-					<tr>
-						<td><a href="https://equinor.github.io/videx-npm-template/modules/_index_.html#hello">hello</a></td>
-					</tr>
-				</table>
-				<br/>
 				<p><img src="images/equinor-logo.png" alt="Equinor Logo"></p>
 			</div>
 		</div>
