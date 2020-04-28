@@ -26,4 +26,17 @@ describe('Controller', () => {
     controller.removeLayer('grid');
     expect(controller.getLayer('grid')).not.toEqual(layer);
   });
+  it('should set default z-index for overlay', () => {
+    const controller = new Controller({ container: elm });
+    const overlayZIndex = controller.overlay.elm.style('z-index');
+    expect(overlayZIndex).toEqual('11');
+  });
+  it('should set z-index for overlay that is higher than layers', () => {
+    const controller = new Controller({ container: elm });
+    const layer = new GridLayer('grid', { order: 13 });
+    controller.addLayer(layer);
+    const overlayZIndex = controller.overlay.elm.style('z-index');
+    expect(overlayZIndex).toEqual('15');
+    expect(layer.order).toBeLessThan(parseInt(overlayZIndex, 10));
+  });
 });
