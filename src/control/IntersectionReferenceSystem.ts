@@ -4,13 +4,11 @@ import { CurveInterpolator, normalize } from 'curve-interpolator';
 import { Interpolator, Trajectory, ReferenceSystemOptions } from '../interfaces';
 
 const DEG_180 = 180;
-
-const defaultOptions = {
-  defaultIntersectionAngle: 45,
-  tension: 0.75,
-  arcDivisions: 5000,
-  thresholdDirectionDist: 30,
-};
+// determines how curvy the curve is
+const TENSION = 0.75;
+// determines how many segments to split the curve into
+const ARC_DIVISIONS = 5000;
+const THRESHOLD_DIRECTION_DISTANCE = 0.001;
 
 export class IntersectionReferenceSystem {
   options: ReferenceSystemOptions;
@@ -43,8 +41,8 @@ export class IntersectionReferenceSystem {
    * @param options (optional)
    * @param options.trajectoryAngle (optional) - trajectory angle in degrees, overrides the calculated value
    * @param options.tension (optional)
-   * @param options.arcDivisions (optional)
-   * @param options.thresholdDirectionDist (optional)
+   * @param options.arcDivisions (optional) how many segments to split the curve into
+   * @param options.thresholdDirectionDist (optional) specifies amount of steps to work back from the end of the curve
    */
   constructor(path: number[][], options?: ReferenceSystemOptions) {
     this.setPath(path, options);
@@ -56,9 +54,9 @@ export class IntersectionReferenceSystem {
     this.getTrajectory = this.getTrajectory.bind(this);
   }
 
-  private setPath(path: number[][], options?: ReferenceSystemOptions): void {
-    this.options = options || defaultOptions;
-    const { arcDivisions, tension, thresholdDirectionDist } = this.options;
+  private setPath(path: number[][], options: ReferenceSystemOptions = {}): void {
+    this.options = options;
+    const { trajectoryAngle } = this.options;
 
     this.path = path;
 
@@ -71,14 +69,14 @@ export class IntersectionReferenceSystem {
       curve: new CurveInterpolator(path),
       trajectory: new CurveInterpolator(
         path.map((d: number[]) => [d[0], d[1]]),
-        { tension, arcDivisions },
+        { tension: TENSION, arcDivisions: ARC_DIVISIONS },
       ),
-      curtain: new CurveInterpolator(this.projectedPath, { tension, arcDivisions }),
+      curtain: new CurveInterpolator(this.projectedPath, { tension: TENSION, arcDivisions: ARC_DIVISIONS }),
     };
 
-    let endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - thresholdDirectionDist, 1);
-    if (this.options.trajectoryAngle) {
-      const angleInRad = (this.options.trajectoryAngle * Math.PI) / DEG_180;
+    let endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1);
+    if (trajectoryAngle) {
+      const angleInRad = (trajectoryAngle * Math.PI) / DEG_180;
       const dirVector = new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
       endVector = dirVector;
     }
