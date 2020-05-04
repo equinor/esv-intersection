@@ -198,4 +198,5 @@ export interface ReferenceSystemOptions {
   tension?: number;
   arcDivisions?: number;
   thresholdDirectionDist?: number;
+  trajectoryAngle?: number;
 }

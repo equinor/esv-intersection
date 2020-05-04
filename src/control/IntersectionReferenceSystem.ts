@@ -3,6 +3,8 @@ import { clamp } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
 import { Interpolator, Trajectory, ReferenceSystemOptions } from '../interfaces';
 
+const DEG_180 = 180;
+
 const defaultOptions = {
   defaultIntersectionAngle: 45,
   tension: 0.75,
@@ -17,8 +19,6 @@ export class IntersectionReferenceSystem {
 
   projectedPath: number[][] = [];
 
-  trajectory: number[][];
-
   projectedTrajectory: number[][];
 
   private _offset: number = 0;
@@ -31,14 +31,21 @@ export class IntersectionReferenceSystem {
 
   trajectoryOffset: number;
 
-  trajectoryAngle: number;
-
   interpolators: Interpolator;
 
   startVector: number[];
 
   endVector: number[];
 
+  /**
+   * Creates a common reference system that layers and other components can use
+   * @param path (required) array of coordinates
+   * @param options (optional)
+   * @param options.trajectoryAngle (optional) - trajectory angle in degrees, overrides the calculated value
+   * @param options.tension (optional)
+   * @param options.arcDivisions (optional)
+   * @param options.thresholdDirectionDist (optional)
+   */
   constructor(path: number[][], options?: ReferenceSystemOptions) {
     this.setPath(path, options);
 
@@ -69,7 +76,13 @@ export class IntersectionReferenceSystem {
       curtain: new CurveInterpolator(this.projectedPath, { tension, arcDivisions }),
     };
 
-    this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - thresholdDirectionDist, 1);
+    let endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - thresholdDirectionDist, 1);
+    if (this.options.trajectoryAngle) {
+      const angleInRad = (this.options.trajectoryAngle * Math.PI) / DEG_180;
+      const dirVector = new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
+      endVector = dirVector;
+    }
+    this.endVector = endVector;
     this.startVector = this.endVector.map((d: number) => d * -1);
   }
   /**
@@ -184,7 +197,6 @@ export class IntersectionReferenceSystem {
 
   /**
    * Perform a curtain projection on a set of points in 3D
-   * AKA toDisplacement, projectCurtain
    * @param points
    * @param origin
    * @param offset
