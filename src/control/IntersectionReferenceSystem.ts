@@ -72,13 +72,13 @@ export class IntersectionReferenceSystem {
       curtain: new CurveInterpolator(this.projectedPath, { tension: TENSION, arcDivisions: ARC_DIVISIONS }),
     };
 
-    let endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1);
     if (trajectoryAngle) {
       const angleInRad = (trajectoryAngle * Math.PI) / DEG_180;
       const dirVector = new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
-      endVector = dirVector;
+      this.endVector = dirVector;
+    } else {
+      this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1)
     }
-    this.endVector = endVector;
     this.startVector = this.endVector.map((d: number) => d * -1);
   }
   /**
