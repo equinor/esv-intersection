@@ -59,10 +59,7 @@ export class Controller {
    * Creates new reference system based on path, overrides any existing reference systems in place
    * @param path array of coords
    * @param options optional
-   * @param options.defaultIntersectionAngle
-   * @param options.tension
-   * @param options.arcDivisions
-   * @param options.thresholdDirectionDist
+   * @param options.trajectoryAngle (optional) angle in degrees
    */
   updatePath(path: number[][], options?: ReferenceSystemOptions): Controller {
     this.setReferenceSystem(new IntersectionReferenceSystem(path, options));

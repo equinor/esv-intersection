@@ -8,6 +8,7 @@ const DEG_180 = 180;
 const TENSION = 0.75;
 // determines how many segments to split the curve into
 const ARC_DIVISIONS = 5000;
+// specifies amount of steps (in the range [0,1]) to work back from the end of the curve
 const THRESHOLD_DIRECTION_DISTANCE = 0.001;
 
 export class IntersectionReferenceSystem {
@@ -40,9 +41,6 @@ export class IntersectionReferenceSystem {
    * @param path (required) array of coordinates
    * @param options (optional)
    * @param options.trajectoryAngle (optional) - trajectory angle in degrees, overrides the calculated value
-   * @param options.tension (optional)
-   * @param options.arcDivisions (optional) how many segments to split the curve into
-   * @param options.thresholdDirectionDist (optional) specifies amount of steps to work back from the end of the curve
    */
   constructor(path: number[][], options?: ReferenceSystemOptions) {
     this.setPath(path, options);
@@ -213,6 +211,12 @@ export class IntersectionReferenceSystem {
     return projected;
   }
 
+  /**
+   * returns a normalized vector
+   * @param interp interpolated curve
+   * @param from number between 0 and 1
+   * @param to number between 0 and 1
+   */
   static getDirectionVector(interp: any, from: number, to: number): number[] {
     const p1 = interp.getPointAt(to);
     const p2 = interp.getPointAt(from);
