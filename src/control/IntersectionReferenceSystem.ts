@@ -1,9 +1,8 @@
 import Vector2 from '@equinor/videx-vector2';
-import { clamp } from '@equinor/videx-math';
+import { clamp, radians } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
 import { Interpolator, Trajectory, ReferenceSystemOptions } from '../interfaces';
 
-const DEG_180 = 180;
 // determines how curvy the curve is
 const TENSION = 0.75;
 // determines how many segments to split the curve into
@@ -73,7 +72,7 @@ export class IntersectionReferenceSystem {
     };
 
     if (trajectoryAngle) {
-      const angleInRad = (trajectoryAngle * Math.PI) / DEG_180;
+      const angleInRad = radians(trajectoryAngle);
       const dirVector = new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
       this.endVector = dirVector;
     } else {
