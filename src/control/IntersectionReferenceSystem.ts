@@ -77,7 +77,7 @@ export class IntersectionReferenceSystem {
       const dirVector = new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
       this.endVector = dirVector;
     } else {
-      this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1)
+      this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1);
     }
     this.startVector = this.endVector.map((d: number) => d * -1);
   }

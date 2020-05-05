@@ -1,7 +1,5 @@
-import { scaleLinear } from 'd3-scale';
 import { WellborepathLayer } from '../../../../src/layers';
 import { WellborepathLayerOptions, OnRescaleEvent } from '../../../../src/interfaces';
-import { generateProjectedWellborePath } from '../../../../src/datautils/trajectory';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 
 import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
@@ -11,8 +9,6 @@ import { IntersectionReferenceSystem } from '../../../../src/control';
 
 const width = 400;
 const height = 500;
-const xbounds = [0, 200];
-const ybounds = [0, 200];
 
 const createEventObj = (elm: any) => {
   return {
@@ -20,17 +16,9 @@ const createEventObj = (elm: any) => {
   };
 };
 
-const defaultOptions = {
-  defaultIntersectionAngle: 135,
-  tension: 0.75,
-  arcDivisions: 5000,
-  thresholdDirectionDist: 0.001,
-};
-
 export const Wellborepath = () => {
   const referenceSystem = new IntersectionReferenceSystem(
     poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
-    defaultOptions,
   );
   const options: WellborepathLayerOptions = {
     order: 1,
@@ -58,7 +46,6 @@ export const WellborepathWithSampleDataAndZoom = () => {
 
   const referenceSystem = new IntersectionReferenceSystem(
     poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
-    defaultOptions,
   );
 
   const options: WellborepathLayerOptions = {

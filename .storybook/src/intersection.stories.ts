@@ -23,6 +23,7 @@ export default {
 
 //Data
 import { casingData, completionData, holeSizeData, cementData, poslog, seismic, stratColumn, surfaceValues, seismicColorMap } from './exampledata';
+import { Casing, HoleSize, Cement } from '../../src';
 
 const xbounds: [number, number] = [0, 1000];
 const ybounds: [number, number] = [0, 1000];
@@ -32,13 +33,6 @@ const axisOptions = {
   xLabel: 'Displacement',
   yLabel: 'TVD MSL',
   unitOfMeasure: 'm',
-};
-
-const defaultOptions = {
-  defaultIntersectionAngle: 135,
-  tension: 0.75,
-  arcDivisions: 5000,
-  thresholdDirectionDist: 0.001,
 };
 
 const width = 700;
@@ -65,7 +59,7 @@ export const intersection = () => {
 
   const path = poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]);
 
-  const referenceSystem = new IntersectionReferenceSystem(path, defaultOptions);
+  const referenceSystem = new IntersectionReferenceSystem(path);
   const displacement = referenceSystem.displacement;
   const extend = 1000 / displacement;
   const steps = surfaceValues[0].data.values.length;
