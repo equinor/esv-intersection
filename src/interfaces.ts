@@ -194,8 +194,5 @@ export interface Trajectory {
 }
 
 export interface ReferenceSystemOptions {
-  defaultIntersectionAngle?: number;
-  tension?: number;
-  arcDivisions?: number;
-  thresholdDirectionDist?: number;
+  trajectoryAngle?: number;
 }

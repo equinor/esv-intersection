@@ -6,17 +6,9 @@ import { IntersectionReferenceSystem } from '../../../../src';
 
 import { poslog, mockedWellborePath } from '../../exampledata';
 
-const defaultOptions = {
-  defaultIntersectionAngle: 135,
-  tension: 0.75,
-  arcDivisions: 5000,
-  thresholdDirectionDist: 0.001,
-};
-
 export const Holes = () => {
   const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
-    defaultOptions,
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
   );
 
   const options: HoleSizeLayerOptions = {
@@ -50,8 +42,7 @@ export const Holes = () => {
 
 export const HoleSizeLayerWithSampleData = () => {
   const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
-    defaultOptions,
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
   );
 
   const options: HoleSizeLayerOptions = {

@@ -7,17 +7,9 @@ import { IntersectionReferenceSystem } from '../../../../src';
 
 import { poslog, mockedWellborePath, casingData, holeSizeData, cementData } from '../../exampledata';
 
-const defaultOptions = {
-  defaultIntersectionAngle: 135,
-  tension: 0.75,
-  arcDivisions: 5000,
-  thresholdDirectionDist: 0.001,
-};
-
 export const CementLayerBasic = () => {
   const referenceSystem = new IntersectionReferenceSystem(
     poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
-    defaultOptions,
   );
 
   const options: CementLayerOptions = {

@@ -1,5 +1,5 @@
-import { Selection, select } from 'd3-selection';
-import { scaleLinear } from 'd3-scale';
+import { Selection } from 'd3-selection';
+
 import { WellborepathLayer, HTMLLayer } from '../../../../src/layers';
 import { OnRescaleEvent, OnMountEvent } from '../../../../src/interfaces';
 import { IntersectionReferenceSystem, Controller } from '../../../../src/control';
@@ -40,7 +40,6 @@ const defaultOptions = {
 export const HighlightWellborepath = () => {
   const referenceSystem = new IntersectionReferenceSystem(
     poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
-    defaultOptions,
   );
 
   const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
@@ -89,7 +88,6 @@ export const HighlightWellborepath = () => {
 export const HighlightWellborepathWithController = () => {
   const referenceSystem = new IntersectionReferenceSystem(
     poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
-    defaultOptions,
   );
 
   const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });

@@ -1,14 +1,14 @@
 import Vector2 from '@equinor/videx-vector2';
-import { clamp } from '@equinor/videx-math';
+import { clamp, radians } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
 import { Interpolator, Trajectory, ReferenceSystemOptions } from '../interfaces';
 
-const defaultOptions = {
-  defaultIntersectionAngle: 45,
-  tension: 0.75,
-  arcDivisions: 5000,
-  thresholdDirectionDist: 30,
-};
+// determines how curvy the curve is
+const TENSION = 0.75;
+// determines how many segments to split the curve into
+const ARC_DIVISIONS = 5000;
+// specifies amount of steps (in the range [0,1]) to work back from the end of the curve
+const THRESHOLD_DIRECTION_DISTANCE = 0.001;
 
 export class IntersectionReferenceSystem {
   options: ReferenceSystemOptions;
@@ -16,8 +16,6 @@ export class IntersectionReferenceSystem {
   path: number[][] = [];
 
   projectedPath: number[][] = [];
-
-  trajectory: number[][];
 
   projectedTrajectory: number[][];
 
@@ -31,14 +29,18 @@ export class IntersectionReferenceSystem {
 
   trajectoryOffset: number;
 
-  trajectoryAngle: number;
-
   interpolators: Interpolator;
 
   startVector: number[];
 
   endVector: number[];
 
+  /**
+   * Creates a common reference system that layers and other components can use
+   * @param path (required) array of coordinates
+   * @param options (optional)
+   * @param options.trajectoryAngle (optional) - trajectory angle in degrees, overrides the calculated value
+   */
   constructor(path: number[][], options?: ReferenceSystemOptions) {
     this.setPath(path, options);
 
@@ -49,9 +51,9 @@ export class IntersectionReferenceSystem {
     this.getTrajectory = this.getTrajectory.bind(this);
   }
 
-  private setPath(path: number[][], options?: ReferenceSystemOptions): void {
-    this.options = options || defaultOptions;
-    const { arcDivisions, tension, thresholdDirectionDist } = this.options;
+  private setPath(path: number[][], options: ReferenceSystemOptions = {}): void {
+    this.options = options;
+    const { trajectoryAngle } = this.options;
 
     this.path = path;
 
@@ -64,12 +66,18 @@ export class IntersectionReferenceSystem {
       curve: new CurveInterpolator(path),
       trajectory: new CurveInterpolator(
         path.map((d: number[]) => [d[0], d[1]]),
-        { tension, arcDivisions },
+        { tension: TENSION, arcDivisions: ARC_DIVISIONS },
       ),
-      curtain: new CurveInterpolator(this.projectedPath, { tension, arcDivisions }),
+      curtain: new CurveInterpolator(this.projectedPath, { tension: TENSION, arcDivisions: ARC_DIVISIONS }),
     };
 
-    this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - thresholdDirectionDist, 1);
+    if (trajectoryAngle) {
+      const angleInRad = radians(trajectoryAngle);
+      const dirVector = new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
+      this.endVector = dirVector;
+    } else {
+      this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1);
+    }
     this.startVector = this.endVector.map((d: number) => d * -1);
   }
   /**
@@ -184,7 +192,6 @@ export class IntersectionReferenceSystem {
 
   /**
    * Perform a curtain projection on a set of points in 3D
-   * AKA toDisplacement, projectCurtain
    * @param points
    * @param origin
    * @param offset
@@ -203,6 +210,12 @@ export class IntersectionReferenceSystem {
     return projected;
   }
 
+  /**
+   * returns a normalized vector
+   * @param interp interpolated curve
+   * @param from number between 0 and 1
+   * @param to number between 0 and 1
+   */
   static getDirectionVector(interp: any, from: number, to: number): number[] {
     const p1 = interp.getPointAt(to);
     const p2 = interp.getPointAt(from);

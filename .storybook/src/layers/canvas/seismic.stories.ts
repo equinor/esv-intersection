@@ -93,7 +93,6 @@ const seismicColorMap = [
   '#00e4ff',
   '#00f0ff',
 ];
-const seismicColorMap2 = ['#00004c', '#000092', '#0000db', '#3131ff', '#9999ff', '#fdfdff', '#ff9999', '#ff3535', '#e60000', '#b30000', '#800000'];
 
 const width = 400;
 const height = 500;

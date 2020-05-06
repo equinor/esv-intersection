@@ -22,8 +22,7 @@ export const CompletionLayerSample = () => {
   ];
 
   const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
-    defaultOptions,
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
   );
 
   const options: CompletionLayerOptions = {
@@ -65,8 +64,7 @@ export const CompletionLayerWithSampleData = () => {
   const fpsLabel = createFPSLabel();
 
   const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockWellborePath,
-    defaultOptions,
+    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
   );
 
   const options: CompletionLayerOptions = {
