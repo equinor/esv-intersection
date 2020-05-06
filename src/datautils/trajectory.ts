@@ -132,7 +132,7 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
     if (len > threshold) break;
   }
 
-  if (len === 0) return null;
+  if (len === 0) return new Vector2([0, 0]);
   return res.scale(1 / len);
 }
 

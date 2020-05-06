@@ -5,11 +5,17 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { poslog, mockedWellborePath, casingData, holeSizeData, cementData } from '../../exampledata';
+import { mockedWellborePath, casingData, holeSizeData, cementData } from '../../exampledata';
 
 export const CementLayerBasic = () => {
+  const width = 400;
+  const height = 800;
+
+  const root = createRootContainer(width);
+  const container = createLayerContainer(width, height);
+
   const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
+    mockedWellborePath,
   );
 
   const options: CementLayerOptions = {
@@ -19,11 +25,7 @@ export const CementLayerBasic = () => {
   };
   const cementLayer = new CementLayer('webgl', options);
 
-  const width = 400;
-  const height = 800;
 
-  const root = createRootContainer(width);
-  const container = createLayerContainer(width, height);
 
   cementLayer.onMount({ elm: root, height, width });
 

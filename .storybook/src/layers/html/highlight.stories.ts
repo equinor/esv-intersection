@@ -7,7 +7,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 
 import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
 
-import poslog from '../../exampledata/poslog.json';
+import { getWellborePath } from '../../utils/api';
 
 const POINTHEIGHT = 5;
 const POINTWIDTH = 5;
@@ -18,112 +18,110 @@ const POINTOFFSETY = (POINTHEIGHT + POINTPADDING) / 2;
 const width = 700;
 const height = 600;
 
-const xRange = 600;
-const yRange = 500;
 const xbounds: number[] = [0, 1000];
 const ybounds: number[] = [0, 1000];
 
-const scaleOptions = { xMin: xbounds[0], xMax: xbounds[1], yMin: ybounds[0], yMax: ybounds[1], height: yRange, width: xRange };
+const scaleOptions = { xMin: xbounds[0], xMax: xbounds[1], yMin: ybounds[0], yMax: ybounds[1] };
 const axisOptions = {
   xLabel: 'Displacement',
   yLabel: 'TVD MSL',
   unitOfMeasure: 'm',
 };
 
-const defaultOptions = {
-  defaultIntersectionAngle: 135,
-  tension: 0.75,
-  arcDivisions: 5000,
-  thresholdDirectionDist: 0.001,
-};
-
 export const HighlightWellborepath = () => {
-  const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
-  );
-
-  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  layer.onMount({ elm: container });
-  layer.onUpdate({});
+  getWellborePath().then((data) => {
+    const referenceSystem = new IntersectionReferenceSystem(
+      data,
+    );
 
-  const highlightLayer = new HighlightLayer('pointhighlighter', {
-    order: 105,
-    referenceSystem,
-    layerOpacity: 0.5,
+    const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
+
+
+    layer.onMount({ elm: container });
+    layer.onUpdate({});
+
+    const highlightLayer = new HighlightLayer('pointhighlighter', {
+      order: 105,
+      referenceSystem,
+      layerOpacity: 0.5,
+    });
+
+    highlightLayer.onMount({ elm: container, width, height });
+
+    const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
+      layer.onRescale({ ...event });
+      highlightLayer.onRescale({ ...event });
+    });
+
+    zoomHandler.setBounds([0, 1000], [0, 1000]);
+    zoomHandler.adjustToSize(width, height);
+    zoomHandler.zFactor = 1;
+    zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+    zoomHandler.enableTranslateExtent = false;
+    zoomHandler.setViewport(1000, 1000, 5000);
+
+    highlightLayer.onRescale(zoomHandler.currentStateAsEvent());
+
+    const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: zoomHandler.currentStateAsEvent(), layer: highlightLayer }), {
+      width,
+      min: 0,
+      max: referenceSystem.length,
+    });
+
+    root.appendChild(container);
+    root.appendChild(slider);
+    root.appendChild(createFPSLabel());
+
   });
-
-  highlightLayer.onMount({ elm: container, width, height });
-
-  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
-    layer.onRescale({ ...event });
-    highlightLayer.onRescale({ ...event });
-  });
-
-  zoomHandler.setBounds([0, 1000], [0, 1000]);
-  zoomHandler.adjustToSize(width, height);
-  zoomHandler.zFactor = 1;
-  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
-  zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000, 1000, 5000);
-
-  highlightLayer.onRescale(zoomHandler.currentStateAsEvent());
-
-  const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: zoomHandler.currentStateAsEvent(), layer: highlightLayer }), {
-    width,
-    min: 0,
-    max: referenceSystem.length,
-  });
-
-  root.appendChild(container);
-  root.appendChild(slider);
-  root.appendChild(createFPSLabel());
 
   return root;
 };
 
 export const HighlightWellborepathWithController = () => {
-  const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]),
-  );
-
-  const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
+  getWellborePath().then((data) => {
+    const referenceSystem = new IntersectionReferenceSystem(
+      data,
+    );
 
-  const controller = new Controller({
-    referenceSystem,
-    axisOptions,
-    scaleOptions,
-    container,
+    const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
+
+
+    const controller = new Controller({
+      referenceSystem,
+      axisOptions,
+      scaleOptions,
+      container,
+    });
+
+    const highlightLayer = new HighlightLayer('pointhighlighter', {
+      order: 105,
+      referenceSystem,
+      layerOpacity: 0.5,
+    });
+
+    controller.addLayer(layer).addLayer(highlightLayer);
+
+    controller.setBounds([0, 1000], [0, 1000]);
+    controller.adjustToSize(width, height);
+    controller.setViewport(1000, 1000, 5000);
+
+    // external event that calls the rescale event the highlighting should change
+    const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: controller.currentStateAsEvent, layer: highlightLayer }), {
+      width,
+      min: -1000,
+      max: controller.referenceSystem.length + 1000,
+    });
+
+    root.appendChild(container);
+    root.appendChild(slider);
+    root.appendChild(createFPSLabel());
+
   });
-
-  const highlightLayer = new HighlightLayer('pointhighlighter', {
-    order: 105,
-    referenceSystem,
-    layerOpacity: 0.5,
-  });
-
-  controller.addLayer(layer).addLayer(highlightLayer);
-
-  controller.setBounds([0, 1000], [0, 1000]);
-  controller.adjustToSize(width, height);
-  controller.setViewport(1000, 1000, 5000);
-
-  // external event that calls the rescale event the highlighting should change
-  const slider = createSlider((event: any) => onUpdate(event, { rescaleEvent: controller.currentStateAsEvent, layer: highlightLayer }), {
-    width,
-    min: -1000,
-    max: controller.referenceSystem.length + 1000,
-  });
-
-  root.appendChild(container);
-  root.appendChild(slider);
-  root.appendChild(createFPSLabel());
 
   return root;
 };

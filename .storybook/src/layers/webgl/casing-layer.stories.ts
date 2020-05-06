@@ -5,74 +5,80 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { poslog, mockedWellborePath } from '../../exampledata';
+import { getWellborePath } from '../../utils/api';
 
 export const CasingLayerBasic = () => {
-  const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
-  );
-
-  const options: CasingLayerOptions = {
-    order: 1,
-    referenceSystem,
-  };
-  const casingLayer = new CasingLayer('webgl', options);
-
   const width = 400;
   const height = 800;
-
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  casingLayer.onMount({ elm: root, height, width });
+  getWellborePath().then((data) => {
+    const referenceSystem = new IntersectionReferenceSystem(
+      data,
+    );
 
-  casingLayer.onUpdate({ elm: root, data: getData() });
+    const options: CasingLayerOptions = {
+      order: 1,
+      referenceSystem,
+    };
+    const casingLayer = new CasingLayer('webgl', options);
 
-  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
-    casingLayer.onRescale(event);
+
+
+    casingLayer.onMount({ elm: root, height, width });
+
+    casingLayer.onUpdate({ elm: root, data: getData() });
+
+    const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
+      casingLayer.onRescale(event);
+    });
+    zoomHandler.setBounds([0, 1000], [0, 1000]);
+    zoomHandler.adjustToSize(width, height);
+    zoomHandler.zFactor = 1;
+    zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+    zoomHandler.enableTranslateExtent = false;
+    zoomHandler.setViewport(1000, 1000, 5000);
   });
-  zoomHandler.setBounds([0, 1000], [0, 1000]);
-  zoomHandler.adjustToSize(width, height);
-  zoomHandler.zFactor = 1;
-  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
-  zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000, 1000, 5000);
 
   root.appendChild(container);
   return root;
 };
 
 export const CasingLayerWithSampleData = () => {
-  const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
-  );
-
-  const options: CasingLayerOptions = {
-    order: 1,
-    referenceSystem,
-  };
-  const casingLayer = new CasingLayer('webgl', options);
-
   const width: number = 1280;
   const height: number = 1024;
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  casingLayer.onMount({ elm: root, height, width });
-  casingLayer.onUpdate({
-    elm: root,
-    data: getSampleDataData(),
-  });
+  getWellborePath().then((data) => {
+    const referenceSystem = new IntersectionReferenceSystem(
+      data,
+    );
 
-  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
-    casingLayer.onRescale(event);
+    const options: CasingLayerOptions = {
+      order: 1,
+      referenceSystem,
+    };
+    const casingLayer = new CasingLayer('webgl', options);
+
+
+    casingLayer.onMount({ elm: root, height, width });
+    casingLayer.onUpdate({
+      elm: root,
+      data: getSampleDataData(),
+    });
+
+    const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
+      casingLayer.onRescale(event);
+    });
+    zoomHandler.setBounds([0, 1000], [0, 1000]);
+    zoomHandler.adjustToSize(width, height);
+    zoomHandler.zFactor = 1;
+    zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+    zoomHandler.enableTranslateExtent = false;
+    zoomHandler.setViewport(1000, 1000, 5000);
   });
-  zoomHandler.setBounds([0, 1000], [0, 1000]);
-  zoomHandler.adjustToSize(width, height);
-  zoomHandler.zFactor = 1;
-  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
-  zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000, 1000, 5000);
 
   root.appendChild(container);
 
