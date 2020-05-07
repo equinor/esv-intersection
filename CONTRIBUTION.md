@@ -1,5 +1,12 @@
 
 # How to contribute
+
+Pull requests should include the following:
+- link to an issue that describing the problem, or a description in the pull request describing the issue and what it solves
+- unit tests (if applicable)
+- storybook (if applicable)
+- a separate commit that contains the ouput from running `npm run docs`
+
 ## Setup guide
 
 ### Cloning repository
@@ -19,6 +26,12 @@ npm install
 ```
 
 ## Usage
+
+### Storybook
+
+```
+npm run storybook
+```
 
 ### Document generation
 
