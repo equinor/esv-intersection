@@ -1,6 +1,6 @@
 # Intersection API
 
-![API overview](images/Intersection-controller-interface.png)
+![API overview](resources/images/intersection-architecture.png)
 
 The component's top level interface is the Controller, here you can either supply layers and reference systems and such at creation, or at a later time. The only thing that is required upon creation is a html container.
 
