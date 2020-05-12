@@ -31,7 +31,8 @@ export class WellboreBaseComponentLayer extends PixiLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.render(event);
+    this.ctx.stage.removeChildren();
+    //this.render(event);
   }
 
   onRescale(event: OnRescaleEvent): void {
@@ -40,9 +41,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     this.ctx.stage.scale.set(event.xRatio, event.yRatio);
   }
 
-  render(event: OnRescaleEvent | OnUpdateEvent): void {
-    // drawholesize ...
-  }
+  render(event: OnRescaleEvent | OnUpdateEvent): void {}
 
   drawBigPolygon = (coords: Point[], t?: Texture): Graphics => {
     const polygon = new Graphics();
