@@ -14,7 +14,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [150, 160],
+    pos: [150, 160],
   },
   {
     title: 'Balder Fm. Top',
@@ -23,7 +23,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [460, 110],
+    pos: [460, 110],
   },
   {
     title: 'Balder Fm. Top',
@@ -32,7 +32,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [460, 110],
+    pos: [460, 110],
   },
   {
     title: 'Odin Fm. Top',
@@ -41,7 +41,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [350, 60],
+    pos: [350, 60],
   },
   {
     title: 'Loke Fm. 2.1 Top',
@@ -50,7 +50,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [40, 70],
+    pos: [40, 70],
   },
   {
     title: 'Loke Fm. 2.1 Top',
@@ -59,7 +59,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [40, 70],
+    pos: [40, 70],
   },
   {
     title: 'Balder Fm. 1.1 SB Top',
@@ -68,7 +68,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [200, 300],
+    pos: [200, 300],
   },
   {
     title: 'Balder Fm. 1.1 SB Base',
@@ -77,7 +77,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [115, 110],
+    pos: [115, 110],
   },
 ];
 
@@ -105,7 +105,7 @@ export const CalloutCanvasWithZoom = () => {
   const container = createLayerContainer(width, height);
 
   const layer = new CalloutCanvasLayer('callout', { order: 1 });
-  layer.onMount(createEventObj(container));
+  layer.onMount({ elm: container });
   layer.onUpdate({ data: annotations });
 
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
@@ -125,18 +125,4 @@ export const CalloutCanvasWithZoom = () => {
   root.appendChild(createFPSLabel());
 
   return root;
-};
-
-const createEventObj = (elm: any) => {
-  return {
-    xScale: xscale.copy(),
-    yScale: yscale.copy(),
-    elm,
-    annotations,
-    isLeftToRight: true,
-    margin,
-    scale: 0,
-    width: xscale.range()[1],
-    height: yscale.range()[1],
-  };
 };

@@ -116,7 +116,7 @@ export interface Annotation {
   tvd: number;
   mdUnit: string;
   depthReferencePoint: string;
-  data: number[];
+  pos: [number, number];
   connector?: Connector;
   group: string;
 }
@@ -196,3 +196,12 @@ export interface Trajectory {
 export interface ReferenceSystemOptions {
   trajectoryAngle?: number;
 }
+
+export type BoundingBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  offsetX?: number;
+  offsetY?: number;
+};
