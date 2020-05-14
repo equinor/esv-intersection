@@ -1,7 +1,7 @@
 import { scaleLinear } from 'd3-scale';
 
 import { CalloutCanvasLayer } from '../../../../src/layers';
-import { Annotation } from '../../../../src/interfaces';
+import { Annotation, OnRescaleEvent } from '../../../../src/interfaces';
 
 import { createLayerContainer, createRootContainer } from '../../utils';
 
@@ -13,7 +13,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [150, 160],
+    pos: [150, 160],
   },
   {
     title: 'Balder Fm. Top',
@@ -22,7 +22,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [460, 110],
+    pos: [460, 110],
   },
   {
     title: 'Odin Fm. Top',
@@ -31,7 +31,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [350, 60],
+    pos: [350, 60],
   },
   {
     title: 'Loke Fm. 2.1 Top',
@@ -40,7 +40,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [40, 70],
+    pos: [40, 70],
   },
   {
     title: 'Balder Fm. 1.1 SB Top',
@@ -49,7 +49,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [200, 300],
+    pos: [200, 300],
   },
   {
     title: 'Balder Fm. 1.1 SB Base',
@@ -58,7 +58,7 @@ const annotations: Annotation[] = [
     mdUnit: 'm',
     depthReferencePoint: 'RKB',
     group: 'strat-picks',
-    data: [115, 110],
+    pos: [115, 110],
   },
 ];
 
@@ -69,11 +69,11 @@ const margin = {
   left: 0,
 };
 
-const xbounds = [0, 500];
-const ybounds = [0, 500];
+const xBounds: [number, number] = [0, 500];
+const yBounds: [number, number] = [0, 500];
 
-const xscale = scaleLinear().domain(xbounds).range([0, 500]);
-const yscale = scaleLinear().domain(ybounds).range([0, 500]);
+const xscale = scaleLinear().domain(xBounds).range([0, 500]);
+const yscale = scaleLinear().domain(yBounds).range([0, 500]);
 
 const width = 500;
 const height = 500;
@@ -83,7 +83,7 @@ export const CalloutCanvas = () => {
   const container = createLayerContainer(width, height);
 
   const layer = new CalloutCanvasLayer('callout', { order: 1 });
-  layer.onMount(createEventObj(container));
+  layer.onMount({ elm: container });
   layer.onUpdate({ data: annotations });
   layer.onRescale(createEventObj(container));
 
@@ -92,10 +92,12 @@ export const CalloutCanvas = () => {
   return root;
 };
 
-const createEventObj = (elm: any) => {
+const createEventObj = (elm: any): OnRescaleEvent => {
   return {
     xScale: xscale.copy(),
     yScale: yscale.copy(),
+    xBounds,
+    yBounds,
     elm,
     annotations,
     isLeftToRight: true,
