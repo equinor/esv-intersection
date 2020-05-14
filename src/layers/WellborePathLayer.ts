@@ -35,7 +35,7 @@ export class WellborepathLayer extends SVGLayer {
     }
     this.elm.select('g').remove();
 
-    const data = this.referenceSystem.projectedPath as [number, number][];
+    const data = this.data || (this.referenceSystem && (this.referenceSystem.projectedPath as [number, number][]));
     if (!data || !this.rescaleEvent) {
       return;
     }
