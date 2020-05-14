@@ -37,7 +37,7 @@ export class IntersectionReferenceSystem {
 
   /**
    * Creates a common reference system that layers and other components can use
-   * @param path (required) array of coordinates [x, y, z]
+   * @param path (required) array of 3d coordinates: [x, y, z]
    * @param options (optional)
    * @param options.trajectoryAngle (optional) - trajectory angle in degrees, overrides the calculated value
    */
