@@ -115,13 +115,9 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     let startPos;
     const portionOfLabelLengthUsedForPosCalc = 0.07;
     if (isLabelsOnLeftSide) {
-      startPos = isXFlipped
-        ? Math.min(surfaceAreaLeftEdge, leftEdge) + (portionOfLabelLengthUsedForPosCalc * labelLengthInWorldCoords) / 2
-        : Math.max(surfaceAreaLeftEdge, leftEdge) - (portionOfLabelLengthUsedForPosCalc * labelLengthInWorldCoords) / 2;
+      startPos = isXFlipped ? Math.min(surfaceAreaLeftEdge, leftEdge) : Math.max(surfaceAreaLeftEdge, leftEdge);
     } else {
-      startPos = isXFlipped
-        ? Math.max(surfaceAreaRightEdge, rightEdge) - (portionOfLabelLengthUsedForPosCalc * labelLengthInWorldCoords) / 2
-        : Math.min(surfaceAreaRightEdge, rightEdge) + (portionOfLabelLengthUsedForPosCalc * labelLengthInWorldCoords) / 2;
+      startPos = isXFlipped ? Math.max(surfaceAreaRightEdge, rightEdge) : Math.min(surfaceAreaRightEdge, rightEdge);
     }
 
     const topEdge = yScale.invert(yScale.range()[0]);
@@ -136,14 +132,14 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     // Sample points from top and calculate position
     const topData = data.map((d) => [d[0], d[1]]);
-    const topPos = this.calcPos(topData, startPos, posSteps, posStep, topEdge);
+    const topPos = this.calcPos(topData, startPos, posSteps, posStep, topEdge, bottomEdge);
     if (!topPos) {
       return;
     }
 
     // Sample points from bottom and calculate position
     const bottomData = data.map((d) => [d[0], d[2]]);
-    let bottomPos = this.calcPos(bottomData, startPos, posSteps, posStep, null, bottomEdge);
+    let bottomPos = this.calcPos(bottomData, startPos, posSteps, posStep, topEdge, bottomEdge);
     if (!bottomPos) {
       bottomPos = new Vector2(topPos.x, bottomEdge);
     }
@@ -163,8 +159,8 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     }
 
     // Sample points from top and bottom and calculate direction vector
-    const initialDirVec = isLabelsOnLeftSide ? Vector2.right : Vector2.left;
-    let dirVec = this.calcAreaDir(topData, bottomData, startPos, dirSteps, dirStep, zFactor, initialDirVec, topEdge, bottomEdge);
+    const initialDirVec = isLabelsOnLeftSide !== isXFlipped ? Vector2.right : Vector2.left;
+    let dirVec = this.calcAreaDir(topData, bottomData, startPos, dirSteps, dirStep, initialDirVec, topEdge, bottomEdge);
     if (!dirVec) {
       return;
     }
@@ -175,6 +171,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     if (isXFlipped) {
       dirVec = new Vector2(-dirVec[0], dirVec[1]);
     }
+    dirVec = new Vector2(dirVec[0], dirVec[1] * zFactor);
     const textAngle = Vector2.angleRight(dirVec) - (isLabelsOnLeftSide ? 0 : Math.PI);
 
     // Draw label
@@ -190,7 +187,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   };
 
   drawLineLabel = (s: SurfaceLine): void => {
-    const { ctx } = this;
+    const { ctx, isXFlipped } = this;
     const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
     const maxX = Math.max(s.data[0][0], s.data[s.data.length - 1][0]);
     const minX = Math.min(s.data[0][0], s.data[s.data.length - 1][0]);
@@ -205,15 +202,17 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     const labelMetrics = ctx.measureText(s.label);
     const labelLengthInWorldCoords = labelMetrics.width / xRatio;
 
+    const leftEdge = xScale.invert(xScale.range()[0]) + marginsInWorldCoords;
+    const rightEdge = xScale.invert(xScale.range()[1]) - marginsInWorldCoords;
+    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges();
+
     // Find edge where to draw
     let startPos;
     const steps = 5;
     if (isLabelsOnLeftSide) {
-      const rightEdge = xScale.invert(xScale.range()[1]);
-      startPos = Math.min(maxX, rightEdge) - marginsInWorldCoords;
+      startPos = isXFlipped ? Math.max(surfaceAreaRightEdge, rightEdge) : Math.min(surfaceAreaRightEdge, rightEdge);
     } else {
-      const leftEdge = xScale.invert(xScale.range()[0]);
-      startPos = Math.max(minX, leftEdge) + marginsInWorldCoords;
+      startPos = isXFlipped ? Math.min(surfaceAreaLeftEdge, leftEdge) : Math.max(surfaceAreaLeftEdge, leftEdge);
     }
 
     // Calculate where to sample points
@@ -228,12 +227,12 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     }
 
     // Calculate position and direction for label
-    const textX = pos.x;
+    const textX = startPos;
     const textY = pos.y - s.width - fontSizeInWorldCoords / 2;
-    const textDir = Vector2.angleRight(dir) - (this.isLabelsOnLeftSide ? Math.PI : 0);
+    const textDir = Vector2.angleRight(dir) - (isLabelsOnLeftSide ? Math.PI : 0);
 
     // Draw label
-    ctx.textAlign = 'center';
+    ctx.textAlign = isLabelsOnLeftSide ? 'right' : 'left';
     ctx.translate(xScale(textX), yScale(textY));
     ctx.rotate(textDir);
     ctx.fillStyle = `#${this.colorToHexString(s.color)}`;
@@ -244,6 +243,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   };
 
   colorToHexString(color: number): string {
+    // eslint-disable-next-line no-magic-numbers
     return color.toString(16).padStart(6, '0');
   }
 
@@ -305,7 +305,6 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     offset: number,
     count: number,
     step: number,
-    zFactor: number,
     initalVector: Vector2 = Vector2.left,
     topLimit: number = null,
     bottomLimit: number = null,
@@ -314,37 +313,33 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   ): Vector2 {
     const dir = initalVector.clone().mutable;
 
+
     const startTopY = findSampleAtPos(top, offset, topLimit, bottomLimit);
     if (startTopY === null) {
       return dir;
     }
     const startBottomY = findSampleAtPos(bottom, offset, topLimit, bottomLimit) || bottomLimit;
-    const startY = ((startTopY + startBottomY) * zFactor) / 2;
+    const startY = (startTopY + startBottomY) / 2;
     const vecAtEnd = new Vector2(offset, startY);
+
     const tmpVec = Vector2.zero.mutable;
     for (let i = 1; i <= count; i++) {
       const x = offset + i * step;
       const topY = findSampleAtPos(top, x, topLimit, bottomLimit);
-      const bottomY = findSampleAtPos(bottom, x, topLimit, bottomLimit);
+      const bottomY = findSampleAtPos(bottom, x, topLimit, bottomLimit) || bottomLimit;
       if (topY !== null) {
-        if (bottomY !== null) {
-          const thickness = bottomY - topY;
-          if (thickness >= thicknessThreshold) {
-            tmpVec.set(x, ((topY + bottomY) * zFactor) / 2);
-            tmpVec.sub(vecAtEnd);
-            tmpVec.normalize();
-            if (scaleByThickness) {
-              tmpVec.scale(thickness);
-            }
-            dir.add(tmpVec);
-          }
-        } else {
-          tmpVec.set(x, topY * zFactor);
-          tmpVec.sub(offset, startTopY * zFactor);
-          tmpVec.add(initalVector);
+        const thickness = bottomY - topY;
+        if (thickness >= thicknessThreshold) {
+          tmpVec.set(x, (topY + bottomY) / 2);
+          tmpVec.sub(vecAtEnd);
           tmpVec.normalize();
+          if (scaleByThickness) {
+            tmpVec.scale(thickness);
+          }
           dir.add(tmpVec);
         }
+      } else {
+        dir.add(initalVector);
       }
     }
 
