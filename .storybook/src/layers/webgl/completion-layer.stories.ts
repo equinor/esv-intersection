@@ -5,14 +5,8 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 import { IntersectionReferenceSystem } from '../../../../src';
 
 // Data
-import { poslog, mockedWellborePath, completionData } from '../../exampledata';
-
-const defaultOptions = {
-  defaultIntersectionAngle: 135,
-  tension: 0.75,
-  arcDivisions: 5000,
-  thresholdDirectionDist: 0.001,
-};
+import { mockedWellborePath } from '../../exampledata';
+import { getWellborePath, getCompletion } from '../../utils/api';
 
 export const CompletionLayerSample = () => {
   const data = [
@@ -22,7 +16,7 @@ export const CompletionLayerSample = () => {
   ];
 
   const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
+    mockedWellborePath,
   );
 
   const options: CompletionLayerOptions = {
@@ -63,29 +57,33 @@ export const CompletionLayerWithSampleData = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const referenceSystem = new IntersectionReferenceSystem(
-    poslog.map((coords) => [coords.easting, coords.northing, coords.tvd]) || mockedWellborePath,
-  );
+  Promise.all([getWellborePath(), getCompletion()]).then((values) => {
+    const [path, completion] = values;
+    const referenceSystem = new IntersectionReferenceSystem(
+      path,
+    );
 
-  const options: CompletionLayerOptions = {
-    order: 1,
-    referenceSystem,
-  };
-  const completionLayer = new CompletionLayer('webgl', options);
-  completionLayer.onMount({ elm: container, height, width });
+    const options: CompletionLayerOptions = {
+      order: 1,
+      referenceSystem,
+    };
+    const completionLayer = new CompletionLayer('webgl', options);
+    completionLayer.onMount({ elm: container, height, width });
 
-  const data = completionData.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter((d: any) => d.start > 400 && d.end < 1800); //.filter(c => c.diameter != 0 && c.start > 0);
+    const data = completion.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter((d: any) => d.start > 400 && d.end < 1800); //.filter(c => c.diameter != 0 && c.start > 0);
 
-  completionLayer.onUpdate({ data });
-  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
-    completionLayer.onRescale(event);
+    completionLayer.onUpdate({ data });
+    const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
+      completionLayer.onRescale(event);
+    });
+    zoomHandler.setBounds([0, 1000], [0, 1000]);
+    zoomHandler.adjustToSize(width, height);
+    zoomHandler.zFactor = 1;
+    zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+    zoomHandler.enableTranslateExtent = false;
+    zoomHandler.setViewport(1000, 1000, 5000);
   });
-  zoomHandler.setBounds([0, 1000], [0, 1000]);
-  zoomHandler.adjustToSize(width, height);
-  zoomHandler.zFactor = 1;
-  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
-  zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000, 1000, 5000);
+
 
   root.appendChild(container);
   root.appendChild(fpsLabel);

@@ -11,13 +11,7 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 import { generateSurfaceData, generateProjectedTrajectory, SurfaceData, generateProjectedWellborePath } from '../../../../src/datautils';
 
 //Data
-import poslog from '../../exampledata/poslog.json';
-import stratColumn from '../../exampledata/stratcolumn.json';
-import surfaceValues from '../../exampledata/surfaces.json';
-
-const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
-const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumn, surfaceValues);
-const wellborePath = generateProjectedWellborePath(poslog);
+import { getSurfaces, getWellborePath, getStratColumns } from '../../utils/api';
 
 const width: number = 800;
 const height: number = 600;
@@ -114,7 +108,14 @@ export const GeoModelWithSampleData = () => {
   const geoModelLayer = new GeomodelLayer('webgl', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
-  geoModelLayer.onUpdate({ data: geolayerdata });
+  Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
+    const [path, surfaces, stratColumns] = values;
+    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }])
+    const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
+    const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
+
+    geoModelLayer.onUpdate({ data: geolayerdata });
+  });
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     geoModelLayer.onRescale(event);
   });
@@ -148,8 +149,17 @@ export const GeoModelWithLabels = () => {
     geoModelLayer.onRescale(event);
     geoModelLabelsLayer.onRescale({ ...event });
   });
-  geoModelLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
-  geoModelLabelsLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+
+  Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
+    const [path, surfaces, stratColumns] = values;
+    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }])
+    const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
+    const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
+    const wellborePath = generateProjectedWellborePath([]);
+
+    geoModelLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+    geoModelLabelsLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+  });
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
   zoomHandler.adjustToSize(width, height);
@@ -181,8 +191,18 @@ export const GeoModelWithLabelsUsingCanvas = () => {
     geoModelLayer.onRescale(event);
     geoModelLabelsLayer.onRescale({ ...event });
   });
-  geoModelLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
-  geoModelLabelsLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+
+
+  Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
+    const [path, surfaces, stratColumns] = values;
+    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }])
+    const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
+    const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
+    const wellborePath = generateProjectedWellborePath([]);
+
+    geoModelLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+    geoModelLabelsLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+  });
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
   zoomHandler.adjustToSize(width, height);
@@ -214,8 +234,18 @@ export const GeoModelWithLabelsUsingVersion2 = () => {
     geoModelLayer.onRescale(event);
     geoModelLabelsLayer.onRescale({ ...event });
   });
-  geoModelLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
-  geoModelLabelsLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+
+
+  Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
+    const [path, surfaces, stratColumns] = values;
+    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }])
+    const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
+    const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
+    const wellborePath = generateProjectedWellborePath([]);
+
+    geoModelLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+    geoModelLabelsLayer.onUpdate({ ...createEventObj(container), data: geolayerdata, wellborePath });
+  });
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
   zoomHandler.adjustToSize(width, height);

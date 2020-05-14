@@ -5,6 +5,9 @@ import { createColorTable } from './colortable';
 import { findIndexOfSample } from './findsample';
 
 export function getSeismicInfo(seismic: any, trajectory: number[][]): any {
+  if (!(seismic && seismic.datapoints)) {
+    return;
+  }
   const minX = trajectory.reduce((acc: number, val: number[]) => Math.min(acc, val[0]), 0);
   const maxX = trajectory.reduce((acc: number, val: number[]) => Math.max(acc, val[0]), 0);
 
@@ -42,6 +45,9 @@ export async function generateSeismicSliceImage(
   colormap: string[],
   isLeftToRight = true,
 ): Promise<ImageBitmap> {
+  if (!(data && data.datapoints && data.datapoints.length > 0)) {
+    return;
+  }
   const { datapoints: dp } = data;
 
   const min = dp.reduce((val: number, array: number[]) => Math.min(...array, val), 0);
