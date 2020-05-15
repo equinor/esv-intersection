@@ -119,27 +119,18 @@ Code formatting
 Documentation isn't optional
 ----------------------------
 
-It's not! Patches without documentation will be returned to sender.  By
-"documentation" we mean:
+It's not! Patches without documentation will be returned to sender. a separate commit should be added that contains the ouput from running `npm run docs`. Methods and classes should also have jsdoc documentation.
 
-* **Docstrings** (for Python; or API-doc-friendly comments for other languages)
-  must be created or updated for public API functions/methods/etc. (This step
-  is optional for some bugfixes.)
-
-    * Don't forget to include `versionadded
-      <http://sphinx-doc.org/markup/para.html#directive-versionadded>`_/`versionchanged
-      <http://sphinx-doc.org/markup/para.html#directive-versionchanged>`_ ReST
-      directives at the bottom of any new or changed Python docstrings!
-
-        * Use ``versionadded`` for truly new API members -- new methods,
-          functions, classes or modules.
-        * Use ``versionchanged`` when adding/removing new function/method
-          arguments, or whenever behavior changes.
-
-* New features should ideally include updates to **prose documentation**,
-  including useful example code snippets.
-* All submissions should have a **changelog entry** crediting the contributor
-  and/or any individuals instrumental in identifying the problem.
+example:
+```javascript
+/**
+ * increment number by 1
+ * @param n - number to be incremented
+ */
+increment(n) {
+  return n + 1;
+}
+```
 
 Tests aren't optional
 ---------------------
@@ -147,6 +138,8 @@ Tests aren't optional
 Any bugfix that doesn't include a test proving the existence of the bug being
 fixed, may be suspect.  Ditto for new features that can't prove they actually
 work.
+
+Your ideally include unit tests and/or storybooks to test and help describe what you are solving
 
 We've found that test-first development really helps make features better
 architected and identifies potential edge cases earlier instead of later.
@@ -188,18 +181,6 @@ Creating Pull Requests
    new bugfix).
 4. Hit 'submit'! And please be patient - the maintainers will get to you when
    they can.
-
-
-## Submitting bugs
-Before submitting a bug, please do the following:
-- Basic troubleshooting
--- Make sure you're on the latest version. If you're not on the most recent version, your problem may have been solved already! Upgrading is always the best first step.
-
-Pull requests should include the following:
-- link to an issue that describes the problem, or a description in the pull request describing the issue and what it solves
-- unit tests (if applicable)
-- storybook (if applicable)
-- a separate commit that contains the ouput from running `npm run docs`
 
 ## Setup guide
 
