@@ -39,15 +39,7 @@ npm run storybook
 npm run docs
 ```
 
-Three part process:
-
-1. Deletes the docs-folder, if it exists.
-2. Automatically generates documentation to a new docs-folder.
-3. Copies the images-folder and .nojekyll into docs.
-
-The copying of images makes it possible to refer to local images within the README!
-
-The empty .nojekyll file makes it possible to upload html pages starting wth underscore to GitHub pages.
+This command will overwrite any old documentation
 
 ### Creating tests
 
