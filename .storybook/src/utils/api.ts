@@ -12,11 +12,18 @@ export const fetchData = async (fileName: string) => {
   });
 }
 
-
 export const getWellborePath = () => {
-  return fetchData('coordinates.json').then((data) => {
-    const coords = data && data.length > 0 ? data : mockedWellborePath;
+  return fetchData('poslog.json').then((data) => {
+    const coords = data && data.length > 0 ? data.map((c) => [c.easting, c.northing, c.tvd]) : mockedWellborePath;
     return coords;
+  });
+}
+
+export const getPositionLog = () => {
+  return fetchData('poslog.json').then((data) => {
+    const plog = mockedWellborePath.map((coords) => { return { easting: coords[0], northing: coords[1], tvd: coords[2] }; })
+    const poslog = data && data.length > 0 ? data : plog;
+    return poslog;
   });
 }
 

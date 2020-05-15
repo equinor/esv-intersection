@@ -8,7 +8,7 @@ import { getSeismicInfo, generateSeismicSliceImage } from '../../../../src/datau
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { OnRescaleEvent } from '../../../../src/interfaces';
 
-import { getSeismic, getWellborePath } from '../../utils/api';
+import { getSeismic, getPositionLog } from '../../utils/api';
 import { seismicColorMap } from '../../exampledata';
 
 const width = 400;
@@ -18,15 +18,14 @@ export const Seismic = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  Promise.all([getWellborePath(), getSeismic()]).then((values) => {
-    const [path, seismic] = values;
+  Promise.all([getPositionLog(), getSeismic()]).then((values) => {
+    const [poslog, seismic] = values;
     const seismicLayer = new SeismicCanvasLayer('seismic', {
       order: 2,
       layerOpacity: 1,
     });
     const ev = { elm: container, width, height };
 
-    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }])
     seismicLayer.onMount({ ...ev });
     const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
     const seismicInfo = getSeismicInfo(seismic, trajectory) || { x: 0, y: 0, width: 0, height: 0 };
