@@ -14,7 +14,7 @@ export const fetchData = async (fileName: string) => {
 
 export const getWellborePath = () => {
   return fetchData('poslog.json').then((data) => {
-    const coords = data && data.length > 0 ? data.map((c) => [c.easting, c.northing, c.tvd]) : mockedWellborePath;
+    const coords = data && data.length > 0 ? data.map((c: any) => [c.easting, c.northing, c.tvd]) : mockedWellborePath;
     return coords;
   });
 }
