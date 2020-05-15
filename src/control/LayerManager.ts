@@ -4,6 +4,7 @@ import { Layer, GridLayer } from '../layers';
 import { ScaleOptions, OnMountEvent, OnRescaleEvent } from '../interfaces';
 import { Axis } from '../components';
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
+import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';
 
 interface AxisOptions {
   xLabel: string;
@@ -124,11 +125,8 @@ export class LayerManager {
   }
 
   adjustToSize(width: number, height: number): void {
-    const horizontalAxisMargin = 40;
-    const verticalAxisMargin = 30;
-
-    const layersWidth = this._axis ? width - horizontalAxisMargin : width;
-    const layersHeight = this._axis ? height - verticalAxisMargin : height;
+    const layersWidth = this._axis && width !== 0 ? width - HORIZONTAL_AXIS_MARGIN : width;
+    const layersHeight = this._axis && height !== 0 ? height - VERTICAL_AXIS_MARGIN : height;
 
     if (this._axis) {
       const resizeEvent = { width, height };
