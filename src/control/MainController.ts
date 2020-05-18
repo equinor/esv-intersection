@@ -118,7 +118,7 @@ export class Controller {
   adjustToSize(width: number, height: number): Controller {
     this.layerManager.adjustToSize(width, height);
 
-    const dimensions = { width: width !== 0 ? width - HORIZONTAL_AXIS_MARGIN : 0, height: height !== 0 ? height - VERTICAL_AXIS_MARGIN : 0 };
+    const dimensions = { width: Math.max(width - HORIZONTAL_AXIS_MARGIN, 0), height: Math.max(height - VERTICAL_AXIS_MARGIN, 0) };
     this.overlay.elm.dispatch('resize', { detail: dimensions, bubbles: true, cancelable: true });
 
     return this;
