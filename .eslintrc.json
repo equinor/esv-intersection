@@ -35,7 +35,7 @@
     "max-len": ["error", { "code": 150 }],
     "comma-dangle": ["error", "always-multiline"],
     "eqeqeq": ["error", "always", { "null": "ignore" }],
-    "no-magic-numbers": ["error", { "ignore": [-1, 0, 1, 2] }],
+    "no-magic-numbers": ["error", { "ignore": [-1, 0, 1, 2, 3] }],
     "newline-per-chained-call": ["off", { "ignoreChainWithDepth": 1 }],
     "no-warning-comments": [0, { "terms": ["todo", "fixme"], "location": "start" }]
   }

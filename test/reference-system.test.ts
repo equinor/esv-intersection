@@ -16,6 +16,30 @@ describe('Reference system', () => {
     expect(rs.path).not.toEqual(undefined);
     expect(rs.path).toEqual(wp);
   });
+  it('should return error on empty path', () => {
+    const arr: any[] = [];
+    expect(() => {
+      const test = new IntersectionReferenceSystem(arr);
+    }).toThrow('Missing coordinates');
+  });
+  it('should return error when path is in 4d and not 3d', () => {
+    const arr: any[] = [[1, 1, 1, 1]];
+    expect(() => {
+      const test = new IntersectionReferenceSystem(arr);
+    }).toThrow('Coordinates should be in 3d');
+  });
+  it('should return error when path is in 2d and not 3d', () => {
+    const arr: any[] = [[1, 1]];
+    expect(() => {
+      const test = new IntersectionReferenceSystem(arr);
+    }).toThrow('Coordinates should be in 3d');
+  });
+  it('should return error when path is in 1d and not 3d', () => {
+    const arr: any[] = [[1]];
+    expect(() => {
+      const test = new IntersectionReferenceSystem(arr);
+    }).toThrow('Coordinates should be in 3d');
+  });
   it('should get start position at 0', () => {
     const pos = rs.getPosition(0);
     expect(pos).toEqual([30, 40]);

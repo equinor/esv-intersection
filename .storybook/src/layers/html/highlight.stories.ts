@@ -1,6 +1,6 @@
 import { Selection } from 'd3-selection';
 
-import { WellborepathLayer, HTMLLayer } from '../../../../src/layers';
+import { WellborepathLayer, HTMLLayer, GridLayer } from '../../../../src/layers';
 import { OnRescaleEvent, OnMountEvent } from '../../../../src/interfaces';
 import { IntersectionReferenceSystem, Controller } from '../../../../src/control';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
@@ -139,7 +139,7 @@ class HighlightLayer extends HTMLLayer {
     const elm = this.elements[0];
     if (this.referenceSystem) {
       // returns coords in [displacement, tvd]
-      const coords = this.referenceSystem.project(event.md || 0);
+      const coords = this.referenceSystem.project(event.curveLength || 0);
 
       // screen coords inside the container
       const newX = event.xScale(coords[0]);
@@ -169,7 +169,7 @@ class HighlightLayer extends HTMLLayer {
 }
 
 const onUpdate = (event: InputEvent, obj: any) => {
-  obj.layer.onRescale({ ...obj.rescaleEvent, md: event.target.valueAsNumber });
+  obj.layer.onRescale({ ...obj.rescaleEvent, curveLength: event.target.valueAsNumber });
 };
 
 const createSlider = (cb: any, opts: any) => {

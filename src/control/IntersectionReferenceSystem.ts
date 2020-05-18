@@ -37,11 +37,17 @@ export class IntersectionReferenceSystem {
 
   /**
    * Creates a common reference system that layers and other components can use
-   * @param path (required) array of coordinates
+   * @param path (required) array of 3d coordinates: [x, y, z]
    * @param options (optional)
    * @param options.trajectoryAngle (optional) - trajectory angle in degrees, overrides the calculated value
    */
   constructor(path: number[][], options?: ReferenceSystemOptions) {
+    if (path.length < 1) {
+      throw new Error('Missing coordinates');
+    }
+    if (path[0] && path[0].length !== 3) {
+      throw new Error('Coordinates should be in 3d');
+    }
     this.setPath(path, options);
 
     this.project = this.project.bind(this);
