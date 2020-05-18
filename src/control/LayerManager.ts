@@ -56,7 +56,7 @@ export class LayerManager {
   }
 
   /**
-   * adds and mounts an array of layers
+   * Adds and mounts an array of layers
    * @param layers array of layers
    */
   addLayers(layers: Layer[]): LayerManager {
@@ -65,14 +65,14 @@ export class LayerManager {
   }
 
   /**
-   * gets all layers currently mounted
+   * Gets all layers currently mounted
    */
   getLayers(): Layer[] {
     return this.layers;
   }
 
   /**
-   * clears data from all mounted layers
+   * Clears data from all mounted layers
    */
   clearAllData(): LayerManager {
     this.layers.forEach((l) => l.clearData());
@@ -80,7 +80,7 @@ export class LayerManager {
   }
 
   /**
-   * adds the layer to the manager, and mounts it
+   * Adds the layer to the manager, and mounts it
    * @param layer Layer
    * @param params extra params to pass to the onUpdate method
    */
@@ -92,7 +92,7 @@ export class LayerManager {
   }
 
   /**
-   * remove layer from manager, and unmounts it
+   * Remove layer from manager, and unmounts it
    * @param layerId name of layer
    */
   removeLayer(layerId: string): LayerManager {
