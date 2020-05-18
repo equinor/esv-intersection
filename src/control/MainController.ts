@@ -66,7 +66,15 @@ export class Controller {
   }
 
   /**
-   * adds layer to list, and initializes it
+   * Clears data from all mounted layers
+   */
+  clearAllData(): Controller {
+    this.layerManager.clearAllData();
+    return this;
+  }
+
+  /**
+   * Adds layer to list, and initializes it
    * @param layer layer object
    * @param params (optional) adds additional parameters to the onUpdateEvent
    */
@@ -77,7 +85,7 @@ export class Controller {
   }
 
   /**
-   * remove layer from list
+   * Remove layer from list
    * @param layerId string id
    */
   removeLayer(layerId: string): Controller {
@@ -86,7 +94,7 @@ export class Controller {
   }
 
   /**
-   * find first layer with given id, returns undefined if none are found
+   * Find first layer with given id, returns undefined if none are found
    * @param layerId string id
    */
   getLayer(layerId: string): Layer {
@@ -94,7 +102,7 @@ export class Controller {
   }
 
   /**
-   * sets visibility to true and rescales the layer
+   * Sets visibility to true and rescales the layer
    * @param layerId string id
    */
   showLayer(layerId: string): Controller {
@@ -103,7 +111,7 @@ export class Controller {
   }
 
   /**
-   * sets visibility to false
+   * Sets visibility to false
    * @param layerId string id
    */
   hideLayer(layerId: string): Controller {
@@ -112,8 +120,9 @@ export class Controller {
   }
 
   /**
-   * Adjust zoom due to changes in size of target
-   * @param  force - force update even if size did not change, defaults to false
+   * Adjust layers, axis, overlay, and zoom according to inputted dimensions
+   * @param width (required)
+   * @param height (required)
    */
   adjustToSize(width: number, height: number): Controller {
     this.layerManager.adjustToSize(width, height);
@@ -137,7 +146,7 @@ export class Controller {
   }
 
   /**
-   * sets bounds for zoom and pan handler
+   * Sets bounds for zoom and pan handler
    * @param xBounds - domain in x-direction
    * @param yBounds - domain in y-direction
    */
@@ -147,7 +156,7 @@ export class Controller {
   }
 
   /**
-   * display both axes
+   * Display both axes
    */
   showAxis(): Controller {
     this.layerManager.showAxis();
@@ -155,7 +164,7 @@ export class Controller {
   }
 
   /**
-   * hide both axes
+   * Hide both axes
    */
   hideAxis(): Controller {
     this.layerManager.hideAxis();
@@ -163,7 +172,7 @@ export class Controller {
   }
 
   /**
-   * shows labels in x and y
+   * Shows labels in x and y
    */
   showAxisLabels(): Controller {
     this.layerManager.showAxisLabels();
@@ -171,7 +180,7 @@ export class Controller {
   }
 
   /**
-   * hide labels in x and y
+   * Hide labels in x and y
    */
   hideAxisLabels(): Controller {
     this.layerManager.hideAxisLabels();
@@ -179,7 +188,7 @@ export class Controller {
   }
 
   /**
-   * sets domain offset, offset is subtracted from domain
+   * Sets domain offset, offset is subtracted from domain
    * @param x
    * @param y
    */
@@ -189,7 +198,7 @@ export class Controller {
   }
 
   /**
-   * sets domain offset in x-direction, offset is subtracted from domain
+   * Sets domain offset in x-direction, offset is subtracted from domain
    * @param x
    */
   setXAxisOffset(x: number): Controller {
@@ -198,7 +207,7 @@ export class Controller {
   }
 
   /**
-   * sets domain offset in y-direction, offset is subtracted from domain
+   * Sets domain offset in y-direction, offset is subtracted from domain
    * @param y
    */
   setYAxisOffset(y: number): Controller {
@@ -207,7 +216,7 @@ export class Controller {
   }
 
   /**
-   * defines min and max of how much one can zoom
+   * Defines min and max of how much one can zoom
    * @param zoomlevels
    */
   setZoomLevelBoundary(zoomlevels: [number, number]): Controller {
@@ -216,7 +225,7 @@ export class Controller {
   }
 
   /**
-   * defines how far in one can zoom
+   * Defines how far in one can zoom
    * @param zoomlevel
    */
   setMaxZoomLevel(zoomlevel: number): Controller {
@@ -225,7 +234,7 @@ export class Controller {
   }
 
   /**
-   * defines how far out one can zoom
+   * Defines how far out one can zoom
    * @param zoomlevel
    */
   setMinZoomLevel(zoomlevel: number): Controller {

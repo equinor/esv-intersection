@@ -25,7 +25,7 @@ export class LayerManager {
   private _svgContainer: Selection<HTMLElement, unknown, null, undefined>;
 
   /**
-   * Class for handling layers
+   * Handles layers and axis also holds a zoom and pan handler object
    * @param container root container
    * @param scaleOptions
    * @param axisOptions
@@ -56,17 +56,32 @@ export class LayerManager {
     this.rescale = this.rescale.bind(this);
   }
 
+  /**
+   * Adds and mounts an array of layers
+   * @param layers array of layers
+   */
   addLayers(layers: Layer[]): LayerManager {
     layers.forEach((layer) => this.addLayer(layer));
     return this;
   }
 
+  /**
+   * Gets all layers currently mounted
+   */
   getLayers(): Layer[] {
     return this.layers;
   }
 
   /**
-   * adds the layer to the manager, and mounts it
+   * Clears data from all mounted layers
+   */
+  clearAllData(): LayerManager {
+    this.layers.forEach((l) => l.clearData());
+    return this;
+  }
+
+  /**
+   * Adds the layer to the manager, and mounts it
    * @param layer Layer
    * @param params extra params to pass to the onUpdate method
    */
@@ -78,7 +93,7 @@ export class LayerManager {
   }
 
   /**
-   * remove layer from manager, and unmounts it
+   * Remove layer from manager, and unmounts it
    * @param layerId name of layer
    */
   removeLayer(layerId: string): LayerManager {
@@ -124,6 +139,11 @@ export class LayerManager {
     return this;
   }
 
+  /**
+   * Adjust layers, axis, and zoom according to inputted dimensions
+   * @param width (required)
+   * @param height (required)
+   */
   adjustToSize(width: number, height: number): void {
     const layersWidth = Math.max(this._axis ? width - HORIZONTAL_AXIS_MARGIN : width, 0);
     const layersHeight = Math.max(this._axis ? height - VERTICAL_AXIS_MARGIN : height, 0);
