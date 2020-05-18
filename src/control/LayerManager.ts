@@ -125,8 +125,8 @@ export class LayerManager {
   }
 
   adjustToSize(width: number, height: number): void {
-    const layersWidth = this._axis && width !== 0 ? width - HORIZONTAL_AXIS_MARGIN : width;
-    const layersHeight = this._axis && height !== 0 ? height - VERTICAL_AXIS_MARGIN : height;
+    const layersWidth = this._axis ? Math.max(width - HORIZONTAL_AXIS_MARGIN, 0) : width;
+    const layersHeight = this._axis ? Math.max(height - VERTICAL_AXIS_MARGIN, 0) : height;
 
     if (this._axis) {
       const resizeEvent = { width, height };
