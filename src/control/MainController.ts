@@ -68,6 +68,14 @@ export class Controller {
   }
 
   /**
+   * clears data from all mounted layers
+   */
+  clearAllData(): Controller {
+    this.layerManager.clearAllData();
+    return this;
+  }
+
+  /**
    * adds layer to list, and initializes it
    * @param layer layer object
    * @param params (optional) adds additional parameters to the onUpdateEvent
@@ -114,8 +122,9 @@ export class Controller {
   }
 
   /**
-   * Adjust zoom due to changes in size of target
-   * @param  force - force update even if size did not change, defaults to false
+   * Adjust layers, axis, overlay, and zoom according to inputted dimensions
+   * @param width (required)
+   * @param height (required)
    */
   adjustToSize(width: number, height: number): Controller {
     this.layerManager.adjustToSize(width, height);
