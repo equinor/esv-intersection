@@ -6,9 +6,7 @@ import { ZoomPanHandler } from './ZoomPanHandler';
 import { ReferenceSystemOptions } from '..';
 import { Axis } from '../components';
 import { overlay, Overlay } from './overlay';
-
-const HORIZONTALAXISMARGIN = 40;
-const VERTICALAXISMARGIN = 30;
+import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';
 
 /**
  * API for controlling data and layers
@@ -120,7 +118,7 @@ export class Controller {
   adjustToSize(width: number, height: number): Controller {
     this.layerManager.adjustToSize(width, height);
 
-    const dimensions = { width: width - HORIZONTALAXISMARGIN, height: height - VERTICALAXISMARGIN };
+    const dimensions = { width: Math.max(width - HORIZONTAL_AXIS_MARGIN, 0), height: Math.max(height - VERTICAL_AXIS_MARGIN, 0) };
     this.overlay.elm.dispatch('resize', { detail: dimensions, bubbles: true, cancelable: true });
 
     return this;
