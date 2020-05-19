@@ -241,5 +241,3 @@ npm run build
 ```
 
 Compiles the code found within the src-folder. Build is outputted to a new dist-folder.
-
-Thanks to [bitprophet](https://github.com/bitprophet/contribution-guide.org/blob/master/index.rst) for contribution guide
