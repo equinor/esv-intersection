@@ -41,7 +41,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     this.ctx.stage.scale.set(event.xRatio, event.yRatio);
   }
 
-// Is overridden by extended well bore items layers (casing, hole)
+  // Is overridden by extended well bore items layers (casing, hole)
   render(event: OnRescaleEvent | OnUpdateEvent): void {}
 
   drawBigPolygon = (coords: Point[], t?: Texture): Graphics => {

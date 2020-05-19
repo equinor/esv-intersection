@@ -22,9 +22,7 @@ export const Wellborepath = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  const referenceSystem = new IntersectionReferenceSystem(
-    mockedWellborePath,
-  );
+  const referenceSystem = new IntersectionReferenceSystem(mockedWellborePath);
   const options: WellborepathLayerOptions = {
     order: 1,
     strokeWidth: '2px',
@@ -47,9 +45,7 @@ export const WellborepathWithSampleDataAndZoom = () => {
   const fpsLabel = createFPSLabel();
 
   getWellborePath().then((data) => {
-    const referenceSystem = new IntersectionReferenceSystem(
-      data,
-    );
+    const referenceSystem = new IntersectionReferenceSystem(data);
 
     const options: WellborepathLayerOptions = {
       order: 1,
