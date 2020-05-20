@@ -4,7 +4,7 @@ import { createRootContainer, createLayerContainer } from '../../utils';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { getWellborePath } from '../../utils/api';
+import { getWellborePath } from '../../api';
 
 export const Holes = () => {
   const width = 400;

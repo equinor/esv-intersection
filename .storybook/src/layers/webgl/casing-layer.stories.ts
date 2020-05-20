@@ -5,7 +5,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { getWellborePath } from '../../utils/api';
+import { getWellborePath } from '../../api';
 
 export const CasingLayerBasic = () => {
   const width = 400;

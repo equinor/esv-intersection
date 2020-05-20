@@ -11,7 +11,7 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 import { generateSurfaceData, generateProjectedTrajectory, SurfaceData, generateProjectedWellborePath } from '../../../../src/datautils';
 
 //Data
-import { getSurfaces, getWellborePath, getStratColumns } from '../../utils/api';
+import { getSurfaces, getWellborePath, getStratColumns } from '../../api';
 
 const width: number = 800;
 const height: number = 600;

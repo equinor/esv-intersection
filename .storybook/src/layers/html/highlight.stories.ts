@@ -7,7 +7,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 
 import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
 
-import { getWellborePath } from '../../utils/api';
+import { getWellborePath } from '../../api';
 
 const POINTHEIGHT = 5;
 const POINTWIDTH = 5;

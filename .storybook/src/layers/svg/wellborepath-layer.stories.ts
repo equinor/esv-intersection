@@ -7,7 +7,7 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 import { IntersectionReferenceSystem } from '../../../../src/control';
 
 import { mockedWellborePath } from '../../exampledata';
-import { getWellborePath } from '../../utils/api';
+import { getWellborePath } from '../../api';
 
 const width = 400;
 const height = 500;
