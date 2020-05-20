@@ -1,4 +1,4 @@
-import { select, event, Selection, mouse } from 'd3-selection';
+import { select, event, Selection, mouse, ContainerElement } from 'd3-selection';
 import { OverlayCallbacks } from './interfaces';
 
 class Overlay {
@@ -45,7 +45,7 @@ class Overlay {
         return;
       }
 
-      const [mx, my] = mouse(document.getElementById('overlay'));
+      const [mx, my] = mouse(this.elm.node() as ContainerElement);
       Object.keys(this.listeners).forEach((key: string) => {
         const target = this.elements[key] || null;
         const ops = this.listeners[key];
