@@ -10,6 +10,7 @@ export interface AxisOptions {
 
 export interface ControllerOptions {
   container: HTMLElement;
+  overlayElementGetter: Function;
   axisOptions?: AxisOptions;
   scaleOptions?: ScaleOptions;
   referenceSystem?: IntersectionReferenceSystem;

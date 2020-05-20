@@ -1,7 +1,9 @@
 [![npm version](https://badge.fury.io/js/%40equinor%2Fesv-intersection.svg)](https://badge.fury.io/js/%40equinor%2Fesv-intersection)
 ![Publish Package](https://github.com/equinor/esv-intersection/workflows/Publish%20Package/badge.svg)
 ![Unit tests](https://github.com/equinor/esv-intersection/workflows/Unit%20tests/badge.svg)
+
 # ESV Intersection component
+
 A reusable component to create intersection visualizations for wells
 
 Part of the [Equinor Subsurface Visualization project](https://github.com/equinor/esv)
@@ -15,11 +17,15 @@ Part of the [Equinor Subsurface Visualization project](https://github.com/equino
 ## Getting started
 
 #### Installation
+
 Using npm:
+
 ```bash
 npm install --save @equinor/esv-intersection
 ```
+
 Using yarn:
+
 ```bash
 yarn add @equinor/esv-intersection
 ```
@@ -30,13 +36,15 @@ yarn add @equinor/esv-intersection
 import { Controller, GridLayer } from '@equinor/esv-intersection';
 
 const container = document.createElement('div');
-const controller = new Controller(container);
+const overlayElementGetter = () => document.getElementById('overlay');
+const controller = new Controller(container, overlayElementGetter);
 
 // the controller initially has zero height
 controller.adjustToSize(400, 400);
 
 controller.addLayer(new GridLayer('grid'));
 ```
+
 For more examples, check out our stories in our online [storybook](https://intersection-component.app.radix.equinor.com).
 
 ## Technical choices
@@ -62,8 +70,8 @@ For more examples, check out our stories in our online [storybook](https://inter
     - automated
     - both tagged releases (semantic versioning) and nightly
 
-
 ## Development methodology
+
 - The _Product Owners_ of the Intersection component are @farzadfz and @thuve
 - Development is driven by _user stories_, created and prioritized by developers and POs together
 - User stories can be grouped into _milestones_. A milestone represents what is expected to be achieved in about 2 months of development
@@ -76,7 +84,6 @@ For more examples, check out our stories in our online [storybook](https://inter
 - During a _technical planning meeting_, current user stories and tasks can be discussed and potentially split into smaller tasks
 - A _demo_ for the stakeholders will be held approximately every 4 weeks
   - Stakeholders for the _WellX_ and _REP_ projects (including the _REP reference user group_) should be invited to the demo
-
 
 ## Setup guide
 

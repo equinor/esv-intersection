@@ -21,6 +21,7 @@ export class Controller {
    * Interface to control layers, reference system, axis and overlay. overlay is created on instantiation, does not currently support opt-out.
    * @param options
    * @param options.container (required) Currently only supports HTMLElement
+   * @param options.overlayElementGetter (required) HTMLElement function to get overlay element used for mouse input.
    * @param options.scaleOptions (optional) currently supports formats listed in examples below
    * @example scaleOptions = { xMin: 0, xMax: 100, yMin: 0, yMax: 100 }
    * @example scaleOptions = { xBounds: [0 , 100], yBounds: [0, 100] }
@@ -30,11 +31,11 @@ export class Controller {
    * @param options.referenceSystem (optional) sets reference system, takes priority over path if both are supplied
    */
   constructor(options: ControllerOptions) {
-    const { container, axisOptions, scaleOptions, referenceSystem, layers, path } = options;
+    const { container, overlayElementGetter, axisOptions, scaleOptions, referenceSystem, layers, path } = options;
 
     this._referenceSystem = referenceSystem || (path && new IntersectionReferenceSystem(path));
 
-    this._overlay = overlay(this, container);
+    this._overlay = overlay(this, container, overlayElementGetter);
 
     this.layerManager = new LayerManager(this._overlay.elm.node() as HTMLElement, scaleOptions, axisOptions);
     if (layers) {

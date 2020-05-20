@@ -12,8 +12,9 @@ const height = 500;
 export const BasicSetup = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
+  const overlayElementGetter = () => document.getElementById('overlay');
 
-  const controller = new Controller({ container });
+  const controller = new Controller({ container, overlayElementGetter });
   controller.addLayer(new GridLayer('grid'));
   controller.adjustToSize(width, height);
 

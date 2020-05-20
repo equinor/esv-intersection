@@ -4,14 +4,15 @@ import { OverlayCallbacks } from './interfaces';
 class Overlay {
   elm: Selection<Element, unknown, null, undefined>;
   source: Element;
+  overlayElementGetter: Function;
   elements: { [propName: string]: Element } = {};
   listeners: { [propName: string]: OverlayCallbacks } = {};
   enabled = true;
 
-  constructor(caller: any, container: HTMLElement) {
+  constructor(caller: any, container: HTMLElement, overlayElementGetter: any) {
     const con = select(container);
     this.elm = con.append('div').attr('id', 'overlay').style('z-index', '11').style('position', 'absolute');
-
+    this.overlayElementGetter = overlayElementGetter;
     this.source = this.elm.node();
 
     const { elm } = this;
@@ -19,7 +20,7 @@ class Overlay {
       const { width, height } = event.detail;
       elm.style('width', `${width}px`).style('height', `${height}px`);
 
-      if (!this.enabled) {
+      if (!this.enabled || this.overlayElementGetter() == null) {
         return;
       }
 
@@ -41,11 +42,11 @@ class Overlay {
     });
 
     elm.on('mousemove', () => {
-      if (!this.enabled) {
+      if (!this.enabled || this.overlayElementGetter() == null) {
         return;
       }
 
-      const [mx, my] = mouse(document.getElementById('overlay'));
+      const [mx, my] = mouse(this.overlayElementGetter());
       Object.keys(this.listeners).forEach((key: string) => {
         const target = this.elements[key] || null;
         const ops = this.listeners[key];
@@ -65,7 +66,7 @@ class Overlay {
     });
 
     elm.on('mouseout', () => {
-      if (!this.enabled) {
+      if (!this.enabled || this.overlayElementGetter() == null) {
         return;
       }
       Object.keys(this.listeners).forEach((key: string) => {
@@ -111,6 +112,6 @@ class Overlay {
   }
 }
 
-const overlay = (caller: any, container: HTMLElement): Overlay => new Overlay(caller, container);
+const overlay = (caller: any, container: HTMLElement, overlayElementGetter: any): Overlay => new Overlay(caller, container, overlayElementGetter);
 
 export { overlay, Overlay };

@@ -26,6 +26,7 @@ import { casingData, holeSizeData, cementData, seismicColorMap } from './example
 import { Casing, HoleSize, Cement } from '../../src';
 
 import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns } from './utils/api';
+import { overlay } from '../../src/control/overlay';
 
 const xbounds: [number, number] = [0, 1000];
 const ybounds: [number, number] = [0, 1000];
@@ -57,6 +58,7 @@ const createCementData = () => {
 export const intersection = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
+  const overlayElementGetter = () => document.getElementById('overlay');
   const btnContainer = createButtonContainer(width);
 
   Promise.all([getWellborePath(), getCompletion(), getSeismic(), getSurfaces(), getStratColumns()]).then((values) => {
@@ -104,6 +106,7 @@ export const intersection = () => {
       scaleOptions,
       axisOptions,
       container,
+      overlayElementGetter,
       referenceSystem,
     };
 

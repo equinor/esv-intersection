@@ -33,12 +33,9 @@ export const HighlightWellborepath = () => {
   const container = createLayerContainer(width, height);
 
   getWellborePath().then((data) => {
-    const referenceSystem = new IntersectionReferenceSystem(
-      data,
-    );
+    const referenceSystem = new IntersectionReferenceSystem(data);
 
     const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-
 
     layer.onMount({ elm: container });
     layer.onUpdate({});
@@ -74,7 +71,6 @@ export const HighlightWellborepath = () => {
     root.appendChild(container);
     root.appendChild(slider);
     root.appendChild(createFPSLabel());
-
   });
 
   return root;
@@ -84,18 +80,17 @@ export const HighlightWellborepathWithController = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
   getWellborePath().then((data) => {
-    const referenceSystem = new IntersectionReferenceSystem(
-      data,
-    );
+    const overlayElementGetter = () => document.getElementById('overlay');
+    const referenceSystem = new IntersectionReferenceSystem(data);
 
     const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-
 
     const controller = new Controller({
       referenceSystem,
       axisOptions,
       scaleOptions,
       container,
+      overlayElementGetter,
     });
 
     const highlightLayer = new HighlightLayer('pointhighlighter', {
@@ -120,7 +115,6 @@ export const HighlightWellborepathWithController = () => {
     root.appendChild(container);
     root.appendChild(slider);
     root.appendChild(createFPSLabel());
-
   });
 
   return root;
