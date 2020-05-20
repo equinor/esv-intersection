@@ -39,6 +39,12 @@ export class CalloutCanvasLayer extends CanvasLayer {
   callouts: Callout[];
   groupFilter: string[] = null;
 
+  setGroupFilter(filter: string[]): void {
+    this.groupFilter = filter;
+    this.callouts = null;
+    this.render();
+  }
+
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     if (!this.data) {
@@ -279,7 +285,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
         const overlap = getOverlapOffset(currentNode.boundingBox, prevNode.boundingBox);
         if (overlap) {
           currentNode.dy += overlap.dy;
-          currentNode.pos.y -= overlap.dy;
+          currentNode.boundingBox.y -= overlap.dy;
         }
       }
     }
@@ -293,7 +299,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
         const overlap = getOverlapOffset(prevNode.boundingBox, currentNode.boundingBox);
         if (overlap) {
           currentNode.dy += overlap.dy;
-          currentNode.pos.y += overlap.dy;
+          currentNode.boundingBox.y += overlap.dy;
         }
       }
     }
