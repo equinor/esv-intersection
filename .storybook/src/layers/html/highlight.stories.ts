@@ -7,7 +7,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 
 import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
 
-import { getWellborePath } from '../../utils/api';
+import { getWellborePath } from '../../api';
 
 const POINTHEIGHT = 5;
 const POINTWIDTH = 5;
@@ -33,12 +33,9 @@ export const HighlightWellborepath = () => {
   const container = createLayerContainer(width, height);
 
   getWellborePath().then((data) => {
-    const referenceSystem = new IntersectionReferenceSystem(
-      data,
-    );
+    const referenceSystem = new IntersectionReferenceSystem(data);
 
     const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-
 
     layer.onMount({ elm: container });
     layer.onUpdate({});
@@ -74,7 +71,6 @@ export const HighlightWellborepath = () => {
     root.appendChild(container);
     root.appendChild(slider);
     root.appendChild(createFPSLabel());
-
   });
 
   return root;
@@ -84,12 +80,9 @@ export const HighlightWellborepathWithController = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
   getWellborePath().then((data) => {
-    const referenceSystem = new IntersectionReferenceSystem(
-      data,
-    );
+    const referenceSystem = new IntersectionReferenceSystem(data);
 
     const layer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-
 
     const controller = new Controller({
       referenceSystem,
@@ -120,7 +113,6 @@ export const HighlightWellborepathWithController = () => {
     root.appendChild(container);
     root.appendChild(slider);
     root.appendChild(createFPSLabel());
-
   });
 
   return root;

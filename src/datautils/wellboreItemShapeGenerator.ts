@@ -45,6 +45,11 @@ export const actualPoints = (s: HoleObjectData): Point[] => {
     }
     return p.md > s.data.start && p.md < s.data.start + s.data.length;
   });
+
+  if (a != null || a.length === 0) {
+    return [];
+  }
+
   startIndex -= 0;
   stopIndex += 0;
   start = s.points[startIndex >= 0 ? startIndex : 0].point;

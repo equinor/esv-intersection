@@ -6,7 +6,7 @@ import { IntersectionReferenceSystem } from '../../../../src';
 
 // Data
 import { mockedWellborePath } from '../../exampledata';
-import { getWellborePath, getCompletion } from '../../utils/api';
+import { getWellborePath, getCompletion } from '../../api';
 
 export const CompletionLayerSample = () => {
   const data = [
@@ -15,9 +15,7 @@ export const CompletionLayerSample = () => {
     { start: 790, end: 800, diameter: 12 },
   ];
 
-  const referenceSystem = new IntersectionReferenceSystem(
-    mockedWellborePath,
-  );
+  const referenceSystem = new IntersectionReferenceSystem(mockedWellborePath);
 
   const options: CompletionLayerOptions = {
     order: 1,
@@ -59,9 +57,7 @@ export const CompletionLayerWithSampleData = () => {
 
   Promise.all([getWellborePath(), getCompletion()]).then((values) => {
     const [path, completion] = values;
-    const referenceSystem = new IntersectionReferenceSystem(
-      path,
-    );
+    const referenceSystem = new IntersectionReferenceSystem(path);
 
     const options: CompletionLayerOptions = {
       order: 1,
@@ -83,7 +79,6 @@ export const CompletionLayerWithSampleData = () => {
     zoomHandler.enableTranslateExtent = false;
     zoomHandler.setViewport(1000, 1000, 5000);
   });
-
 
   root.appendChild(container);
   root.appendChild(fpsLabel);

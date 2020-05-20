@@ -14,9 +14,7 @@ export const CementLayerBasic = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  const referenceSystem = new IntersectionReferenceSystem(
-    mockedWellborePath,
-  );
+  const referenceSystem = new IntersectionReferenceSystem(mockedWellborePath);
 
   const options: CementLayerOptions = {
     order: 1,
@@ -24,8 +22,6 @@ export const CementLayerBasic = () => {
     data: getData(),
   };
   const cementLayer = new CementLayer('webgl', options);
-
-
 
   cementLayer.onMount({ elm: root, height, width });
 

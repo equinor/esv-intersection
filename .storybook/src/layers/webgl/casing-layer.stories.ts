@@ -5,7 +5,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { getWellborePath } from '../../utils/api';
+import { getWellborePath } from '../../api';
 
 export const CasingLayerBasic = () => {
   const width = 400;
@@ -14,17 +14,13 @@ export const CasingLayerBasic = () => {
   const container = createLayerContainer(width, height);
 
   getWellborePath().then((data) => {
-    const referenceSystem = new IntersectionReferenceSystem(
-      data,
-    );
+    const referenceSystem = new IntersectionReferenceSystem(data);
 
     const options: CasingLayerOptions = {
       order: 1,
       referenceSystem,
     };
     const casingLayer = new CasingLayer('webgl', options);
-
-
 
     casingLayer.onMount({ elm: root, height, width });
 
@@ -52,16 +48,13 @@ export const CasingLayerWithSampleData = () => {
   const container = createLayerContainer(width, height);
 
   getWellborePath().then((data) => {
-    const referenceSystem = new IntersectionReferenceSystem(
-      data,
-    );
+    const referenceSystem = new IntersectionReferenceSystem(data);
 
     const options: CasingLayerOptions = {
       order: 1,
       referenceSystem,
     };
     const casingLayer = new CasingLayer('webgl', options);
-
 
     casingLayer.onMount({ elm: root, height, width });
     casingLayer.onUpdate({

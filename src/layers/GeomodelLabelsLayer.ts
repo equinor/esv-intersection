@@ -313,7 +313,6 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   ): Vector2 {
     const dir = initalVector.clone().mutable;
 
-
     const startTopY = findSampleAtPos(top, offset, topLimit, bottomLimit);
     if (startTopY === null) {
       return dir;

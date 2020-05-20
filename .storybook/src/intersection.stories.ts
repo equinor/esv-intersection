@@ -22,10 +22,10 @@ export default {
 };
 
 //Data
-import { casingData, holeSizeData, cementData, seismicColorMap } from './exampledata';
+import { seismicColorMap } from './exampledata';
 import { Casing, HoleSize, Cement } from '../../src';
 
-import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns } from './utils/api';
+import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement } from './api';
 
 const xbounds: [number, number] = [0, 1000];
 const ybounds: [number, number] = [0, 1000];
@@ -40,27 +40,13 @@ const axisOptions = {
 const width = 700;
 const height = 600;
 
-const createCementData = () => {
-  // Cement requires data casing and holes to create cement width
-  const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: `${c.start + c.length}` }));
-  const holes = holeSizeData.map((h: HoleSize) => ({ ...h, end: h.start + h.length }));
-  const cement: Cement[] = [];
-  for (let i = 0; i < casingData.length && i < cementData.length; i++) {
-    const c: Cement = (cementData[i] as unknown) as Cement;
-    c.casingId = `${casings[i].casingId}`;
-    cement.push(c);
-  }
-  const d = { cement, casings, holes };
-  return d;
-};
-
 export const intersection = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
   const btnContainer = createButtonContainer(width);
-
-  Promise.all([getWellborePath(), getCompletion(), getSeismic(), getSurfaces(), getStratColumns()]).then((values) => {
-    const [path, completionData, seismic, surfaces, stratColumns] = values;
+  const promises = [getWellborePath(), getCompletion(), getSeismic(), getSurfaces(), getStratColumns(), getCasings(), getHolesize(), getCement()];
+  Promise.all(promises).then((values) => {
+    const [path, completionData, seismic, surfaces, stratColumns, casings, holesizes, cement] = values;
 
     const referenceSystem = new IntersectionReferenceSystem(path);
     const displacement = referenceSystem.displacement;
@@ -81,12 +67,12 @@ export const intersection = () => {
     const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
     const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8 });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-    const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holeSizeData, referenceSystem });
-    const casingLayer = new CasingLayer('casing', { order: 5, data: casingData, referenceSystem });
+    const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holesizes, referenceSystem });
+    const casingLayer = new CasingLayer('casing', { order: 5, data: casings, referenceSystem });
     const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
     const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
     const completionLayer = new CompletionLayer('completion', { order: 4, data: completion, referenceSystem });
-    const cementLayer = new CementLayer('cement', { order: 99, data: createCementData(), referenceSystem });
+    const cementLayer = new CementLayer('cement', { order: 99, data: { cement, casings, holes: holesizes }, referenceSystem });
 
     const layers = [
       gridLayer,

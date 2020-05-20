@@ -11,7 +11,7 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 import { generateSurfaceData, generateProjectedTrajectory, SurfaceData, generateProjectedWellborePath } from '../../../../src/datautils';
 
 //Data
-import { getSurfaces, getWellborePath, getStratColumns } from '../../utils/api';
+import { getSurfaces, getWellborePath, getStratColumns } from '../../api';
 
 const width: number = 800;
 const height: number = 600;
@@ -110,7 +110,7 @@ export const GeoModelWithSampleData = () => {
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
     const [path, surfaces, stratColumns] = values;
-    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }])
+    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }]);
     const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
 
@@ -152,7 +152,7 @@ export const GeoModelWithLabels = () => {
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
     const [path, surfaces, stratColumns] = values;
-    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }])
+    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }]);
     const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
     const wellborePath = generateProjectedWellborePath([]);
@@ -192,10 +192,9 @@ export const GeoModelWithLabelsUsingCanvas = () => {
     geoModelLabelsLayer.onRescale({ ...event });
   });
 
-
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
     const [path, surfaces, stratColumns] = values;
-    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }])
+    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }]);
     const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
     const wellborePath = generateProjectedWellborePath([]);
@@ -235,10 +234,9 @@ export const GeoModelWithLabelsUsingVersion2 = () => {
     geoModelLabelsLayer.onRescale({ ...event });
   });
 
-
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
     const [path, surfaces, stratColumns] = values;
-    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }])
+    const poslog = path.map((coords) => [{ easting: coords[0], northing: coords[1], tvd: coords[2], md: coords[2] }]);
     const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
     const wellborePath = generateProjectedWellborePath([]);

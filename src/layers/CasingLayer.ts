@@ -52,6 +52,10 @@ export class CasingLayer extends WellboreBaseComponentLayer {
   }
 
   drawHoleSize = (holeObject: HoleObjectData, defaultTexture: Texture): void => {
+    if (holeObject == null || holeObject.points.length === 0) {
+      return;
+    }
+
     const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = createNormalCoords(holeObject);
 
@@ -64,7 +68,6 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     const pctOffset = 0.35;
     texture = this.createTexure(holeObject.data.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
     casingWallWidth = Math.abs(holeObject.data.diameter - holeObject.innerDiameter);
-
     this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
 
     this.drawLine(polygonCoords, lineColor, casingWallWidth);

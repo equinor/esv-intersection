@@ -4,7 +4,7 @@ import { createRootContainer, createLayerContainer } from '../../utils';
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { getWellborePath } from '../../utils/api';
+import { getWellborePath } from '../../api';
 
 export const Holes = () => {
   const width = 400;
@@ -12,17 +12,13 @@ export const Holes = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
   getWellborePath().then((data) => {
-    const referenceSystem = new IntersectionReferenceSystem(
-      data,
-    );
+    const referenceSystem = new IntersectionReferenceSystem(data);
 
     const options: HoleSizeLayerOptions = {
       order: 1,
       referenceSystem,
     };
     const holeSizeLayer = new HoleSizeLayer('webgl', options);
-
-
 
     holeSizeLayer.onMount({ elm: container, height, width });
     holeSizeLayer.onUpdate({ elm: root, data: getData() });
@@ -36,7 +32,6 @@ export const Holes = () => {
     zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
     zoomHandler.enableTranslateExtent = false;
     zoomHandler.setViewport(1000, 1000, 5000);
-
   });
 
   root.appendChild(container);
@@ -51,17 +46,13 @@ export const HoleSizeLayerWithSampleData = () => {
   const container = createLayerContainer(width, height);
 
   getWellborePath().then((data) => {
-    const referenceSystem = new IntersectionReferenceSystem(
-      data,
-    );
+    const referenceSystem = new IntersectionReferenceSystem(data);
 
     const options: HoleSizeLayerOptions = {
       order: 1,
       referenceSystem,
     };
     const holeSizeLayer = new HoleSizeLayer('webgl', options);
-
-
 
     holeSizeLayer.onMount({ elm: container, height, width });
 

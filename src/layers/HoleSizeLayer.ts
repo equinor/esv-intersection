@@ -51,6 +51,10 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
   }
 
   drawHoleSize = (holeObject: HoleObjectData, texture: Texture): void => {
+    if (holeObject == null || holeObject.points.length === 0) {
+      return;
+    }
+
     const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = createNormalCoords(holeObject);
 
