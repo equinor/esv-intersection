@@ -46,7 +46,7 @@ export const actualPoints = (s: HoleObjectData): Point[] => {
     return p.md > s.data.start && p.md < s.data.start + s.data.length;
   });
 
-  if (a != null || a.length === 0) {
+  if (a == null || a.length === 0) {
     return [];
   }
 
