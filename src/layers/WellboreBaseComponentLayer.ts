@@ -12,7 +12,7 @@ import {
   OnMountEvent,
 } from '../interfaces';
 
-export const StaticWellboreBaseComponentIncrement = 0.1;
+const DefaultStaticWellboreBaseComponentIncrement = 0.1;
 
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;
@@ -21,6 +21,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     super(id, options);
     this.options = {
       ...options,
+      wellboreBaseComponentIncrement: options.wellboreBaseComponentIncrement || DefaultStaticWellboreBaseComponentIncrement,
     };
     this.render = this.render.bind(this);
   }
@@ -100,7 +101,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     const points: any = [];
 
     // Add distance to points
-    for (let i = data.start; i < data.end; i += StaticWellboreBaseComponentIncrement) {
+    for (let i = data.start; i < data.end; i += this.options.wellboreBaseComponentIncrement) {
       const p = this.referenceSystem.project(i);
       points.push({ point: new Point(p[0], p[1]), md: i });
     }

@@ -1,4 +1,4 @@
-import { WellboreBaseComponentLayer, StaticWellboreBaseComponentIncrement } from './WellboreBaseComponentLayer';
+import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleObjectData, HoleSize } from '..';
 import { Texture, Point } from 'pixi.js';
 import { createNormalCoords, generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';

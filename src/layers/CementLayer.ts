@@ -1,4 +1,4 @@
-import { WellboreBaseComponentLayer, StaticWellboreBaseComponentIncrement } from './WellboreBaseComponentLayer';
+import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CementLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, MDPoint } from '..';
 import { findCasing, findIntersectingItems } from '../datautils/wellboreItemShapeGenerator';
 import { Point, Texture } from 'pixi.js';
@@ -58,7 +58,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
     const createMiddlePath = (c: CompiledCement): MDPoint[] => {
       const points = [];
       // Add distance to points
-      for (let i = c.toc; i < c.boc; i += StaticWellboreBaseComponentIncrement) {
+      for (let i = c.toc; i < c.boc; i += this.options.wellboreBaseComponentIncrement) {
         const p = this.referenceSystem.project(i);
         points.push({ point: new Point(p[0], p[1]), md: i });
       }
@@ -70,7 +70,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
       const points: { left: Point[]; right: Point[] } = { left: [], right: [] };
       let prevPoint = null;
 
-      for (let md = c.toc; md < c.boc; md += StaticWellboreBaseComponentIncrement) {
+      for (let md = c.toc; md < c.boc; md += this.options.wellboreBaseComponentIncrement) {
         // create normal for sections
         const offsetItem = getClosestRelatedItem(c.intersectingItems, md);
         const start = md;

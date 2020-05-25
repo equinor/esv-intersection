@@ -1,4 +1,4 @@
-import { WellboreBaseComponentLayer, StaticWellboreBaseComponentIncrement } from './WellboreBaseComponentLayer';
+import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleObjectData, Casing } from '..';
 import { Texture, Point } from 'pixi.js';
 import { createNormalCoords, generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';
@@ -80,7 +80,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       const newPoints: Point[] = [];
 
       for (let i = 0; tot < meters && i > points.length - lastMeterPoint; i++) {
-        tot += StaticWellboreBaseComponentIncrement;
+        tot += this.options.wellboreBaseComponentIncrement;
         newPoints.push(points[points.length - 1 - i].clone());
       }
 
