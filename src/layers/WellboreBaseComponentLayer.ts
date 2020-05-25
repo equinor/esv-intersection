@@ -100,7 +100,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     const points: any = [];
 
     // Add distance to points
-    for (let i = data.start; i < data.start + data.length; i += StaticWellboreBaseComponentIncrement) {
+    for (let i = data.start; i < data.end; i += StaticWellboreBaseComponentIncrement) {
       const p = this.referenceSystem.project(i);
       points.push({ point: new Point(p[0], p[1]), md: i });
     }

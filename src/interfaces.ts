@@ -123,7 +123,6 @@ export interface Annotation {
 
 export interface HoleSize {
   diameter: number;
-  length: number;
   start: number;
   end: number;
   hasShoe?: boolean;
