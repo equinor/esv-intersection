@@ -7,6 +7,12 @@ const wp = [
   [50, 110, 10],
 ];
 
+function dist(a: number[], b: number[]): number {
+  const d0 = a[0] - b[0];
+  const d1 = a[1] - b[1];
+  return Math.sqrt(d0*d0 + d1*d1);
+}
+
 describe('Reference system', () => {
   let rs: IntersectionReferenceSystem;
   beforeEach(() => {
@@ -56,4 +62,69 @@ describe('Reference system', () => {
     const pos = rs.getPosition(120);
     expect(pos).toEqual([50, 110]);
   });
+  it('should have correct number of points', () => {
+    const trajectory = rs.getTrajectory(100);
+    expect(trajectory.points.length).toEqual(100);
+  });
+  it('should have same distance between points in trajectory', () => {
+    const trajectory = rs.getTrajectory(80);
+    const firstDistance = dist(trajectory.points[0], trajectory.points[1]);
+    let lastPoint = trajectory.points[1];
+    for(let i = 2; i < trajectory.points.length; i++){
+      const point = trajectory.points[i];
+      const currentDistance = dist(point, lastPoint);
+      expect(currentDistance).toBeCloseTo(firstDistance);
+      lastPoint = point;
+    }
+  });
+  /* TODO: Jest fails due to not finding Vector2 constructor, uncomment when issue is solved
+  it('should have correct number of points', () => {
+    const trajectory = rs.getExtendedTrajectory(100);
+    expect(trajectory.points.length).toEqual(100);
+  });
+  it('should have same distance between points in extended trajectory', () => {
+    const trajectory = rs.getExtendedTrajectory(200, 500.0, 500.0);
+    const firstDistance = dist(trajectory.points[0], trajectory.points[1]);
+    let lastPoint = trajectory.points[1];
+    for(let i = 2; i < trajectory.points.length; i++){
+      const point = trajectory.points[i];
+      const currentDistance = dist(point, lastPoint);
+      expect(currentDistance).toBeCloseTo(firstDistance);
+      lastPoint = point;
+    }
+  });
+  it('should have correct length on extension', () => {
+    const trajectory = rs.getExtendedTrajectory(100, 500.0, 500.0);
+    const startExtend = dist(trajectory.points[0], rs.interpolators.trajectory.getPointAt(0.0));
+    const endExtend = dist(trajectory.points[99], rs.interpolators.trajectory.getPointAt(1.0));
+    expect(startExtend).toBeCloseTo(500.0);
+    expect(endExtend).toBeCloseTo(500.0);
+  });
+  it('should throw error when parameters are negative', () => {
+    expect(() => {
+      const trajectory = rs.getExtendedTrajectory(100, -50.0, 500.0);
+    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionStart parameter');
+    expect(() => {
+      const trajectory = rs.getExtendedTrajectory(100, 50.0, -500.0);
+    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionEnd parameter');
+  });
+  it('should work for vertical wellbore', () => {
+    const verticalPosLog = [
+      [30, 40, 100],
+      [30, 40, 7000],
+    ];
+    const options = {trajectoryAngle: 45.0};
+    const irs = new IntersectionReferenceSystem(verticalPosLog, options);
+
+    const trajectory = irs.getExtendedTrajectory(100, 1500.0, 1500.0);
+    expect(trajectory.points.length).toEqual(100);
+
+    const startExtend = dist(trajectory.points[0], irs.interpolators.trajectory.getPointAt(0.0));
+    const endExtend = dist(trajectory.points[99], irs.interpolators.trajectory.getPointAt(1.0));
+    expect(startExtend).toBeCloseTo(1500.0);
+    expect(endExtend).toBeCloseTo(1500.0);
+    const angle = Math.atan((trajectory.points[99][0] - trajectory.points[0][0]) / (trajectory.points[99][1] - trajectory.points[0][1]));
+    expect(endExtend).toBeCloseTo(45.0);
+  });
+  */
 });
