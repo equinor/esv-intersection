@@ -56,7 +56,6 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     if (holeObject == null || holeObject.points.length === 0) {
       return;
     }
-    console.log(holeObject);
 
     const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = createNormalCoords(holeObject);

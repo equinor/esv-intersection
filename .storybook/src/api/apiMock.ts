@@ -39,7 +39,6 @@ export const getHolesize = (): Promise<any[]> => {
 };
 
 export const getCasings = (): Promise<any[]> => {
-  console.log(casingData);
   return Promise.resolve(casingData);
 };
 

@@ -238,7 +238,6 @@ const createSetLayerButton = (cementLayer: any, casingLayer: any, cement: any, c
       return { ...c, end: c.end += 10 };
     };
     casings[0] = alterCasing(casings[0]);
-    console.log(casings[0]);
     cementLayer.setData({ cement, casings, holes });
     casingLayer.setData(casings);
   };
