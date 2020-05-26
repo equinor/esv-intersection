@@ -10,6 +10,9 @@ const ARC_DIVISIONS = 5000;
 // specifies amount of steps (in the range [0,1]) to work back from the end of the curve
 const THRESHOLD_DIRECTION_DISTANCE = 0.001;
 
+const DEFAULT_START_EXTEND_LENGTH = 1000.0;
+const DEFAULT_END_EXTEND_LENGTH = 1000.0;
+
 export class IntersectionReferenceSystem {
   options: ReferenceSystemOptions;
 
@@ -174,8 +177,8 @@ export class IntersectionReferenceSystem {
     }
     const points = [];
     const tl = to - from;
-    const curveSteps = Math.ceil(((t1 - t0) / tl) * steps);
     const preSteps = Math.floor((extensionStart / tl) * steps);
+    const curveSteps = Math.ceil(((t1 - t0) / tl) * steps);
     const postSteps = steps - curveSteps - preSteps;
 
     if (p0) {
@@ -185,14 +188,58 @@ export class IntersectionReferenceSystem {
         points.push([p0[0] - this.startVector[0] * f, p0[1] - this.startVector[1] * f]);
       }
     }
-    points.push(...this.interpolators.trajectory.getPoints(curveSteps, null, t0, t1));
+    const cuvePoints = this.interpolators.trajectory.getPoints(curveSteps - 1, null, t0, t1); // returns steps + 1 points
+    points.push(...cuvePoints);
     if (p3) {
-      for (let i = 1; i < postSteps; i++) {
+      for (let i = 1; i < postSteps - 1; i++) {
         const f = (i / postSteps) * extensionEnd * this.displacement;
         points.push([p2[0] + this.endVector[0] * f, p2[1] + this.endVector[1] * f]);
       }
       points.push(p3);
     }
+    return { points, offset };
+  }
+
+  /**
+   * Generate a set of coordinates along the trajectory of the curve
+   */
+  getExtendedTrajectory(steps: number, extensionStart = DEFAULT_START_EXTEND_LENGTH, extensionEnd = DEFAULT_END_EXTEND_LENGTH): Trajectory {
+    if (!extensionStart || extensionStart < 0.0) {
+      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionStart parameter');
+    }
+    if (!extensionEnd || extensionEnd < 0.0) {
+      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionEnd parameter');
+    }
+
+    const totalLength = this.displacement + extensionStart + extensionEnd;
+    const preSteps = Math.floor((extensionStart / totalLength) * steps);
+    const curveSteps = Math.ceil((this.displacement / totalLength) * steps);
+    const postSteps = steps - curveSteps - preSteps;
+
+    const points = [];
+
+    const refStart = new Vector2(this.interpolators.trajectory.getPointAt(0.0));
+    const startVec = new Vector2(this.startVector);
+    const preStep = extensionStart / preSteps;
+    for (let i = preSteps; i > 0; i--) {
+      const f = i * preStep;
+      const point = refStart.add(startVec.scale(f));
+      points.push(point.toArray());
+    }
+
+    points.push(...this.interpolators.trajectory.getPoints(curveSteps, null, 0.0, 1.0));
+
+    const refEnd = new Vector2(this.interpolators.trajectory.getPointAt(1.0));
+    const endVec = new Vector2(this.endVector);
+    const postStep = extensionEnd / postSteps;
+    for (let i = 1; i < postSteps; i++) {
+      const f = i * postStep;
+      const point = refEnd.add(endVec.scale(f));
+      points.push(point.toArray());
+    }
+
+    const offset = extensionStart + this.displacement;
+
     return { points, offset };
   }
 
