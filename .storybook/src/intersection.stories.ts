@@ -61,7 +61,7 @@ export const intersection = () => {
       width: 0,
       height: 0,
     };
-    const completion = completionData.map((c) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
+    const completion = completionData.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
     // Instantiate layers
     const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
@@ -234,10 +234,11 @@ const createSetLayerButton = (cementLayer: any, casingLayer: any, cement: any, c
   btn.innerHTML = `Update data for compl`;
   btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
   btn.onclick = () => {
-    const alterCasing = (c: any) => {
-      return { ...c, end: c.end += 10 };
+    const alterWBI = (c: any): any => {
+      return { ...c, end: c.end += 15 };
     };
-    casings[0] = alterCasing(casings[0]);
+    casings[0] = alterWBI(casings[0]);
+    holes[0] = alterWBI(holes[0]);
     cementLayer.setData({ cement, casings, holes });
     casingLayer.setData(casings);
   };

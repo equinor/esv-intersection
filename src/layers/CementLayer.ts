@@ -58,61 +58,72 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     const createMiddlePath = (c: CompiledCement): MDPoint[] => {
       const points = [];
+      let prevAngle = 10000;
+      const allowedAngleDiff = 0.0005;
+
       // Add distance to points
       for (let i = c.toc; i < c.boc; i += this.options.wellboreBaseComponentIncrement) {
         const p = this.referenceSystem.project(i);
-        points.push({ point: new Point(p[0], p[1]), md: i });
+        const angle = Math.atan2(p[1], p[0]);
+        // Reduce number of points on a straight line by angle since last point
+        if (Math.abs(angle - prevAngle) > allowedAngleDiff) {
+          points.push({ point: new Point(p[0], p[1]), md: i });
+          prevAngle = angle;
+        }
       }
+
+      // Always add last point
+      const p = this.referenceSystem.project(c.boc);
+      points.push({ point: new Point(p[0], p[1]), md: c.boc });
       return points;
     };
 
     const createSimplePolygonPath = (c: CompiledCement): Point[] => {
       const middle = createMiddlePath(c);
       const points: { left: Point[]; right: Point[] } = { left: [], right: [] };
-      let prevPoint = null;
 
-      for (let md = c.toc; md < c.boc; md += this.options.wellboreBaseComponentIncrement) {
-        // create normal for sections
+      for (let md = c.toc; md <= c.boc; md += this.options.wellboreBaseComponentIncrement) {
+        // Create normal for sections
         const offsetItem = getClosestRelatedItem(c.intersectingItems, md);
         const start = md;
         md = Math.min(c.boc, offsetItem != null ? offsetItem.end : c.boc); // set next calc MD
 
         // Subtract casing thickness / holesize edge
-        console.log('off', offsetItem);
-        const offsetDimDiff = offsetItem != null ? offsetItem.diameter - offsetItem.innerDiameter : 0.1;
-        const defaultCementWidth = 100; // Default to flow cement outside to seabed to show error in data
-        const offset = offsetItem != null ? offsetItem.diameter - offsetDimDiff : defaultCementWidth;
+        const getOffset = (offsetItem: any) => {
+          const offsetDimDiff =
+            offsetItem != null && offsetItem.diameter != null && offsetItem.innerDiameter != null
+              ? offsetItem.diameter - offsetItem.innerDiameter
+              : 0.1;
+          const defaultCementWidth = 100; // Default to flow cement outside to seabed to show error in data
+          const offset = offsetItem != null ? offsetItem.diameter - offsetDimDiff : defaultCementWidth;
+
+          return offset;
+        };
         const stop = md;
-        let partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
-
-        if (prevPoint != null) {
-          partPoints = [prevPoint, ...partPoints];
-        }
-
-        const sideLeft = createNormal(partPoints, -offset);
-        const sideRight = createNormal(partPoints, offset);
-
-        prevPoint = partPoints[partPoints.length - 2];
-
+        const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
+        const offset = getOffset(offsetItem);
+        const sideLeft = createNormal(partPoints, -offset).filter((p) => !isNaN(p.x));
+        const sideRight = createNormal(partPoints, offset).filter((p) => !isNaN(p.x));
         points.left.push(...sideLeft);
         points.right.push(...sideRight);
       }
 
-      const centerPiece = findCasing(c.casingId, this.data.casings);
+      const centerPieceDim = findCasing(c.casingId, this.data.casings).diameter;
       const wholeMiddlePoints = middle.map((s) => s.point);
-      const sideLeftMiddle = createNormal(wholeMiddlePoints, -centerPiece.diameter);
-      const sideRightMiddle = createNormal(wholeMiddlePoints, +centerPiece.diameter);
+
+      const sideLeftMiddle = createNormal(wholeMiddlePoints, -centerPieceDim);
+      const sideRightMiddle = createNormal(wholeMiddlePoints, +centerPieceDim);
 
       const sideLeftMiddleR = sideLeftMiddle.map((s) => s.clone()).reverse();
       const rightR = points.right.map((s) => s.clone()).reverse();
-      const cementRectCoords = [...sideLeftMiddleR, ...points.left, sideLeftMiddleR[0], ...rightR, ...sideRightMiddle];
+      const cementRectCoords = [...sideLeftMiddleR, ...points.left, ...rightR, ...sideRightMiddle];
 
       // const line = [...sideLeftMiddleR, ...points.left];
       // this.drawLine(line, 0xff0000);
       return cementRectCoords;
     };
 
-    const t = this.createTexture();
+    const t: any = this.createTexture();
     const paths = cementCompiled.map((c) => createSimplePolygonPath(c));
 
     // const bigSquareBackgroundTest = new Graphics();
