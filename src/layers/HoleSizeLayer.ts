@@ -9,6 +9,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
   constructor(id?: string, options?: HoleSizeLayerOptions) {
     super(id, options);
     this.options = {
+      ...this.options,
       firstColor: 'rgb(163, 102, 42)',
       secondColor: 'rgb(255, 255, 255)',
       lineColor: 0x8b4513,
@@ -57,6 +58,10 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
 
     const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
     const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = createNormalCoords(holeObject);
+
+    if (wellBorePathCoords.length === 0) {
+      return;
+    }
 
     const { top, bottom, left, right } = generateHoleCoords(normalOffsetCoordsUp, normalOffsetCoordsDown);
     const polygonCoords = [...left, ...right];

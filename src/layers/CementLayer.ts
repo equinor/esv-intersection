@@ -9,6 +9,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
   constructor(id?: string, options?: CementLayerOptions) {
     super(id, options);
     this.options = {
+      ...this.options,
       firstColor: '#c7b9ab',
       secondColor: '#5b5b5b',
       lineColor: 0x5b5b5b,
@@ -77,7 +78,8 @@ export class CementLayer extends WellboreBaseComponentLayer {
         md = Math.min(c.boc, offsetItem != null ? offsetItem.end : c.boc); // set next calc MD
 
         // Subtract casing thickness / holesize edge
-        const offsetDimDiff = offsetItem.diameter - offsetItem.innerDiameter || 1;
+        console.log('off', offsetItem);
+        const offsetDimDiff = offsetItem != null ? offsetItem.diameter - offsetItem.innerDiameter : 0.1;
         const defaultCementWidth = 100; // Default to flow cement outside to seabed to show error in data
         const offset = offsetItem != null ? offsetItem.diameter - offsetDimDiff : defaultCementWidth;
         const stop = md;

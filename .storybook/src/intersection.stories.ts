@@ -125,6 +125,7 @@ export const intersection = () => {
     const btnCement = createButton(controller, cementLayer, 'Cement');
     const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
     const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
+    const btnSetDataForCompletion = createSetLayerButton(cementLayer, casingLayer, cement, casings, holesizes);
     let show = true;
     const toggleAxis = createButtonWithCb('Toggle axis labels', () => {
       if (show) {
@@ -160,6 +161,7 @@ export const intersection = () => {
     btnContainer.appendChild(btnCement);
     btnContainer.appendChild(btnGeomodelLabels);
     btnContainer.appendChild(btnSeismic);
+    btnContainer.appendChild(btnSetDataForCompletion);
     btnContainer.appendChild(btnLarger);
     btnContainer.appendChild(btnSmaller);
     btnContainer.appendChild(toggleAxis);
@@ -223,6 +225,22 @@ const createButton = (manager: Controller, layer: Layer, title: string) => {
       manager.hideLayer(layer.id);
     }
     show = !show;
+  };
+  return btn;
+};
+
+const createSetLayerButton = (cementLayer: any, casingLayer: any, cement: any, casings: any, holes: any) => {
+  const btn = document.createElement('button');
+  btn.innerHTML = `Update data for compl`;
+  btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
+  btn.onclick = () => {
+    const alterCasing = (c: any) => {
+      return { ...c, end: c.end += 10 };
+    };
+    casings[0] = alterCasing(casings[0]);
+    console.log(casings[0]);
+    cementLayer.setData({ cement, casings, holes });
+    casingLayer.setData(casings);
   };
   return btn;
 };
