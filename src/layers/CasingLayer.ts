@@ -2,7 +2,7 @@ import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleObjectData, Casing } from '..';
 import { Texture, Point } from 'pixi.js';
 import { createNormalCoords, generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';
-import { createNormal } from '../utils/vectorUtils';
+import { createNormal, arrayToPoint } from '../utils/vectorUtils';
 
 export class CasingLayer extends WellboreBaseComponentLayer {
   options: CasingLayerOptions;
@@ -75,42 +75,32 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     this.drawLine(top, topBottomLineColor, 1);
     this.drawLine(bottom, topBottomLineColor, 1);
 
-    const takeMeters = (points: Point[], meters: number): Point[] => {
-      let tot = 0;
-      const lastMeterPoint = 2;
-      const newPoints: Point[] = [];
-
-      for (let i = 0; tot < meters && i > points.length - lastMeterPoint; i++) {
-        tot += this.options.wellboreBaseComponentIncrement;
-        newPoints.push(points[points.length - 1 - i].clone());
-      }
-
-      return newPoints.reverse();
-    };
-
     if (holeObject.hasShoe === true) {
-      const shoeWidth = 5;
-      const meters = 10;
-      const shoeHeightCoords = takeMeters(normalOffsetCoordsDown, meters);
-      const shoeCoords = this.generateShoe(shoeHeightCoords, -shoeWidth);
-      this.drawBigPolygon(shoeCoords);
-
-      const shoeHeightCoords2 = takeMeters(normalOffsetCoordsUp, meters);
-      const shoeCoords2 = this.generateShoe(shoeHeightCoords2, shoeWidth);
+      const shoeWidth = 25;
+      const meters = 20;
+      const shoeCoords = this.generateShoe(holeObject.data.end, holeObject.data.diameter, meters, shoeWidth);
+      const shoeCoords2 = this.generateShoe(holeObject.data.end, holeObject.data.diameter, meters, -shoeWidth);
       this.drawBigPolygon(shoeCoords2);
+      this.drawBigPolygon(shoeCoords);
     }
   };
 
-  generateShoe = (triangleSideShoe: Point[], offset: number): Point[] => {
-    if (triangleSideShoe.length < 1) {
-      return [];
+  generateShoe = (casingEnd: number, casingDiameter: number, meters: number, offset: number): Point[] => {
+    const pts: Point[] = [];
+    for (let i = casingEnd; i > casingEnd - meters; i -= this.options.wellboreBaseComponentIncrement) {
+      pts.push(arrayToPoint(this.referenceSystem.project(i) as [number, number]));
     }
-    const normalOffset = createNormal(
-      [triangleSideShoe[0], triangleSideShoe[1], triangleSideShoe[triangleSideShoe.length - 1], triangleSideShoe[triangleSideShoe.length - 1]],
-      offset,
-    );
+    pts.reverse();
 
-    const a = [triangleSideShoe[0], triangleSideShoe[triangleSideShoe.length - 1], normalOffset[normalOffset.length - 1], triangleSideShoe[0]];
-    return a;
+    const triangleSideShoe: Point[] = createNormal(pts, casingDiameter * (offset < 0 ? -1 : 1));
+
+    const top = triangleSideShoe[0];
+    const bottom = triangleSideShoe[triangleSideShoe.length - 1];
+    const middle = triangleSideShoe[triangleSideShoe.length - 2];
+
+    const normalOffset = createNormal([top, middle, bottom], offset);
+    const outlier = normalOffset[normalOffset.length - 1];
+
+    return [top, bottom, outlier];
   };
 }
