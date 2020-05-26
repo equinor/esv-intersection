@@ -25,7 +25,7 @@ export abstract class HTMLLayer extends Layer {
       .style('opacity', this.opacity)
       .style('overflow', 'hidden')
       .style('pointer-events', interactive)
-      .attr('z-index', this.order);
+      .style('z-index', this.order);
   }
 
   onUnmount(): void {
@@ -57,7 +57,7 @@ export abstract class HTMLLayer extends Layer {
 
   onOrderChanged(order: number): void {
     if (this.elm) {
-      this.elm.attr('z-index', order);
+      this.elm.style('z-index', order);
     }
   }
 
