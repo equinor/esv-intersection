@@ -64,10 +64,10 @@ describe('HTML', () => {
     const layer = new htmlLayer('well');
     layer.onMount({ elm });
     expect(layer.order).toEqual(1);
-    expect(layer.elm.attr('z-index')).toEqual('1');
+    expect(layer.elm.style('z-index')).toEqual('1');
     layer.order = 2;
     expect(layer.order).toEqual(2);
-    expect(layer.elm.attr('z-index')).toEqual('2');
+    expect(layer.elm.style('z-index')).toEqual('2');
   });
   it('should update opacity when changing its value', () => {
     const layer = new htmlLayer('well');
