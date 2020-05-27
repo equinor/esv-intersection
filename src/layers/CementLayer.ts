@@ -60,9 +60,21 @@ export class CementLayer extends WellboreBaseComponentLayer {
       const points = [];
       let prevAngle = 10000;
       const allowedAngleDiff = 0.0005;
+      const morePointsForStartAndEndMeters = 10;
+
+      // Always add first points
+
+      for (let i = c.toc; i < c.toc + morePointsForStartAndEndMeters; i += this.options.wellboreBaseComponentIncrement) {
+        const p = this.referenceSystem.project(i);
+        points.push({ point: new Point(p[0], p[1]), md: i });
+      }
 
       // Add distance to points
-      for (let i = c.toc; i < c.boc; i += this.options.wellboreBaseComponentIncrement) {
+      for (
+        let i = c.toc + morePointsForStartAndEndMeters;
+        i < c.boc - morePointsForStartAndEndMeters;
+        i += this.options.wellboreBaseComponentIncrement
+      ) {
         const p = this.referenceSystem.project(i);
         const angle = Math.atan2(p[1], p[0]);
         // Reduce number of points on a straight line by angle since last point
@@ -72,9 +84,14 @@ export class CementLayer extends WellboreBaseComponentLayer {
         }
       }
 
-      // Always add last point
+      // Always add last points
+      for (let i = c.boc - morePointsForStartAndEndMeters; i < c.boc; i += this.options.wellboreBaseComponentIncrement) {
+        const p = this.referenceSystem.project(i);
+        points.push({ point: new Point(p[0], p[1]), md: i });
+      }
       const p = this.referenceSystem.project(c.boc);
       points.push({ point: new Point(p[0], p[1]), md: c.boc });
+
       return points;
     };
 
@@ -102,8 +119,8 @@ export class CementLayer extends WellboreBaseComponentLayer {
         const stop = md;
         const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
         const offset = getOffset(offsetItem);
-        const sideLeft = createNormal(partPoints, -offset).filter((p) => !isNaN(p.x));
-        const sideRight = createNormal(partPoints, offset).filter((p) => !isNaN(p.x));
+        const sideLeft = createNormal(partPoints, -offset).filter((p) => !isNaN(p.x) && !isNaN(p.y));
+        const sideRight = createNormal(partPoints, offset).filter((p) => !isNaN(p.x) && !isNaN(p.y));
         points.left.push(...sideLeft);
         points.right.push(...sideRight);
       }
@@ -118,12 +135,13 @@ export class CementLayer extends WellboreBaseComponentLayer {
       const rightR = points.right.map((s) => s.clone()).reverse();
       const cementRectCoords = [...sideLeftMiddleR, ...points.left, ...rightR, ...sideRightMiddle];
 
-      // const line = [...sideLeftMiddleR, ...points.left];
+      // const line = [sideLeftMiddleR[0], sideLeftMiddleR[sideLeftMiddleR.length - 1]];
       // this.drawLine(line, 0xff0000);
+
       return cementRectCoords;
     };
 
-    const t: any = this.createTexture();
+    const t: Texture = this.createTexture();
     const paths = cementCompiled.map((c) => createSimplePolygonPath(c));
 
     // const bigSquareBackgroundTest = new Graphics();
