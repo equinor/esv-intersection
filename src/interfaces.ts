@@ -112,13 +112,11 @@ export interface Connector {
 
 export interface Annotation {
   title: string;
-  md: number;
-  tvd: number;
-  mdUnit: string;
-  depthReferencePoint: string;
-  pos: [number, number];
-  connector?: Connector;
+  label: string;
+  color: string;
   group: string;
+  md?: number;
+  pos?: [number, number];
 }
 
 export interface HoleSize {

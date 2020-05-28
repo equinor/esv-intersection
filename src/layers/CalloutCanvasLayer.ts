@@ -1,5 +1,4 @@
 /* eslint-disable no-magic-numbers */
-import { round } from '@equinor/videx-math';
 import { ScaleLinear } from 'd3-scale';
 
 import { CanvasLayer } from './base/CanvasLayer';
@@ -24,6 +23,7 @@ type Point = {
 type Callout = {
   title: string;
   label: string;
+  color: string;
   pos: Point;
   group: string;
   alignment: string;
@@ -83,11 +83,9 @@ export class CalloutCanvasLayer extends CanvasLayer {
     }
 
     this.callouts.forEach((callout) => {
-      const { pos, title } = callout;
+      const { pos, title, color } = callout;
       const x = xScale(pos.x);
       const y = yScale(pos.y);
-
-      const color = callout.group === 'strat-picks' ? '#227' : 'rgba(0,0,0,0.8)';
 
       const calloutBB = {
         x,
@@ -205,15 +203,15 @@ export class CalloutCanvasLayer extends CanvasLayer {
     const alignment = isLeftToRight ? Location.topleft : Location.topright;
 
     const nodes = annotations.map((a) => {
-      const label = scale === 0 ? `${round(a.md)} ${a.mdUnit} MD ${a.depthReferencePoint}` : `${round(a.tvd)} ${a.mdUnit} TVD MSL`;
-
+      const pos = a.pos ? a.pos : this.referenceSystem.project(a.md);
       return {
         title: a.title,
-        label,
-        pos: { x: a.pos[0], y: a.pos[1] },
+        label: a.label,
+        color: a.color,
+        pos: { x: pos[0], y: pos[1] },
         group: a.group,
         alignment,
-        boundingBox: this.getAnnotationBoundingBox(a.title, label, a.pos, xScale, yScale, fontSize),
+        boundingBox: this.getAnnotationBoundingBox(a.title, a.label, a.pos, xScale, yScale, fontSize),
         dx: offset,
         dy: offset,
       };
