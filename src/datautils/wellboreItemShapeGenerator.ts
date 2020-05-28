@@ -40,10 +40,10 @@ export const actualPoints = (s: HoleObjectData): Point[] => {
     if (s.data.start > p.md) {
       startIndex = index;
     }
-    if (s.data.start + s.data.length >= p.md) {
+    if (s.data.end >= p.md) {
       stopIndex = index;
     }
-    return p.md > s.data.start && p.md < s.data.start + s.data.length;
+    return p.md > s.data.start && p.md < s.data.end;
   });
 
   if (a == null || a.length === 0) {
