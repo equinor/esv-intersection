@@ -1,14 +1,12 @@
-import { mockedWellborePath, cementData, holeSizeData, casingData } from '../exampledata';
+import { poslog, cementData, holeSizeData, casingData } from '../exampledata';
 
 export const getWellborePath = (): Promise<any> => {
-  return Promise.resolve(mockedWellborePath);
+  const coords = poslog.map((c: any) => [c.easting, c.northing, c.tvd]);
+  return Promise.resolve(coords);
 };
 
 export const getPositionLog = (): Promise<any> => {
-  const plog = mockedWellborePath.map((coords) => {
-    return { easting: coords[0], northing: coords[1], tvd: coords[2] };
-  });
-  return Promise.resolve(plog);
+  return Promise.resolve(poslog);
 };
 
 export const getCompletion = (): Promise<any[]> => {
@@ -41,7 +39,6 @@ export const getHolesize = (): Promise<any[]> => {
 };
 
 export const getCasings = (): Promise<any[]> => {
-  console.log(casingData);
   return Promise.resolve(casingData);
 };
 
