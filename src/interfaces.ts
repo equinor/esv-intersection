@@ -92,6 +92,7 @@ export interface WellComponentBaseOptions extends LayerOptions {
   maxFontSize?: number;
   textColor?: string;
   font?: string;
+  wellboreBaseComponentIncrement?: number;
 }
 
 export interface GeoModelData {
