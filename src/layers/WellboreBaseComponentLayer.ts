@@ -1,18 +1,8 @@
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import {
-  HoleSizeLayerOptions,
-  OnUpdateEvent,
-  OnRescaleEvent,
-  MDPoint,
-  HoleObjectData,
-  NormalCoordsObject,
-  HoleSize,
-  Casing,
-  OnMountEvent,
-} from '../interfaces';
+import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, HoleSize, Casing, OnMountEvent } from '../interfaces';
 
-export const StaticWellboreBaseComponentIncrement = 0.1;
+const DefaultStaticWellboreBaseComponentIncrement = 0.1;
 
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;
@@ -20,6 +10,8 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   constructor(id?: string, options?: HoleSizeLayerOptions) {
     super(id, options);
     this.options = {
+      ...this.options,
+      wellboreBaseComponentIncrement: options.wellboreBaseComponentIncrement || DefaultStaticWellboreBaseComponentIncrement,
       ...options,
     };
     this.render = this.render.bind(this);
@@ -41,7 +33,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     this.ctx.stage.scale.set(event.xRatio, event.yRatio);
   }
 
-  // Is overridden by extended well bore items layers (casing, hole)
+  // This is overridden by the extended well bore items layers (casing, hole)
   render(event: OnRescaleEvent | OnUpdateEvent): void {}
 
   drawBigPolygon = (coords: Point[], t?: Texture): Graphics => {
@@ -59,6 +51,10 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   };
 
   createRopeTextureBackground = (coords: Point[], texture: Texture, mask: Graphics): SimpleRope => {
+    if (coords.length === 0) {
+      return null;
+    }
+
     const rope: SimpleRope = new SimpleRope(texture, coords);
     rope.mask = mask;
     this.ctx.stage.addChild(rope);
@@ -97,10 +93,10 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   };
 
   generateHoleSizeData = (data: HoleSize | Casing): HoleObjectData => {
-    const points: any = [];
+    const points: MDPoint[] = [];
 
     // Add distance to points
-    for (let i = data.start; i < data.start + data.length; i += StaticWellboreBaseComponentIncrement) {
+    for (let i = data.start; i < data.end; i += this.options.wellboreBaseComponentIncrement) {
       const p = this.referenceSystem.project(i);
       points.push({ point: new Point(p[0], p[1]), md: i });
     }
