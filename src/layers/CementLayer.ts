@@ -55,6 +55,12 @@ export class CementLayer extends WellboreBaseComponentLayer {
       return result;
     };
 
+    const getMdPoint = (md: number) => {
+      const p = this.referenceSystem.project(md);
+      const point = { point: new Point(p[0], p[1]), md: md };
+      return point;
+    };
+
     const createMiddlePath = (c: CompiledCement): MDPoint[] => {
       const points = [];
       // Add distance to points
@@ -63,6 +69,19 @@ export class CementLayer extends WellboreBaseComponentLayer {
         points.push({ point: new Point(p[0], p[1]), md: i });
       }
       return points;
+    };
+
+    const getOffset = (offsetItem: any): number => {
+      const offsetDefaultDim = 0.1;
+      const defaultCementWidth = 100; // Default to flow cement outside to seabed to show error in data
+
+      const offsetDimDiff =
+        offsetItem != null && offsetItem.diameter != null && offsetItem.innerDiameter != null
+          ? offsetItem.diameter - offsetItem.innerDiameter
+          : offsetDefaultDim;
+      const offset = offsetItem != null ? offsetItem.diameter - offsetDimDiff : defaultCementWidth;
+
+      return offset;
     };
 
     const createSimplePolygonPath = (c: CompiledCement): Point[] => {
@@ -114,12 +133,12 @@ export class CementLayer extends WellboreBaseComponentLayer {
     const paths = cementCompiled.map((c) => createSimplePolygonPath(c));
 
     // const bigSquareBackgroundTest = new Graphics();
-    // bigSquareBackgroundTest.beginTextureFill({ texture: t });
+    // bigSquareBackgroundTest.beginTextureFill({ texture });
     // bigSquareBackgroundTest.drawRect(-1000, -1000, 2000, 2000);
     // bigSquareBackgroundTest.endFill();
     // this.ctx.stage.addChild(bigSquareBackgroundTest);
 
-    paths.map((p) => this.drawBigPolygon(p, t));
+    paths.map((polygon) => this.drawBigPolygon(polygon, texture));
   }
 
   createTexture = (): Texture => {
