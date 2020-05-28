@@ -56,43 +56,59 @@ export class CementLayer extends WellboreBaseComponentLayer {
       return result;
     };
 
+    const getMdPoint = (md: number) => {
+      const p = this.referenceSystem.project(md);
+      const point = { point: new Point(p[0], p[1]), md: md };
+      return point;
+    };
+
     const createMiddlePath = (c: CompiledCement): MDPoint[] => {
       const points = [];
       let prevAngle = 10000;
       const allowedAngleDiff = 0.0005;
       const morePointsForStartAndEndMeters = 10;
 
-      // Always add first points
+      // Take more points for the start and end (default 10 meters, or if not enough cement. Use 1/3 of the cement length)
+      const lastMeters = c.boc - morePointsForStartAndEndMeters > c.toc ? c.boc - morePointsForStartAndEndMeters : c.boc - (c.boc - c.toc) / 3;
+      const firstMeters = c.toc + morePointsForStartAndEndMeters < c.boc ? c.toc + morePointsForStartAndEndMeters : c.toc + (c.boc - c.toc) / 3;
 
-      for (let i = c.toc; i < c.toc + morePointsForStartAndEndMeters; i += this.options.wellboreBaseComponentIncrement) {
-        const p = this.referenceSystem.project(i);
-        points.push({ point: new Point(p[0], p[1]), md: i });
+      // Always add first points
+      for (let i = c.toc; i < firstMeters; i += this.options.wellboreBaseComponentIncrement) {
+        points.push(getMdPoint(i));
       }
 
       // Add distance to points
-      for (
-        let i = c.toc + morePointsForStartAndEndMeters;
-        i < c.boc - morePointsForStartAndEndMeters;
-        i += this.options.wellboreBaseComponentIncrement
-      ) {
-        const p = this.referenceSystem.project(i);
-        const angle = Math.atan2(p[1], p[0]);
+      for (let i = firstMeters; i < lastMeters; i += this.options.wellboreBaseComponentIncrement) {
+        const point = getMdPoint(i);
+        const angle = Math.atan2(point.point.y, point.point.x);
+
         // Reduce number of points on a straight line by angle since last point
         if (Math.abs(angle - prevAngle) > allowedAngleDiff) {
-          points.push({ point: new Point(p[0], p[1]), md: i });
+          points.push(point);
           prevAngle = angle;
         }
       }
 
       // Always add last points
-      for (let i = c.boc - morePointsForStartAndEndMeters; i < c.boc; i += this.options.wellboreBaseComponentIncrement) {
-        const p = this.referenceSystem.project(i);
-        points.push({ point: new Point(p[0], p[1]), md: i });
+      for (let i = lastMeters; i < c.boc; i += this.options.wellboreBaseComponentIncrement) {
+        points.push(getMdPoint(i));
       }
-      const p = this.referenceSystem.project(c.boc);
-      points.push({ point: new Point(p[0], p[1]), md: c.boc });
+      points.push(getMdPoint(c.boc));
 
       return points;
+    };
+
+    const getOffset = (offsetItem: any): number => {
+      const offsetDefaultDim = 0.1;
+      const defaultCementWidth = 100; // Default to flow cement outside to seabed to show error in data
+
+      const offsetDimDiff =
+        offsetItem != null && offsetItem.diameter != null && offsetItem.innerDiameter != null
+          ? offsetItem.diameter - offsetItem.innerDiameter
+          : offsetDefaultDim;
+      const offset = offsetItem != null ? offsetItem.diameter - offsetDimDiff : defaultCementWidth;
+
+      return offset;
     };
 
     const createSimplePolygonPath = (c: CompiledCement): Point[] => {
@@ -106,16 +122,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
         md = Math.min(c.boc, offsetItem != null ? offsetItem.end : c.boc); // set next calc MD
 
         // Subtract casing thickness / holesize edge
-        const getOffset = (offsetItem: any) => {
-          const offsetDimDiff =
-            offsetItem != null && offsetItem.diameter != null && offsetItem.innerDiameter != null
-              ? offsetItem.diameter - offsetItem.innerDiameter
-              : 0.1;
-          const defaultCementWidth = 100; // Default to flow cement outside to seabed to show error in data
-          const offset = offsetItem != null ? offsetItem.diameter - offsetDimDiff : defaultCementWidth;
-
-          return offset;
-        };
         const stop = md;
         const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
         const offset = getOffset(offsetItem);
@@ -141,16 +147,16 @@ export class CementLayer extends WellboreBaseComponentLayer {
       return cementRectCoords;
     };
 
-    const t: Texture = this.createTexture();
-    const paths = cementCompiled.map((c) => createSimplePolygonPath(c));
+    const texture: Texture = this.createTexture();
+    const paths = cementCompiled.map(createSimplePolygonPath);
 
     // const bigSquareBackgroundTest = new Graphics();
-    // bigSquareBackgroundTest.beginTextureFill({ texture: t });
+    // bigSquareBackgroundTest.beginTextureFill({ texture });
     // bigSquareBackgroundTest.drawRect(-1000, -1000, 2000, 2000);
     // bigSquareBackgroundTest.endFill();
     // this.ctx.stage.addChild(bigSquareBackgroundTest);
 
-    paths.map((p) => this.drawBigPolygon(p, t));
+    paths.map((polygon) => this.drawBigPolygon(polygon, texture));
   }
 
   createTexture = (): Texture => {
