@@ -5,7 +5,7 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 import { IntersectionReferenceSystem } from '../../../../src';
 
 // Data
-import { mockedWellborePath } from '../../exampledata';
+import { poslog as mockedWellborePath } from '../../exampledata';
 import { getWellborePath, getCompletion } from '../../api';
 
 export const CompletionLayerSample = () => {

@@ -6,8 +6,7 @@ import { createRootContainer, createLayerContainer, createFPSLabel } from '../..
 
 import { IntersectionReferenceSystem } from '../../../../src/control';
 
-import { mockedWellborePath } from '../../exampledata';
-import { getWellborePath } from '../../api';
+import { getWellborePath } from '../../api/apiMock';
 
 const width = 400;
 const height = 500;
@@ -21,22 +20,23 @@ const createEventObj = (elm: any) => {
 export const Wellborepath = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
+  getWellborePath().then((wbp) => {
+    const referenceSystem = new IntersectionReferenceSystem(wbp);
+    const options: WellborepathLayerOptions = {
+      order: 1,
+      strokeWidth: '2px',
+      stroke: 'black',
+      referenceSystem,
+    };
+    const layer = new WellborepathLayer('wellborepath', options);
 
-  const referenceSystem = new IntersectionReferenceSystem(mockedWellborePath);
-  const options: WellborepathLayerOptions = {
-    order: 1,
-    strokeWidth: '2px',
-    stroke: 'black',
-    referenceSystem,
-  };
-  const layer = new WellborepathLayer('wellborepath', options);
+    layer.onMount({ elm: container });
+    layer.onUpdate(createEventObj(container));
 
-  layer.onMount({ elm: container });
-  layer.onUpdate(createEventObj(container));
+    root.appendChild(container);
 
-  root.appendChild(container);
-
-  return root;
+    return root;
+  });
 };
 
 export const WellborepathWithSampleDataAndZoom = () => {
