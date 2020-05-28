@@ -5,7 +5,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { mockedWellborePath, casingData, holeSizeData, cementData } from '../../exampledata';
+import { getWellborePath, getCasings, getCement, getHolesize } from '../../api/apiMock';
 
 export const CementLayerBasic = () => {
   const width = 400;
@@ -14,28 +14,30 @@ export const CementLayerBasic = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  const referenceSystem = new IntersectionReferenceSystem(mockedWellborePath);
+  Promise.all([getWellborePath(), getCement(), getCasings(), getHolesize()]).then(([wbp, cement, casings, holes]) => {
+    const referenceSystem = new IntersectionReferenceSystem(wbp);
 
-  const options: CementLayerOptions = {
-    order: 1,
-    referenceSystem,
-    data: getData(),
-  };
-  const cementLayer = new CementLayer('webgl', options);
+    const options: CementLayerOptions = {
+      order: 1,
+      referenceSystem,
+      data: { cement, casings, holes },
+    };
+    const cementLayer = new CementLayer('webgl', options);
 
-  cementLayer.onMount({ elm: root, height, width });
+    cementLayer.onMount({ elm: root, height, width });
 
-  cementLayer.onUpdate({ elm: root });
+    cementLayer.onUpdate({ elm: root });
+    const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
+      cementLayer.onRescale(event);
+    });
 
-  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
-    cementLayer.onRescale(event);
+    zoomHandler.setBounds([0, 1000], [0, 1000]);
+    zoomHandler.adjustToSize(width, height);
+    zoomHandler.zFactor = 1;
+    zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+    zoomHandler.enableTranslateExtent = false;
+    zoomHandler.setViewport(1000, 1000, 5000);
   });
-  zoomHandler.setBounds([0, 1000], [0, 1000]);
-  zoomHandler.adjustToSize(width, height);
-  zoomHandler.zFactor = 1;
-  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
-  zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000, 1000, 5000);
 
   root.appendChild(container);
   return root;
@@ -75,20 +77,6 @@ export const CementLayerBasic = () => {
 
 //   return root;
 // };
-
-const getData = () => {
-  // Cement requires data casing and holes to create cement width
-  const casings = casingData.map((c: Casing) => ({ ...c, end: c.start + c.length, casingId: `${c.start + c.length}` }));
-  const holes = holeSizeData.map((h: HoleSize) => ({ ...h, end: h.start + h.length }));
-  const cement: Cement[] = [];
-  for (let i = 0; i < casingData.length && i < cementData.length; i++) {
-    const c: Cement = (cementData[i] as unknown) as Cement;
-    c.casingId = `${casings[i].casingId}`;
-    cement.push(c);
-  }
-  const d = { cement, casings, holes };
-  return d;
-};
 
 // const getSampleDataData = () => {
 //   const data: Cement[] = [
