@@ -25,7 +25,7 @@ export default {
 import { seismicColorMap } from './exampledata';
 import { Casing, HoleSize, Cement } from '../../src';
 
-import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement } from './api';
+import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement } from './data';
 
 const xbounds: [number, number] = [0, 1000];
 const ybounds: [number, number] = [0, 1000];

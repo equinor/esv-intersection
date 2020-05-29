@@ -6,7 +6,7 @@ import { IntersectionReferenceSystem } from '../../../../src';
 
 // Data
 import { poslog as mockedWellborePath } from '../../exampledata';
-import { getWellborePath, getCompletion } from '../../api';
+import { getWellborePath, getCompletion } from '../../data';
 
 export const CompletionLayerSample = () => {
   const data = [

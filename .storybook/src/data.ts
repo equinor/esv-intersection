@@ -1,4 +1,4 @@
-import { poslog, cementData, holeSizeData, casingData } from '../exampledata';
+import { poslog, cementData, holeSizeData, casingData } from './esv-intersection-data';
 
 export const getWellborePath = (): Promise<any> => {
   const coords = poslog.map((c: any) => [c.easting, c.northing, c.tvd]);
