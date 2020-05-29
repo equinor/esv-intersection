@@ -2,11 +2,16 @@
 import { ScaleLinear } from 'd3-scale';
 
 import { CanvasLayer } from './base/CanvasLayer';
-import { OnUpdateEvent, Annotation, OnRescaleEvent, BoundingBox } from '../interfaces';
+import { OnUpdateEvent, Annotation, OnRescaleEvent, BoundingBox, CalloutOptions } from '../interfaces';
 import { calcSize, isOverlapping, getOverlapOffset } from '../utils';
 
-const MAX_FONT_SIZE = 11;
-const MIN_FONT_SIZE = 7;
+const DEFAULT_MIN_FONT_SIZE = 7;
+const DEFAULT_MAX_FONT_SIZE = 11;
+const DEFAULT_FONT_SIZE_FACTOR = 7;
+
+const DEFAULT_OFFSET_MIN = 20;
+const DEFAULT_OFFSET_MAX = 120;
+const DEFAULT_OFFSET_FACTOR = 19;
 
 const Location = {
   topleft: 'topleft',
@@ -38,6 +43,22 @@ export class CalloutCanvasLayer extends CanvasLayer {
   xRatio: number;
   callouts: Callout[];
   groupFilter: string[] = null;
+  minFontSize: number;
+  maxFontSize: number;
+  fontSizeFactor: number;
+  offsetMin: number;
+  offsetMax: number;
+  offsetFactor: number;
+
+  constructor(id?: string, options?: CalloutOptions){
+    super(id, options);
+    this.minFontSize = options.minFontSize || DEFAULT_MIN_FONT_SIZE;
+    this.maxFontSize = options.maxFontSize || DEFAULT_MAX_FONT_SIZE;
+    this.fontSizeFactor = options.fontSizeFactor || DEFAULT_FONT_SIZE_FACTOR;
+    this.offsetMin = options.offsetMin || DEFAULT_OFFSET_MIN;
+    this.offsetMax = options.offsetMax || DEFAULT_OFFSET_MAX;
+    this.offsetFactor = options.offsetFactor || DEFAULT_OFFSET_FACTOR;
+  }
 
   setGroupFilter(filter: string[]): void {
     this.groupFilter = filter;
@@ -73,12 +94,12 @@ export class CalloutCanvasLayer extends CanvasLayer {
     const isLeftToRight = xBounds[0] > xBounds[1];
     const scale = 0;
 
-    const fontSize = calcSize(7, MIN_FONT_SIZE, MAX_FONT_SIZE, xScale);
+    const fontSize = calcSize(this.fontSizeFactor, this.minFontSize, this.maxFontSize, xScale);
 
     if (!this.isPanning || !this.callouts) {
       ctx.font = `bold ${fontSize}px arial`;
       const filtered = data.filter((d: Annotation) => !groupFilter || groupFilter.includes(d.group));
-      const offset = calcSize(19, 20, 120, xScale);
+      const offset = calcSize(this.offsetFactor, this.offsetMin, this.offsetMax, xScale);
       this.callouts = this.positionCallouts(filtered, isLeftToRight, xScale, yScale, scale, fontSize, offset);
     }
 

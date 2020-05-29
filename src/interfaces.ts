@@ -202,3 +202,12 @@ export type BoundingBox = {
   offsetX?: number;
   offsetY?: number;
 };
+
+export interface CalloutOptions extends LayerOptions {
+  minFontSize?: number;
+  maxFontSize?: number;
+  fontSizeFactor?: number;
+  offsetMin?: number;
+  offsetMax?: number;
+  offsetFactor?: number;
+}
