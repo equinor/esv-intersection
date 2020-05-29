@@ -31,8 +31,8 @@ Version control branching
 -------------------------
 There are 2 active branches on this repo, plus branches for each major version (see below):
 - The `master` branch is the main branch of the repository, the one that is used for active development
-  - Every time this branch is modified (typically when merging a PR), a Storybook is automatically deployed (on _Radix_, `master` environment). It can be found [here](TODO: add link)
-  - Every time this branch is modified, an updated package is deployed to [npm](TODO: add link)
+  - Every time this branch is modified (typically when merging a PR), a Storybook is automatically deployed (on _Radix_, `master` environment). It can be found [here](https://intersection-component.app.radix.equinor.com/)
+  - Every time this branch is modified, an updated package is deployed to [npm](https://www.npmjs.com/package/@equinor/esv-intersection)
 - The `latest` branch always points at the the most recent version released
   - The branch has to be updated manually, whenever a new release is created
   - Every time this branch is updated, the Storybook is automatically deployed (on _Radix_, `latest` environment). It can be found [here](TODO: add link)
