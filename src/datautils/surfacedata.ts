@@ -180,38 +180,39 @@ const unassignedColorScale = scaleOrdinal<number, string>()
 function findBestMatchingBaseIndex(top: any, index: number, surfaces: any): number {
   const nextIndex: number = index + 1;
 
-  if (!surfaces || nextIndex >= surfaces.length) return null;
+  if (!surfaces || nextIndex >= surfaces.length) {
+    return null;
+  }
 
   // if there is a matching base by name, use that
   let candidate: any = surfaces[nextIndex];
   if (candidate.isBase && candidate.name === top.name) {
     return nextIndex;
   }
-  // verify that each data point in the top has a corresponding
-  // data point in the base candidate. If not, find another candidate
-  // if none match up, select the best ranked, based on the info we have.
+
+  // Select nearest surface as base
   const scores: any = [];
-  let isAcceptable: boolean;
   let ci: number = nextIndex;
   for (; ci < surfaces.length; ci++) {
     candidate = surfaces[ci];
     let score: number = 0;
-    isAcceptable = true;
+    let count: number = 0;
     for (let x = 0; x < top.values.length; x++) {
-      if (top.values[x] !== null && candidate.values[x] === null) {
-        isAcceptable = false;
-        break;
-      } else {
-        score += 1;
+      if (top.values[x] === null || candidate.values[x] === null) {
+        continue;
       }
+      score += candidate.values[x] - top.values[x];
+      count++;
     }
-    if (isAcceptable) break;
-    scores.push({ ci, score });
+    if (count) {
+      scores.push({ ci, score: score / count });
+    }
   }
-  if (isAcceptable) return ci;
 
-  if (scores.length < 2) return nextIndex;
-  scores.sort((a: any, b: any) => b.score - a.score || a.ci - b.ci);
+  if (scores.length < 2) {
+    return nextIndex;
+  }
+  scores.filter((s: any) => s.scores > 0).sort((a: any, b: any) => b.score - a.score || a.ci - b.ci);
 
   return scores[0].ci;
 }
@@ -241,7 +242,7 @@ function generateSurfaceAreas(projection: number[][], surfaces: any): any {
 
 // get the value from the surface with the supplied index,
 // iterate to next surface if value is null
-function getBaseValue(index: number, surfaces: any[], datapoint: number) {
+function getBaseValue(index: number, surfaces: any[], datapoint: number): number {
   if (!surfaces || !index || index >= surfaces.length) return null;
 
   for (let i: number = index; i < surfaces.length; i++) {
