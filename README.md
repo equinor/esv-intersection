@@ -140,4 +140,4 @@ npm run build
 
 Compiles the code found within the src-folder. Build is outputted to a new dist-folder.
 
-![Equinor Logo](images/equinor-logo.png)
+![Equinor Logo](resources/images/equinor-logo.png)
