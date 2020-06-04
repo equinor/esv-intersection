@@ -1,6 +1,7 @@
 # Changelog
 
 ## New changes not yet released
+- bugfix: corrected input validation on getExtendedTrajectory
 
 ## v0.9.0-alpha
 - added method in the IntersectionReferenceSystem to get an extended trajectory
