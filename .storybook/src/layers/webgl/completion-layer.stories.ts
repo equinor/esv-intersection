@@ -15,7 +15,7 @@ export const CompletionLayerSample = () => {
     { start: 790, end: 800, diameter: 12 },
   ];
 
-  const referenceSystem = new IntersectionReferenceSystem(mockedWellborePath);
+  const referenceSystem = new IntersectionReferenceSystem(mockedWellborePath.map((p) => [p.easting, p.northing, p.tvd]));
 
   const options: CompletionLayerOptions = {
     order: 1,

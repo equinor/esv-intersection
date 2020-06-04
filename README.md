@@ -85,7 +85,7 @@ For more examples, check out our stories in our online [storybook](https://inter
 Start by cloning the repository to desired directory.
 
 ```
-git clone https://github.com/equinor/esv-intersection.git
+git clone --recursive https://github.com/equinor/esv-intersection.git
 ```
 
 ### Install dependencies
