@@ -1,6 +1,8 @@
 # Changelog
 
 ## New changes not yet released
+
+## v0.9.1-alpha
 - bugfix: corrected input validation on getExtendedTrajectory
 
 ## v0.9.0-alpha
