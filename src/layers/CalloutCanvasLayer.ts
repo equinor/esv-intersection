@@ -232,7 +232,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
         pos: { x: pos[0], y: pos[1] },
         group: a.group,
         alignment,
-        boundingBox: this.getAnnotationBoundingBox(a.title, a.label, a.pos, xScale, yScale, fontSize),
+        boundingBox: this.getAnnotationBoundingBox(a.title, a.label, pos, xScale, yScale, fontSize),
         dx: offset,
         dy: offset,
       };
@@ -256,7 +256,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
   getAnnotationBoundingBox(
     title: string,
     label: string,
-    pos: [number, number],
+    pos: number[],
     xScale: ScaleLinear<number, number>,
     yScale: ScaleLinear<number, number>,
     height: number,
