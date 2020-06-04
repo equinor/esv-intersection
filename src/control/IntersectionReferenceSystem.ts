@@ -204,10 +204,10 @@ export class IntersectionReferenceSystem {
    * Generate a set of coordinates along the trajectory of the curve
    */
   getExtendedTrajectory(steps: number, extensionStart = DEFAULT_START_EXTEND_LENGTH, extensionEnd = DEFAULT_END_EXTEND_LENGTH): Trajectory {
-    if (!extensionStart || extensionStart < 0.0) {
+    if (!extensionStart || extensionStart <= 0.0) {
       throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionStart parameter');
     }
-    if (!extensionEnd || extensionEnd < 0.0) {
+    if (!extensionEnd || extensionEnd <= 0.0) {
       throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionEnd parameter');
     }
 
