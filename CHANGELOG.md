@@ -2,6 +2,15 @@
 
 ## New changes not yet released
 
+## v0.9.0-alpha
+- added method in the IntersectionReferenceSystem to get an extended trajectory
+- added option to pass in increment, which help specify distance between points on various layers like cement, casing, and holesize layers
+- fixed a bug with z-index on html layers
+- improved perfomance on cement layer
+- add posibility to pass in either a curve length (measured depth, md) or a set of coordinates to the callout layer
+- resolve vulnerability
+- misc bugfixes and improvements
+
 ## v0.8.1-alpha
 - misc bugfixes
 
