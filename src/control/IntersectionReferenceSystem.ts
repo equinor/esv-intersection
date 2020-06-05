@@ -204,11 +204,11 @@ export class IntersectionReferenceSystem {
    * Generate a set of coordinates along the trajectory of the curve
    */
   getExtendedTrajectory(steps: number, extensionStart = DEFAULT_START_EXTEND_LENGTH, extensionEnd = DEFAULT_END_EXTEND_LENGTH): Trajectory {
-    if (!extensionStart || extensionStart <= 0.0) {
-      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionStart parameter');
+    if (!isFinite(extensionStart) || extensionStart < 0.0) {
+      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive extensionStart parameter');
     }
-    if (!extensionEnd || extensionEnd <= 0.0) {
-      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionEnd parameter');
+    if (!isFinite(extensionEnd) || extensionEnd < 0.0) {
+      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive extensionEnd parameter');
     }
 
     const totalLength = this.displacement + extensionStart + extensionEnd;
