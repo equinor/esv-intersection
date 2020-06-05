@@ -2,6 +2,9 @@
 
 ## New changes not yet released
 
+## v0.9.3-alpha
+- improve input validation on getExtendedTrajectory
+
 ## v0.9.2-alpha
 - bugfix: correctly handle position when md or position is supplied in callout layer
 
