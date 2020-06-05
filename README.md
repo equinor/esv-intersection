@@ -140,4 +140,12 @@ npm run build
 
 Compiles the code found within the src-folder. Build is outputted to a new dist-folder.
 
-![Equinor Logo](resources/images/equinor-logo.png)
+### update data folder
+
+If you see that our data [repository](https://github.com/equinor/esv-intersection-data) has new updates that you would like to test out, you can run:
+
+```
+git submodule update --init --recursive
+```
+
+![Equinor Logo](images/equinor-logo.png)
