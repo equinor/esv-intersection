@@ -140,12 +140,16 @@ npm run build
 
 Compiles the code found within the src-folder. Build is outputted to a new dist-folder.
 
-### update data folder
+### Storybook
 
-If you see that our data [repository](https://github.com/equinor/esv-intersection-data) has new updates that you would like to test out, you can run:
-
-```
-git submodule update --init --recursive
+```bash
+npm run storybook
 ```
 
-![Equinor Logo](images/equinor-logo.png)
+Run the Storybook on the local machine. The storybook relies on data stored in the [esv-intersection-data](https://github.com/equinor/esv-intersection-data) repository. 
+It is included here as a git submodule. It is advised to run `git submodule update` before starting the storybook, in order to be sure that the sample data is up-to-date.
+
+If the error `Cannot find module './esv-intersection-data'` appears in the console, there is a high chance that the submodule with the data has not been cloned correctly. Running `git submodule update --init` should fix the issue
+
+
+![Equinor Logo](resources/images/equinor-logo.png)
