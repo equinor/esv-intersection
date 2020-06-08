@@ -238,7 +238,7 @@ export class IntersectionReferenceSystem {
       points.push(point.toArray());
     }
 
-    const offset = extensionStart + this.displacement;
+    const offset = -extensionStart;
 
     return { points, offset };
   }
