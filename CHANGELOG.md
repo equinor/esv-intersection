@@ -2,6 +2,10 @@
 
 ## New changes not yet released
 
+## v0.9.4-alpha
+- bugfix: use only extensionStart as offset
+- bump websocket-extensions version
+
 ## v0.9.3-alpha
 - improve input validation on getExtendedTrajectory
 
