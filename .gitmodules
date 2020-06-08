@@ -1,0 +1,3 @@
+[submodule ".storybook/src/esv-intersection-data"]
+	path = .storybook/src/esv-intersection-data
+	url = https://github.com/equinor/esv-intersection-data.git

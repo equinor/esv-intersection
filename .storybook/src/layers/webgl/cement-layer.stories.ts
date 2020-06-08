@@ -5,7 +5,7 @@ import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { createRootContainer, createLayerContainer } from '../../utils';
 import { IntersectionReferenceSystem } from '../../../../src';
 
-import { getWellborePath, getCasings, getCement, getHolesize } from '../../api/apiMock';
+import { getWellborePath, getCasings, getCement, getHolesize } from '../../data';
 
 export const CementLayerBasic = () => {
   const width = 400;

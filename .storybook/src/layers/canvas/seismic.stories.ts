@@ -8,7 +8,7 @@ import { getSeismicInfo, generateSeismicSliceImage } from '../../../../src/datau
 import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
 import { OnRescaleEvent } from '../../../../src/interfaces';
 
-import { getSeismic, getPositionLog } from '../../api';
+import { getSeismic, getPositionLog } from '../../data';
 import { seismicColorMap } from '../../exampledata';
 
 const width = 400;
