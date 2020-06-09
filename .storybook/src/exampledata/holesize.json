@@ -1,6 +1,0 @@
-[
-  { "start": 0, "end": 500, "diameter": 36 },
-  { "start": 500, "end": 1000, "diameter": 22 },
-  { "start": 1000, "end": 1500, "diameter": 20 },
-  { "start": 1500, "end": 4500, "diameter": 12 }
-]
