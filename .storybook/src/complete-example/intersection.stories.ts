@@ -1,4 +1,4 @@
-import { IntersectionReferenceSystem, Controller } from '../../src/control';
+import { IntersectionReferenceSystem, Controller } from '../../../src/control';
 import {
   GridLayer,
   WellborepathLayer,
@@ -10,27 +10,21 @@ import {
   CasingLayer,
   CompletionLayer,
   CementLayer,
-} from '../../src/layers';
+} from '../../../src/layers';
 
-import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer } from './utils';
+import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
 
-import { generateSurfaceData, SurfaceData } from '../../src/datautils';
-import { getSeismicInfo, generateSeismicSliceImage } from '../../src/datautils/seismicimage';
-
-export default {
-  title: 'Intersection',
-};
+import { generateSurfaceData, SurfaceData, getSeismicInfo, generateSeismicSliceImage, transformFormationData } from '../../../src/datautils';
 
 //Data
-import { seismicColorMap } from './exampledata';
-import { Casing, HoleSize, Cement } from '../../src';
+import { seismicColorMap } from '../exampledata';
 
-import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement } from './data';
+import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement } from '../data';
 
-const xbounds: [number, number] = [0, 1000];
-const ybounds: [number, number] = [0, 1000];
+const xBounds: [number, number] = [0, 1000];
+const yBounds: [number, number] = [0, 1000];
 
-const scaleOptions = { xMin: xbounds[0], xMax: xbounds[1], yMin: ybounds[0], yMax: ybounds[1] };
+const scaleOptions = { xBounds, yBounds };
 const axisOptions = {
   xLabel: 'Displacement',
   yLabel: 'TVD MSL',
@@ -41,15 +35,17 @@ const width = 700;
 const height = 600;
 
 export const intersection = () => {
+  // helper container elements
   const root = createRootContainer(width);
+  const btnToggleContainer = createButtonContainer(width);
+  const btnMiscContainer = createButtonContainer(width);
   const container = createLayerContainer(width, height);
-  const btnContainer = createButtonContainer(width);
+
   const promises = [getWellborePath(), getCompletion(), getSeismic(), getSurfaces(), getStratColumns(), getCasings(), getHolesize(), getCement()];
   Promise.all(promises).then((values) => {
-    const [path, completionData, seismic, surfaces, stratColumns, casings, holesizes, cement] = values;
-
+    const [path, completion, seismic, surfaces, stratColumns, casings, holesizes, cement] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
-    const displacement = referenceSystem.displacement;
+    const displacement = referenceSystem.displacement || 1;
     const extend = 1000 / displacement;
     const steps = surfaces[0]?.data?.values?.length || 1;
     const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
@@ -61,7 +57,6 @@ export const intersection = () => {
       width: 0,
       height: 0,
     };
-    const completion = completionData.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax })); //.filter(c => c.diameter != 0 && c.start > 0);
 
     // Instantiate layers
     const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
@@ -93,7 +88,7 @@ export const intersection = () => {
       referenceSystem,
     };
 
-    const controller = new Controller({ path, layers, ...opts });
+    const controller = new Controller({ layers, ...opts });
 
     addMDOverlay(controller);
 
@@ -107,7 +102,7 @@ export const intersection = () => {
     };
 
     generateSeismicSliceImage(seismic as any, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
-      seismicLayer.data = { image: seismicImage, options: seismicOptions };
+      seismicLayer.setData({ image: seismicImage, options: seismicOptions });
     });
 
     controller.adjustToSize(width, height);
@@ -127,46 +122,65 @@ export const intersection = () => {
     const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
     const btnSetDataForCompletion = createSetLayerButton(cementLayer, casingLayer, cement, casings, holesizes);
     let show = true;
-    const toggleAxis = createButtonWithCb('Toggle axis labels', () => {
+    const toggleAxis = createButtonWithCb('Axis labels', (btn: any) => {
       if (show) {
         controller.hideAxisLabels();
+        btn.style.backgroundColor = 'red';
+        btn.style.color = 'white';
         show = false;
       } else {
         controller.showAxisLabels();
         show = true;
+        btn.style.backgroundColor = 'lightblue';
+        btn.style.color = '';
       }
-    });
+    }, 'background: lightblue;');
     const btnLarger = createButtonWithCb('800x600', () => {
       const w = 800;
       const h = 600;
       container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
-      container.setAttribute('height', `${h}`);
-      container.setAttribute('width', `${w}`);
+      root.style.width = `${w}px`;
+      btnMiscContainer.style.width = `${w}px`;
+      btnToggleContainer.style.width = `${w}px`;
       controller.adjustToSize(w, h);
     });
     const btnSmaller = createButtonWithCb('600x400', () => {
       const w = 600;
       const h = 400;
       container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
-      container.setAttribute('height', `${h}`);
-      container.setAttribute('width', `${w}`);
+      root.style.width = `${w}px`;
+      btnMiscContainer.style.width = `${w}px`;
+      btnToggleContainer.style.width = `${w}px`;
       controller.adjustToSize(w, h);
     });
-    btnContainer.appendChild(btnGrid);
-    btnContainer.appendChild(btnWellbore);
-    btnContainer.appendChild(btnGeomodel);
-    btnContainer.appendChild(btnHoleSize);
-    btnContainer.appendChild(btnCasing);
-    btnContainer.appendChild(btnCompletion);
-    btnContainer.appendChild(btnCement);
-    btnContainer.appendChild(btnGeomodelLabels);
-    btnContainer.appendChild(btnSeismic);
-    btnContainer.appendChild(btnLarger);
-    btnContainer.appendChild(btnSmaller);
-    btnContainer.appendChild(toggleAxis);
+    const btnDefault = createButtonWithCb('Default', () => {
+      container.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
+      root.style.width = `${width}px`;
+      btnMiscContainer.style.width = `${width}px`;
+      btnToggleContainer.style.width = `${width}px`;
+      controller.adjustToSize(width, height);
+    });
 
+    btnToggleContainer.appendChild(btnGrid);
+    btnToggleContainer.appendChild(btnWellbore);
+    btnToggleContainer.appendChild(btnGeomodel);
+    btnToggleContainer.appendChild(btnGeomodelLabels);
+    btnToggleContainer.appendChild(btnSeismic);
+    btnToggleContainer.appendChild(btnHoleSize);
+    btnToggleContainer.appendChild(btnCasing);
+    btnToggleContainer.appendChild(btnCompletion);
+    btnToggleContainer.appendChild(btnCement);
+    btnToggleContainer.appendChild(toggleAxis);
+    btnMiscContainer.appendChild(btnLarger);
+    btnMiscContainer.appendChild(btnSmaller);
+    btnMiscContainer.appendChild(btnDefault);
+
+    root.appendChild(createHelpText('A complete example of multiple layers comprised of SVG, Canvas, HTML and pixi.js (WebGL). We use a controller to update and display each layer in a container (just a plain div element) on top of each other.'))
     root.appendChild(container);
-    root.appendChild(btnContainer);
+    root.appendChild(createHelpText('Toggle'));
+    root.appendChild(btnToggleContainer);
+    root.appendChild(createHelpText('Adjust size'));
+    root.appendChild(btnMiscContainer);
     root.appendChild(FPSLabel);
   });
 
@@ -203,6 +217,7 @@ function addMDOverlay(instance: any) {
   elm.style.color = 'white';
   elm.style.right = '5px';
   elm.style.bottom = '5px';
+  elm.style.zIndex = '100';
 }
 
 /**
@@ -214,14 +229,18 @@ function addMDOverlay(instance: any) {
  */
 const createButton = (manager: Controller, layer: Layer, title: string) => {
   const btn = document.createElement('button');
-  btn.innerHTML = `Toggle ${title}`;
-  btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
+  btn.innerHTML = `${title}`;
+  btn.setAttribute('style', 'width: 170px;height:32px;margin-top:12px;background: lightblue;');
   let show = false;
   btn.onclick = () => {
     if (show) {
       manager.showLayer(layer.id);
+      btn.style.backgroundColor = 'lightblue';
+      btn.style.color = '';
     } else {
       manager.hideLayer(layer.id);
+      btn.style.backgroundColor = 'red';
+      btn.style.color = 'white';
     }
     show = !show;
   };
@@ -244,10 +263,16 @@ const createSetLayerButton = (cementLayer: any, casingLayer: any, cement: any, c
   return btn;
 };
 
-function createButtonWithCb(label: string, cb: any) {
+/**
+ * helper method
+ * @param label - button label
+ * @param cb - callback function when clicking
+ */
+function createButtonWithCb(label: string, cb: any, initialStyle = '') {
   const btn = document.createElement('button');
   btn.innerHTML = label;
-  btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
-  btn.onclick = cb;
+  btn.setAttribute('style', `${initialStyle}width: 170px;height:32px;margin-top:12px;`);
+  // cb(btn);
+  btn.onclick = () => cb(btn);
   return btn;
 }

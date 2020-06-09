@@ -1,10 +1,10 @@
 import { select } from 'd3-selection';
-import { CanvasLayer } from '../../src/layers';
-import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../../src/interfaces';
-import { GridLayer } from '../../src/layers';
-import { ZoomPanHandler } from '../../src/control';
-import { Axis } from '../../src/components';
-import { createFPSLabel, createRootContainer, createLayerContainer } from './utils';
+import { CanvasLayer } from '../../../src/layers';
+import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../../../src/interfaces';
+import { GridLayer } from '../../../src/layers';
+import { ZoomPanHandler } from '../../../src/control';
+import { Axis } from '../../../src/components';
+import { createFPSLabel, createRootContainer, createLayerContainer } from '../utils';
 
 const width = 600;
 const height = 400;
@@ -149,11 +149,11 @@ class TestLayer extends CanvasLayer {
   }
 }
 
-export default {
-  title: 'Zoom',
-};
+// export default {
+//   title: 'Zoom',
+// };
 
-export const Test = () => {
+export const ZoomWithTestLayer = () => {
   const root = document.createElement('div');
 
   const container = document.createElement('div');
@@ -243,7 +243,7 @@ export const Test = () => {
   return root;
 };
 
-export const Grid = () => {
+export const ZoomWithGridLayer = () => {
   const root = document.createElement('div');
   root.className = 'Test-container';
   root.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
@@ -272,7 +272,7 @@ export const Grid = () => {
   return root;
 };
 
-export const GridWithAxis = () => {
+export const ZoomWithGridAndAxis = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
   const buttons = document.createElement('div');

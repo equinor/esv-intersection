@@ -1,13 +1,13 @@
 import { Selection } from 'd3-selection';
 
-import { WellborepathLayer, HTMLLayer, GridLayer } from '../../../../src/layers';
-import { OnRescaleEvent, OnMountEvent } from '../../../../src/interfaces';
-import { IntersectionReferenceSystem, Controller } from '../../../../src/control';
-import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
+import { WellborepathLayer, HTMLLayer, GridLayer } from '../../../src/layers';
+import { OnRescaleEvent, OnMountEvent } from '../../../src/interfaces';
+import { IntersectionReferenceSystem, Controller } from '../../../src/control';
+import { ZoomPanHandler } from '../../../src/control/ZoomPanHandler';
 
-import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
+import { createRootContainer, createLayerContainer, createFPSLabel } from '../utils';
 
-import { getWellborePath } from '../../data';
+import { getWellborePath } from '../data';
 
 const POINTHEIGHT = 5;
 const POINTWIDTH = 5;

@@ -1,20 +1,14 @@
-import { SeismicCanvasLayer } from '../../../../src/layers';
+import { SeismicCanvasLayer, ZoomPanHandler, OnRescaleEvent } from '../../../src';
+import { generateProjectedTrajectory, getSeismicInfo, generateSeismicSliceImage } from '../../../src/datautils';
+import { getSeismic, getPositionLog } from '../data';
+import { seismicColorMap } from '../exampledata';
 
-import { createRootContainer, createLayerContainer, createFPSLabel } from '../../utils';
-import { generateProjectedTrajectory } from '../../../../src/datautils';
-import { getSeismicInfo, generateSeismicSliceImage } from '../../../../src/datautils/seismicimage';
+import { createRootContainer, createLayerContainer, createFPSLabel } from '../utils';
 
-//Data
-import { ZoomPanHandler } from '../../../../src/control/ZoomPanHandler';
-import { OnRescaleEvent } from '../../../../src/interfaces';
+const width: number = 700;
+const height: number = 600;
 
-import { getSeismic, getPositionLog } from '../../data';
-import { seismicColorMap } from '../../exampledata';
-
-const width = 400;
-const height = 500;
-
-export const Seismic = () => {
+export const SeismicUsingLowLevelInterface = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
