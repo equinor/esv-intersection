@@ -80,7 +80,7 @@ export class IntersectionReferenceSystem {
       curtain: new CurveInterpolator(this.projectedPath, { tension: TENSION, arcDivisions: ARC_DIVISIONS }),
     };
 
-    if (trajectoryAngle) {
+    if (isFinite(trajectoryAngle)) {
       const angleInRad = radians(trajectoryAngle);
       const dirVector = new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
       this.endVector = dirVector;
@@ -213,7 +213,7 @@ export class IntersectionReferenceSystem {
 
     const totalLength = this.displacement + extensionStart + extensionEnd;
     const preSteps = Math.floor((extensionStart / totalLength) * steps);
-    const curveSteps = Math.ceil((this.displacement / totalLength) * steps);
+    const curveSteps = Math.max(Math.ceil((this.displacement / totalLength) * steps), 1);
     const postSteps = steps - curveSteps - preSteps;
 
     const points = [];
