@@ -2,6 +2,10 @@
 
 ## New changes not yet released
 
+## v0.9.5-alpha
+- Added option to remove reference system when clearing data on layers
+- misc: added validation when missing data
+
 ## v0.9.4-alpha
 - bugfix: use only extensionStart as offset
 - bump websocket-extensions version
