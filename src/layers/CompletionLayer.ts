@@ -2,7 +2,6 @@ import { OnMountEvent, OnUpdateEvent, OnRescaleEvent } from '..';
 import { CompletionLayerOptions } from '../interfaces';
 import { PixiLayer } from './base/PixiLayer';
 import { Graphics, Point } from 'pixi.js';
-import { calcDist } from '../utils/vectorUtils';
 
 interface CompletionItem {}
 
@@ -23,7 +22,7 @@ export class CompletionLayer extends PixiLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.render(event);
+    this.render();
   }
 
   onRescale(event: OnRescaleEvent): void {
@@ -32,14 +31,15 @@ export class CompletionLayer extends PixiLayer {
     this.ctx.stage.scale.set(event.xRatio, event.yRatio);
   }
 
-  render(event: OnRescaleEvent | OnUpdateEvent): void {
-    const wellborePath = this.referenceSystem.projectedPath as [number, number][];
+  render(): void {
+    const wellborePath = this.referenceSystem ? (this.referenceSystem.projectedPath as [number, number][]) : [];
 
     if (wellborePath == null) {
       return;
     }
 
-    const items: CompletionItem[] = this.data.map((d: any) => this.generateCompletionItem(wellborePath, d));
+    // TODO: clear old completion items when there is no data to display
+    const items: CompletionItem[] = this.data?.length > 0 ? this.data.map((d: any) => this.generateCompletionItem(wellborePath, d)) : [];
     items.map((s: any) => this.drawCompletionItem(s));
   }
 
@@ -69,6 +69,9 @@ export class CompletionLayer extends PixiLayer {
   }
 
   generateCompletionItem(wbp: any, data: any): CompletionItem {
+    if (!this.referenceSystem) {
+      return;
+    }
     const offset = 1;
     const pointTop = this.referenceSystem.project(data.start);
     const pointBottom = this.referenceSystem.project(data.end);
