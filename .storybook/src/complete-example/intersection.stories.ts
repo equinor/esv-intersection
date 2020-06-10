@@ -38,6 +38,7 @@ export const intersection = () => {
   // helper container elements
   const root = createRootContainer(width);
   const btnToggleContainer = createButtonContainer(width);
+  const btnAdjustSizeContainer = createButtonContainer(width);
   const btnMiscContainer = createButtonContainer(width);
   const container = createLayerContainer(width, height);
 
@@ -140,7 +141,7 @@ export const intersection = () => {
       const h = 600;
       container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
       root.style.width = `${w}px`;
-      btnMiscContainer.style.width = `${w}px`;
+      btnAdjustSizeContainer.style.width = `${w}px`;
       btnToggleContainer.style.width = `${w}px`;
       controller.adjustToSize(w, h);
     });
@@ -149,16 +150,20 @@ export const intersection = () => {
       const h = 400;
       container.setAttribute('style', `height: ${h}px; width: ${w}px;background-color: #eee;`);
       root.style.width = `${w}px`;
-      btnMiscContainer.style.width = `${w}px`;
+      btnAdjustSizeContainer.style.width = `${w}px`;
       btnToggleContainer.style.width = `${w}px`;
       controller.adjustToSize(w, h);
     });
     const btnDefault = createButtonWithCb('Default', () => {
       container.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
       root.style.width = `${width}px`;
-      btnMiscContainer.style.width = `${width}px`;
+      btnAdjustSizeContainer.style.width = `${width}px`;
       btnToggleContainer.style.width = `${width}px`;
       controller.adjustToSize(width, height);
+    });
+
+    const btnClearData = createButtonWithCb('Clear everything', () => {
+      controller.clearAllData();
     });
 
     btnToggleContainer.appendChild(btnGrid);
@@ -171,15 +176,18 @@ export const intersection = () => {
     btnToggleContainer.appendChild(btnCompletion);
     btnToggleContainer.appendChild(btnCement);
     btnToggleContainer.appendChild(toggleAxis);
-    btnMiscContainer.appendChild(btnLarger);
-    btnMiscContainer.appendChild(btnSmaller);
-    btnMiscContainer.appendChild(btnDefault);
+    btnAdjustSizeContainer.appendChild(btnLarger);
+    btnAdjustSizeContainer.appendChild(btnSmaller);
+    btnAdjustSizeContainer.appendChild(btnDefault);
+    btnMiscContainer.appendChild(btnClearData);
 
     root.appendChild(createHelpText('A complete example of multiple layers comprised of SVG, Canvas, HTML and pixi.js (WebGL). We use a controller to update and display each layer in a container (just a plain div element) on top of each other.'))
     root.appendChild(container);
     root.appendChild(createHelpText('Toggle'));
     root.appendChild(btnToggleContainer);
     root.appendChild(createHelpText('Adjust size'));
+    root.appendChild(btnAdjustSizeContainer);
+    root.appendChild(createHelpText('Miscellaneous'));
     root.appendChild(btnMiscContainer);
     root.appendChild(FPSLabel);
   });

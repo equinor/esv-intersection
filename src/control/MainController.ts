@@ -67,9 +67,10 @@ export class Controller {
 
   /**
    * Clears data from all mounted layers
+   * @param includeReferenceSystem - (optional) if true also removes reference system, default is true
    */
-  clearAllData(): Controller {
-    this.layerManager.clearAllData();
+  clearAllData(includeReferenceSystem: boolean = true): Controller {
+    this.layerManager.clearAllData(includeReferenceSystem);
     return this;
   }
 

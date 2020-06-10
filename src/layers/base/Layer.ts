@@ -122,8 +122,15 @@ export abstract class Layer {
     this.onUpdate({ data });
   }
 
-  clearData(): void {
+  /**
+   * Clears data and (optionally) the reference system
+   * @param includeReferenceSystem - (optional) if true also removes reference system, default is true
+   */
+  clearData(includeReferenceSystem: boolean = true): void {
     this._data = null;
+    if (includeReferenceSystem) {
+      this.referenceSystem = null;
+    }
     this.onUpdate({});
   }
 

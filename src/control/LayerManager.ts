@@ -74,9 +74,10 @@ export class LayerManager {
 
   /**
    * Clears data from all mounted layers
+   * @param includeReferenceSystem - (optional) if true also removes reference system, default is true
    */
-  clearAllData(): LayerManager {
-    this.layers.forEach((l) => l.clearData());
+  clearAllData(includeReferenceSystem: boolean = true): LayerManager {
+    this.layers.forEach((l) => l.clearData(includeReferenceSystem));
     return this;
   }
 

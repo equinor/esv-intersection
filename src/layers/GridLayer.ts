@@ -46,6 +46,10 @@ export class GridLayer extends CanvasLayer {
 
     this.clearCanvas();
 
+    if (!(event.xScale || event.yScale)) {
+      return;
+    }
+
     const xScale = event.xScale.copy();
     const yScale = event.yScale.copy();
 
