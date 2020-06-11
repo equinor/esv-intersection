@@ -2,6 +2,10 @@
 
 ## New changes not yet released
 
+## v0.9.6-alpha
+- improve validation on trajectoryAngle in IntersectionReferenceSystem
+- handle cases where a curve is vertical
+
 ## v0.9.5-alpha
 - Added option to remove reference system when clearing data on layers
 - misc: added validation when missing data
