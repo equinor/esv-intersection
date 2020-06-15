@@ -1,9 +1,10 @@
 import { GeomodelLayer, GeomodelCanvasLayer, GeomodelLayerV2, GeomodelLabelsLayer, ZoomPanHandler, GeomodelLayerOptions, LayerOptions, OnRescaleEvent, IntersectionReferenceSystem, Controller } from '../../../src';
-import { generateSurfaceData, SurfaceData } from '../../../src/datautils';
+import { generateSurfaceData, SurfaceData, SurfaceLine, SurfaceArea, convertColor } from '../../../src/datautils';
 import { getSurfaces, getStratColumns, getPositionLog, getWellborePath } from '../data';
 
-
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
+
+import pozoData from '../exampledata/POZO/intersection.json';
 
 const width = 700;
 const height = 600;
@@ -174,6 +175,57 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
   });
 
   root.appendChild(createHelpText('High level interface for creating and displaying geo model (aka surfaces) with labels. The geo model layer is made using webGL and the labels using canvas.'));
+  root.appendChild(container);
+  root.appendChild(fpsLabel);
+
+  return root;
+};
+
+export const GeoModelWithLabelsUsingPozoData = () => {
+  const root = createRootContainer(width);
+  const container = createLayerContainer(width, height);
+  const fpsLabel = createFPSLabel();
+
+  const options: GeomodelLayerOptions = { order: 1 };
+  const geoModelLayer = new GeomodelLayer('geomodels', options);
+  geoModelLayer.onMount({ elm: container, height, width });
+
+  const options2: LayerOptions = { order: 1 };
+  const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
+  geoModelLabelsLayer.onMount({ elm: container });
+
+  const lines: SurfaceLine[] = pozoData.lines.map(p => ({
+    id: p.label,
+    label: p.label,
+    width: 2,
+    color: convertColor(p.color),
+    data: p.data.map(d => ([d.xl, d.yt])),
+  }));
+  const areas: SurfaceArea[] = pozoData.areas.filter(p => p.exclude == false).map(p => ({
+    id: p.label,
+    label: p.label,
+    color: convertColor(p.color),
+    data: p.data.map(d => ([d.xl, d.yt, d.yb])),
+  }));
+
+  const geolayerdata: SurfaceData = {
+    lines,
+    areas
+  };
+
+  geoModelLayer.setData(geolayerdata);
+  geoModelLabelsLayer.setData(geolayerdata);
+
+  const controller = new Controller({ container, layers: [geoModelLayer, geoModelLabelsLayer] });
+
+  controller.setBounds([0, 1000], [0, 1000]);
+  controller.adjustToSize(width, height);
+  controller.zoomPanHandler.zFactor = 1;
+  controller.zoomPanHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+  controller.zoomPanHandler.enableTranslateExtent = false;
+  controller.setViewport(1000, 1000, 5000);
+
+  root.appendChild(createHelpText('High level interface for creating and displaying geo model in dataformat used by POZO.'));
   root.appendChild(container);
   root.appendChild(fpsLabel);
 

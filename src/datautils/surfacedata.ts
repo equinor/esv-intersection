@@ -155,7 +155,7 @@ function mapSurfaceData(surfaces: SurfaceMetaAndValues[]): any {
 /**
  * Convert color string to number
  */
-function convertColor(colorStr: string): number {
+export function convertColor(colorStr: string): number {
   const c: Color = color(colorStr);
   const d: string = c.hex();
   const n: number = parseInt(d.replace('#', '0x'));
