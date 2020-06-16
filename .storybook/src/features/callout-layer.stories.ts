@@ -20,7 +20,7 @@ export const CalloutUsingLowLevelInterface = () => {
     const [poslog, picks, stratcolumn] = values;
 
     const transformedData = transformFormationData(picks, stratcolumn);
-    const rs = new IntersectionReferenceSystem(poslog.map((p) => [p.easting, p.northing, p.tvd]));
+    const rs = new IntersectionReferenceSystem(poslog.map((p: any) => [p.easting, p.northing, p.tvd]));
     const picksData = getPicksData(transformedData);
 
     const wp = new WellborepathLayer('path', { referenceSystem: rs, stroke: 'red', strokeWidth: '1' });
@@ -53,7 +53,7 @@ export const CalloutUsingHighLevelInterface = () => {
     const [poslog, picks, stratcolumn] = values;
 
     const transformedData = transformFormationData(picks, stratcolumn);
-    const rs = new IntersectionReferenceSystem(poslog.map((p) => [p.easting, p.northing, p.tvd]));
+    const rs = new IntersectionReferenceSystem(poslog.map((p: any) => [p.easting, p.northing, p.tvd]));
     const picksData = getPicksData(transformedData);
 
     const wp = new WellborepathLayer('path', { referenceSystem: rs, stroke: 'red', strokeWidth: '1' });

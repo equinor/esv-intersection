@@ -1,4 +1,4 @@
-import { poslog, cementData, holeSizeData, casingData, surfaces, completion, stratColumns, picks } from './esv-intersection-data';
+import { poslog, cementData, holeSizeData, casingData, surfaces, completion, stratColumns, picks, seismic } from './esv-intersection-data';
 
 export const getWellborePath = (): Promise<any> => {
   const coords = poslog.map((c: any) => [c.easting, c.northing, c.tvd]);
@@ -23,16 +23,7 @@ export const getStratColumns = (): Promise<any[]> => {
 };
 
 export const getSeismic = (): Promise<any> => {
-  return Promise.resolve({
-    requestId: '',
-    fileId: '',
-    fieldGuid: 0,
-    fieldIdentifier: '',
-    dateLastChange: '',
-    yAxisLabel: '',
-    yAxisUnits: '',
-    yAxisValues: [],
-  });
+  return Promise.resolve(seismic);
 };
 
 export const getHolesize = (): Promise<any[]> => {
