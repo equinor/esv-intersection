@@ -32,12 +32,6 @@ export const createNormal = (coords: Point[], offset: number): Point[] => {
   const newPoints: Point[] = [];
   const nextToLastPointIndex = 2;
 
-  const old = convertToUnitVector(calcNormal(coords[1], coords[1 + 1]));
-  const normalVec = Vector2.sub(pointToArray(coords[1]), pointToArray(coords[1 + 1])); //.normalized();
-  console.log(normalVec, old);
-
-  return [];
-
   for (let i = 0; i < coords.length - nextToLastPointIndex; i++) {
     const p = pointToVector(coords[i]);
     const n = pointToVector(coords[i+1]).sub(p).rotate90().normalize()
