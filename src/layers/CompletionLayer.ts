@@ -1,8 +1,8 @@
+import Vector2 from '@equinor/videx-vector2';
+import { Graphics, Point } from 'pixi.js';
+import { PixiLayer } from './base/PixiLayer';
 import { OnMountEvent, OnUpdateEvent, OnRescaleEvent } from '..';
 import { CompletionLayerOptions } from '../interfaces';
-import { PixiLayer } from './base/PixiLayer';
-import { Graphics, Point } from 'pixi.js';
-import { calcDist } from '../utils/vectorUtils';
 
 interface CompletionItem {}
 
@@ -64,15 +64,11 @@ export class CompletionLayer extends PixiLayer {
     }
   }
 
-  getAngle(p1: { y: number; x: number }, p2: { y: number; x: number }): number {
-    return Math.atan2(p2.y - p1.y, p2.x - p1.x);
-  }
-
   generateCompletionItem(wbp: any, data: any): CompletionItem {
     const offset = 1;
     const pointTop = this.referenceSystem.project(data.start);
     const pointBottom = this.referenceSystem.project(data.end);
-    const rotation = this.getAngle(new Point(pointTop[0], pointTop[1]), new Point(pointBottom[0], pointBottom[1]));
+    const rotation = Vector2.angle(pointTop, pointBottom);
 
     const graphics: Graphics = this.getShape(data.shape); // cache?
     const { scaleX, scaleY } = this.getScale(data.shape, data.start - data.end, data.diameter);

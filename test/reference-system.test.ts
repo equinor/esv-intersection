@@ -10,7 +10,7 @@ const wp = [
 function dist(a: number[], b: number[]): number {
   const d0 = a[0] - b[0];
   const d1 = a[1] - b[1];
-  return Math.sqrt(d0*d0 + d1*d1);
+  return Math.sqrt(d0 * d0 + d1 * d1);
 }
 
 describe('Reference system', () => {
@@ -70,7 +70,7 @@ describe('Reference system', () => {
     const trajectory = rs.getTrajectory(80);
     const firstDistance = dist(trajectory.points[0], trajectory.points[1]);
     let lastPoint = trajectory.points[1];
-    for(let i = 2; i < trajectory.points.length; i++){
+    for (let i = 2; i < trajectory.points.length; i++) {
       const point = trajectory.points[i];
       const currentDistance = dist(point, lastPoint);
       expect(currentDistance).toBeCloseTo(firstDistance);

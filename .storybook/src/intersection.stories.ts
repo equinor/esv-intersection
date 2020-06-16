@@ -164,6 +164,7 @@ export const intersection = () => {
     btnContainer.appendChild(btnLarger);
     btnContainer.appendChild(btnSmaller);
     btnContainer.appendChild(toggleAxis);
+    btnContainer.appendChild(btnSetDataForCompletion);
 
     root.appendChild(container);
     root.appendChild(btnContainer);
