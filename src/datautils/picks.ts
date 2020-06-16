@@ -1,16 +1,12 @@
-import { IntersectionReferenceSystem } from '../control';
 import { Annotation } from '../interfaces';
 
 function mapPick(
   p: { pickIdentifier: any; identifier: any; md: number; tvd: any; mdUnit: any; depthReferencePoint: any },
   groupName: string,
-  referenceSystem: { project: (arg0: number) => any },
-  offset: number,
 ): Annotation {
   const itm = {
     title: p.pickIdentifier || p.identifier,
     group: groupName,
-    pos: referenceSystem.project(p.md - offset),
     label: `${p.md} ${p.mdUnit} ${p.depthReferencePoint}`,
     color: groupName === 'strat-picks' ? '#227' : 'rgba(0,0,0,0.8)',
     md: p.md,
@@ -18,25 +14,25 @@ function mapPick(
   return itm;
 }
 
-function getReferencePicks(picks: any[], referenceSystem: IntersectionReferenceSystem, offset: number): any[] {
+function getReferencePicks(picks: any[]): any[] {
   if (!picks) {
     return [];
   }
 
-  return picks.map((p: any) => mapPick(p, 'ref-picks', referenceSystem, offset));
+  return picks.map((p: any) => mapPick(p, 'ref-picks'));
 }
 
-function getEntryPicks(formationPicks: any[], referenceSystem: IntersectionReferenceSystem, offset: number): any[] {
+function getEntryPicks(formationPicks: any[]): any[] {
   if (!formationPicks) {
     return [];
   }
 
   return formationPicks
     .filter((d: { entryPick: { md: any }; from: any }) => d.entryPick.md === d.from)
-    .map((p: { entryPick: any }) => mapPick(p.entryPick, 'strat-picks', referenceSystem, offset));
+    .map((p: { entryPick: any }) => mapPick(p.entryPick, 'strat-picks'));
 }
 
-function getFilteredExitPicks(formationPicks: any[], referenceSystem: IntersectionReferenceSystem, offset: number): any[] {
+function getFilteredExitPicks(formationPicks: any[]): any[] {
   if (!formationPicks) {
     return [];
   }
@@ -47,7 +43,7 @@ function getFilteredExitPicks(formationPicks: any[], referenceSystem: Intersecti
         (d: { exitPick: { md: number } }) =>
           formationPicks.findIndex((p: { entryPick: { md: number } }) => Math.abs(p.entryPick.md - d.exitPick.md) < 0.5) === -1,
       )
-      .map((p: { exitPick: any }) => mapPick(p.exitPick, 'strat-picks', referenceSystem, offset))
+      .map((p: { exitPick: any }) => mapPick(p.exitPick, 'strat-picks'))
       // Remove duplicates from unitpicks filling in gaps in formation
       .filter(
         (obj: Annotation, i: any, array: any[]) => i === array.findIndex((v: { title: any; md: any }) => v.title === obj.title && v.md === obj.md),
@@ -55,22 +51,10 @@ function getFilteredExitPicks(formationPicks: any[], referenceSystem: Intersecti
   );
 }
 
-export function getPicksData(picksData: any, referenceSystem: IntersectionReferenceSystem, offset: number): any[] {
-  // const field = await getWellboreMasterField(wellboreId, type);
-  // const stratColumnId = await getStratColumnId(modelId, field.guid);
-  // const [picksData, referenceSystem, wellbore] = await Promise.all([
-  //   store.resolve(keys.FormationData, wellboreId, stratColumnId),
-  //   getIntersectionReferenceSystem(wellboreId, type),
-  //   store.resolve(keys.WellboreHeader, wellboreId),
-  // ]);
+export function getPicksData(picksData: any): any[] {
   const { unitPicks, nonUnitPicks } = picksData;
-  // const offset = wellbore.depthRef;
 
-  const picks = [
-    ...getReferencePicks(nonUnitPicks, referenceSystem, offset),
-    ...getEntryPicks(unitPicks, referenceSystem, offset),
-    ...getFilteredExitPicks(unitPicks, referenceSystem, offset),
-  ];
+  const picks = [...getReferencePicks(nonUnitPicks), ...getEntryPicks(unitPicks), ...getFilteredExitPicks(unitPicks)];
 
   picks.sort((a, b) => a.md - b.md);
 
@@ -314,73 +298,4 @@ export function transformFormationData(picks: any, stratColumn: any) {
     );
   }
   return { unitPicks, nonUnitPicks };
-}
-
-/**
- * Transform biostrat track data
- * @param {object[]} picks picks
- * @param {object[]} stratColumn strat column
- * @returns {{ epoch: object[], age: object[] }}
- */
-export function transformBiostratData(picks: any, stratColumn: any) {
-  const epochLevel = 4;
-  const { joined } = joinPicksAndStratColumn(picks, stratColumn);
-  const pairs = pairJoinedPicks(joined);
-  const itemstack = pairs
-    .filter((d) => d.mdEntry <= d.mdExit)
-    .sort((a, b) => a.mdEntry - b.mdEntry || a.level - b.level)
-    .reverse();
-
-  // Remove picks that are stacking.
-  const vettedPicks: any[] = [];
-  Object.values(itemstack).forEach((d) => {
-    let usePick = true;
-    if (d.level > epochLevel) {
-      const testStack = itemstack.filter((f) => f.level > d.level && f.mdEntry >= d.mdEntry && f.mdExit <= d.mdExit);
-      usePick = testStack.length === 0;
-    }
-    if (usePick) {
-      vettedPicks.push(d);
-    }
-  });
-
-  // Add depth position and chekc if the pick has a depth.
-  const unitPicks = [];
-  unitPicks.push(
-    ...vettedPicks.map((d) => ({
-      from: d.mdEntry,
-      to: d.mdExit,
-      hasDepth: d.mdEntry - d.mdExit !== 0,
-      ...d,
-    })),
-  );
-
-  if (unitPicks.length === 0) {
-    return null;
-  }
-
-  return {
-    epoch: unitPicks.filter((d) => d.level <= epochLevel),
-    age: unitPicks.filter((d) => d.level > epochLevel),
-  };
-}
-
-/**
- * @param {[]} units
- * @param {string} unitname
- * @param {[]} path
- */
-export function findStratcolumnUnit(units: any, unitname: string, path: any[] = []) {
-  const unit = units.find((u: any) => u.identifier.toLowerCase() === unitname.toLowerCase());
-  if (unit) {
-    // Build path
-    let temp = unit;
-    do {
-      path.unshift(temp);
-      temp = units.find((u: any) => u.identifier === temp.stratUnitParent);
-    } while (temp);
-
-    return unit;
-  }
-  return null;
 }

@@ -60,11 +60,11 @@ export const intersection = () => {
     };
 
     const transformedPicksData = transformFormationData(picks, stratColumns);
-    const picksData = getPicksData(transformedPicksData, referenceSystem, path[0][2]);
+    const picksData = getPicksData(transformedPicksData);
 
     // Instantiate layers
     const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
-    const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8 });
+    const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.6 });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
     const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holesizes, referenceSystem });
     const casingLayer = new CasingLayer('casing', { order: 5, data: casings, referenceSystem });

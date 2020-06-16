@@ -21,10 +21,10 @@ export const CalloutUsingLowLevelInterface = () => {
 
     const transformedData = transformFormationData(picks, stratcolumn);
     const rs = new IntersectionReferenceSystem(poslog.map((p) => [p.easting, p.northing, p.tvd]));
-    const picksData = getPicksData(transformedData, rs, 0);
+    const picksData = getPicksData(transformedData);
 
     const wp = new WellborepathLayer('path', { referenceSystem: rs, stroke: 'red', strokeWidth: '1' });
-    const layer = new CalloutCanvasLayer('callout', { order: 1 });
+    const layer = new CalloutCanvasLayer('callout', { order: 1, referenceSystem: rs });
     layer.onMount({ elm: container });
     wp.onMount({ elm: container });
     layer.onUpdate({ data: picksData });
@@ -54,10 +54,10 @@ export const CalloutUsingHighLevelInterface = () => {
 
     const transformedData = transformFormationData(picks, stratcolumn);
     const rs = new IntersectionReferenceSystem(poslog.map((p) => [p.easting, p.northing, p.tvd]));
-    const picksData = getPicksData(transformedData, rs, 0);
+    const picksData = getPicksData(transformedData);
 
     const wp = new WellborepathLayer('path', { referenceSystem: rs, stroke: 'red', strokeWidth: '1' });
-    const layer = new CalloutCanvasLayer('callout', { order: 1, data: picksData });
+    const layer = new CalloutCanvasLayer('callout', { order: 1, data: picksData, referenceSystem: rs });
 
     const controller = new Controller({ container, referenceSystem: rs });
     controller.addLayer(wp);
