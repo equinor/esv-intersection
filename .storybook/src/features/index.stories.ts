@@ -1,5 +1,6 @@
 export * from './axis.stories';
 export * from './zoom.stories';
+export * from './callout-layer.stories';
 export * from './grid-layer.stories';
 export * from './seismic.stories';
 export * from './highlight.stories';

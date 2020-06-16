@@ -47,5 +47,9 @@ export const getCement = (): Promise<any[]> => {
   return Promise.resolve(cementData);
 };
 
+export const getPicks = (): Promise<any[]> => {
+  return Promise.resolve(picks);
+}
+
 // Nothing for mock
 export const fetchData = async (fileName: string) => {};

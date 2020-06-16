@@ -10,16 +10,17 @@ import {
   CasingLayer,
   CompletionLayer,
   CementLayer,
+  CalloutCanvasLayer,
 } from '../../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
 
-import { generateSurfaceData, SurfaceData, getSeismicInfo, generateSeismicSliceImage, transformFormationData } from '../../../src/datautils';
+import { generateSurfaceData, SurfaceData, getSeismicInfo, generateSeismicSliceImage, transformFormationData, getPicksData } from '../../../src/datautils';
 
 //Data
 import { seismicColorMap } from '../exampledata';
 
-import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement } from '../data';
+import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks } from '../data';
 
 const xBounds: [number, number] = [0, 1000];
 const yBounds: [number, number] = [0, 1000];
@@ -42,9 +43,9 @@ export const intersection = () => {
   const btnMiscContainer = createButtonContainer(width);
   const container = createLayerContainer(width, height);
 
-  const promises = [getWellborePath(), getCompletion(), getSeismic(), getSurfaces(), getStratColumns(), getCasings(), getHolesize(), getCement()];
+  const promises = [getWellborePath(), getCompletion(), getSeismic(), getSurfaces(), getStratColumns(), getCasings(), getHolesize(), getCement(), getPicks()];
   Promise.all(promises).then((values) => {
-    const [path, completion, seismic, surfaces, stratColumns, casings, holesizes, cement] = values;
+    const [path, completion, seismic, surfaces, stratColumns, casings, holesizes, cement, picks] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
     const displacement = referenceSystem.displacement || 1;
     const extend = 1000 / displacement;
@@ -59,9 +60,12 @@ export const intersection = () => {
       height: 0,
     };
 
+    const transformedPicksData = transformFormationData(picks, stratColumns);
+    const picksData = getPicksData(transformedPicksData);
+
     // Instantiate layers
     const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
-    const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.8 });
+    const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.6 });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
     const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holesizes, referenceSystem });
     const casingLayer = new CasingLayer('casing', { order: 5, data: casings, referenceSystem });
@@ -69,6 +73,7 @@ export const intersection = () => {
     const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
     const completionLayer = new CompletionLayer('completion', { order: 4, data: completion, referenceSystem });
     const cementLayer = new CementLayer('cement', { order: 99, data: { cement, casings, holes: holesizes }, referenceSystem });
+    const calloutLayer = new CalloutCanvasLayer('callout', { order: 100, data: picksData, referenceSystem });
 
     const layers = [
       gridLayer,
@@ -80,6 +85,7 @@ export const intersection = () => {
       holeSizeLayer,
       casingLayer,
       cementLayer,
+      calloutLayer,
     ];
 
     const opts = {
@@ -121,9 +127,10 @@ export const intersection = () => {
     const btnCement = createButton(controller, cementLayer, 'Cement');
     const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
     const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
+    const btnPicks = createButton(controller, calloutLayer, 'Picks');
     const btnSetDataForCompletion = createSetLayerButton(cementLayer, casingLayer, cement, casings, holesizes);
     let show = true;
-    const toggleAxis = createButtonWithCb('Axis labels', (btn: any) => {
+    const toggleAxis = createButtonWithCb('Axis labels', (btn: HTMLElement) => {
       if (show) {
         controller.hideAxisLabels();
         btn.style.backgroundColor = 'red';
@@ -175,6 +182,7 @@ export const intersection = () => {
     btnToggleContainer.appendChild(btnCasing);
     btnToggleContainer.appendChild(btnCompletion);
     btnToggleContainer.appendChild(btnCement);
+    btnToggleContainer.appendChild(btnPicks);
     btnToggleContainer.appendChild(toggleAxis);
     btnAdjustSizeContainer.appendChild(btnLarger);
     btnAdjustSizeContainer.appendChild(btnSmaller);
