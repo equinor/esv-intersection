@@ -3,4 +3,3 @@ dist
 .storybook/src/exampledata/**
 storybook-static
 report*
-.storybook/src/api/index.ts
