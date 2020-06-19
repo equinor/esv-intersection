@@ -62,33 +62,19 @@ export const findCasing = (id: string, casings: any) => {
   return res.length > 0 ? res[0] : {};
 };
 
-export const isBetween = (top: number, bottom: number, itemBottom: number, itemTop: number) => {
-  // item is inside
-  if (itemTop < top && itemBottom > bottom) {
-    return true;
-  }
+const inRange = (number: number, min: number, max: number): boolean => number >= min && number <= max;
 
-  // Top half and over
-  if (itemTop > top && itemBottom < top) {
-    return true;
-  }
-
-  // bottom half and below
-  if (itemTop > bottom && itemBottom < bottom) {
-    return true;
-  }
-
-  return false;
-};
+export const overlaps = (top: number, bottom: number, itemBottom: number, itemTop: number): boolean =>
+  inRange(itemTop, top, bottom) || inRange(itemBottom, top, bottom);
 
 export const findIntersectingItems = (cement: Cement, parentCasing: Casing, casings: Casing[], holes: HoleSize[]) => {
   const { toc: start } = cement;
 
   const res = [];
-  res.push(...holes.filter((h: HoleSize) => isBetween(start, parentCasing.end, h.start, h.end) && h.diameter > parentCasing.diameter));
+  res.push(...holes.filter((h: HoleSize) => overlaps(start, parentCasing.end, h.start, h.end) && h.diameter > parentCasing.diameter));
   res.push(
     ...casings.filter(
-      (c: Casing) => c.casingId !== cement.casingId && isBetween(start, parentCasing.end, c.start, c.end) && c.diameter > parentCasing.diameter,
+      (c: Casing) => c.casingId !== cement.casingId && overlaps(start, parentCasing.end, c.start, c.end) && c.diameter > parentCasing.diameter,
     ),
   );
   return res;
