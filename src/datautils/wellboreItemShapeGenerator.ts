@@ -62,10 +62,7 @@ export const findCasing = (id: string, casings: any) => {
   return res.length > 0 ? res[0] : {};
 };
 
-const inRange = (number: number, min: number, max: number): boolean => number >= min && number <= max;
-
-export const overlaps = (top: number, bottom: number, itemBottom: number, itemTop: number): boolean =>
-  inRange(itemTop, top, bottom) || inRange(itemBottom, top, bottom);
+export const overlaps = (top1: number, bottom1: number, top2: number, bottom2: number): boolean => top1 <= bottom2 && top2 <= bottom1;
 
 export const findIntersectingItems = (cement: Cement, parentCasing: Casing, casings: Casing[], holes: HoleSize[]) => {
   const { toc: start } = cement;
