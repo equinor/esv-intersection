@@ -50,39 +50,43 @@ For more examples, check out our stories in our online [storybook](https://equin
 - **Miscellaneous**:
   - Architecture: A container component that holds several layers, specialized for the type of data and visualization they address (analogous to the VidEx-map component https://github.com/equinor/videx-map)
   - Browser support: Target Edge, Chrome, Firefox, Safari
-  - Styling: To be defined. Possibly SCSS or Emotion
-  - Testing:
-    - linting and unit tests, with test coverage - run automatically on Github Actions
-    - possibly snapshot tests at a later stage
-    - later on simulation tests, depending on resources and requirements
-  - Dependencies:
-    - _d3_
-    - each layer can include additional dependencies
-  - Accessibility: investigate compliance with WCAG2.1 (poossibly automatically)
-  - Publishing:
-    - automated
-    - both tagged releases (semantic versioning) and nightly
-
+  - Linting and unit tests run automatically on Github Actions
+  
 
 ## Development methodology
-- The _Product Owners_ of the Intersection component are @farzadfz and @thuve
-- Development is driven by _user stories_, created and prioritized by developers and POs together
-- User stories can be grouped into _milestones_. A milestone represents what is expected to be achieved in about 2 months of development
-- The development team has _planning meetings_ with the POs once a week
-- The development team has _daily standups_, POs participation is optional but very much encouraged
+- The project is maintained by the [VidEx team](https://github.com/orgs/equinor/teams/viz) (Software Innovation Stavanger) and the [Heap Purple team](https://github.com/orgs/equinor/teams/heap-purple) (Software Innovation Bergen)
+- TODO: Development is driven by _user stories_, created and prioritized by developers and POs together
+- TODO: The development team has _planning meetings_ with the POs once a week
 - Development relies on a _project board_ hosted on github (https://github.com/equinor/intersection/projects/1)
 - During planning meetings, the `To do` column of the board is populated with user stories and tasks
-- What is placed in the `To do` column is expected to be completed in 1 week of normal work
-- At the developers discretion, a _technical planning meeting_ can be held after the planning
-- During a _technical planning meeting_, current user stories and tasks can be discussed and potentially split into smaller tasks
-- A _demo_ for the stakeholders will be held approximately every 4 weeks
-  - Stakeholders for the _WellX_ and _REP_ projects (including the _REP reference user group_) should be invited to the demo
+
+
+## Support
+If you are an equinor employee, the easiest way to get in touch with the maintainers is through the #esv-intersection channel on Slack.
+
+Otherwise, Github issues are the main communication channel with the maintainers. If you have a bug to report, a feature request, or need some help using the component, simply [create an issue in the repository](https://github.com/equinor/esv-intersection/issues) and one of the maintainers will pick it up. Before creating an issue, please have a look at the following guidelines. Also keep in mind that creating [Pull Requests](CONTRIBUTION.md) is very much welcome. 
+
+### Help needed
+Describe your use case in details, make sure to include the version of the component you are using, and relevant software that are part of your pipeline (eg, Chrome/Firefox/Safari, Node, npm, …), including their version as well
+
+### Bug reports
+Follow the instructions from the _Help needed_ section above, but also include precise instructions about how to reproduce the bug. If any data is required for reproducing the bug, we need to have access to it as well.
+
+### Feature requests
+Give a precise description of your use case. It would be best if you could formulate your request as a user story, using the format `As a <subject> I would like to <the feature you need> so that <the task you want to accomplish>`
 
 ## Contribution
 
 See the contribution [page](CONTRIBUTION.md)
 
+## License
+The large majority of the files in this repository are released under the [MIT license](LICENSE). There are 2 exceptions:
+- the [CONTRIBUTION.md](CONTRIBUTION.md) file, which uses _BSD 2-Clause "Simplified" License_, as described at the end of the file itself
+- the content of the [esv-intersection-data](https://github.com/equinor/esv-intersection-data) submodule uses the same license as Equinor's [Volve dataset](https://data.equinor.com/dataset/Volve), which is also available in the submodule
+
 ### Storybook
+
+TODO: this should be probably moved to CONTRIBUTION.md
 
 ```bash
 npm run storybook
