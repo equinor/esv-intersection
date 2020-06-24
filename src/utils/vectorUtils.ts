@@ -1,37 +1,30 @@
 import { Point } from 'pixi.js';
+import Vector2 from '@equinor/videx-vector2';
 
-export const calcDist = (prev: number[], point: number[]): number => {
-  const a = prev[0] - point[0];
-  const b = prev[1] - point[1];
+export const pointToVector = (p: Point): Vector2 => new Vector2(p.x, p.y);
+export const pointToArray = (p: Point): [number, number] => [p.x, p.y];
+export const vectorToPoint = (v: Vector2): Point => new Point(v[0], v[1]);
+export const vectorToArray = (v: Vector2): [number, number] => [v[0], v[1]];
+export const arrayToPoint = (a: [number, number]): Point => new Point(a[0], a[1]);
+export const arrayToVector = (a: [number, number]): Vector2 => new Vector2(a[0], a[1]);
 
-  return Math.sqrt(a * a + b * b);
+export const calcDist = (prev: [number, number], point: [number, number]): number => {
+  return arrayToVector(point).sub(prev).magnitude;
 };
 
 export const calcDistPoint = (prev: Point, point: Point): number => {
-  return calcDist([prev.x, prev.y], [point.x, point.y]);
+  return pointToVector(point).sub(prev.x, prev.y).magnitude;
 };
 
 export const calcNormal = (p1: Point, p2: Point): Point => {
-  // if (p1 == null || p2 == null) {
-  //   throw `Calculate normal null point: P1: ${p1} P2: ${p2}`;
-  // }
-
-  let dx = p2.x - p1.x;
-  let dy = p2.y - p1.y;
-  dx = dy === 0 ? 1 : dx;
-  dy = dx === 0 ? 1 : dy;
-  return new Point(-dy, dx);
+  const d = pointToVector(p2).sub(p1.x, p1.y);
+  d.x = d.y === 0 ? 1 : d.x;
+  d.y = d.x === 0 ? 1 : d.y;
+  return vectorToPoint(d.rotate90()); //TODO: normalize
 };
 
-export const pointToArray = (p: Point): [number, number] => [p.x, p.y];
-
-export const arrayToPoint = (p: [number, number]): Point => new Point(p[0], p[1]);
-
-export const convertToUnitVector = (vector: Point): Point => {
-  const dist = calcDistPoint(new Point(0, 0), vector);
-  const div = 1 / dist;
-  const unitVector = new Point(div * vector.x, div * vector.y);
-  return unitVector;
+export const convertToUnitVector = (p: Point): Point => {
+  return vectorToPoint(pointToVector(p).normalize());
 };
 
 export const createNormal = (coords: Point[], offset: number): Point[] => {
@@ -39,19 +32,18 @@ export const createNormal = (coords: Point[], offset: number): Point[] => {
   const nextToLastPointIndex = 2;
 
   for (let i = 0; i < coords.length - nextToLastPointIndex; i++) {
-    const normalVec = convertToUnitVector(calcNormal(coords[i], coords[i + 1]));
-
-    const newPoint = coords[i].clone();
-    newPoint.x += normalVec.x * offset;
-    newPoint.y += normalVec.y * offset;
-    newPoints.push(newPoint);
+    const p = pointToVector(coords[i]);
+    const n = pointToVector(coords[i + 1])
+      .sub(p)
+      .rotate90()
+      .normalize();
+    newPoints.push(vectorToPoint(p.add(n.scale(offset))));
   }
   if (coords.length > nextToLastPointIndex) {
-    const lastPoint = convertToUnitVector(calcNormal(coords[coords.length - nextToLastPointIndex - 1], coords[coords.length - nextToLastPointIndex]));
-    const newPoint = coords[coords.length - nextToLastPointIndex].clone();
-    newPoint.x += lastPoint.x * offset;
-    newPoint.y += lastPoint.y * offset;
-    newPoints.push(newPoint);
+    const p = pointToVector(coords[coords.length - nextToLastPointIndex]);
+    const q = pointToVector(coords[coords.length - nextToLastPointIndex - 1]);
+    const n = p.sub(q).rotate90().normalize();
+    newPoints.push(vectorToPoint(p.add(n.scale(offset))));
   }
   return newPoints;
 };

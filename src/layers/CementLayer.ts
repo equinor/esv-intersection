@@ -1,7 +1,7 @@
-import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CementLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, MDPoint } from '..';
-import { findCasing, findIntersectingItems } from '../datautils/wellboreItemShapeGenerator';
 import { Point, Texture } from 'pixi.js';
+import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
+import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, MDPoint } from '..';
+import { findCasing, findIntersectingItems } from '../datautils/wellboreItemShapeGenerator';
 import { createNormal } from '../utils/vectorUtils';
 
 export class CementLayer extends WellboreBaseComponentLayer {
