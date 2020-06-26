@@ -2,6 +2,11 @@
 
 ## New changes not yet released
 
+## v1.0.0
+- bring package out of alpha
+- bugfix: corrected overlapping logic for WellboreItemShapeGenerator
+- minor refactoring
+
 ## v0.9.6-alpha
 - improve validation on trajectoryAngle in IntersectionReferenceSystem
 - handle cases where a curve is vertical
