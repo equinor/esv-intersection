@@ -165,8 +165,8 @@ export interface WellItemGraphics {
 
 export interface NormalCoordsObject {
   wellBorePathCoords: Point[];
-  normalOffsetCoordsDown: Point[];
-  normalOffsetCoordsUp: Point[];
+  offsetCoordsRight: Point[];
+  offsetCoordsLeft: Point[];
 }
 
 export interface ScaleOptions {

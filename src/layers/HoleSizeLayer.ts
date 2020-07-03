@@ -1,7 +1,7 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleObjectData, HoleSize } from '..';
-import { Texture, Point } from 'pixi.js';
-import { createNormalCoords, generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';
+import { Texture } from 'pixi.js';
+import { createOffsetCoords, generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';
 
 export class HoleSizeLayer extends WellboreBaseComponentLayer {
   options: HoleSizeLayerOptions;
@@ -57,13 +57,13 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
     }
 
     const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
-    const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = createNormalCoords(holeObject);
+    const { wellBorePathCoords, offsetCoordsLeft, offsetCoordsRight } = createOffsetCoords(holeObject);
 
     if (wellBorePathCoords.length === 0) {
       return;
     }
 
-    const { top, bottom, left, right } = generateHoleCoords(normalOffsetCoordsUp, normalOffsetCoordsDown);
+    const { top, bottom, left, right } = generateHoleCoords(offsetCoordsRight, offsetCoordsLeft);
     const polygonCoords = [...left, ...right];
     const mask = this.drawBigPolygon(polygonCoords);
     const casingWallWidth = 1;

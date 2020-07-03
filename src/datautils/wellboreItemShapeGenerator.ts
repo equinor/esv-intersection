@@ -1,35 +1,27 @@
 import { Point } from 'pixi.js';
-import { HoleObjectData, NormalCoordsObject, MDPoint, Cement, Casing, HoleSize, CompiledCement } from '..';
-import { createNormals, pointToArray, arrayToPoint, offsetPoints } from '../utils/vectorUtils';
-import { CurveInterpolator } from 'curve-interpolator';
+import { HoleObjectData, NormalCoordsObject, Cement, Casing, HoleSize, CompiledCement } from '..';
+import { createNormals, offsetPoints } from '../utils/vectorUtils';
 
-export const generateHoleCoords = (normalOffsetCoordsUp: any, normalOffsetCoordsDown: any): any => {
+export const generateHoleCoords = (offsetCoordsRight: any, offsetCoordsLeft: any): any => {
   return {
-    left: normalOffsetCoordsUp,
-    right: normalOffsetCoordsDown.map((d: Point) => d.clone()).reverse(),
-    top: [normalOffsetCoordsUp[0], normalOffsetCoordsDown[0]],
-    bottom: [normalOffsetCoordsUp[normalOffsetCoordsUp.length - 1], normalOffsetCoordsDown[normalOffsetCoordsDown.length - 1]],
+    left: offsetCoordsRight,
+    right: offsetCoordsLeft.map((d: Point) => d.clone()).reverse(),
+    top: [offsetCoordsRight[0], offsetCoordsLeft[0]],
+    bottom: [offsetCoordsRight[offsetCoordsRight.length - 1], offsetCoordsLeft[offsetCoordsLeft.length - 1]],
   };
 };
 
-export const createNormalCoords = (s: HoleObjectData): NormalCoordsObject => {
+export const createOffsetCoords = (s: HoleObjectData): NormalCoordsObject => {
   const wellBorePathCoords = s.points.map((p) => p.point);
   const normals = createNormals(wellBorePathCoords);
-  const normalOffsetCoordsUpOrig = offsetPoints(wellBorePathCoords, normals, s.data.diameter);
-  const normalOffsetCoordsDownOrig = offsetPoints(wellBorePathCoords, normals, -s.data.diameter);
+  const offsetCoordsRight = offsetPoints(wellBorePathCoords, normals, s.data.diameter);
+  const offsetCoordsLeft = offsetPoints(wellBorePathCoords, normals, -s.data.diameter);
 
-  if (normalOffsetCoordsUpOrig.length <= 2) {
-    return { wellBorePathCoords, normalOffsetCoordsDown: wellBorePathCoords, normalOffsetCoordsUp: wellBorePathCoords };
+  if (offsetCoordsLeft.length <= 2) {
+    return { wellBorePathCoords, offsetCoordsRight: wellBorePathCoords, offsetCoordsLeft: wellBorePathCoords };
   }
 
-  const tension = 0.2;
-  const numPoints = 999;
-  const normalOffsetCoordsUpInterpolator = new CurveInterpolator(normalOffsetCoordsUpOrig.map(pointToArray), tension);
-  const normalOffsetCoordsDownInterpolator = new CurveInterpolator(normalOffsetCoordsDownOrig.map(pointToArray), tension);
-  const normalOffsetCoordsUp = normalOffsetCoordsUpInterpolator.getPoints(numPoints).map(arrayToPoint);
-  const normalOffsetCoordsDown = normalOffsetCoordsDownInterpolator.getPoints(numPoints).map(arrayToPoint);
-
-  return { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp };
+  return { wellBorePathCoords, offsetCoordsRight, offsetCoordsLeft };
 };
 
 export const findCasing = (id: string, casings: any) => {
