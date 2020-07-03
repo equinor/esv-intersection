@@ -1,3 +1,4 @@
+import { merge } from 'd3-array';
 import { Point, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, MDPoint } from '..';
@@ -111,7 +112,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
       return offset;
     };
 
-    const createSimplePolygonPath = (c: CompiledCement): Point[] => {
+    const createSimplePolygonPath = (c: CompiledCement): Point[][] => {
       const middle = createMiddlePath(c);
       const points: { left: Point[]; right: Point[] } = { left: [], right: [] };
 
@@ -144,7 +145,10 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
       const sideLeftMiddleR = sideLeftMiddle.map((s) => s.clone()).reverse();
       const rightR = points.right.map((s) => s.clone()).reverse();
-      const cementRectCoords = [...sideLeftMiddleR, ...points.left, ...rightR, ...sideRightMiddle];
+      const cementRectCoords = [
+        [...sideLeftMiddleR, ...points.left],
+        [...rightR, ...sideRightMiddle],
+      ];
 
       // const line = [sideLeftMiddleR[0], sideLeftMiddleR[sideLeftMiddleR.length - 1]];
       // this.drawLine(line, 0xff0000);
@@ -153,7 +157,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
     };
 
     const texture: Texture = this.createTexture();
-    const paths = cementCompiled.map(createSimplePolygonPath);
+    const paths: Point[][] = merge(cementCompiled.map(createSimplePolygonPath));
 
     // const bigSquareBackgroundTest = new Graphics();
     // bigSquareBackgroundTest.beginTextureFill({ texture });
