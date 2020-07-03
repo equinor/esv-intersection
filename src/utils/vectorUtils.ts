@@ -27,23 +27,36 @@ export const convertToUnitVector = (p: Point): Point => {
   return vectorToPoint(pointToVector(p).normalize());
 };
 
-export const createNormal = (coords: Point[], offset: number): Point[] => {
-  const newPoints: Point[] = [];
-  const nextToLastPointIndex = 2;
+export const createNormals = (points: Point[]): Vector2[] => {
+  if (points.length < 2) {
+    return [new Vector2(0)];
+  }
 
-  for (let i = 0; i < coords.length - nextToLastPointIndex; i++) {
-    const p = pointToVector(coords[i]);
-    const n = pointToVector(coords[i + 1])
-      .sub(p)
-      .rotate90()
-      .normalize();
-    newPoints.push(vectorToPoint(p.add(n.scale(offset))));
+  let n: Vector2;
+
+  return points.map((coord, i, list) => {
+    if (i < list.length - 1) {
+      const p = pointToVector(list[i]);
+      const q = pointToVector(list[i + 1]);
+      const np = q.sub(p);
+      const rotate = np.rotate90();
+      n = rotate.normalized();
+      return n;
+    }
+
+    // reuse previous normal for last coord
+    return n;
+  });
+};
+
+export const offsetPoints = (points: Point[], vectors: Vector2[], offset: number): Point[] => {
+  if (points.length !== vectors.length) {
+    throw new Error('Number of vectors does not match number of points');
   }
-  if (coords.length > nextToLastPointIndex) {
-    const p = pointToVector(coords[coords.length - nextToLastPointIndex]);
-    const q = pointToVector(coords[coords.length - nextToLastPointIndex - 1]);
-    const n = p.sub(q).rotate90().normalize();
-    newPoints.push(vectorToPoint(p.add(n.scale(offset))));
-  }
-  return newPoints;
+
+  return points.map((point, index) => {
+    const p = pointToVector(point);
+    const n = vectors[index];
+    return vectorToPoint(p.add(n.scale(offset)));
+  });
 };

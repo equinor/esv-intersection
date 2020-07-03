@@ -2,7 +2,7 @@ import { Point, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, MDPoint } from '..';
 import { findCasing, findIntersectingItems } from '../datautils/wellboreItemShapeGenerator';
-import { createNormal } from '../utils/vectorUtils';
+import { createNormals, offsetPoints } from '../utils/vectorUtils';
 
 export class CementLayer extends WellboreBaseComponentLayer {
   options: CementLayerOptions;
@@ -124,18 +124,23 @@ export class CementLayer extends WellboreBaseComponentLayer {
         // Subtract casing thickness / holesize edge
         const stop = md;
         const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
+        const partPointNormals = createNormals(partPoints);
+
         const offset = getOffset(offsetItem);
-        const sideLeft = createNormal(partPoints, -offset).filter((p) => !isNaN(p.x) && !isNaN(p.y));
-        const sideRight = createNormal(partPoints, offset).filter((p) => !isNaN(p.x) && !isNaN(p.y));
+
+        const sideLeft = offsetPoints(partPoints, partPointNormals, -offset);
+        const sideRight = offsetPoints(partPoints, partPointNormals, offset);
         points.left.push(...sideLeft);
         points.right.push(...sideRight);
       }
 
-      const centerPieceDim = findCasing(c.casingId, this.data.casings).diameter;
       const wholeMiddlePoints = middle.map((s) => s.point);
+      const wholeMiddlePointNormals = createNormals(wholeMiddlePoints);
 
-      const sideLeftMiddle = createNormal(wholeMiddlePoints, -centerPieceDim);
-      const sideRightMiddle = createNormal(wholeMiddlePoints, +centerPieceDim);
+      const centerPieceDim = findCasing(c.casingId, this.data.casings).diameter;
+
+      const sideLeftMiddle = offsetPoints(wholeMiddlePoints, wholeMiddlePointNormals, -centerPieceDim);
+      const sideRightMiddle = offsetPoints(wholeMiddlePoints, wholeMiddlePointNormals, +centerPieceDim);
 
       const sideLeftMiddleR = sideLeftMiddle.map((s) => s.clone()).reverse();
       const rightR = points.right.map((s) => s.clone()).reverse();

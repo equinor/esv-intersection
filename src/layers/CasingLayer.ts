@@ -2,7 +2,7 @@ import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleObjectData, Casing } from '..';
 import { Texture, Point } from 'pixi.js';
 import { createNormalCoords, generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';
-import { createNormal, arrayToPoint } from '../utils/vectorUtils';
+import { createNormals, arrayToPoint, offsetPoints } from '../utils/vectorUtils';
 
 export class CasingLayer extends WellboreBaseComponentLayer {
   options: CasingLayerOptions;
@@ -92,13 +92,15 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     }
     pts.reverse();
 
-    const triangleSideShoe: Point[] = createNormal(pts, casingDiameter * (offset < 0 ? -1 : 1));
+    const ptNormals = createNormals(pts);
+    const triangleSideShoe: Point[] = offsetPoints(pts, ptNormals, casingDiameter * (offset < 0 ? -1 : 1));
 
     const top = triangleSideShoe[0];
     const bottom = triangleSideShoe[triangleSideShoe.length - 1];
     const middle = triangleSideShoe[triangleSideShoe.length - 2];
 
-    const normalOffset = createNormal([top, middle, bottom], offset);
+    const outlierNormals = createNormals([top, middle, bottom]);
+    const normalOffset = offsetPoints([top, middle, bottom], outlierNormals, offset);
     const outlier = normalOffset[normalOffset.length - 1];
 
     return [top, bottom, outlier];
