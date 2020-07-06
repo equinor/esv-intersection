@@ -1,6 +1,7 @@
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, HoleSize, Casing, OnMountEvent } from '../interfaces';
+import Vector2 from '@equinor/videx-vector2';
 
 const DefaultStaticWellboreBaseComponentIncrement = 0.1;
 
@@ -35,6 +36,12 @@ export class WellboreBaseComponentLayer extends PixiLayer {
 
   // This is overridden by the extended well bore items layers (casing, hole)
   render(event: OnRescaleEvent | OnUpdateEvent): void {}
+
+  getNormal(md: number): Vector2 {
+    const tangent = this.referenceSystem.curtainTangent(md);
+    const normal = new Vector2(tangent[0], tangent[1]).rotate90();
+    return normal;
+  }
 
   drawBigPolygon = (coords: Point[], t?: Texture): Graphics => {
     const polygon = new Graphics();

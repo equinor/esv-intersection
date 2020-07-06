@@ -101,6 +101,14 @@ export class IntersectionReferenceSystem {
     return p;
   }
 
+  curtainTangent(length: number) {
+    const { curtain } = this.interpolators;
+    const l = (length - this._offset) / this.length;
+    const t = clamp(l, 0, 1);
+    const p = curtain.getTangentAt(t);
+    return p;
+  }
+
   /**
    * Map a displacement back to length along the curve
    */

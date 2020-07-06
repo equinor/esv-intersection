@@ -4,6 +4,7 @@ import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, MDPoint } from '..';
 import { findCasing, findIntersectingItems } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
+import Vector2 from '@equinor/videx-vector2';
 
 export class CementLayer extends WellboreBaseComponentLayer {
   options: CementLayerOptions;
@@ -57,10 +58,15 @@ export class CementLayer extends WellboreBaseComponentLayer {
       return result;
     };
 
-    const getMdPoint = (md: number) => {
+    const getMdPoint = (md: number): MDPoint => {
       const p = this.referenceSystem.project(md);
       const point = { point: new Point(p[0], p[1]), md: md };
       return point;
+    };
+
+    const addNormal = (point: MDPoint): MDPoint => {
+      const normal = this.getNormal(point.md);
+      return { ...point, normal };
     };
 
     const createMiddlePath = (c: CompiledCement): MDPoint[] => {
@@ -96,7 +102,9 @@ export class CementLayer extends WellboreBaseComponentLayer {
       }
       points.push(getMdPoint(c.boc));
 
-      return points;
+      const pointsWithNormal = points.map(addNormal);
+
+      return pointsWithNormal;
     };
 
     const getOffset = (offsetItem: any): number => {
@@ -124,8 +132,9 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
         // Subtract casing thickness / holesize edge
         const stop = md;
-        const partPoints = middle.filter((x) => x.md >= start && x.md <= stop).map((s) => s.point);
-        const partPointNormals = createNormals(partPoints);
+        const partMdPoints = middle.filter((x) => x.md >= start && x.md <= stop);
+        const partPoints = partMdPoints.map((s) => s.point);
+        const partPointNormals = partMdPoints.map((s) => s.normal);
 
         const offset = getOffset(offsetItem);
 
@@ -136,7 +145,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
       }
 
       const wholeMiddlePoints = middle.map((s) => s.point);
-      const wholeMiddlePointNormals = createNormals(wholeMiddlePoints);
+      const wholeMiddlePointNormals = middle.map((s) => s.normal);
 
       const centerPieceDim = findCasing(c.casingId, this.data.casings).diameter;
 

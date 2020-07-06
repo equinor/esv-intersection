@@ -2,6 +2,7 @@ import { ZoomTransform } from 'd3-zoom';
 import { Point, Graphics } from 'pixi.js';
 import { Layer } from './layers/base/Layer';
 import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
+import Vector2 from '@equinor/videx-vector2';
 
 interface LayerEvent {
   [propType: string]: any;
@@ -149,6 +150,7 @@ export interface Cement {
 
 export interface MDPoint {
   point: Point;
+  normal?: Vector2;
   md: number; // Currently calculated MD
 }
 
