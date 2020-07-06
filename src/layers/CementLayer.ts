@@ -70,22 +70,18 @@ export class CementLayer extends WellboreBaseComponentLayer {
     };
 
     const createMiddlePath = (c: CompiledCement): MDPoint[] => {
+      const points = getPath(c.toc, c.boc);
+      const pointsWithNormal = points.map(addNormal);
+      return pointsWithNormal;
+    };
+
+    const getPath = (start: number, end: number): MDPoint[] => {
       const points = [];
       let prevAngle = 10000;
       const allowedAngleDiff = 0.0005;
-      const morePointsForStartAndEndMeters = 10;
-
-      // Take more points for the start and end (default 10 meters, or if not enough cement. Use 1/3 of the cement length)
-      const lastMeters = c.boc - morePointsForStartAndEndMeters > c.toc ? c.boc - morePointsForStartAndEndMeters : c.boc - (c.boc - c.toc) / 3;
-      const firstMeters = c.toc + morePointsForStartAndEndMeters < c.boc ? c.toc + morePointsForStartAndEndMeters : c.toc + (c.boc - c.toc) / 3;
-
-      // Always add first points
-      for (let i = c.toc; i < firstMeters; i += this.options.wellboreBaseComponentIncrement) {
-        points.push(getMdPoint(i));
-      }
 
       // Add distance to points
-      for (let i = firstMeters; i < lastMeters; i += this.options.wellboreBaseComponentIncrement) {
+      for (let i = start; i < end; i += this.options.wellboreBaseComponentIncrement) {
         const point = getMdPoint(i);
         const angle = Math.atan2(point.point.y, point.point.x);
 
@@ -96,15 +92,10 @@ export class CementLayer extends WellboreBaseComponentLayer {
         }
       }
 
-      // Always add last points
-      for (let i = lastMeters; i < c.boc; i += this.options.wellboreBaseComponentIncrement) {
-        points.push(getMdPoint(i));
-      }
-      points.push(getMdPoint(c.boc));
+      // Always add last point
+      points.push(getMdPoint(end));
 
-      const pointsWithNormal = points.map(addNormal);
-
-      return pointsWithNormal;
+      return points;
     };
 
     const getOffset = (offsetItem: any): number => {
@@ -125,7 +116,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
       const points: { left: Point[]; right: Point[] } = { left: [], right: [] };
 
       for (let md = c.toc; md <= c.boc; md += this.options.wellboreBaseComponentIncrement) {
-        // Create normal for sections
         const offsetItem = getClosestRelatedItem(c.intersectingItems, md);
         const start = md;
         md = Math.min(c.boc, offsetItem != null ? offsetItem.end : c.boc); // set next calc MD
