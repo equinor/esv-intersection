@@ -151,15 +151,15 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     return t;
   };
 
-  generateHoleSizeData = (data: HoleSize | Casing): HoleObjectData => {
-    const points: MDPoint[] = [];
+  // generateHoleSizeData = (data: HoleSize | Casing): HoleObjectData => {
+  //   const points: MDPoint[] = [];
 
-    // Add distance to points
-    for (let i = data.start; i < data.end; i += this.options.wellboreBaseComponentIncrement) {
-      const p = this.referenceSystem.project(i);
-      points.push({ point: new Point(p[0], p[1]), md: i });
-    }
+  //   // Add distance to points
+  //   for (let i = data.start; i < data.end; i += this.options.wellboreBaseComponentIncrement) {
+  //     const p = this.referenceSystem.project(i);
+  //     points.push({ point: new Point(p[0], p[1]), md: i });
+  //   }
 
-    return { data: { ...data, diameter: data.diameter }, points, hasShoe: data.hasShoe, innerDiameter: data.innerDiameter };
-  };
+  //   return { data: { ...data, diameter: data.diameter }, points, hasShoe: data.hasShoe, innerDiameter: data.innerDiameter };
+  // };
 }

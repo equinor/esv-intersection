@@ -1,7 +1,7 @@
 import { Point } from 'pixi.js';
 import { merge } from 'd3-array';
 import { HoleObjectData, NormalCoordsObject, Cement, Casing, HoleSize, CompiledCement } from '..';
-import { createNormals, offsetPoints } from '../utils/vectorUtils';
+import { offsetPoints } from '../utils/vectorUtils';
 
 export const generateHoleCoords = (offsetCoordsRight: any, offsetCoordsLeft: any): any => {
   return {
@@ -12,18 +12,18 @@ export const generateHoleCoords = (offsetCoordsRight: any, offsetCoordsLeft: any
   };
 };
 
-export const createOffsetCoords = (s: HoleObjectData): NormalCoordsObject => {
-  const wellBorePathCoords = s.points.map((p) => p.point);
-  const normals = createNormals(wellBorePathCoords);
-  const offsetCoordsRight = offsetPoints(wellBorePathCoords, normals, s.data.diameter);
-  const offsetCoordsLeft = offsetPoints(wellBorePathCoords, normals, -s.data.diameter);
+// export const createOffsetCoords = (s: HoleObjectData): NormalCoordsObject => {
+//   const wellBorePathCoords = s.points.map((p) => p.point);
+//   const normals = createNormals(wellBorePathCoords);
+//   const offsetCoordsRight = offsetPoints(wellBorePathCoords, normals, s.data.diameter);
+//   const offsetCoordsLeft = offsetPoints(wellBorePathCoords, normals, -s.data.diameter);
 
-  if (offsetCoordsLeft.length <= 2) {
-    return { wellBorePathCoords, offsetCoordsRight: wellBorePathCoords, offsetCoordsLeft: wellBorePathCoords };
-  }
+//   if (offsetCoordsLeft.length <= 2) {
+//     return { wellBorePathCoords, offsetCoordsRight: wellBorePathCoords, offsetCoordsLeft: wellBorePathCoords };
+//   }
 
-  return { wellBorePathCoords, offsetCoordsRight, offsetCoordsLeft };
-};
+//   return { wellBorePathCoords, offsetCoordsRight, offsetCoordsLeft };
+// };
 
 export const findCasing = (id: string, casings: any) => {
   const res = casings.filter((c: any) => c.casingId === id);

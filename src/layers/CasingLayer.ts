@@ -1,8 +1,8 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleObjectData, Casing } from '..';
 import { Texture, Point } from 'pixi.js';
-import { createOffsetCoords, generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';
-import { createNormals, arrayToPoint, offsetPoints } from '../utils/vectorUtils';
+import { generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';
+import { arrayToPoint, createNormals, offsetPoints } from '../utils/vectorUtils';
 
 export class CasingLayer extends WellboreBaseComponentLayer {
   options: CasingLayerOptions;
@@ -43,22 +43,28 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       return;
     }
 
-    const sizes: HoleObjectData[] = data.map((d: Casing) => this.generateHoleSizeData(d));
+    // const sizes: HoleObjectData[] = data.map((d: Casing) => this.generateHoleSizeData(d));
 
-    const maxDiameter = Math.max(...sizes.map((s: HoleObjectData) => s.data.diameter));
+    const maxDiameter = Math.max(...data.map((s: Casing) => s.diameter));
     const texture = this.createTexure(maxDiameter * maxTextureDiameterScale, firstColor, secondColor);
-    sizes
-      .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1)) // draw smaller casings and holes inside bigger ones if overlapping
+    data
+      .sort((a: any, b: any) => (a.diameter <= b.diameter ? 1 : -1)) // draw smaller casings and holes inside bigger ones if overlapping
       .map((s: any) => this.drawHoleSize(s, texture));
   }
 
-  drawHoleSize = (holeObject: HoleObjectData, defaultTexture: Texture): void => {
-    if (holeObject == null || holeObject.points.length === 0) {
+  drawHoleSize = (holeObject: Casing, defaultTexture: Texture): void => {
+    if (holeObject == null) {
       return;
     }
 
     const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
-    const { wellBorePathCoords, offsetCoordsLeft, offsetCoordsRight } = createOffsetCoords(holeObject);
+    // const { wellBorePathCoords, offsetCoordsLeft, offsetCoordsRight } = createOffsetCoords(holeObject);
+    const path = this.getPathWithNormals(holeObject.start, holeObject.end, []);
+
+    const partPathPoints = path.map((p) => p.point);
+    const normals = path.map((p) => p.normal);
+    const offsetCoordsRight = offsetPoints(partPathPoints, normals, holeObject.diameter);
+    const offsetCoordsLeft = offsetPoints(partPathPoints, normals, -holeObject.diameter);
 
     const { top, bottom, left, right } = generateHoleCoords(offsetCoordsRight, offsetCoordsLeft);
     const polygonCoords = [...left, ...right];
@@ -67,9 +73,9 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     let casingWallWidth = 1;
 
     const pctOffset = 0.35;
-    texture = this.createTexure(holeObject.data.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
-    casingWallWidth = Math.abs(holeObject.data.diameter - holeObject.innerDiameter);
-    this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
+    texture = this.createTexure(holeObject.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
+    casingWallWidth = Math.abs(holeObject.diameter - holeObject.innerDiameter);
+    this.createRopeTextureBackground(partPathPoints, texture, mask);
 
     this.drawLine(polygonCoords, lineColor, casingWallWidth);
     this.drawLine(top, topBottomLineColor, 1);
@@ -78,8 +84,8 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     if (holeObject.hasShoe === true) {
       const shoeWidth = 25;
       const meters = 20;
-      const shoeCoords = this.generateShoe(holeObject.data.end, holeObject.data.diameter, meters, shoeWidth);
-      const shoeCoords2 = this.generateShoe(holeObject.data.end, holeObject.data.diameter, meters, -shoeWidth);
+      const shoeCoords = this.generateShoe(holeObject.end, holeObject.diameter, meters, shoeWidth);
+      const shoeCoords2 = this.generateShoe(holeObject.end, holeObject.diameter, meters, -shoeWidth);
       this.drawBigPolygon(shoeCoords2);
       this.drawBigPolygon(shoeCoords);
     }
