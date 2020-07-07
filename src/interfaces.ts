@@ -141,7 +141,11 @@ export interface CompiledCement {
   toc: number;
   boc: number;
   casingId: string;
-  intersectingItems: any;
+  attachedCasing: Casing;
+  intersectingItems: {
+    holes: HoleSize[];
+    casings: Casing[];
+  };
 }
 export interface Cement {
   toc: number;

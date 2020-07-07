@@ -1,4 +1,5 @@
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
+import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, HoleSize, Casing, OnMountEvent } from '../interfaces';
 import Vector2 from '@equinor/videx-vector2';
@@ -37,11 +38,62 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   // This is overridden by the extended well bore items layers (casing, hole)
   render(event: OnRescaleEvent | OnUpdateEvent): void {}
 
-  getNormal(md: number): Vector2 {
+  getMdPoint = (md: number): MDPoint => {
+    const p = this.referenceSystem.project(md);
+    const point = { point: new Point(p[0], p[1]), md: md };
+    return point;
+  };
+
+  computeNormal(md: number): Vector2 {
     const tangent = this.referenceSystem.curtainTangent(md);
-    const normal = new Vector2(tangent[0], tangent[1]).rotate90();
+    const normal = new Vector2(tangent).rotate90();
     return normal;
   }
+
+  getNormal = (point: MDPoint): MDPoint => {
+    const normal = this.computeNormal(point.md);
+    return { ...point, normal };
+  };
+
+  getPath(start: number, end: number): MDPoint[] {
+    const points = [];
+    let prevAngle = 10000;
+    const allowedAngleDiff = 0.005;
+
+    // Add distance to points
+    for (let i = start; i < end; i += this.options.wellboreBaseComponentIncrement) {
+      const point = this.getMdPoint(i);
+      const angle = Math.atan2(point.point.y, point.point.x);
+
+      // Reduce number of points on a straight line by angle since last point
+      if (Math.abs(angle - prevAngle) > allowedAngleDiff) {
+        points.push(point);
+        prevAngle = angle;
+      }
+    }
+
+    // Always add last point
+    points.push(this.getMdPoint(end));
+
+    return points;
+  }
+
+  getPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
+    const pathPoints = this.getPath(start, end);
+    const interestMdPoints = interestPoints.map(this.getMdPoint);
+
+    const points = merge<MDPoint>([pathPoints, interestMdPoints]);
+    points.sort((a, b) => a.md - b.md);
+
+    return points;
+  };
+
+  getPathWithNormals = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
+    const points = this.getPathForPoints(start, end, interestPoints);
+    const pointsWithNormal = points.map<MDPoint>(this.getNormal);
+
+    return pointsWithNormal;
+  };
 
   drawBigPolygon = (coords: Point[], t?: Texture): Graphics => {
     const polygon = new Graphics();
