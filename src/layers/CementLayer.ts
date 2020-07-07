@@ -1,7 +1,7 @@
 import { merge } from 'd3-array';
 import { Point, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, MDPoint } from '..';
+import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement } from '../interfaces';
 import { cementDiameterChangeDepths, parseCement, calculateCementDiameter } from '../datautils/wellboreItemShapeGenerator';
 import { offsetPoints } from '../utils/vectorUtils';
 
@@ -34,7 +34,10 @@ export class CementLayer extends WellboreBaseComponentLayer {
     }
 
     const { cement, casings, holes } = this.data;
-    this.createCementShapes(cement, casings, holes);
+    const texture: Texture = this.createTexture();
+
+    const paths = this.createCementShapes(cement, casings, holes);
+    paths.forEach((polygon) => this.drawBigPolygon(polygon, texture));
   }
 
   createSimplePolygonPath = (cement: CompiledCement): Point[][] => {
@@ -85,13 +88,12 @@ export class CementLayer extends WellboreBaseComponentLayer {
     return merge(cementPolygonCoords);
   };
 
-  createCementShapes(cement: Cement[], casings: Casing[], holes: HoleSize[]): void {
+  createCementShapes(cement: Cement[], casings: Casing[], holes: HoleSize[]): Point[][] {
     const cementCompiled = cement.map((c: Cement) => parseCement(c, casings, holes));
 
-    const texture: Texture = this.createTexture();
     const paths: Point[][] = merge(cementCompiled.map(this.createSimplePolygonPath));
 
-    paths.map((polygon) => this.drawBigPolygon(polygon, texture));
+    return paths;
   }
 
   createTexture(): Texture {

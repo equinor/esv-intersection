@@ -1,9 +1,9 @@
 import { Point } from 'pixi.js';
 import { merge } from 'd3-array';
-import { HoleObjectData, NormalCoordsObject, Cement, Casing, HoleSize, CompiledCement } from '..';
-import { offsetPoints } from '../utils/vectorUtils';
+import { Cement, Casing, HoleSize, CompiledCement } from '..';
+import { HOLE_OUTLINE } from '../constants';
 
-export const generateHoleCoords = (offsetCoordsRight: any, offsetCoordsLeft: any): any => {
+export const groupCoords = (offsetCoordsRight: any, offsetCoordsLeft: any): any => {
   return {
     left: offsetCoordsRight,
     right: offsetCoordsLeft.map((d: Point) => d.clone()).reverse(),
@@ -12,22 +12,12 @@ export const generateHoleCoords = (offsetCoordsRight: any, offsetCoordsLeft: any
   };
 };
 
-// export const createOffsetCoords = (s: HoleObjectData): NormalCoordsObject => {
-//   const wellBorePathCoords = s.points.map((p) => p.point);
-//   const normals = createNormals(wellBorePathCoords);
-//   const offsetCoordsRight = offsetPoints(wellBorePathCoords, normals, s.data.diameter);
-//   const offsetCoordsLeft = offsetPoints(wellBorePathCoords, normals, -s.data.diameter);
-
-//   if (offsetCoordsLeft.length <= 2) {
-//     return { wellBorePathCoords, offsetCoordsRight: wellBorePathCoords, offsetCoordsLeft: wellBorePathCoords };
-//   }
-
-//   return { wellBorePathCoords, offsetCoordsRight, offsetCoordsLeft };
-// };
-
-export const findCasing = (id: string, casings: any) => {
-  const res = casings.filter((c: any) => c.casingId === id);
-  return res.length > 0 ? res[0] : {};
+export const findCasing = (id: string, casings: Casing[]): Casing => {
+  const res = casings.filter((c) => c.casingId === id);
+  if (res.length === 0) {
+    throw new Error('Casing not found');
+  }
+  return res[0];
 };
 
 export const overlaps = (top1: number, bottom1: number, top2: number, bottom2: number): boolean => top1 <= bottom2 && top2 <= bottom1;
@@ -74,11 +64,10 @@ export const cementDiameterChangeDepths = (
   const diameterChangeDepths =
     merge(
       diameterIntervals.map((d) => [
-        // +- 0.0001 to find diameter right before/after object
-        d.start - 0.0001,
+        d.start - 0.0001, // +- 0.0001 to find diameter right beforeobject
         d.start,
         d.end,
-        d.end + 0.0001,
+        d.end + 0.0001, // +- 0.0001 to find diameter right after object
       ]),
     ).filter((d) => d >= cement.toc && d <= cement.boc) as number[]; // trim
 
@@ -116,7 +105,7 @@ export const calculateCementDiameter = (innerCasing: Casing, nonAttachedCasings:
   const outerDiameter = outerObjectAtDepth
     ? outerObjectAtDepth.innerDiameter
       ? outerObjectAtDepth.innerDiameter
-      : outerObjectAtDepth.diameter - 1 // TODO explain this. Don't overlap hole wall. 1 = hole wall thickness?
+      : outerObjectAtDepth.diameter - HOLE_OUTLINE
     : defaultCementWidth;
 
   return {

@@ -125,7 +125,6 @@ export interface HoleSize {
   diameter: number;
   start: number;
   end: number;
-  hasShoe?: boolean;
   innerDiameter?: number;
 }
 
@@ -156,13 +155,6 @@ export interface MDPoint {
   point: Point;
   normal?: Vector2;
   md: number; // Currently calculated MD
-}
-
-export interface HoleObjectData {
-  data: HoleSize;
-  points: MDPoint[];
-  hasShoe?: boolean;
-  innerDiameter?: number;
 }
 
 export interface WellItemGraphics {

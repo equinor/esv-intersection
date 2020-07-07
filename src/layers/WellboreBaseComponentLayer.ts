@@ -1,7 +1,7 @@
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
-import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, HoleSize, Casing, OnMountEvent } from '../interfaces';
+import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, OnMountEvent } from '../interfaces';
 import Vector2 from '@equinor/videx-vector2';
 
 const DefaultStaticWellboreBaseComponentIncrement = 0.1;
@@ -26,7 +26,6 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.ctx.stage.removeChildren();
-    //this.render(event);
   }
 
   onRescale(event: OnRescaleEvent): void {
@@ -58,9 +57,8 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   getPath(start: number, end: number): MDPoint[] {
     const points = [];
     let prevAngle = 10000;
-    const allowedAngleDiff = 0.005;
+    const allowedAngleDiff = 0.0005;
 
-    // Add distance to points
     for (let i = start; i < end; i += this.options.wellboreBaseComponentIncrement) {
       const point = this.getMdPoint(i);
       const angle = Math.atan2(point.point.y, point.point.x);
@@ -71,7 +69,6 @@ export class WellboreBaseComponentLayer extends PixiLayer {
         prevAngle = angle;
       }
     }
-
     // Always add last point
     points.push(this.getMdPoint(end));
 
@@ -150,16 +147,4 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     const t = Texture.from(canvas);
     return t;
   };
-
-  // generateHoleSizeData = (data: HoleSize | Casing): HoleObjectData => {
-  //   const points: MDPoint[] = [];
-
-  //   // Add distance to points
-  //   for (let i = data.start; i < data.end; i += this.options.wellboreBaseComponentIncrement) {
-  //     const p = this.referenceSystem.project(i);
-  //     points.push({ point: new Point(p[0], p[1]), md: i });
-  //   }
-
-  //   return { data: { ...data, diameter: data.diameter }, points, hasShoe: data.hasShoe, innerDiameter: data.innerDiameter };
-  // };
 }
