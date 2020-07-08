@@ -23,7 +23,10 @@ export class WellboreBaseComponentLayer extends PixiLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.ctx.stage.removeChildren();
+    const children = this.ctx.stage.removeChildren();
+    children.forEach((child) => {
+      child.destroy();
+    });
   }
 
   onRescale(event: OnRescaleEvent): void {
