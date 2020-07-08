@@ -3,8 +3,7 @@ import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, OnMountEvent } from '../interfaces';
 import Vector2 from '@equinor/videx-vector2';
-
-const DefaultStaticWellboreBaseComponentIncrement = 0.1;
+import { arrayToPoint } from '../utils/vectorUtils';
 
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;
@@ -13,7 +12,6 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     super(id, options);
     this.options = {
       ...this.options,
-      wellboreBaseComponentIncrement: options.wellboreBaseComponentIncrement || DefaultStaticWellboreBaseComponentIncrement,
       ...options,
     };
     this.render = this.render.bind(this);
@@ -39,7 +37,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
 
   getMdPoint = (md: number): MDPoint => {
     const p = this.referenceSystem.project(md);
-    const point = { point: new Point(p[0], p[1]), md: md };
+    const point = { point: arrayToPoint(p as [number, number]), md: md };
     return point;
   };
 
@@ -54,29 +52,8 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     return { ...point, normal };
   };
 
-  getPath(start: number, end: number): MDPoint[] {
-    const points = [];
-    let prevAngle = 10000;
-    const allowedAngleDiff = 0.0005;
-
-    for (let i = start; i < end; i += this.options.wellboreBaseComponentIncrement) {
-      const point = this.getMdPoint(i);
-      const angle = Math.atan2(point.point.y, point.point.x);
-
-      // Reduce number of points on a straight line by angle since last point
-      if (Math.abs(angle - prevAngle) > allowedAngleDiff) {
-        points.push(point);
-        prevAngle = angle;
-      }
-    }
-    // Always add last point
-    points.push(this.getMdPoint(end));
-
-    return points;
-  }
-
   getPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
-    const pathPoints = this.getPath(start, end);
+    const pathPoints = this.referenceSystem.getCurtainPath(start, end).map((p) => ({ point: arrayToPoint(p.point as [number, number]), md: p.md }));
     const interestMdPoints = interestPoints.map(this.getMdPoint);
 
     const points = merge<MDPoint>([pathPoints, interestMdPoints]);
@@ -86,7 +63,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   };
 
   getPathWithNormals = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
-    const points = this.getPathForPoints(start, end, interestPoints);
+    const points = this.getPathForPoints(start, end, [start, ...interestPoints, end]);
     const pointsWithNormal = points.map<MDPoint>(this.getNormal);
 
     return pointsWithNormal;

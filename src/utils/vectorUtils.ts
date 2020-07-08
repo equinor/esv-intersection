@@ -49,14 +49,18 @@ export const createNormals = (points: Point[]): Vector2[] => {
   });
 };
 
+export const offsetPoint = (point: Point, vector: Vector2, offset: number): Point => {
+  const p = pointToVector(point);
+  return vectorToPoint(p.add(vector.scale(offset)));
+};
+
 export const offsetPoints = (points: Point[], vectors: Vector2[], offset: number): Point[] => {
   if (points.length !== vectors.length) {
     throw new Error('Number of vectors does not match number of points');
   }
 
   return points.map((point, index) => {
-    const p = pointToVector(point);
-    const n = vectors[index];
-    return vectorToPoint(p.add(n.scale(offset)));
+    const vector = vectors[index];
+    return offsetPoint(point, vector, offset);
   });
 };
