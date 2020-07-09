@@ -8,6 +8,8 @@ import { arrayToPoint } from '../utils/vectorUtils';
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;
 
+  _textureCache: Record<string, Texture> = {};
+
   constructor(id?: string, options?: HoleSizeLayerOptions) {
     super(id, options);
     this.options = {
@@ -86,7 +88,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     return polygon;
   };
 
-  drawRope = (polygon: Point[], texture: Texture, maskTexture: boolean = false): SimpleRope => {
+  drawRope(polygon: Point[], texture: Texture, maskTexture: boolean = false): SimpleRope {
     if (polygon.length === 0) {
       return null;
     }
@@ -105,9 +107,9 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     this.ctx.stage.addChild(rope);
 
     return rope;
-  };
+  }
 
-  drawLine = (coords: Point[], lineColor: number, lineWidth = 1): void => {
+  drawLine(coords: Point[], lineColor: number, lineWidth = 1): void {
     const DRAW_ALIGNMENT_INSIDE = 1;
     const startPoint = coords[0];
     const line = new Graphics();
@@ -115,9 +117,16 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     coords.map((p: Point) => line.lineTo(p.x, p.y));
 
     this.ctx.stage.addChild(line);
-  };
+  }
 
-  createTexure = (maxWidth: number, firstColor: string, secondColor: string, startPctOffset = 0): Texture => {
+  createTexture(maxWidth: number, startPctOffset: number = 0): Texture {
+    const cacheKey = `${maxWidth}X${startPctOffset}`;
+    if (this._textureCache.hasOwnProperty(cacheKey)) {
+      return this._textureCache[cacheKey];
+    }
+
+    const { firstColor, secondColor } = this.options;
+
     const halfWayPct = 0.5;
     const canvas = document.createElement('canvas');
     canvas.width = 300;
@@ -134,6 +143,8 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
     const t = Texture.from(canvas);
+    this._textureCache[cacheKey] = t;
+
     return t;
-  };
+  }
 }

@@ -42,8 +42,6 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       return;
     }
 
-    const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
-
     data
       .sort((a: Casing, b: Casing) => b.diameter - a.diameter) // draw smaller casings and holes on top of bigger ones if overlapping
       .forEach((casing: Casing) => this.drawCasing(casing));
@@ -54,9 +52,9 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       return;
     }
     const pctOffset = 0.35;
-    const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
+    const { maxTextureDiameterScale, lineColor, topBottomLineColor } = this.options;
 
-    const texture = this.createTexure(casing.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
+    const texture = this.createTexture(casing.diameter * maxTextureDiameterScale, pctOffset);
 
     const path = this.getPathWithNormals(casing.start, casing.end, []);
 

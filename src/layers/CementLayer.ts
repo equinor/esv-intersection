@@ -96,6 +96,11 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   createTexture(): Texture {
+    const cacheKey = 'cement';
+    if (this._textureCache.hasOwnProperty(cacheKey)) {
+      return this._textureCache[cacheKey];
+    }
+
     const canvas = document.createElement('canvas');
     canvas.width = 150;
     canvas.height = 150;
@@ -117,6 +122,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
     canvasCtx.stroke();
 
     const t = Texture.from(canvas);
+    this._textureCache[cacheKey] = t;
 
     return t;
   }

@@ -52,9 +52,9 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       return;
     }
 
-    const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
+    const { maxTextureDiameterScale } = this.options;
 
-    const texture = this.createTexure(holeObject.diameter * maxTextureDiameterScale, firstColor, secondColor);
+    const texture = this.createTexture(holeObject.diameter * maxTextureDiameterScale);
 
     const path = this.getPathWithNormals(holeObject.start, holeObject.end, []);
     const points = path.map((p) => p.point);
