@@ -39,7 +39,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     const texture: Texture = this.createTexture();
 
-    polygons.forEach((polygon) => this.drawBigPolygon(polygon, texture));
+    polygons.forEach((polygon) => this.drawRope(polygon, texture, true));
   }
 
   createSimplePolygonPath = (cement: CompiledCement): Point[][] => {

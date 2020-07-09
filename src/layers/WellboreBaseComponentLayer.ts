@@ -86,13 +86,22 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     return polygon;
   };
 
-  createRopeTextureBackground = (coords: Point[], texture: Texture, mask: Graphics): SimpleRope => {
-    if (coords.length === 0) {
+  drawRope = (polygon: Point[], texture: Texture, maskTexture: boolean = false): SimpleRope => {
+    if (polygon.length === 0) {
       return null;
     }
 
-    const rope: SimpleRope = new SimpleRope(texture, coords);
-    rope.mask = mask;
+    const rope: SimpleRope = new SimpleRope(texture, polygon, 1);
+
+    if (maskTexture) {
+      const mask = new Graphics();
+      mask.beginFill(0);
+      mask.drawPolygon(polygon);
+      mask.endFill();
+      this.ctx.stage.addChild(mask);
+      rope.mask = mask;
+    }
+
     this.ctx.stage.addChild(rope);
 
     return rope;

@@ -44,19 +44,19 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
 
-    const maxDiameter = Math.max(...data.map((s: Casing) => s.diameter));
-    const texture = this.createTexure(maxDiameter * maxTextureDiameterScale, firstColor, secondColor);
     data
       .sort((a: Casing, b: Casing) => b.diameter - a.diameter) // draw smaller casings and holes on top of bigger ones if overlapping
-      .forEach((casing: Casing) => this.drawCasing(casing, texture));
+      .forEach((casing: Casing) => this.drawCasing(casing));
   }
 
-  drawCasing = (casing: Casing, defaultTexture: Texture): void => {
+  drawCasing = (casing: Casing): void => {
     if (casing == null) {
       return;
     }
-
+    const pctOffset = 0.35;
     const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
+
+    const texture = this.createTexure(casing.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
 
     const path = this.getPathWithNormals(casing.start, casing.end, []);
 
@@ -67,26 +67,28 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     const { top, bottom } = getEndLines(rightPath, leftPath);
     const polygonCoords = getRopePolygon(leftPath, rightPath);
-    const mask = this.drawBigPolygon(polygonCoords);
 
-    const pctOffset = 0.35;
-    const texture = this.createTexure(casing.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
     const casingWallWidth = Math.abs(casing.diameter - casing.innerDiameter);
-    this.createRopeTextureBackground(points, texture, mask);
+
+    this.drawRope(points, texture);
 
     this.drawLine(polygonCoords, lineColor, casingWallWidth);
     this.drawLine(top, topBottomLineColor, 1);
     this.drawLine(bottom, topBottomLineColor, 1);
 
     if (casing.hasShoe === true) {
-      const shoeWidth = 50;
-      const shoeLength = 20;
-      const shoeCoords = this.generateShoe(casing.end, casing.diameter, shoeLength, shoeWidth);
-      const shoeCoords2 = this.generateShoe(casing.end, casing.diameter, shoeLength, -shoeWidth);
-      this.drawBigPolygon(shoeCoords2);
-      this.drawBigPolygon(shoeCoords);
+      this.drawShoe(casing.end, casing.diameter);
     }
   };
+
+  drawShoe(casingEnd: number, casingDiameter: number) {
+    const shoeWidth = 50;
+    const shoeLength = 20;
+    const shoeCoords = this.generateShoe(casingEnd, casingDiameter, shoeLength, shoeWidth);
+    const shoeCoords2 = this.generateShoe(casingEnd, casingDiameter, shoeLength, -shoeWidth);
+    this.drawBigPolygon(shoeCoords2);
+    this.drawBigPolygon(shoeCoords);
+  }
 
   generateShoe = (casingEnd: number, casingDiameter: number, length: number, width: number): Point[] => {
     const start = casingEnd - length;

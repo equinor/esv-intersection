@@ -42,19 +42,19 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       return;
     }
 
-    const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
-
-    const maxDiameter = Math.max(...data.map((s: HoleSize) => s.diameter));
-    const texture = this.createTexure(maxDiameter * maxTextureDiameterScale, firstColor, secondColor);
     data
       .sort((a: HoleSize, b: HoleSize) => (a.diameter <= b.diameter ? 1 : -1)) // draw smaller casings and holes inside bigger ones if overlapping
-      .forEach((hole: HoleSize) => this.drawHoleSize(hole, texture));
+      .forEach((hole: HoleSize) => this.drawHoleSize(hole));
   }
 
-  drawHoleSize = (holeObject: HoleSize, texture: Texture): void => {
+  drawHoleSize = (holeObject: HoleSize): void => {
     if (holeObject == null) {
       return;
     }
+
+    const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
+
+    const texture = this.createTexure(holeObject.diameter * maxTextureDiameterScale, firstColor, secondColor);
 
     const path = this.getPathWithNormals(holeObject.start, holeObject.end, []);
     const points = path.map((p) => p.point);
@@ -71,9 +71,8 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
 
     const { top, bottom } = getEndLines(rightPath, leftPath);
     const polygonCoords = getRopePolygon(leftPath, rightPath);
-    const mask = this.drawBigPolygon(polygonCoords);
 
-    this.createRopeTextureBackground(points, texture, mask);
+    this.drawRope(points, texture);
 
     this.drawLine(polygonCoords, lineColor, HOLE_OUTLINE);
     this.drawLine(top, topBottomLineColor, 1);
