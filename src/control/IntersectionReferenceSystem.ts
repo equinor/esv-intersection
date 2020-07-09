@@ -14,7 +14,7 @@ const DEFAULT_START_EXTEND_LENGTH = 1000.0;
 const DEFAULT_END_EXTEND_LENGTH = 1000.0;
 
 const ALLOWED_ANGLE_CHANGE = 0.0005;
-const POINT_INCREMENT = 0.1;
+const CURTAIN_SAMPLING_INTERVAL = 0.1;
 
 export class IntersectionReferenceSystem {
   options: ReferenceSystemOptions;
@@ -120,7 +120,7 @@ export class IntersectionReferenceSystem {
     if (!this._curtainPathCache) {
       const points = [];
       let prevAngle = Math.PI * 2; // Always add first point
-      for (let i = this._offset; i <= this.length + this._offset; i += POINT_INCREMENT) {
+      for (let i = this._offset; i <= this.length + this._offset; i += CURTAIN_SAMPLING_INTERVAL) {
         const point = this.project(i);
         const angle = Math.atan2(point[1], point[0]);
 

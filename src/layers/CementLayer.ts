@@ -2,7 +2,7 @@ import { merge } from 'd3-array';
 import { Point, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement } from '../interfaces';
-import { cementDiameterChangeDepths, parseCement, calculateCementDiameter } from '../datautils/wellboreItemShapeGenerator';
+import { cementDiameterChangeDepths, compileCement, calculateCementDiameter } from '../datautils/wellboreItemShapeGenerator';
 import { offsetPoints } from '../utils/vectorUtils';
 
 export class CementLayer extends WellboreBaseComponentLayer {
@@ -34,30 +34,31 @@ export class CementLayer extends WellboreBaseComponentLayer {
     }
 
     const { cement, casings, holes } = this.data;
+    const compiledCements = cement.map((c: Cement) => compileCement(c, casings, holes));
+    const polygons = this.createCementShapes(compiledCements);
+
     const texture: Texture = this.createTexture();
 
-    const paths = this.createCementShapes(cement, casings, holes);
-    paths.forEach((polygon) => this.drawBigPolygon(polygon, texture));
+    polygons.forEach((polygon) => this.drawBigPolygon(polygon, texture));
   }
 
   createSimplePolygonPath = (cement: CompiledCement): Point[][] => {
     const { attachedCasing } = cement;
-    const nonAttachedCasings = cement.intersectingItems.casings;
-    const holes = cement.intersectingItems.holes;
+    const { outerCasings, holes } = cement.intersectingItems;
 
     const innerDiameterInterval = {
       start: attachedCasing.start,
       end: attachedCasing.end,
     };
 
-    const outerDiameterIntervals = [...nonAttachedCasings, ...holes].map((d) => ({
+    const outerDiameterIntervals = [...outerCasings, ...holes].map((d) => ({
       start: d.start,
       end: d.end,
     }));
 
     const changeDepths = cementDiameterChangeDepths(cement, [innerDiameterInterval, ...outerDiameterIntervals]);
 
-    const diameterAtChangeDepths = changeDepths.map(calculateCementDiameter(attachedCasing, nonAttachedCasings, holes));
+    const diameterAtChangeDepths = changeDepths.map(calculateCementDiameter(attachedCasing, outerCasings, holes));
 
     const path = this.getPathWithNormals(
       cement.toc,
@@ -88,12 +89,10 @@ export class CementLayer extends WellboreBaseComponentLayer {
     return merge(cementPolygonCoords);
   };
 
-  createCementShapes(cement: Cement[], casings: Casing[], holes: HoleSize[]): Point[][] {
-    const cementCompiled = cement.map((c: Cement) => parseCement(c, casings, holes));
+  createCementShapes(compiledCements: CompiledCement[]): Point[][] {
+    const polygons: Point[][] = merge(compiledCements.map(this.createSimplePolygonPath));
 
-    const paths: Point[][] = merge(cementCompiled.map(this.createSimplePolygonPath));
-
-    return paths;
+    return polygons;
   }
 
   createTexture(): Texture {

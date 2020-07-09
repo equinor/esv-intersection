@@ -1,7 +1,7 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleSize } from '..';
 import { Texture } from 'pixi.js';
-import { groupCoords } from '../datautils/wellboreItemShapeGenerator';
+import { getEndLines, getRopePolygon } from '../datautils/wellboreItemShapeGenerator';
 import { offsetPoints } from '../utils/vectorUtils';
 import { HOLE_OUTLINE } from '../constants';
 
@@ -57,23 +57,23 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
     }
 
     const path = this.getPathWithNormals(holeObject.start, holeObject.end, []);
-
-    const partPathPoints = path.map((p) => p.point);
+    const points = path.map((p) => p.point);
     const normals = path.map((p) => p.normal);
-    const offsetCoordsRight = offsetPoints(partPathPoints, normals, holeObject.diameter);
-    const offsetCoordsLeft = offsetPoints(partPathPoints, normals, -holeObject.diameter);
+
+    const rightPath = offsetPoints(points, normals, holeObject.diameter);
+    const leftPath = offsetPoints(points, normals, -holeObject.diameter);
 
     const { lineColor, topBottomLineColor } = this.options;
 
-    if (partPathPoints.length === 0) {
+    if (points.length === 0) {
       return;
     }
 
-    const { top, bottom, left, right } = groupCoords(offsetCoordsRight, offsetCoordsLeft);
-    const polygonCoords = [...left, ...right];
+    const { top, bottom } = getEndLines(rightPath, leftPath);
+    const polygonCoords = getRopePolygon(leftPath, rightPath);
     const mask = this.drawBigPolygon(polygonCoords);
 
-    this.createRopeTextureBackground(partPathPoints, texture, mask);
+    this.createRopeTextureBackground(points, texture, mask);
 
     this.drawLine(polygonCoords, lineColor, HOLE_OUTLINE);
     this.drawLine(top, topBottomLineColor, 1);

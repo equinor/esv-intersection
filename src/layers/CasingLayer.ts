@@ -1,7 +1,7 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Casing } from '..';
 import { Texture, Point } from 'pixi.js';
-import { groupCoords } from '../datautils/wellboreItemShapeGenerator';
+import { getEndLines, getRopePolygon } from '../datautils/wellboreItemShapeGenerator';
 import { offsetPoints, offsetPoint } from '../utils/vectorUtils';
 import { MDPoint } from '../interfaces';
 
@@ -60,20 +60,19 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     const path = this.getPathWithNormals(casing.start, casing.end, []);
 
-    const partPathPoints = path.map((p) => p.point);
+    const points = path.map((p) => p.point);
     const normals = path.map((p) => p.normal);
-    const offsetCoordsRight = offsetPoints(partPathPoints, normals, casing.diameter);
-    const offsetCoordsLeft = offsetPoints(partPathPoints, normals, -casing.diameter);
+    const rightPath = offsetPoints(points, normals, casing.diameter);
+    const leftPath = offsetPoints(points, normals, -casing.diameter);
 
-    const { top, bottom, left, right } = groupCoords(offsetCoordsRight, offsetCoordsLeft);
-    const polygonCoords = [...left, ...right];
+    const { top, bottom } = getEndLines(rightPath, leftPath);
+    const polygonCoords = getRopePolygon(leftPath, rightPath);
     const mask = this.drawBigPolygon(polygonCoords);
-    let texture = defaultTexture;
 
     const pctOffset = 0.35;
-    texture = this.createTexure(casing.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
+    const texture = this.createTexure(casing.diameter * maxTextureDiameterScale, firstColor, secondColor, pctOffset);
     const casingWallWidth = Math.abs(casing.diameter - casing.innerDiameter);
-    this.createRopeTextureBackground(partPathPoints, texture, mask);
+    this.createRopeTextureBackground(points, texture, mask);
 
     this.drawLine(polygonCoords, lineColor, casingWallWidth);
     this.drawLine(top, topBottomLineColor, 1);

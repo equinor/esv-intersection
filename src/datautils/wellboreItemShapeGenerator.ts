@@ -3,13 +3,26 @@ import { merge } from 'd3-array';
 import { Cement, Casing, HoleSize, CompiledCement } from '..';
 import { HOLE_OUTLINE } from '../constants';
 
-export const groupCoords = (offsetCoordsRight: any, offsetCoordsLeft: any): any => {
+export const getEndLines = (
+  rightPath: Point[],
+  leftPath: Point[],
+): {
+  top: Point[];
+  bottom: Point[];
+} => {
   return {
-    left: offsetCoordsRight,
-    right: offsetCoordsLeft.map((d: Point) => d.clone()).reverse(),
-    top: [offsetCoordsRight[0], offsetCoordsLeft[0]],
-    bottom: [offsetCoordsRight[offsetCoordsRight.length - 1], offsetCoordsLeft[offsetCoordsLeft.length - 1]],
+    top: [rightPath[0], leftPath[0]],
+    bottom: [rightPath[rightPath.length - 1], leftPath[leftPath.length - 1]],
   };
+};
+
+export const getRopePolygon = (rightPath: Point[], leftPath: Point[]): Point[] => {
+  return [
+    ...leftPath,
+    ...rightPath
+      .map<Point>((d) => d.clone())
+      .reverse(),
+  ];
 };
 
 export const findCasing = (id: string, casings: Casing[]): Casing => {
@@ -29,7 +42,7 @@ export const findIntersectingItems = (
   parentCasing: Casing,
   casings: Casing[],
   holes: HoleSize[],
-): { holes: HoleSize[]; casings: Casing[] } => {
+): { holes: HoleSize[]; outerCasings: Casing[] } => {
   const { toc: start } = cement;
   const { end } = parentCasing;
   const overlappingHoles = holes.filter((h: HoleSize) => overlaps(start, end, h.start, h.end) && h.diameter > parentCasing.diameter);
@@ -39,19 +52,18 @@ export const findIntersectingItems = (
 
   return {
     holes: overlappingHoles,
-    casings: overlappingCasings,
+    outerCasings: overlappingCasings,
   };
 };
 
-export const parseCement = (cement: Cement, casings: Casing[], holes: HoleSize[]): CompiledCement => {
+export const compileCement = (cement: Cement, casings: Casing[], holes: HoleSize[]): CompiledCement => {
   const attachedCasing = findCasing(cement.casingId, casings);
-  const res: CompiledCement = {
+  return {
     ...cement,
     boc: attachedCasing.end,
     attachedCasing,
     intersectingItems: findIntersectingItems(cement, attachedCasing, casings, holes),
   };
-  return res;
 };
 
 export const cementDiameterChangeDepths = (
@@ -92,21 +104,19 @@ export const calculateCementDiameter = (innerCasing: Casing, nonAttachedCasings:
 
   const outerCasings = nonAttachedCasings.filter((casing) => casing.innerDiameter > innerDiameter);
   const holeAtDepth = holes.find((casing) => casing.start <= depth && casing.end >= depth);
-
-  const outerObjectAtDepth = [...outerCasings, holeAtDepth]
+  const outerCasingAtDepth = outerCasings
     .filter((d) => d)
-    .sort((a, b) => {
-      const aDim = a.innerDiameter ? a.innerDiameter : a.diameter;
-      const bDim = b.innerDiameter ? b.innerDiameter : b.diameter;
-      return aDim - bDim;
-    }) // ascending
+    .sort((a, b) => a.innerDiameter - b.innerDiameter) // ascending
     .find((object) => object.start <= depth && object.end >= depth);
 
-  const outerDiameter = outerObjectAtDepth
-    ? outerObjectAtDepth.innerDiameter
-      ? outerObjectAtDepth.innerDiameter
-      : outerObjectAtDepth.diameter - HOLE_OUTLINE
-    : defaultCementWidth;
+  let outerDiameter;
+  if (outerCasingAtDepth) {
+    outerDiameter = outerCasingAtDepth.innerDiameter;
+  } else if (holeAtDepth) {
+    outerDiameter = holeAtDepth.diameter - HOLE_OUTLINE;
+  } else {
+    outerDiameter = defaultCementWidth;
+  }
 
   return {
     md: depth,

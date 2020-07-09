@@ -142,7 +142,7 @@ export interface CompiledCement {
   attachedCasing: Casing;
   intersectingItems: {
     holes: HoleSize[];
-    casings: Casing[];
+    outerCasings: Casing[];
   };
 }
 export interface Cement {
@@ -158,12 +158,6 @@ export interface MDPoint {
 
 export interface WellItemGraphics {
   graphics: Graphics;
-}
-
-export interface NormalCoordsObject {
-  wellBorePathCoords: Point[];
-  offsetCoordsRight: Point[];
-  offsetCoordsLeft: Point[];
 }
 
 export interface ScaleOptions {
