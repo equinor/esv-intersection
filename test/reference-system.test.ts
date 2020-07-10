@@ -77,11 +77,13 @@ describe('Reference system', () => {
       lastPoint = point;
     }
   });
-  /* TODO: Jest fails due to not finding Vector2 constructor, uncomment when issue is solved
   it('should have correct number of points', () => {
     const trajectory = rs.getExtendedTrajectory(100);
     expect(trajectory.points.length).toEqual(100);
   });
+
+  /* TODO: Issue is now solved and tests can be fixed and uncommented
+   * Jest failed previously due to not finding Vector2 constructor.
   it('should have same distance between points in extended trajectory', () => {
     const trajectory = rs.getExtendedTrajectory(200, 500.0, 500.0);
     const firstDistance = dist(trajectory.points[0], trajectory.points[1]);
@@ -100,14 +102,16 @@ describe('Reference system', () => {
     expect(startExtend).toBeCloseTo(500.0);
     expect(endExtend).toBeCloseTo(500.0);
   });
+*/
   it('should throw error when parameters are negative', () => {
     expect(() => {
       const trajectory = rs.getExtendedTrajectory(100, -50.0, 500.0);
-    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionStart parameter');
+    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive extensionStart parameter');
     expect(() => {
       const trajectory = rs.getExtendedTrajectory(100, 50.0, -500.0);
-    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a positive extensionEnd parameter');
+    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive extensionEnd parameter');
   });
+  /*
   it('should work for vertical wellbore', () => {
     const verticalPosLog = [
       [30, 40, 100],
