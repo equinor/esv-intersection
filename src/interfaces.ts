@@ -145,6 +145,12 @@ export interface CompiledCement {
     outerCasings: Casing[];
   };
 }
+
+export interface CementShape {
+  rightPolygon: Point[];
+  leftPolygon: Point[];
+  path: Point[];
+}
 export interface Cement {
   toc: number;
   casingId: string; // TODO find the actual ID

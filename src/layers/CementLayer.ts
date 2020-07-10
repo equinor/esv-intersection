@@ -1,8 +1,8 @@
 import { merge } from 'd3-array';
 import { Point, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement } from '../interfaces';
-import { cementDiameterChangeDepths, compileCement, calculateCementDiameter } from '../datautils/wellboreItemShapeGenerator';
+import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, CompiledCement, CementShape } from '../interfaces';
+import { cementDiameterChangeDepths, compileCement, calculateCementDiameter, getRopePolygon } from '../datautils/wellboreItemShapeGenerator';
 import { offsetPoints } from '../utils/vectorUtils';
 
 export class CementLayer extends WellboreBaseComponentLayer {
@@ -35,14 +35,17 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     const { cement, casings, holes } = this.data;
     const compiledCements = cement.map((c: Cement) => compileCement(c, casings, holes));
-    const polygons = this.createCementShapes(compiledCements);
+    const cementShapes = compiledCements.map(this.createCementShape);
 
     const texture: Texture = this.createTexture();
 
-    polygons.forEach((polygon) => this.drawRope(polygon, texture, true));
+    cementShapes.forEach((cementShape: CementShape) => {
+      this.drawRopeWithMask(cementShape.path, cementShape.leftPolygon, texture);
+      this.drawRopeWithMask(cementShape.path, cementShape.rightPolygon, texture);
+    });
   }
 
-  createSimplePolygonPath = (cement: CompiledCement): Point[][] => {
+  createCementShape = (cement: CompiledCement): CementShape => {
     const { attachedCasing } = cement;
     const { outerCasings, holes } = cement.intersectingItems;
 
@@ -66,34 +69,37 @@ export class CementLayer extends WellboreBaseComponentLayer {
       diameterAtChangeDepths.map((d) => d.md),
     );
 
+    const side1Left: Point[] = [];
+    const side1Right: Point[] = [];
+    const side2Left: Point[] = [];
+    const side2Right: Point[] = [];
+
     let previousDepth = diameterAtChangeDepths.shift();
-    const cementPolygonCoords = diameterAtChangeDepths.map((depth) => {
-      const partMdPoints = path.filter((x) => x.md >= previousDepth.md && x.md <= depth.md);
+    for (const depth of diameterAtChangeDepths) {
+      const intervalMdPoints = path.filter((x) => x.md >= previousDepth.md && x.md <= depth.md);
 
-      const partPoints = partMdPoints.map((s) => s.point);
-      const partPointNormals = partMdPoints.map((s) => s.normal);
+      const intervalPoints = intervalMdPoints.map((s) => s.point);
+      const intervalPointNormals = intervalMdPoints.map((s) => s.normal);
 
-      const side1Left = offsetPoints(partPoints, partPointNormals, previousDepth.outerDiameter);
-      const side1Right = offsetPoints(partPoints, partPointNormals, previousDepth.innerDiameter);
-      const side2Left = offsetPoints(partPoints, partPointNormals, -previousDepth.innerDiameter);
-      const side2Right = offsetPoints(partPoints, partPointNormals, -previousDepth.outerDiameter);
+      const intervalSide1Left = offsetPoints(intervalPoints, intervalPointNormals, previousDepth.outerDiameter);
+      const intervalSide1Right = offsetPoints(intervalPoints, intervalPointNormals, previousDepth.innerDiameter);
+      const intervalSide2Left = offsetPoints(intervalPoints, intervalPointNormals, -previousDepth.innerDiameter);
+      const intervalSide2Right = offsetPoints(intervalPoints, intervalPointNormals, -previousDepth.outerDiameter);
+
+      side1Left.push(...intervalSide1Left);
+      side1Right.push(...intervalSide1Right);
+      side2Left.push(...intervalSide2Left);
+      side2Right.push(...intervalSide2Right);
 
       previousDepth = depth;
+    }
 
-      return [
-        [...side1Right, ...side1Left.reverse()],
-        [...side2Right, ...side2Left.reverse()],
-      ];
-    });
+    const pathPoints = path.map((s) => s.point);
+    const leftPolygon = getRopePolygon(side1Left, side1Right);
+    const rightPolygon = getRopePolygon(side2Left, side2Right);
 
-    return merge(cementPolygonCoords);
+    return { leftPolygon, rightPolygon, path: pathPoints };
   };
-
-  createCementShapes(compiledCements: CompiledCement[]): Point[][] {
-    const polygons: Point[][] = merge(compiledCements.map(this.createSimplePolygonPath));
-
-    return polygons;
-  }
 
   createTexture(): Texture {
     const cacheKey = 'cement';

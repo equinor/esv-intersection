@@ -58,19 +58,19 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     const path = this.getPathWithNormals(casing.start, casing.end, []);
 
-    const points = path.map((p) => p.point);
+    const pathPoints = path.map((p) => p.point);
     const normals = path.map((p) => p.normal);
-    const rightPath = offsetPoints(points, normals, casing.diameter);
-    const leftPath = offsetPoints(points, normals, -casing.diameter);
+    const rightPath = offsetPoints(pathPoints, normals, casing.diameter);
+    const leftPath = offsetPoints(pathPoints, normals, -casing.diameter);
 
     const { top, bottom } = getEndLines(rightPath, leftPath);
-    const polygonCoords = getRopePolygon(leftPath, rightPath);
+    const polygon = getRopePolygon(leftPath, rightPath);
 
     const casingWallWidth = Math.abs(casing.diameter - casing.innerDiameter);
 
-    this.drawRope(points, texture);
+    this.drawRope(pathPoints, texture);
 
-    this.drawLine(polygonCoords, lineColor, casingWallWidth);
+    this.drawLine(polygon, lineColor, casingWallWidth);
     this.drawLine(top, topBottomLineColor, 1);
     this.drawLine(bottom, topBottomLineColor, 1);
 

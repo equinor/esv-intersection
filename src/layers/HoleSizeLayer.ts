@@ -57,22 +57,22 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
     const texture = this.createTexture(holeObject.diameter * maxTextureDiameterScale);
 
     const path = this.getPathWithNormals(holeObject.start, holeObject.end, []);
-    const points = path.map((p) => p.point);
+    const pathPoints = path.map((p) => p.point);
     const normals = path.map((p) => p.normal);
 
-    const rightPath = offsetPoints(points, normals, holeObject.diameter);
-    const leftPath = offsetPoints(points, normals, -holeObject.diameter);
+    const rightPath = offsetPoints(pathPoints, normals, holeObject.diameter);
+    const leftPath = offsetPoints(pathPoints, normals, -holeObject.diameter);
 
     const { lineColor, topBottomLineColor } = this.options;
 
-    if (points.length === 0) {
+    if (pathPoints.length === 0) {
       return;
     }
 
     const { top, bottom } = getEndLines(rightPath, leftPath);
     const polygonCoords = getRopePolygon(leftPath, rightPath);
 
-    this.drawRope(points, texture);
+    this.drawRope(pathPoints, texture);
 
     this.drawLine(polygonCoords, lineColor, HOLE_OUTLINE);
     this.drawLine(top, topBottomLineColor, 1);
