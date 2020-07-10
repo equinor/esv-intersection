@@ -1,7 +1,6 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleSize } from '..';
-import { Texture } from 'pixi.js';
-import { getEndLines, getRopePolygon } from '../datautils/wellboreItemShapeGenerator';
+import { getEndLines, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { offsetPoints } from '../utils/vectorUtils';
 import { HOLE_OUTLINE } from '../constants';
 
@@ -70,7 +69,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
     }
 
     const { top, bottom } = getEndLines(rightPath, leftPath);
-    const polygonCoords = getRopePolygon(leftPath, rightPath);
+    const polygonCoords = makeTubularPolygon(leftPath, rightPath);
 
     this.drawRope(pathPoints, texture);
 

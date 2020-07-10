@@ -1,6 +1,6 @@
 import { Point } from 'pixi.js';
 import { merge } from 'd3-array';
-import { Cement, Casing, HoleSize, CompiledCement } from '..';
+import { Cement, Casing, HoleSize } from '..';
 import { HOLE_OUTLINE } from '../constants';
 
 export const getEndLines = (
@@ -16,7 +16,7 @@ export const getEndLines = (
   };
 };
 
-export const getRopePolygon = (rightPath: Point[], leftPath: Point[]): Point[] => {
+export const makeTubularPolygon = (rightPath: Point[], leftPath: Point[]): Point[] => {
   return [
     ...leftPath,
     ...rightPath
@@ -56,23 +56,16 @@ export const findIntersectingItems = (
   };
 };
 
-export const compileCement = (cement: Cement, casings: Casing[], holes: HoleSize[]): CompiledCement => {
-  const attachedCasing = findCasing(cement.casingId, casings);
-  return {
-    ...cement,
-    boc: attachedCasing.end,
-    attachedCasing,
-    intersectingItems: findIntersectingItems(cement, attachedCasing, casings, holes),
-  };
-};
-
 export const cementDiameterChangeDepths = (
-  cement: CompiledCement,
+  cement: Cement,
+  bottomOfCement: number,
   diameterIntervals: {
     start: number;
     end: number;
   }[],
 ): number[] => {
+  const topOfCement = cement.toc;
+
   const diameterChangeDepths =
     merge(
       diameterIntervals.map((d) => [
@@ -81,10 +74,10 @@ export const cementDiameterChangeDepths = (
         d.end,
         d.end + 0.0001, // +- 0.0001 to find diameter right after object
       ]),
-    ).filter((d) => d >= cement.toc && d <= cement.boc) as number[]; // trim
+    ).filter((d) => d >= topOfCement && d <= bottomOfCement) as number[]; // trim
 
-  diameterChangeDepths.push(cement.toc);
-  diameterChangeDepths.push(cement.boc);
+  diameterChangeDepths.push(topOfCement);
+  diameterChangeDepths.push(bottomOfCement);
 
   const uniqDepths = uniq(diameterChangeDepths);
 

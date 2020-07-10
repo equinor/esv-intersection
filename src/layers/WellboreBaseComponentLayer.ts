@@ -68,7 +68,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   };
 
   getPathWithNormals = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
-    const points = this.getPathForPoints(start, end, [start, ...interestPoints, end]);
+    const points = this.getPathForPoints(start, end, [start, end, ...interestPoints]);
     const pointsWithNormal = points.map<MDPoint>(this.getNormal);
 
     return pointsWithNormal;
@@ -149,6 +149,6 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     const t = Texture.from(canvas);
     this._textureCache[cacheKey] = t;
 
-    return t;
+    return this._textureCache[cacheKey];
   }
 }

@@ -1,7 +1,7 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Casing } from '..';
-import { Texture, Point } from 'pixi.js';
-import { getEndLines, getRopePolygon } from '../datautils/wellboreItemShapeGenerator';
+import { Point } from 'pixi.js';
+import { getEndLines, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { offsetPoints, offsetPoint } from '../utils/vectorUtils';
 import { MDPoint } from '../interfaces';
 
@@ -64,12 +64,11 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     const leftPath = offsetPoints(pathPoints, normals, -casing.diameter);
 
     const { top, bottom } = getEndLines(rightPath, leftPath);
-    const polygon = getRopePolygon(leftPath, rightPath);
+    const polygon = makeTubularPolygon(leftPath, rightPath);
 
     const casingWallWidth = Math.abs(casing.diameter - casing.innerDiameter);
 
     this.drawRope(pathPoints, texture);
-
     this.drawLine(polygon, lineColor, casingWallWidth);
     this.drawLine(top, topBottomLineColor, 1);
     this.drawLine(bottom, topBottomLineColor, 1);
