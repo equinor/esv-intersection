@@ -47,7 +47,6 @@ export const intersection = () => {
   Promise.all(promises).then((values) => {
     const [path, completion, seismic, surfaces, stratColumns, casings, holesizes, cement, picks] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
-    // referenceSystem.offset = path[0][2]
     const displacement = referenceSystem.displacement || 1;
     const extend = 1000 / displacement;
     const steps = surfaces[0]?.data?.values?.length || 1;
