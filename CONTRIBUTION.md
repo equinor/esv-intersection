@@ -5,27 +5,13 @@ Licensing of contributed material
 ---------------------------------
 
 Keep in mind as you contribute, that code, docs and other material submitted to
-open source projects are usually considered licensed under the same terms
-as the rest of the work.
+this repository are considered licensed under the same terms as the rest of the work.
 
-The details vary from project to project, but from the perspective of this
-document's authors:
-
-- Anything submitted to a project falls under the licensing terms in the
-  repository's top level ``LICENSE`` file.
-
-    - For example, if a project's ``LICENSE`` is BSD-based, contributors should
-      be comfortable with their work potentially being distributed in binary
-      form without the original source code.
+- Anything submitted to the project falls under the ``MIT`` licensing terms as dscribed in this repository's top level ``LICENSE`` file.
 
 - Per-file copyright/license headers are typically extraneous and undesirable.
-  Please don't add your own copyright headers to new files unless the project's
-  license actually requires them!
-
-    - Not least because even a new file created by one individual (who often
-      feels compelled to put their personal copyright notice at the top) will
-      inherently end up contributed to by dozens of others over time, making a
-      per-file header outdated/misleading.
+  Please don't add your own copyright headers to new files without contacting the maintainers first
+  
 
 Version control branching
 -------------------------
@@ -129,70 +115,64 @@ Creating Pull Requests
 4. Hit 'submit'! And please be patient - the maintainers will get to you when
    they can.
 
-## Setup guide
+## Setup and usage
 
 ### Cloning repository
 
 Start by cloning the repository to desired directory.
-
-```
+```bash
 git clone --recursive https://github.com/equinor/esv-intersection.git
 ```
 
 ### Install dependencies
-
-Install all dev dependencies defined in package.json using node.
-
-```
+```bash
 npm install
 ```
+Install all dev dependencies defined in package.json using node.
 
-## Usage
+
+### Building/Compiling
+```bash
+npm run build
+```
+Compiles the code found within the src-folder. Build is outputted to a new dist-folder.
+
+
+### Creating tests
+All tests are defined within the test-folder. Jest naming convention is to place tests for `SOMESCRIPT.ts` in a single file `SOMESCRIPT.test.ts`.
+
+
+### Running tests
+```bash
+npm run test
+```
+Executes all tests defined within the test folder.
+```bash
+npm run test:watch
+```
+Executes all tests, but does not return immediately. Makes it possible to re-run failed tests quickly.
+
 
 ### Storybook
-
-```
+```bash
 npm run storybook
 ```
+Run the Storybook on the local machine. The storybook relies on data stored in the [esv-intersection-data](https://github.com/equinor/esv-intersection-data) repository. It is included here as a git submodule. It is advised to run `git submodule update` before starting the storybook, in order to be sure that the sample data is up-to-date.
+
+If the error `Cannot find module './esv-intersection-data'` appears in the console, there is a high chance that the submodule with the data has not been cloned correctly. Running `git submodule update --init` should fix the issue
+
 
 ### Document generation
-
 ```
 npm run docs
 ```
-
 This command will overwrite any old documentation
 
-### Creating tests
 
-All tests are defined within the test-folder. Jest naming convention is to place tests for SOMESCRIPT.ts in a single file SOMESCRIPT.test.ts.
-
-### Testing
-
-```
-npm run test
-```
-
-Executes all tests defined within the test folder.
-
-```
-npm run test:watch
-```
-
-Executes all tests, but does not return immediately. Makes it possible to re-run failed tests quickly.
-
-### Building/Compiling
-
-```
-npm run build
-```
-
-Compiles the code found within the src-folder. Build is outputted to a new dist-folder.
-
-----
+---
 The content of this file is largely inspired by [bitprophet's contribution guide](https://github.com/bitprophet/contribution-guide.org/blob/master/index.rst).
 This file is licensed under the _BSD 2-Clause "Simplified" License_ that follows:
-
+```
 -------------
 Copyright (c) 2020 Jeff Forcier.
 All rights reserved.
@@ -217,3 +197,4 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------
+```
