@@ -55,22 +55,21 @@ For more examples, check out our stories in our online [storybook](https://equin
 
 ## Development methodology
 - The project is maintained by the [VidEx team](https://github.com/orgs/equinor/teams/viz) (Software Innovation Stavanger) and the [Heap Purple team](https://github.com/orgs/equinor/teams/heap-purple) (Software Innovation Bergen)
-- TODO: Development is driven by _user stories_, created and prioritized by developers and POs together
-- TODO: The development team has _planning meetings_ with the POs once a week
+- The maintainers meet once a month to discuss the direction of the project, and possible development activities
+- Development is currently limited to critical bug fixes. New features could be requested by opening a dedicated issue or, even better, by opening a [Pull Requests](CONTRIBUTION.md)
 - Development relies on a _project board_ hosted on github (https://github.com/equinor/intersection/projects/1)
-- During planning meetings, the `To do` column of the board is populated with user stories and tasks
 
 
 ## Support
 If you are an equinor employee, the easiest way to get in touch with the maintainers is through the #esv-intersection channel on Slack.
 
-Otherwise, Github issues are the main communication channel with the maintainers. If you have a bug to report, a feature request, or need some help using the component, simply [create an issue in the repository](https://github.com/equinor/esv-intersection/issues) and one of the maintainers will pick it up. Before creating an issue, please have a look at the following guidelines. Also keep in mind that creating [Pull Requests](CONTRIBUTION.md) is very much welcome. 
+Otherwise, Github issues are the main communication channel with the maintainers. If you have a bug report, a feature request, or need some help using the component, simply [create an issue in the repository](https://github.com/equinor/esv-intersection/issues) and one of the maintainers will pick it up. Before creating an issue, please have a look at the following guidelines. Also keep in mind that creating [Pull Requests](CONTRIBUTION.md) is the preferred way to contribute to the project. 
 
 ### Help needed
 Describe your use case in details, make sure to include the version of the component you are using, and relevant software that are part of your pipeline (eg, Chrome/Firefox/Safari, Node, npm, …), including their version as well
 
 ### Bug reports
-Follow the instructions from the _Help needed_ section above, but also include precise instructions about how to reproduce the bug. If any data is required for reproducing the bug, we need to have access to it as well.
+Follow the instructions from the _Help needed_ section above, but also include precise instructions about how to reproduce the bug. If any data is required for reproducing the bug, it would be beneficial to have access to it as well.
 
 ### Feature requests
 Give a precise description of your use case. It would be best if you could formulate your request as a user story, using the format `As a <subject> I would like to <the feature you need> so that <the task you want to accomplish>`
@@ -83,19 +82,5 @@ See the contribution [page](CONTRIBUTION.md)
 The large majority of the files in this repository are released under the [MIT license](LICENSE). There are 2 exceptions:
 - the [CONTRIBUTION.md](CONTRIBUTION.md) file, which uses _BSD 2-Clause "Simplified" License_, as described at the end of the file itself
 - the content of the [esv-intersection-data](https://github.com/equinor/esv-intersection-data) submodule uses the same license as Equinor's [Volve dataset](https://data.equinor.com/dataset/Volve), which is also available in the submodule
-
-### Storybook
-
-TODO: this should be probably moved to CONTRIBUTION.md
-
-```bash
-npm run storybook
-```
-
-Run the Storybook on the local machine. The storybook relies on data stored in the [esv-intersection-data](https://github.com/equinor/esv-intersection-data) repository.
-It is included here as a git submodule. It is advised to run `git submodule update` before starting the storybook, in order to be sure that the sample data is up-to-date.
-
-If the error `Cannot find module './esv-intersection-data'` appears in the console, there is a high chance that the submodule with the data has not been cloned correctly. Running `git submodule update --init` should fix the issue
-
 
 ![Equinor Logo](resources/images/equinor-logo.png)
