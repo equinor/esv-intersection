@@ -7,10 +7,11 @@ A reusable component to create intersection visualizations for wells
 Part of the [Equinor Subsurface Visualization project](https://github.com/equinor/esv)
 
 - **Repository**: https://github.com/equinor/esv-intersection
-- **Storybook**: https://intersection-component.app.radix.equinor.com
 - **NPM Package**: https://www.npmjs.com/package/@equinor/esv-intersection
-- **Documentation**: https://equinor.github.io/esv-intersection/
-- **React (typescript) example**: https://github.com/equinor/react-intersection-example
+- **Documentation (latest)**: https://equinor.github.io/esv-intersection/
+- **Storybook (latest)**: https://equinor.github.io/esv-intersection/storybook/latest
+- **Storybook (nightly)**: https://equinor.github.io/esv-intersection/storybook/master
+- **React/typescript example**: https://github.com/equinor/react-intersection-example
 
 ## Getting started
 
@@ -37,7 +38,7 @@ controller.adjustToSize(400, 400);
 
 controller.addLayer(new GridLayer('grid'));
 ```
-For more examples, check out our stories in our online [storybook](https://intersection-component.app.radix.equinor.com).
+For more examples, check out our stories in our online [storybook](https://equinor.github.io/esv-intersection/storybook/latest).
 
 ## Technical choices
 
