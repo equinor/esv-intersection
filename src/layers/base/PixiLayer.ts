@@ -31,6 +31,7 @@ export abstract class PixiLayer extends Layer {
         transparent: true,
         clearBeforeRender: true,
         autoResize: true,
+        preserveDrawingBuffer: true,
       };
 
       this.ctx = new Application(pixiOptions);
