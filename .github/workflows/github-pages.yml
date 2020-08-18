@@ -26,8 +26,8 @@ jobs:
     - name: Build documentation # only if this was triggered from latest
       if: github.ref == 'refs/heads/latest' 
       run: |
-        npm docs
-        npm postdocs
+        npm run docs
+        npm run postdocs
 
     - name: Generate storybook
       run:  npx build-storybook -c .storybook -o docs_out/storybook/$(basename ${{ github.ref }})
