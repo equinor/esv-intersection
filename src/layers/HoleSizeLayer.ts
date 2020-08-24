@@ -1,7 +1,8 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleObjectData, HoleSize } from '..';
-import { Texture, Point } from 'pixi.js';
-import { createNormalCoords, generateHoleCoords } from '../datautils/wellboreItemShapeGenerator';
+import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleSize } from '..';
+import { getEndLines, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
+import { offsetPoints } from '../utils/vectorUtils';
+import { HOLE_OUTLINE } from '../constants';
 
 export class HoleSizeLayer extends WellboreBaseComponentLayer {
   options: HoleSizeLayerOptions;
@@ -34,43 +35,45 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    super.render(event);
-    const { maxTextureDiameterScale, firstColor, secondColor } = this.options;
     const { data } = this;
 
     if (data == null) {
       return;
     }
 
-    const sizes: HoleObjectData[] = data.map((d: HoleSize) => this.generateHoleSizeData(d));
-
-    const maxDiameter = Math.max(...sizes.map((s: HoleObjectData) => s.data.diameter));
-    const texture = this.createTexure(maxDiameter * maxTextureDiameterScale, firstColor, secondColor);
-    sizes
-      .sort((a: any, b: any) => (a.data.diameter <= b.data.diameter ? 1 : -1)) // draw smaller casings and holes inside bigger ones if overlapping
-      .map((s: any) => this.drawHoleSize(s, texture));
+    data
+      .sort((a: HoleSize, b: HoleSize) => (a.diameter <= b.diameter ? 1 : -1)) // draw smaller casings and holes inside bigger ones if overlapping
+      .forEach((hole: HoleSize) => this.drawHoleSize(hole));
   }
 
-  drawHoleSize = (holeObject: HoleObjectData, texture: Texture): void => {
-    if (holeObject == null || holeObject.points.length === 0) {
+  drawHoleSize = (holeObject: HoleSize): void => {
+    if (holeObject == null) {
       return;
     }
 
-    const { maxTextureDiameterScale, firstColor, secondColor, lineColor, topBottomLineColor } = this.options;
-    const { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp } = createNormalCoords(holeObject);
+    const { maxTextureDiameterScale } = this.options;
 
-    if (wellBorePathCoords.length === 0) {
+    const texture = this.createTexture(holeObject.diameter * maxTextureDiameterScale);
+
+    const path = this.getPathWithNormals(holeObject.start, holeObject.end, []);
+    const pathPoints = path.map((p) => p.point);
+    const normals = path.map((p) => p.normal);
+
+    const rightPath = offsetPoints(pathPoints, normals, holeObject.diameter);
+    const leftPath = offsetPoints(pathPoints, normals, -holeObject.diameter);
+
+    const { lineColor, topBottomLineColor } = this.options;
+
+    if (pathPoints.length === 0) {
       return;
     }
 
-    const { top, bottom, left, right } = generateHoleCoords(normalOffsetCoordsUp, normalOffsetCoordsDown);
-    const polygonCoords = [...left, ...right];
-    const mask = this.drawBigPolygon(polygonCoords);
-    const casingWallWidth = 1;
+    const { top, bottom } = getEndLines(rightPath, leftPath);
+    const polygonCoords = makeTubularPolygon(leftPath, rightPath);
 
-    this.createRopeTextureBackground(wellBorePathCoords, texture, mask);
+    this.drawRope(pathPoints, texture);
 
-    this.drawLine(polygonCoords, lineColor, casingWallWidth);
+    this.drawLine(polygonCoords, lineColor, HOLE_OUTLINE);
     this.drawLine(top, topBottomLineColor, 1);
     this.drawLine(bottom, topBottomLineColor, 1);
   };

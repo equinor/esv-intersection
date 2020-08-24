@@ -2,6 +2,7 @@ import { ZoomTransform } from 'd3-zoom';
 import { Point, Graphics } from 'pixi.js';
 import { Layer } from './layers/base/Layer';
 import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
+import Vector2 from '@equinor/videx-vector2';
 
 interface LayerEvent {
   [propType: string]: any;
@@ -92,7 +93,6 @@ export interface WellComponentBaseOptions extends LayerOptions {
   maxFontSize?: number;
   textColor?: string;
   font?: string;
-  wellboreBaseComponentIncrement?: number;
 }
 
 export interface GeoModelData {
@@ -124,7 +124,6 @@ export interface HoleSize {
   diameter: number;
   start: number;
   end: number;
-  hasShoe?: boolean;
   innerDiameter?: number;
 }
 
@@ -136,12 +135,6 @@ export interface Casing {
   innerDiameter: number;
   casingId: string;
 }
-export interface CompiledCement {
-  toc: number;
-  boc: number;
-  casingId: string;
-  intersectingItems: any;
-}
 export interface Cement {
   toc: number;
   casingId: string; // TODO find the actual ID
@@ -149,24 +142,12 @@ export interface Cement {
 
 export interface MDPoint {
   point: Point;
+  normal?: Vector2;
   md: number; // Currently calculated MD
-}
-
-export interface HoleObjectData {
-  data: HoleSize;
-  points: MDPoint[];
-  hasShoe?: boolean;
-  innerDiameter?: number;
 }
 
 export interface WellItemGraphics {
   graphics: Graphics;
-}
-
-export interface NormalCoordsObject {
-  wellBorePathCoords: Point[];
-  normalOffsetCoordsDown: Point[];
-  normalOffsetCoordsUp: Point[];
 }
 
 export interface ScaleOptions {

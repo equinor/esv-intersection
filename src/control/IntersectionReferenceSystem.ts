@@ -13,6 +13,9 @@ const THRESHOLD_DIRECTION_DISTANCE = 0.001;
 const DEFAULT_START_EXTEND_LENGTH = 1000.0;
 const DEFAULT_END_EXTEND_LENGTH = 1000.0;
 
+const CURTAIN_SAMPLING_ANGLE_THRESHOLD = 0.0005;
+const CURTAIN_SAMPLING_INTERVAL = 0.1;
+
 export class IntersectionReferenceSystem {
   options: ReferenceSystemOptions;
 
@@ -37,6 +40,8 @@ export class IntersectionReferenceSystem {
   startVector: number[];
 
   endVector: number[];
+
+  _curtainPathCache: { point: number[]; md: number }[];
 
   /**
    * Creates a common reference system that layers and other components can use
@@ -88,6 +93,8 @@ export class IntersectionReferenceSystem {
       this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1);
     }
     this.startVector = this.endVector.map((d: number) => d * -1);
+
+    this._curtainPathCache = undefined;
   }
   /**
    * Map a length along the curve to intersection coordinates
@@ -99,6 +106,44 @@ export class IntersectionReferenceSystem {
     const t = clamp(l, 0, 1);
     const p = curtain.getPointAt(t);
     return p;
+  }
+
+  curtainTangent(length: number): number[] {
+    const { curtain } = this.interpolators;
+    const l = (length - this._offset) / this.length;
+    const clampedL = clamp(l, 0, 1);
+    const tangent = curtain.getTangentAt(clampedL);
+    return tangent;
+  }
+
+  /**
+   * Returns as resampled version of the projected path between start and end
+   * Samples are picked from the beginning of the path at every CURTAIN_SAMPLING_INTERVAL meters
+   * If the angle between two consecutive segments is close to 180 degrees depending on CURTAIN_SAMPLING_ANGLE_THRESHOLD,
+   * a sample in between is discarded.
+   *
+   * The start and the end are not guaranteed to be part of the returned set of points
+   * @param start in MD
+   * @param end in MD
+   */
+  getCurtainPath(start: number, end: number): { point: number[]; md: number }[] {
+    if (!this._curtainPathCache) {
+      const points = [];
+      let prevAngle = Math.PI * 2; // Always add first point
+      for (let i = this._offset; i <= this.length + this._offset; i += CURTAIN_SAMPLING_INTERVAL) {
+        const point = this.project(i);
+        const angle = Math.atan2(point[1], point[0]);
+
+        // Reduce number of points on a straight line by angle since last point
+        if (Math.abs(angle - prevAngle) > CURTAIN_SAMPLING_ANGLE_THRESHOLD) {
+          points.push({ point, md: i });
+          prevAngle = angle;
+        }
+      }
+      this._curtainPathCache = points;
+    }
+
+    return this._curtainPathCache.filter((p) => p.md >= start && p.md <= end);
   }
 
   /**
@@ -285,6 +330,7 @@ export class IntersectionReferenceSystem {
   }
 
   set offset(offset: number) {
+    this._curtainPathCache = undefined;
     this._offset = offset;
   }
 }

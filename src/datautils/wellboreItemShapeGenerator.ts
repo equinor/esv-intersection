@@ -1,78 +1,119 @@
 import { Point } from 'pixi.js';
-import { HoleObjectData, NormalCoordsObject, MDPoint, Cement, Casing, HoleSize, CompiledCement } from '..';
-import { createNormal, pointToArray, arrayToPoint } from '../utils/vectorUtils';
-import { CurveInterpolator } from 'curve-interpolator';
+import { merge } from 'd3-array';
+import { Cement, Casing, HoleSize } from '..';
+import { HOLE_OUTLINE } from '../constants';
 
-export const generateHoleCoords = (normalOffsetCoordsUp: any, normalOffsetCoordsDown: any): any => {
+export const getEndLines = (
+  rightPath: Point[],
+  leftPath: Point[],
+): {
+  top: Point[];
+  bottom: Point[];
+} => {
   return {
-    left: normalOffsetCoordsUp,
-    right: normalOffsetCoordsDown.map((d: Point) => d.clone()).reverse(),
-    top: [normalOffsetCoordsUp[0], normalOffsetCoordsDown[0]],
-    bottom: [normalOffsetCoordsUp[normalOffsetCoordsUp.length - 1], normalOffsetCoordsDown[normalOffsetCoordsDown.length - 1]],
+    top: [rightPath[0], leftPath[0]],
+    bottom: [rightPath[rightPath.length - 1], leftPath[leftPath.length - 1]],
   };
 };
 
-export const createNormalCoords = (s: HoleObjectData): NormalCoordsObject => {
-  const wellBorePathCoords = actualPoints(s);
-  const normalOffsetCoordsUpOrig = createNormal(wellBorePathCoords, s.data.diameter);
-  const normalOffsetCoordsDownOrig = createNormal(wellBorePathCoords, -s.data.diameter);
-
-  if (normalOffsetCoordsUpOrig.length <= 2) {
-    return { wellBorePathCoords, normalOffsetCoordsDown: wellBorePathCoords, normalOffsetCoordsUp: wellBorePathCoords };
-  }
-
-  const tension = 0.2;
-  const numPoints = 999;
-  const normalOffsetCoordsUpInterpolator = new CurveInterpolator(normalOffsetCoordsUpOrig.map(pointToArray), tension);
-  const normalOffsetCoordsDownInterpolator = new CurveInterpolator(normalOffsetCoordsDownOrig.map(pointToArray), tension);
-  const normalOffsetCoordsUp = normalOffsetCoordsUpInterpolator.getPoints(numPoints).map(arrayToPoint);
-  const normalOffsetCoordsDown = normalOffsetCoordsDownInterpolator.getPoints(numPoints).map(arrayToPoint);
-
-  return { wellBorePathCoords, normalOffsetCoordsDown, normalOffsetCoordsUp };
+export const makeTubularPolygon = (rightPath: Point[], leftPath: Point[]): Point[] => {
+  return [
+    ...leftPath,
+    ...rightPath
+      .map<Point>((d) => d.clone())
+      .reverse(),
+  ];
 };
 
-export const actualPoints = (s: HoleObjectData): Point[] => {
-  let start = new Point();
-  let stop = new Point();
-  let startIndex = 0;
-  let stopIndex = 0;
-  const a = s.points.filter((p: MDPoint, index: number) => {
-    if (s.data.start > p.md) {
-      startIndex = index;
-    }
-    if (s.data.end >= p.md) {
-      stopIndex = index;
-    }
-    return p.md > s.data.start && p.md < s.data.end;
-  });
-
-  if (a == null || a.length === 0) {
-    return [];
+export const findCasing = (id: string, casings: Casing[]): Casing => {
+  const res = casings.filter((c) => c.casingId === id);
+  if (res.length === 0) {
+    throw new Error('Casing not found');
   }
-
-  startIndex -= 0;
-  stopIndex += 0;
-  start = s.points[startIndex >= 0 ? startIndex : 0].point;
-  stop = s.points[stopIndex <= s.points.length ? stopIndex : s.points.length - 1].point;
-  return [start, ...a.map((b: MDPoint) => b.point), stop];
-};
-
-export const findCasing = (id: string, casings: any) => {
-  const res = casings.filter((c: any) => c.casingId === id);
-  return res.length > 0 ? res[0] : {};
+  return res[0];
 };
 
 export const overlaps = (top1: number, bottom1: number, top2: number, bottom2: number): boolean => top1 <= bottom2 && top2 <= bottom1;
 
-export const findIntersectingItems = (cement: Cement, parentCasing: Casing, casings: Casing[], holes: HoleSize[]) => {
-  const { toc: start } = cement;
+export const uniq = <T>(arr: T[]): T[] => Array.from<T>(new Set(arr));
 
-  const res = [];
-  res.push(...holes.filter((h: HoleSize) => overlaps(start, parentCasing.end, h.start, h.end) && h.diameter > parentCasing.diameter));
-  res.push(
-    ...casings.filter(
-      (c: Casing) => c.casingId !== cement.casingId && overlaps(start, parentCasing.end, c.start, c.end) && c.diameter > parentCasing.diameter,
-    ),
+export const findIntersectingItems = (
+  cement: Cement,
+  parentCasing: Casing,
+  casings: Casing[],
+  holes: HoleSize[],
+): { holes: HoleSize[]; outerCasings: Casing[] } => {
+  const { toc: start } = cement;
+  const { end } = parentCasing;
+  const overlappingHoles = holes.filter((h: HoleSize) => overlaps(start, end, h.start, h.end) && h.diameter > parentCasing.diameter);
+  const overlappingCasings = casings.filter(
+    (c: Casing) => c.casingId !== cement.casingId && overlaps(start, end, c.start, c.end) && c.diameter > parentCasing.diameter,
   );
-  return res;
+
+  return {
+    holes: overlappingHoles,
+    outerCasings: overlappingCasings,
+  };
+};
+
+export const cementDiameterChangeDepths = (
+  cement: Cement,
+  bottomOfCement: number,
+  diameterIntervals: {
+    start: number;
+    end: number;
+  }[],
+): number[] => {
+  const topOfCement = cement.toc;
+
+  const diameterChangeDepths =
+    merge(
+      diameterIntervals.map((d) => [
+        d.start - 0.0001, // +- 0.0001 to find diameter right beforeobject
+        d.start,
+        d.end,
+        d.end + 0.0001, // +- 0.0001 to find diameter right after object
+      ]),
+    ).filter((d) => d >= topOfCement && d <= bottomOfCement) as number[]; // trim
+
+  diameterChangeDepths.push(topOfCement);
+  diameterChangeDepths.push(bottomOfCement);
+
+  const uniqDepths = uniq(diameterChangeDepths);
+
+  return uniqDepths.sort((a: number, b: number) => a - b);
+};
+
+export const calculateCementDiameter = (innerCasing: Casing, nonAttachedCasings: Casing[], holes: HoleSize[]) => (
+  depth: number,
+): {
+  md: number;
+  innerDiameter: number;
+  outerDiameter: number;
+} => {
+  const defaultCementWidth = 100; // Default to flow cement outside to show error in data
+
+  const innerDiameter = innerCasing ? innerCasing.diameter : 0;
+
+  const outerCasings = nonAttachedCasings.filter((casing) => casing.innerDiameter > innerDiameter);
+  const holeAtDepth = holes.find((casing) => casing.start <= depth && casing.end >= depth);
+  const outerCasingAtDepth = outerCasings
+    .filter((d) => d)
+    .sort((a, b) => a.innerDiameter - b.innerDiameter) // ascending
+    .find((object) => object.start <= depth && object.end >= depth);
+
+  let outerDiameter;
+  if (outerCasingAtDepth) {
+    outerDiameter = outerCasingAtDepth.innerDiameter;
+  } else if (holeAtDepth) {
+    outerDiameter = holeAtDepth.diameter - HOLE_OUTLINE;
+  } else {
+    outerDiameter = defaultCementWidth;
+  }
+
+  return {
+    md: depth,
+    innerDiameter,
+    outerDiameter,
+  };
 };

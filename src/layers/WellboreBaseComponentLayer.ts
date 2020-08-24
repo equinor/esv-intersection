@@ -1,17 +1,19 @@
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
+import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
-import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, HoleObjectData, HoleSize, Casing, OnMountEvent } from '../interfaces';
-
-const DefaultStaticWellboreBaseComponentIncrement = 0.1;
+import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, OnMountEvent } from '../interfaces';
+import Vector2 from '@equinor/videx-vector2';
+import { arrayToPoint } from '../utils/vectorUtils';
 
 export class WellboreBaseComponentLayer extends PixiLayer {
   options: HoleSizeLayerOptions;
+
+  _textureCache: Record<string, Texture> = {};
 
   constructor(id?: string, options?: HoleSizeLayerOptions) {
     super(id, options);
     this.options = {
       ...this.options,
-      wellboreBaseComponentIncrement: options.wellboreBaseComponentIncrement || DefaultStaticWellboreBaseComponentIncrement,
       ...options,
     };
     this.render = this.render.bind(this);
@@ -23,8 +25,10 @@ export class WellboreBaseComponentLayer extends PixiLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.ctx.stage.removeChildren();
-    //this.render(event);
+    const children = this.ctx.stage.removeChildren();
+    children.forEach((child) => {
+      child.destroy();
+    });
   }
 
   onRescale(event: OnRescaleEvent): void {
@@ -35,6 +39,40 @@ export class WellboreBaseComponentLayer extends PixiLayer {
 
   // This is overridden by the extended well bore items layers (casing, hole)
   render(event: OnRescaleEvent | OnUpdateEvent): void {}
+
+  getMdPoint = (md: number): MDPoint => {
+    const p = this.referenceSystem.project(md);
+    const point = { point: arrayToPoint(p as [number, number]), md: md };
+    return point;
+  };
+
+  computeNormal(md: number): Vector2 {
+    const tangent = this.referenceSystem.curtainTangent(md);
+    const normal = new Vector2(tangent).rotate90();
+    return normal;
+  }
+
+  getNormal = (point: MDPoint): MDPoint => {
+    const normal = this.computeNormal(point.md);
+    return { ...point, normal };
+  };
+
+  getPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
+    const pathPoints = this.referenceSystem.getCurtainPath(start, end).map((p) => ({ point: arrayToPoint(p.point as [number, number]), md: p.md }));
+    const interestMdPoints = interestPoints.map(this.getMdPoint);
+
+    const points = merge<MDPoint>([pathPoints, interestMdPoints]);
+    points.sort((a, b) => a.md - b.md);
+
+    return points;
+  };
+
+  getPathWithNormals = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
+    const points = this.getPathForPoints(start, end, [start, end, ...interestPoints]);
+    const pointsWithNormal = points.map<MDPoint>(this.getNormal);
+
+    return pointsWithNormal;
+  };
 
   drawBigPolygon = (coords: Point[], t?: Texture): Graphics => {
     const polygon = new Graphics();
@@ -50,19 +88,32 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     return polygon;
   };
 
-  createRopeTextureBackground = (coords: Point[], texture: Texture, mask: Graphics): SimpleRope => {
-    if (coords.length === 0) {
+  drawRopeWithMask(path: Point[], maskPolygon: Point[], texture: Texture): void {
+    if (maskPolygon.length === 0 || path.length === 0) {
+      return null;
+    }
+    const rope: SimpleRope = new SimpleRope(texture, path, 1);
+
+    const mask = new Graphics();
+    mask.beginFill(0);
+    mask.drawPolygon(maskPolygon);
+    mask.endFill();
+    this.ctx.stage.addChild(mask);
+    rope.mask = mask;
+
+    this.ctx.stage.addChild(rope);
+  }
+
+  drawRope(path: Point[], texture: Texture): void {
+    if (path.length === 0) {
       return null;
     }
 
-    const rope: SimpleRope = new SimpleRope(texture, coords);
-    rope.mask = mask;
+    const rope: SimpleRope = new SimpleRope(texture, path, 1);
     this.ctx.stage.addChild(rope);
+  }
 
-    return rope;
-  };
-
-  drawLine = (coords: Point[], lineColor: number, lineWidth = 1): void => {
+  drawLine(coords: Point[], lineColor: number, lineWidth = 1): void {
     const DRAW_ALIGNMENT_INSIDE = 1;
     const startPoint = coords[0];
     const line = new Graphics();
@@ -70,9 +121,16 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     coords.map((p: Point) => line.lineTo(p.x, p.y));
 
     this.ctx.stage.addChild(line);
-  };
+  }
 
-  createTexure = (maxWidth: number, firstColor: string, secondColor: string, startPctOffset = 0): Texture => {
+  createTexture(maxWidth: number, startPctOffset: number = 0): Texture {
+    const cacheKey = `${maxWidth}X${startPctOffset}`;
+    if (this._textureCache.hasOwnProperty(cacheKey)) {
+      return this._textureCache[cacheKey];
+    }
+
+    const { firstColor, secondColor } = this.options;
+
     const halfWayPct = 0.5;
     const canvas = document.createElement('canvas');
     canvas.width = 300;
@@ -89,18 +147,8 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
     const t = Texture.from(canvas);
-    return t;
-  };
+    this._textureCache[cacheKey] = t;
 
-  generateHoleSizeData = (data: HoleSize | Casing): HoleObjectData => {
-    const points: MDPoint[] = [];
-
-    // Add distance to points
-    for (let i = data.start; i < data.end; i += this.options.wellboreBaseComponentIncrement) {
-      const p = this.referenceSystem.project(i);
-      points.push({ point: new Point(p[0], p[1]), md: i });
-    }
-
-    return { data: { ...data, diameter: data.diameter }, points, hasShoe: data.hasShoe, innerDiameter: data.innerDiameter };
-  };
+    return this._textureCache[cacheKey];
+  }
 }
