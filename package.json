@@ -17,9 +17,9 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "predocs": "rimraf docs",
-    "docs": "typedoc --out docs src",
-    "postdocs": "copyfiles images/* docs && copyfiles .nojekyll docs",
+    "predocs": "rimraf docs_out",
+    "docs": "typedoc --out docs_out src",
+    "postdocs": "copyfiles images/* docs_out && copyfiles .nojekyll docs_out",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "prettier": "prettier --write --config .prettierrc \"**/*.ts\" "
@@ -33,10 +33,6 @@
     "heappurple",
     "intersection",
     "typescript"
-  ],
-  "contributors": [
-    "Tom Kristian Tjemsland",
-    "Brynjulf Risbakken"
   ],
   "license": "MIT",
   "bugs": {

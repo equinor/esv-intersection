@@ -13,27 +13,25 @@ jobs:
       with:
         submodules: true
         persist-credentials: false
-    
+
     - name: Info
       run: echo "Running on branch $(basename ${{ github.ref }})"
-    
+
     - name: Install dependencies
       run:  npm install --production=false
-    
+
     - name: Create build dir
-      run: mkdir docs_out    
-    
+      run: mkdir docs_out
+
     - name: Build documentation # only if this was triggered from latest
       if: github.ref == 'refs/heads/latest' 
-      # TODO: replace these with `npm docs` and `npm postdocs` once you are sure everything works
       run: |
-        npx typedoc --out docs_out src
-        npx copyfiles images/* docs_out
-        npx copyfiles .nojekyll docs_out
-    
+        npm run docs
+        npm run postdocs
+
     - name: Generate storybook
       run:  npx build-storybook -c .storybook -o docs_out/storybook/$(basename ${{ github.ref }})
-            
+
     - name: Publish GH pages
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
