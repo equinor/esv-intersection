@@ -1,4 +1,5 @@
 import Vector2 from '@equinor/videx-vector2';
+import { clamp } from '@equinor/videx-math'
 
 import { CanvasLayer } from './base/CanvasLayer';
 import { GeomodelLayerLabelsOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
@@ -124,7 +125,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     const bottomEdge = yScale.invert(yScale.range()[1]);
 
     // Calculate where to sample points
-    const dirSteps = 3;
+    const dirSteps = 5;
     const posSteps = 3;
     const posStep =
       portionOfLabelLengthUsedForPosCalc * (labelLengthInWorldCoords / posSteps) * (isLabelsOnLeftSide ? 1 : -1) * (isXFlipped ? -1 : 1);
@@ -160,21 +161,13 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     // Sample points from top and bottom and calculate direction vector
     const initialDirVec = isLabelsOnLeftSide !== isXFlipped ? Vector2.right : Vector2.left;
-    let dirVec = this.calcAreaDir(topData, bottomData, startPos, dirSteps, dirStep, initialDirVec, topEdge, bottomEdge);
-    if (!dirVec) {
-      return;
-    }
-
-    // Calculate position and direction for label
-    const textX = startPos;
-    const textY = (topPos.y + bottomPos.y) / 2;
-    if (isXFlipped) {
-      dirVec = new Vector2(-dirVec[0], dirVec[1]);
-    }
-    dirVec = new Vector2(dirVec[0], dirVec[1] * zFactor);
-    const textAngle = Vector2.angleRight(dirVec) - (isLabelsOnLeftSide ? 0 : Math.PI);
+    const areaDir = this.calcAreaDir(topData, bottomData, startPos, dirSteps, dirStep, initialDirVec, topEdge, bottomEdge);
+    const scaledAngle = Math.atan(Math.tan(areaDir) * zFactor);
 
     // Draw label
+    const textX = startPos;
+    const textY = (topPos.y + bottomPos.y) / 2;
+    const textAngle = isXFlipped ? -scaledAngle : scaledAngle;
     ctx.textAlign = isLabelsOnLeftSide ? 'left' : 'right';
     ctx.translate(xScale(textX), yScale(textY));
     ctx.rotate(textAngle);
@@ -189,8 +182,6 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   drawLineLabel = (s: SurfaceLine): void => {
     const { ctx, isXFlipped } = this;
     const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
-    const maxX = Math.max(s.data[0][0], s.data[s.data.length - 1][0]);
-    const minX = Math.min(s.data[0][0], s.data[s.data.length - 1][0]);
     const isLabelsOnLeftSide = this.checkDrawLabelsOnLeftSide();
     const marginsInWorldCoords = this.getMarginsInWorldCoordinates();
     const maxFontSize = this.options.maxFontSize || this.defaultMaxFontSize;
@@ -308,14 +299,15 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     initalVector: Vector2 = Vector2.left,
     topLimit: number = null,
     bottomLimit: number = null,
-    thicknessThreshold: number = -1,
-    scaleByThickness: boolean = true,
-  ): Vector2 {
-    const dir = initalVector.clone().mutable;
+    minReductionAngle: number = 0,
+    maxReductionAngle: number = Math.PI / 4,
+    angleReductionExponent: number = 4,
+  ): number {
+    const angles: number[] = [];
 
     const startTopY = findSampleAtPos(top, offset, topLimit, bottomLimit);
     if (startTopY === null) {
-      return dir;
+      return Vector2.angleRight(initalVector);
     }
     const startBottomY = findSampleAtPos(bottom, offset, topLimit, bottomLimit) || bottomLimit;
     const startY = (startTopY + startBottomY) / 2;
@@ -327,22 +319,26 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       const topY = findSampleAtPos(top, x, topLimit, bottomLimit);
       const bottomY = findSampleAtPos(bottom, x, topLimit, bottomLimit) || bottomLimit;
       if (topY !== null) {
-        const thickness = bottomY - topY;
-        if (thickness >= thicknessThreshold) {
-          tmpVec.set(x, (topY + bottomY) / 2);
-          tmpVec.sub(vecAtEnd);
-          tmpVec.normalize();
-          if (scaleByThickness) {
-            tmpVec.scale(thickness);
-          }
-          dir.add(tmpVec);
-        }
+        tmpVec.set(x, (topY + bottomY) / 2);
+        tmpVec.sub(vecAtEnd);
+
+        angles.push(Vector2.angleRight(tmpVec));
       } else {
-        dir.add(initalVector);
+        angles.push(Vector2.angleRight(initalVector));
       }
     }
 
-    return dir;
+    const refAngle = angles[0];
+    const offsetAngles = angles.map((d: number) => d - refAngle);
+    let factors = 0;
+    const offsetSum = offsetAngles.reduce((acc: number, v: number) => {
+      const ratio = (Math.abs(v) - minReductionAngle) / maxReductionAngle;
+      const factor = Math.pow(1 - clamp(ratio, 0, 1), angleReductionExponent);
+      factors += factor;
+      return acc + (v * factor);
+    }, 0);
+    const angle = (offsetSum / factors) + refAngle;
+    return angle;
   }
 
   updateXFlipped(): void {
