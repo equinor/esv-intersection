@@ -88,7 +88,10 @@ export class GeomodelLayer extends PixiLayer {
   drawSurfaceLine = (s: any): void => {
     const { graphics: g } = this;
     const { data: d } = s;
-    g.lineStyle(s.width, s.color, 1);
+
+    const alignment = 0.5;
+
+    g.lineStyle(s.width, s.color, 1, alignment, true);
     let penDown = false;
     for (let i = 0; i < d.length; i++) {
       if (d[i][1]) {
