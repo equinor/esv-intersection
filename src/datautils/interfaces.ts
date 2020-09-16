@@ -36,10 +36,9 @@ export interface SurfaceMetaAndValues {
  * Surfaces lines ready for drawing by geomodel layer
  */
 export interface SurfaceLine {
-  id: string;
+  id?: string;
   label: string;
-  width: number;
-  color: number;
+  color: number | string; // Color is passed to pixi.js and accepts both CSS color strings and hex color value
   data: number[][];
 }
 
@@ -47,9 +46,9 @@ export interface SurfaceLine {
  * Surfaces areas ready for drawing by geomodel layer
  */
 export interface SurfaceArea {
-  id: string;
+  id?: string;
   label: string;
-  color: number;
+  color: number | string; // Color is passed to pixi.js and accepts both CSS color strings and hex color value
   data: number[][];
   exclude?: boolean;
 }

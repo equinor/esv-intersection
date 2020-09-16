@@ -1,7 +1,8 @@
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
-
+import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
+import { SURFACE_LINE_WIDTH } from '../constants';
 export class GeomodelLayer extends PixiLayer {
   options: GeomodelLayerOptions;
 
@@ -10,6 +11,22 @@ export class GeomodelLayer extends PixiLayer {
   constructor(id?: string, options?: GeomodelLayerOptions) {
     super(id, options);
     this.render = this.render.bind(this);
+  }
+
+  get data(): SurfaceData {
+    return super.getData();
+  }
+
+  set data(data: SurfaceData) {
+    this.setData(data);
+  }
+
+  getData(): SurfaceData {
+    return super.getData();
+  }
+
+  setData(data: SurfaceData): void {
+    super.setData(data);
   }
 
   onMount(event: OnMountEvent): void {
@@ -39,8 +56,8 @@ export class GeomodelLayer extends PixiLayer {
     }
 
     this.graphics.clear();
-    data.areas.forEach((s: GeoModelData) => this.drawAreaPolygon(s));
-    data.lines.forEach((s: any) => this.drawSurfaceLine(s));
+    data.areas.forEach((s: SurfaceArea) => this.drawAreaPolygon(s));
+    data.lines.forEach((s: SurfaceLine) => this.drawSurfaceLine(s));
   }
 
   createPolygon = (data: any): number[][] => {
@@ -75,23 +92,23 @@ export class GeomodelLayer extends PixiLayer {
     return polygons;
   };
 
-  drawAreaPolygon = (s: GeoModelData): void => {
+  drawAreaPolygon = (s: SurfaceArea): void => {
     const { graphics: g } = this;
     const polygons = this.createPolygon(s.data);
     polygons.forEach((polygon: any) => {
-      g.beginFill(s.color);
+      g.beginFill(s.color as number);
       g.drawPolygon(polygon);
       g.endFill();
     });
   };
 
-  drawSurfaceLine = (s: any): void => {
+  drawSurfaceLine = (s: SurfaceLine): void => {
     const { graphics: g } = this;
     const { data: d } = s;
 
     const alignment = 0.5;
+    g.lineStyle(SURFACE_LINE_WIDTH, s.color as number, 1, alignment, true);
 
-    g.lineStyle(s.width, s.color, 1, alignment, true);
     let penDown = false;
     for (let i = 0; i < d.length; i++) {
       if (d[i][1]) {

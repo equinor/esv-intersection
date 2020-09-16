@@ -1,15 +1,31 @@
 import { Graphics, Container } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
+import { SURFACE_LINE_WIDTH } from '../constants';
 
 export class GeomodelLayerV2 extends PixiLayer {
   options: GeomodelLayerOptions;
 
   pixiContainer: Container;
 
-  data: any;
-
   polygons: any;
+
+  get data(): SurfaceData {
+    return super.getData();
+  }
+
+  set data(data: SurfaceData) {
+    this.setData(data);
+  }
+
+  getData(): SurfaceData {
+    return super.getData();
+  }
+
+  setData(data: SurfaceData): void {
+    super.setData(data);
+  }
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
@@ -74,22 +90,22 @@ export class GeomodelLayerV2 extends PixiLayer {
     return polygons;
   };
 
-  generateAreaPolygon = (s: GeoModelData): void => {
+  generateAreaPolygon = (s: SurfaceArea): void => {
     const g = new Graphics();
-    g.lineStyle(1, s.color, 1);
-    g.beginFill(s.color);
+    g.lineStyle(1, s.color as number, 1);
+    g.beginFill(s.color as number);
     const polygons = this.createPolygons(s.data);
     polygons.forEach((polygon: any) => g.drawPolygon(polygon));
     g.endFill();
     this.pixiContainer.addChild(g);
   };
 
-  generateSurfaceLine = (s: any): void => {
+  generateSurfaceLine = (s: SurfaceLine): void => {
     const g = new Graphics();
     const { data: d } = s;
 
     const alignment = 0.5;
-    g.lineStyle(s.width, s.color, 1, alignment, true);
+    g.lineStyle(SURFACE_LINE_WIDTH, s.color as number, 1, alignment, true);
 
     let penDown = false;
     for (let i = 0; i < d.length; i++) {

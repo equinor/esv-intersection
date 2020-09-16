@@ -95,12 +95,6 @@ export interface WellComponentBaseOptions extends LayerOptions {
   font?: string;
 }
 
-export interface GeoModelData {
-  name: string;
-  color: number;
-  data: [number[]];
-}
-
 export interface ZoomAndPanOptions {
   maxZoomLevel: number;
   minZoomLevel: number;
