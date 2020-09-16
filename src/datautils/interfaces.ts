@@ -38,7 +38,7 @@ export interface SurfaceMetaAndValues {
 export interface SurfaceLine {
   id?: string;
   label: string;
-  color: number | string;
+  color: number | string; // Color is passed to pixi.js and accepts both CSS color strings and hex color value
   data: number[][];
 }
 
@@ -48,7 +48,7 @@ export interface SurfaceLine {
 export interface SurfaceArea {
   id?: string;
   label: string;
-  color: number | string;
+  color: number | string; // Color is passed to pixi.js and accepts both CSS color strings and hex color value
   data: number[][];
   exclude?: boolean;
 }
