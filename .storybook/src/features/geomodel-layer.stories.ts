@@ -197,3 +197,45 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
 
   return root;
 };
+
+export const GeoModelCanvasUsingHighLevelInterface = () => {
+  const root = createRootContainer(width);
+  const container = createLayerContainer(width, height);
+  const fpsLabel = createFPSLabel();
+
+  const options: GeomodelLayerOptions = { order: 1 };
+  const geoModelLayer = new GeomodelCanvasLayer('canvas', options);
+
+  Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
+    const [path, surfaces, stratColumns] = values;
+
+    const referenceSystem = new IntersectionReferenceSystem(path);
+    const displacement = referenceSystem.displacement || 1;
+    const extend = 1000 / displacement;
+    const steps = surfaces[0]?.data?.values?.length || 1;
+    const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
+    const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
+    const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
+
+    geoModelLayer.setData(geolayerdata);
+  });
+
+  const controller = new Controller({ container, layers: [geoModelLayer] });
+
+  controller.setBounds([0, 1000], [0, 1000]);
+  controller.adjustToSize(width, height);
+  controller.zoomPanHandler.zFactor = 1;
+  controller.zoomPanHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+  controller.zoomPanHandler.enableTranslateExtent = false;
+  controller.setViewport(1000, 1000, 5000);
+
+  root.appendChild(
+    createHelpText(
+      'High level interface for creating and displaying geo model (aka surfaces). This layer is made using plain HTML canvas. GeomodelLayer is preferred for rendering geo models if your browser supports WebGL.',
+    ),
+  );
+  root.appendChild(container);
+  root.appendChild(fpsLabel);
+
+  return root;
+};
