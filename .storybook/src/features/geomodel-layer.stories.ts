@@ -1,7 +1,17 @@
-import { GeomodelLayer, GeomodelCanvasLayer, GeomodelLayerV2, GeomodelLabelsLayer, ZoomPanHandler, GeomodelLayerOptions, LayerOptions, OnRescaleEvent, IntersectionReferenceSystem, Controller } from '../../../src';
+import {
+  GeomodelLayer,
+  GeomodelCanvasLayer,
+  GeomodelLayerV2,
+  GeomodelLabelsLayer,
+  ZoomPanHandler,
+  GeomodelLayerOptions,
+  LayerOptions,
+  OnRescaleEvent,
+  IntersectionReferenceSystem,
+  Controller,
+} from '../../../src';
 import { generateSurfaceData, SurfaceData } from '../../../src/datautils';
 import { getSurfaces, getStratColumns, getPositionLog, getWellborePath } from '../data';
-
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
 
@@ -76,10 +86,10 @@ export const GeoModelWithLabelsUsingLowLevelInterface = () => {
     const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
 
+    geoModelLayer.referenceSystem = referenceSystem;
+    geoModelLabelsLayer.referenceSystem = referenceSystem;
     geoModelLayer.setData(geolayerdata);
     geoModelLabelsLayer.setData(geolayerdata);
-    geoModelLayer.referenceSystem = referenceSystem;
-    geoModelLabelsLayer.referenceSystem = referenceSystem
   });
 
   zoomHandler.setBounds([0, 1000], [0, 1000]);
@@ -89,7 +99,11 @@ export const GeoModelWithLabelsUsingLowLevelInterface = () => {
   zoomHandler.enableTranslateExtent = false;
   zoomHandler.setViewport(1000, 1000, 5000);
 
-  root.appendChild(createHelpText('Low level interface for creating and displaying geo model (aka surfaces) with labels. The geo model layer is made using webGL and the labels using canvas.'));
+  root.appendChild(
+    createHelpText(
+      'Low level interface for creating and displaying geo model (aka surfaces) with labels. The geo model layer is made using webGL and the labels using canvas.',
+    ),
+  );
   root.appendChild(container);
   root.appendChild(fpsLabel);
 
@@ -158,12 +172,12 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
     const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
 
-    geoModelLayer.setData(geolayerdata);
-    geoModelLabelsLayer.setData(geolayerdata);
-
     const controller = new Controller({ container, layers: [geoModelLayer, geoModelLabelsLayer] });
 
     controller.setReferenceSystem(referenceSystem);
+
+    geoModelLayer.setData(geolayerdata);
+    geoModelLabelsLayer.setData(geolayerdata);
 
     controller.setBounds([0, 1000], [0, 1000]);
     controller.adjustToSize(width, height);
@@ -173,7 +187,11 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
     controller.setViewport(1000, 1000, 5000);
   });
 
-  root.appendChild(createHelpText('High level interface for creating and displaying geo model (aka surfaces) with labels. The geo model layer is made using webGL and the labels using canvas.'));
+  root.appendChild(
+    createHelpText(
+      'High level interface for creating and displaying geo model (aka surfaces) with labels. The geo model layer is made using webGL and the labels using canvas.',
+    ),
+  );
   root.appendChild(container);
   root.appendChild(fpsLabel);
 

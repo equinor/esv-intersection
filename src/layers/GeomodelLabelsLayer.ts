@@ -1,9 +1,10 @@
 import Vector2 from '@equinor/videx-vector2';
-import { clamp } from '@equinor/videx-math'
+import { clamp } from '@equinor/videx-math';
 
 import { CanvasLayer } from './base/CanvasLayer';
 import { GeomodelLayerLabelsOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
-import { SurfaceArea, SurfaceLine, findSampleAtPos } from '../datautils';
+import { SurfaceArea, SurfaceLine, findSampleAtPos, SurfaceData } from '../datautils';
+import { SURFACE_LINE_WIDTH } from '../constants';
 
 const DEFAULT_MARGINS = 18;
 const DEFAULT_MIN_FONT_SIZE = 8;
@@ -30,6 +31,22 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     this.getMarginsInWorldCoordinates = this.getMarginsInWorldCoordinates.bind(this);
     this.getSurfacesAreaEdges = this.getSurfacesAreaEdges.bind(this);
     this.updateXFlipped = this.updateXFlipped.bind(this);
+  }
+
+  get data(): SurfaceData {
+    return super.getData();
+  }
+
+  set data(data: SurfaceData) {
+    this.setData(data);
+  }
+
+  getData(): SurfaceData {
+    return super.getData();
+  }
+
+  setData(data: SurfaceData): void {
+    super.setData(data);
   }
 
   onMount(event: OnMountEvent): void {
@@ -64,11 +81,11 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   drawAreaLabels(): void {
-    this.data.areas.filter((d: any) => d.label).forEach((s: SurfaceArea) => this.drawAreaLabel(s));
+    this.data.areas.filter((d: SurfaceArea) => d.label).forEach((s: SurfaceArea) => this.drawAreaLabel(s));
   }
 
   drawLineLabels(): void {
-    this.data.lines.filter((d: any) => d.label).forEach((s: SurfaceLine) => this.drawLineLabel(s));
+    this.data.lines.filter((d: SurfaceLine) => d.label).forEach((s: SurfaceLine) => this.drawLineLabel(s));
   }
 
   drawAreaLabel = (s: SurfaceArea): void => {
@@ -219,23 +236,28 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     // Calculate position and direction for label
     const textX = startPos;
-    const textY = pos.y - s.width - fontSizeInWorldCoords / 2;
+    const textY = pos.y - SURFACE_LINE_WIDTH - fontSizeInWorldCoords / 2;
     const textDir = Vector2.angleRight(dir) - (isLabelsOnLeftSide ? Math.PI : 0);
 
     // Draw label
     ctx.textAlign = isLabelsOnLeftSide ? 'right' : 'left';
     ctx.translate(xScale(textX), yScale(textY));
     ctx.rotate(textDir);
-    ctx.fillStyle = `#${this.colorToHexString(s.color)}`;
+    ctx.fillStyle = this.colorToCSSColor(s.color);
     ctx.textBaseline = 'middle';
     ctx.fillText(s.id, 0, 0);
 
     ctx.restore();
   };
 
-  colorToHexString(color: number): string {
-    // eslint-disable-next-line no-magic-numbers
-    return color.toString(16).padStart(6, '0');
+  colorToCSSColor(color: number | string): string {
+    if (typeof color === 'string') {
+      return color;
+    }
+
+    let hexString = color.toString(16);
+    hexString = '000000'.substr(0, 6 - hexString.length) + hexString;
+    return `#${hexString}`;
   }
 
   calcPos(data: number[][], offset: number, count: number, step: number, topLimit: number = null, bottomLimit: number = null): Vector2 {
@@ -335,9 +357,9 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       const ratio = (Math.abs(v) - minReductionAngle) / maxReductionAngle;
       const factor = Math.pow(1 - clamp(ratio, 0, 1), angleReductionExponent);
       factors += factor;
-      return acc + (v * factor);
+      return acc + v * factor;
     }, 0);
-    const angle = (offsetSum / factors) + refAngle;
+    const angle = offsetSum / factors + refAngle;
     return angle;
   }
 

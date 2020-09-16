@@ -1,4 +1,5 @@
-import { GeoModelData, GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
+import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 import { CanvasLayer } from './base/CanvasLayer';
 
 const DEFAULT_MAX_DEPTH = 10000;
@@ -6,6 +7,7 @@ const DEFAULT_MAX_DEPTH = 10000;
 export class GeomodelCanvasLayer extends CanvasLayer {
   rescaleEvent: OnRescaleEvent;
 
+  // TODO add types for surfaceAreasPaths and surfaceLinesPaths
   surfaceAreasPaths: any[] = [];
 
   surfaceLinesPaths: any[] = [];
@@ -19,6 +21,22 @@ export class GeomodelCanvasLayer extends CanvasLayer {
     this.generateSurfaceLinesPaths = this.generateSurfaceLinesPaths.bind(this);
     this.drawPolygonPath = this.drawPolygonPath.bind(this);
     this.drawLinePath = this.drawLinePath.bind(this);
+  }
+
+  get data(): SurfaceData {
+    return super.getData();
+  }
+
+  set data(data: SurfaceData) {
+    this.setData(data);
+  }
+
+  getData(): SurfaceData {
+    return super.getData();
+  }
+
+  setData(data: SurfaceData): void {
+    super.setData(data);
   }
 
   onMount(event: OnMountEvent): void {
@@ -53,15 +71,21 @@ export class GeomodelCanvasLayer extends CanvasLayer {
     this.surfaceLinesPaths.forEach((l: any) => this.drawLinePath(l.color, l.path));
   }
 
-  colorToHexString(color: number): string {
-    return color.toString(16).padStart(6, '0');
+  colorToCSSColor(color: number | string): string {
+    if (typeof color === 'string') {
+      return color;
+    }
+
+    let hexString = color.toString(16);
+    hexString = '000000'.substr(0, 6 - hexString.length) + hexString;
+    return `#${hexString}`;
   }
 
   generateSurfaceAreasPaths(): void {
-    this.surfaceAreasPaths = this.data.areas.reduce((acc: any, s: GeoModelData) => {
+    this.surfaceAreasPaths = this.data.areas.reduce((acc: any, s: SurfaceArea) => {
       const polygons = this.createPolygons(s.data);
       const mapped = polygons.map((polygon: any) => ({
-        color: `#${this.colorToHexString(s.color)}`,
+        color: this.colorToCSSColor(s.color),
         path: this.generatePolygonPath(polygon),
       }));
       return [...acc, ...mapped];
@@ -69,9 +93,9 @@ export class GeomodelCanvasLayer extends CanvasLayer {
   }
 
   generateSurfaceLinesPaths(): void {
-    this.surfaceLinesPaths = this.data.lines.reduce((acc: any, l: any) => {
+    this.surfaceLinesPaths = this.data.lines.reduce((acc: any, l: SurfaceLine) => {
       const lines = this.generateLinePaths(l);
-      const mapped = lines.map((path: Path2D) => ({ color: `#${this.colorToHexString(l.color)}`, path }));
+      const mapped = lines.map((path: Path2D) => ({ color: this.colorToCSSColor(l.color), path }));
       return [...acc, ...mapped];
     }, []);
   }
