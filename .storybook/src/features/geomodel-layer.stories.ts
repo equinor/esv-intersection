@@ -1,5 +1,4 @@
 import {
-  GeomodelLayer,
   GeomodelCanvasLayer,
   GeomodelLayerV2,
   GeomodelLabelsLayer,
@@ -24,7 +23,7 @@ export const GeoModelUsingLowLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: GeomodelLayerOptions = { order: 1 };
-  const geoModelLayer = new GeomodelLayer('webgl', options);
+  const geoModelLayer = new GeomodelLayerV2('webgl', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
@@ -63,7 +62,7 @@ export const GeoModelWithLabelsUsingLowLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: GeomodelLayerOptions = { order: 1 };
-  const geoModelLayer = new GeomodelLayer('geomodels', options);
+  const geoModelLayer = new GeomodelLayerV2('geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
   const options2: LayerOptions = { order: 1 };
@@ -116,7 +115,7 @@ export const GeoModelUsingHighLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: GeomodelLayerOptions = { order: 1 };
-  const geoModelLayer = new GeomodelLayer('webgl', options);
+  const geoModelLayer = new GeomodelLayerV2('webgl', options);
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
     const [path, surfaces, stratColumns] = values;
@@ -154,7 +153,7 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: GeomodelLayerOptions = { order: 1 };
-  const geoModelLayer = new GeomodelLayer('geomodels', options);
+  const geoModelLayer = new GeomodelLayerV2('geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
   const options2: LayerOptions = { order: 1 };
