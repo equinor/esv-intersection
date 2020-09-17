@@ -1,0 +1,343 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@equinor/esv-intersection</title>
+	<meta name="description" content="Documentation for @equinor/esv-intersection">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@equinor/esv-intersection</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>@equinor/esv-intersection</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<p><a href="https://badge.fury.io/js/%40equinor%2Fesv-intersection"><img src="https://badge.fury.io/js/%40equinor%2Fesv-intersection.svg" alt="npm version"></a>
+					<img src="https://github.com/equinor/esv-intersection/workflows/Publish%20Package/badge.svg" alt="Publish Package">
+				<img src="https://github.com/equinor/esv-intersection/workflows/Unit%20tests/badge.svg" alt="Unit tests"></p>
+				<a href="#esv-intersection-component" id="esv-intersection-component" style="color: inherit; text-decoration: none;">
+					<h1>ESV Intersection component</h1>
+				</a>
+				<p>A reusable component to create intersection visualizations for wells</p>
+				<p>Part of the <a href="https://github.com/equinor/esv">Equinor Subsurface Visualization project</a></p>
+				<ul>
+					<li><strong>Repository</strong>: <a href="https://github.com/equinor/esv-intersection">https://github.com/equinor/esv-intersection</a></li>
+					<li><strong>NPM Package</strong>: <a href="https://www.npmjs.com/package/@equinor/esv-intersection">https://www.npmjs.com/package/@equinor/esv-intersection</a></li>
+					<li><strong>Documentation (latest)</strong>: <a href="https://equinor.github.io/esv-intersection/">https://equinor.github.io/esv-intersection/</a></li>
+					<li><strong>Storybook (latest)</strong>: <a href="https://equinor.github.io/esv-intersection/storybook/latest">https://equinor.github.io/esv-intersection/storybook/latest</a></li>
+					<li><strong>Storybook (nightly)</strong>: <a href="https://equinor.github.io/esv-intersection/storybook/master">https://equinor.github.io/esv-intersection/storybook/master</a></li>
+					<li><strong>React/typescript example</strong>: <a href="https://github.com/equinor/react-intersection-example">https://github.com/equinor/react-intersection-example</a></li>
+				</ul>
+				<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
+					<h2>Getting started</h2>
+				</a>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h4>Installation</h4>
+				</a>
+				<p>Using npm:</p>
+				<pre><code class="language-bash">npm install --save @equinor/esv-intersection</code></pre>
+				<p>Using yarn:</p>
+				<pre><code class="language-bash">yarn add @equinor/esv-intersection</code></pre>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { Controller, GridLayer } <span class="hljs-keyword">from</span> <span class="hljs-string">'@equinor/esv-intersection'</span>;
+
+<span class="hljs-keyword">const</span> container = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+<span class="hljs-keyword">const</span> controller = <span class="hljs-keyword">new</span> Controller(container);
+
+<span class="hljs-comment">// the controller initially has zero height</span>
+controller.adjustToSize(<span class="hljs-number">400</span>, <span class="hljs-number">400</span>);
+
+controller.addLayer(<span class="hljs-keyword">new</span> GridLayer(<span class="hljs-string">'grid'</span>));</code></pre>
+				<p>For more examples, check out our stories in our online <a href="https://equinor.github.io/esv-intersection/storybook/latest">storybook</a>.</p>
+				<a href="#technical-choices" id="technical-choices" style="color: inherit; text-decoration: none;">
+					<h2>Technical choices</h2>
+				</a>
+				<ul>
+					<li><strong>Compiler</strong>: <a href="https://www.npmjs.com/package/typescript">Typescript</a></li>
+					<li><strong>Module bundler</strong>: <a href="https://www.npmjs.com/package/rollup">Rollup</a></li>
+					<li><strong>Testing</strong>: <a href="https://www.npmjs.com/package/jest">Jest</a></li>
+					<li><strong>Documentation</strong>: <a href="https://www.npmjs.com/package/typedoc">TypeDoc</a></li>
+					<li><strong>Code compressor</strong>: <a href="https://www.npmjs.com/package/terser">Terser</a></li>
+					<li><strong>Miscellaneous</strong>:<ul>
+							<li>Architecture: A container component that holds several layers, specialized for the type of data and visualization they address (analogous to the VidEx-map component <a href="https://github.com/equinor/videx-map">https://github.com/equinor/videx-map</a>)</li>
+							<li>Browser support: Target Edge, Chrome, Firefox, Safari</li>
+							<li>Linting and unit tests run automatically on Github Actions</li>
+						</ul>
+					</li>
+				</ul>
+				<a href="#development-methodology" id="development-methodology" style="color: inherit; text-decoration: none;">
+					<h2>Development methodology</h2>
+				</a>
+				<ul>
+					<li>The project is maintained by the <a href="https://github.com/orgs/equinor/teams/viz">VidEx team</a> (Software Innovation Stavanger) and the <a href="https://github.com/orgs/equinor/teams/heap-purple">Heap Purple team</a> (Software Innovation Bergen)</li>
+					<li>The maintainers meet once a month to discuss the direction of the project, and possible development activities</li>
+					<li>Development is currently limited to critical bug fixes. New features could be requested by opening a dedicated issue or, even better, by opening a <a href="CONTRIBUTION.md">Pull Requests</a></li>
+					<li>Development relies on a <em>project board</em> hosted on github (<a href="https://github.com/equinor/intersection/projects/1">https://github.com/equinor/intersection/projects/1</a>)</li>
+				</ul>
+				<a href="#support" id="support" style="color: inherit; text-decoration: none;">
+					<h2>Support</h2>
+				</a>
+				<p>If you are an equinor employee, the easiest way to get in touch with the maintainers is through the #esv-intersection channel on Slack.</p>
+				<p>Otherwise, Github issues are the main communication channel with the maintainers. If you have a bug report, a feature request, or need some help using the component, simply <a href="https://github.com/equinor/esv-intersection/issues">create an issue in the repository</a> and one of the maintainers will pick it up. Before creating an issue, please have a look at the following guidelines. Also keep in mind that creating <a href="CONTRIBUTION.md">Pull Requests</a> is the preferred way to contribute to the project. </p>
+				<a href="#help-needed" id="help-needed" style="color: inherit; text-decoration: none;">
+					<h3>Help needed</h3>
+				</a>
+				<p>Describe your use case in details, make sure to include the version of the component you are using, and relevant software that are part of your pipeline (eg, Chrome/Firefox/Safari, Node, npm, …), including their version as well</p>
+				<a href="#bug-reports" id="bug-reports" style="color: inherit; text-decoration: none;">
+					<h3>Bug reports</h3>
+				</a>
+				<p>Follow the instructions from the <em>Help needed</em> section above, but also include precise instructions about how to reproduce the bug. If any data is required for reproducing the bug, it would be beneficial to have access to it as well.</p>
+				<a href="#feature-requests" id="feature-requests" style="color: inherit; text-decoration: none;">
+					<h3>Feature requests</h3>
+				</a>
+				<p>Give a precise description of your use case. It would be best if you could formulate your request as a user story, using the format <code>As a &lt;subject&gt; I would like to &lt;the feature you need&gt; so that &lt;the task you want to accomplish&gt;</code></p>
+				<a href="#contribution" id="contribution" style="color: inherit; text-decoration: none;">
+					<h2>Contribution</h2>
+				</a>
+				<p>See the contribution <a href="CONTRIBUTION.md">page</a></p>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p>The large majority of the files in this repository are released under the <a href="LICENSE">MIT license</a>. There are 2 exceptions:</p>
+				<ul>
+					<li>the <a href="CONTRIBUTION.md">CONTRIBUTION.md</a> file, which uses <em>BSD 2-Clause &quot;Simplified&quot; License</em>, as described at the end of the file itself</li>
+					<li>the content of the <a href="https://github.com/equinor/esv-intersection-data">esv-intersection-data</a> submodule uses the same license as Equinor&#39;s <a href="https://data.equinor.com/dataset/Volve">Volve dataset</a>, which is also available in the submodule</li>
+				</ul>
+				<p><img src="resources/images/equinor-logo.png" alt="Equinor Logo"></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_components_axis_.html">&quot;components/axis&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_components_index_.html">&quot;components/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_constants_.html">&quot;constants&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_intersectionreferencesystem_.html">&quot;control/<wbr>Intersection<wbr>Reference<wbr>System&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_layermanager_.html">&quot;control/<wbr>Layer<wbr>Manager&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_maincontroller_.html">&quot;control/<wbr>Main<wbr>Controller&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_zoompanhandler_.html">&quot;control/<wbr>Zoom<wbr>Pan<wbr>Handler&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_index_.html">&quot;control/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_interfaces_.html">&quot;control/interfaces&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_control_overlay_.html">&quot;control/overlay&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_camelcase_.html">&quot;datautils/camelcase&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_colortable_.html">&quot;datautils/colortable&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_findsample_.html">&quot;datautils/findsample&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_index_.html">&quot;datautils/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_interfaces_.html">&quot;datautils/interfaces&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_picks_.html">&quot;datautils/picks&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_seismicimage_.html">&quot;datautils/seismicimage&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_surfacedata_.html">&quot;datautils/surfacedata&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_trajectory_.html">&quot;datautils/trajectory&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_datautils_wellboreitemshapegenerator_.html">&quot;datautils/wellbore<wbr>Item<wbr>Shape<wbr>Generator&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_index_.html">&quot;index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_interfaces_.html">&quot;interfaces&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_calloutcanvaslayer_.html">&quot;layers/<wbr>Callout<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_casinglayer_.html">&quot;layers/<wbr>Casing<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_cementlayer_.html">&quot;layers/<wbr>Cement<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_completionlayer_.html">&quot;layers/<wbr>Completion<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_geomodelcanvaslayer_.html">&quot;layers/<wbr>Geomodel<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_geomodellabelslayer_.html">&quot;layers/<wbr>Geomodel<wbr>Labels<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_geomodellayer_.html">&quot;layers/<wbr>Geomodel<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_geomodellayerv2_.html">&quot;layers/<wbr>Geomodel<wbr>Layer<wbr>V2&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_gridlayer_.html">&quot;layers/<wbr>Grid<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_holesizelayer_.html">&quot;layers/<wbr>Hole<wbr>Size<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_imagecanvaslayer_.html">&quot;layers/<wbr>Image<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_seismiccanvaslayer_.html">&quot;layers/<wbr>Seismic<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_wellborebasecomponentlayer_.html">&quot;layers/<wbr>Wellbore<wbr>Base<wbr>Component<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_wellborepathlayer_.html">&quot;layers/<wbr>Wellbore<wbr>Path<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_canvaslayer_.html">&quot;layers/base/<wbr>Canvas<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_htmllayer_.html">&quot;layers/base/HTMLLayer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_layer_.html">&quot;layers/base/<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_pixilayer_.html">&quot;layers/base/<wbr>Pixi<wbr>Layer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_svglayer_.html">&quot;layers/base/SVGLayer&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_base_index_.html">&quot;layers/base/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_layers_index_.html">&quot;layers/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_utils_index_.html">&quot;utils/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_utils_text_.html">&quot;utils/text&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_utils_vectorutils_.html">&quot;utils/vector<wbr>Utils&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
