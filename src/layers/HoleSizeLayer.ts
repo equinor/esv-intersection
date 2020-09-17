@@ -30,10 +30,6 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
     this.render(event);
   }
 
-  onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-  }
-
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { data } = this;
 

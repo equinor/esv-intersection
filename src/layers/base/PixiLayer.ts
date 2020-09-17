@@ -64,6 +64,11 @@ export abstract class PixiLayer extends Layer {
     const [, width] = event.xScale.range();
     this.ctx.view.style.height = `${height}px`;
     this.ctx.view.style.width = `${width}px`;
+
+    const flippedX = event.xBounds[0] > event.xBounds[1];
+    const flippedY = event.yBounds[0] > event.yBounds[1];
+    this.ctx.stage.position.set(event.xScale(0), event.yScale(0));
+    this.ctx.stage.scale.set(event.xRatio * (flippedX ? -1 : 1), event.yRatio * (flippedY ? -1 : 1));
   }
 
   setTransform = (width: number, height: number, xScale: any, yScale: any): any => {

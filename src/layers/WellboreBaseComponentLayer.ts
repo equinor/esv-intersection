@@ -31,12 +31,6 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     });
   }
 
-  onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-    this.ctx.stage.position.set(event.transform.x, event.transform.y);
-    this.ctx.stage.scale.set(event.xRatio, event.yRatio);
-  }
-
   // This is overridden by the extended well bore items layers (casing, hole)
   render(event: OnRescaleEvent | OnUpdateEvent): void {}
 
