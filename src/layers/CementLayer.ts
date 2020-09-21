@@ -4,7 +4,6 @@ import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, Hole
 import {
   calculateCementDiameter,
   cementDiameterChangeDepths,
-  findCasing,
   findIntersectingItems,
   makeTubularPolygon,
 } from '../datautils/wellboreItemShapeGenerator';
@@ -56,24 +55,26 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   createCementShape = (cement: Cement, casings: Casing[], holes: HoleSize[]): CementShape => {
-    const attachedCasing = findCasing(cement.casingId, casings);
-    const bottomOfCement = attachedCasing.end;
+    const attachedCasings = (cement.casingIds || []).map((casingId) => casings.find((casing) => casing.casingId === casingId));
+    if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
+      throw new Error('Invalid cement data, cement is missing attached casing');
+    }
 
-    const { outerCasings, holes: overlappingHoles } = findIntersectingItems(cement, attachedCasing, casings, holes);
+    attachedCasings.sort((a: Casing, b: Casing) => a.end - b.end); // ascending
+    const bottomOfCement = attachedCasings[attachedCasings.length - 1].end;
 
-    const innerDiameterInterval = {
-      start: attachedCasing.start,
-      end: attachedCasing.end,
-    };
+    const { outerCasings, holes: overlappingHoles } = findIntersectingItems(cement, bottomOfCement, attachedCasings, casings, holes);
+
+    const innerDiameterIntervals = attachedCasings;
 
     const outerDiameterIntervals = [...outerCasings, ...overlappingHoles].map((d) => ({
       start: d.start,
       end: d.end,
     }));
 
-    const changeDepths = cementDiameterChangeDepths(cement, bottomOfCement, [innerDiameterInterval, ...outerDiameterIntervals]);
+    const changeDepths = cementDiameterChangeDepths(cement, bottomOfCement, [...innerDiameterIntervals, ...outerDiameterIntervals]);
 
-    const diameterAtChangeDepths = changeDepths.map(calculateCementDiameter(attachedCasing, outerCasings, overlappingHoles));
+    const diameterAtChangeDepths = changeDepths.map(calculateCementDiameter(attachedCasings, outerCasings, overlappingHoles));
 
     const path = this.getPathWithNormals(
       cement.toc,
