@@ -215,7 +215,7 @@ export const GeoModelWithLabelsUsingPozoData = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const referenceSystem = new IntersectionReferenceSystem(pozoPosLog.sort((a, b) => b.md - a.md).map((d) => [d.easting, d.northing, d.tvdMsl]));
+  const referenceSystem = new IntersectionReferenceSystem(pozoPosLog.sort((a, b) => a.md - b.md).map((d) => [d.easting, d.northing, d.tvdMsl]));
   referenceSystem.offset = pozoPosLog[0].tvdMsl;
 
   const options: GeomodelLayerOptions = { order: 1 };
