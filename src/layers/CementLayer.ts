@@ -55,7 +55,10 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   createCementShape = (cement: Cement, casings: Casing[], holes: HoleSize[]): CementShape => {
-    const attachedCasings = (cement.casingIds || []).map((casingId) => casings.find((casing) => casing.casingId === casingId));
+    // Merge deprecated casingId and casingIds array
+    const casingIds = [cement.casingId, ...(cement.casingIds || [])].filter((id) => id);
+
+    const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
     if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
       throw new Error('Invalid cement data, cement is missing attached casing');
     }

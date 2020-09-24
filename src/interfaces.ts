@@ -132,6 +132,10 @@ export interface Casing {
 export interface Cement {
   toc: number;
   casingIds: string[];
+  /**
+   * @‌deprecated use casingIds
+   */
+  casingId: string;
 }
 
 export interface MDPoint {
