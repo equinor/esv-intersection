@@ -1,6 +1,6 @@
 import { Selection } from 'd3-selection';
 
-import { WellborepathLayer, HTMLLayer, GridLayer } from '../../../src/layers';
+import { WellborepathLayer, HTMLLayer } from '../../../src/layers';
 import { OnRescaleEvent, OnMountEvent } from '../../../src/interfaces';
 import { IntersectionReferenceSystem, Controller } from '../../../src/control';
 import { ZoomPanHandler } from '../../../src/control/ZoomPanHandler';
@@ -120,6 +120,7 @@ export const HighlightWellborepathWithController = () => {
 
 class HighlightLayer extends HTMLLayer {
   elements: Selection<HTMLElement, any, null, undefined>[] = [];
+  elementCurveLength: number = 0;
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
@@ -131,7 +132,7 @@ class HighlightLayer extends HTMLLayer {
     const elm = this.elements[0];
     if (this.referenceSystem) {
       // returns coords in [displacement, tvd]
-      const coords = this.referenceSystem.project(event.curveLength || 0);
+      const coords = this.referenceSystem.project(this.elementCurveLength);
 
       // screen coords inside the container
       const newX = event.xScale(coords[0]);
@@ -158,10 +159,15 @@ class HighlightLayer extends HTMLLayer {
   getElement(id: string): Selection<HTMLElement, any, null, undefined> {
     return this.elm.select(id);
   }
+
+  onUpdateCurveLength(curveLength: number) {
+    this.elementCurveLength = curveLength;
+  }
 }
 
 const onUpdate = (event: InputEvent, obj: any) => {
-  obj.layer.onRescale({ ...obj.rescaleEvent, curveLength: event.target.valueAsNumber });
+  obj.layer.onUpdateCurveLength(event.target.valueAsNumber);
+  obj.layer.onRescale(obj.rescaleEvent);
 };
 
 const createSlider = (cb: any, opts: any) => {
