@@ -1,21 +1,24 @@
 import {
-  GeomodelLayer,
+  Annotation,
+  CalloutCanvasLayer,
+  Controller,
   GeomodelLabelsLayer,
-  ZoomPanHandler,
+  GeomodelLayer,
   GeomodelLayerOptions,
+  IntersectionReferenceSystem,
   LayerOptions,
   OnRescaleEvent,
-  IntersectionReferenceSystem,
-  Controller,
   WellborepathLayer,
+  ZoomPanHandler,
 } from '../../../src';
-import { generateSurfaceData, SurfaceData, SurfaceLine, SurfaceArea, convertColor } from '../../../src/datautils';
-import { getSurfaces, getStratColumns, getPositionLog, getWellborePath } from '../data';
+import {convertColor, generateSurfaceData, SurfaceArea, SurfaceData, SurfaceLine} from '../../../src/datautils';
+import {getPositionLog, getStratColumns, getSurfaces, getWellborePath} from '../data';
 
-import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
+import {createFPSLabel, createHelpText, createLayerContainer, createRootContainer} from '../utils';
 
 import pozoData from '../exampledata/POZO/intersection.json';
 import pozoPosLog from '../exampledata/POZO/positionLog D-32.json';
+import pozoPlannedWellMarkers from '../exampledata/POZO/plannedWellMarkers D-32.json';
 
 const width = 700;
 const height = 600;
@@ -25,9 +28,9 @@ export const GeoModelUsingLowLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions = {order: 1};
   const geoModelLayer = new GeomodelLayer('webgl', options);
-  geoModelLayer.onMount({ elm: container, height, width });
+  geoModelLayer.onMount({elm: container, height, width});
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
     const [path, surfaces, stratColumns] = values;
@@ -40,7 +43,7 @@ export const GeoModelUsingLowLevelInterface = () => {
     const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
 
-    geoModelLayer.onUpdate({ data: geolayerdata });
+    geoModelLayer.onUpdate({data: geolayerdata});
   });
   const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
     geoModelLayer.onRescale(event);
@@ -64,17 +67,17 @@ export const GeoModelWithLabelsUsingLowLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions = {order: 1};
   const geoModelLayer = new GeomodelLayer('geomodels', options);
-  geoModelLayer.onMount({ elm: container, height, width });
+  geoModelLayer.onMount({elm: container, height, width});
 
-  const options2: LayerOptions = { order: 1 };
+  const options2: LayerOptions = {order: 1};
   const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
-  geoModelLabelsLayer.onMount({ elm: container });
+  geoModelLabelsLayer.onMount({elm: container});
 
   const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
     geoModelLayer.onRescale(event);
-    geoModelLabelsLayer.onRescale({ ...event });
+    geoModelLabelsLayer.onRescale({...event});
   });
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
@@ -117,7 +120,7 @@ export const GeoModelUsingHighLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions = {order: 1};
   const geoModelLayer = new GeomodelLayer('webgl', options);
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
@@ -134,7 +137,7 @@ export const GeoModelUsingHighLevelInterface = () => {
     geoModelLayer.setData(geolayerdata);
   });
 
-  const controller = new Controller({ container, layers: [geoModelLayer] });
+  const controller = new Controller({container, layers: [geoModelLayer]});
 
   controller.setBounds([0, 1000], [0, 1000]);
   controller.adjustToSize(width, height);
@@ -155,13 +158,13 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions = {order: 1};
   const geoModelLayer = new GeomodelLayer('geomodels', options);
-  geoModelLayer.onMount({ elm: container, height, width });
+  geoModelLayer.onMount({elm: container, height, width});
 
-  const options2: LayerOptions = { order: 1 };
+  const options2: LayerOptions = {order: 1};
   const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
-  geoModelLabelsLayer.onMount({ elm: container });
+  geoModelLabelsLayer.onMount({elm: container});
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
     const [path, surfaces, stratColumns] = values;
@@ -177,7 +180,7 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
     geoModelLayer.setData(geolayerdata);
     geoModelLabelsLayer.setData(geolayerdata);
 
-    const controller = new Controller({ container, layers: [geoModelLayer, geoModelLabelsLayer] });
+    const controller = new Controller({container, layers: [geoModelLayer, geoModelLabelsLayer]});
 
     controller.setReferenceSystem(referenceSystem);
 
@@ -204,7 +207,7 @@ export const GeoModelWithLabelsUsingPozoData = () => {
   const xBounds: [number, number] = [0, 1000];
   const yBounds: [number, number] = [0, 1000];
 
-  const scaleOptions = { xBounds, yBounds };
+  const scaleOptions = {xBounds, yBounds};
   const axisOptions = {
     xLabel: 'Displacement',
     yLabel: 'TVD MSL',
@@ -215,18 +218,20 @@ export const GeoModelWithLabelsUsingPozoData = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const referenceSystem = new IntersectionReferenceSystem(pozoPosLog.sort((a, b) => a.md - b.md).map((d) => [d.easting, d.northing, d.tvdMsl]));
+  const referenceSystem = new IntersectionReferenceSystem(pozoPosLog.sort((a, b) => b.md - a.md).map((d) => [d.easting, d.northing, d.tvdMsl]));
   referenceSystem.offset = pozoPosLog[0].tvdMsl;
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions = {order: 1};
   const geoModelLayer = new GeomodelLayer('geomodels', options);
-  geoModelLayer.onMount({ elm: container, height, width });
+  geoModelLayer.onMount({elm: container, height, width});
 
-  const options2: LayerOptions = { order: 2 };
+  const options2: LayerOptions = {order: 2};
   const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
-  geoModelLabelsLayer.onMount({ elm: container });
+  geoModelLabelsLayer.onMount({elm: container});
 
-  const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red' });
+  const wellboreLayer = new WellborepathLayer('wellborepath', {order: 3, strokeWidth: '2px', stroke: 'red'});
+
+  const picksLayer = new CalloutCanvasLayer('picks', {order: 4});
 
   const lines: SurfaceLine[] = pozoData.lines.map((p) => ({
     id: p.label,
@@ -249,12 +254,21 @@ export const GeoModelWithLabelsUsingPozoData = () => {
     areas,
   };
 
+  const datumElevation = 74.3;
+  const picksdata: Annotation[] = pozoPlannedWellMarkers.map(m => ({
+    title: m.markerName,
+    label: Math.round((m.markerDepthMdMsl + datumElevation) * 10) / 10 + 'm MD RKB',
+    md: m.markerDepthMdMsl + datumElevation,
+    group: 'picks',
+    color: 'black'
+  }))
+
   const opts = {
     scaleOptions,
     axisOptions,
     container,
     referenceSystem,
-    layers: [geoModelLayer, geoModelLabelsLayer, wellboreLayer],
+    layers: [geoModelLayer, geoModelLabelsLayer, wellboreLayer, picksLayer],
   };
 
   const controller = new Controller(opts);
@@ -262,6 +276,7 @@ export const GeoModelWithLabelsUsingPozoData = () => {
 
   geoModelLayer.setData(geolayerdata);
   geoModelLabelsLayer.setData(geolayerdata);
+  picksLayer.setData(picksdata);
 
   controller.adjustToSize(width, height);
   controller.zoomPanHandler.zFactor = 3;
