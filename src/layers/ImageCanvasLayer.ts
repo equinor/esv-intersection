@@ -19,6 +19,7 @@ export class ImageLayer extends CanvasLayer {
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
+    this.setTransform(event);
     this.render(event);
   }
 

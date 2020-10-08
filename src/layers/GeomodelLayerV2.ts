@@ -49,11 +49,6 @@ export class GeomodelLayerV2 extends PixiLayer {
     this.data.lines.forEach((l: any) => this.generateSurfaceLine(l));
   }
 
-  onRescale(event: OnRescaleEvent): void {
-    this.pixiContainer.position.set(event.transform.x, event.transform.y);
-    this.pixiContainer.scale.set(event.xRatio, event.yRatio);
-  }
-
   cleanUpContainer(): void {
     this.pixiContainer.children.forEach((g: Graphics) => g.destroy());
     this.pixiContainer.removeChildren();
