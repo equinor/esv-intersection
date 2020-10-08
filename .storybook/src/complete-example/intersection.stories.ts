@@ -78,7 +78,7 @@ const renderIntersection = (scaleOptions) => {
   Promise.all(promises).then((values) => {
     const [path, completion, seismic, surfaces, stratColumns, casings, holesizes, cement, picks] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
-    referenceSystem.offset = path[0][2];
+    referenceSystem.offset = path[0][2]; // Offset should be md at start of path
     const displacement = referenceSystem.displacement || 1;
     const extend = 1000 / displacement;
     const steps = surfaces[0]?.data?.values?.length || 1;
@@ -99,25 +99,25 @@ const renderIntersection = (scaleOptions) => {
     const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
     const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.6 });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-    const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holesizes, referenceSystem });
-    const casingLayer = new CasingLayer('casing', { order: 5, data: casings, referenceSystem });
+    const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holesizes, referenceSystem, poslog: path });
+    const casingLayer = new CasingLayer('casing', { order: 5, data: casings, referenceSystem, poslog: path });
     const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
     const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
     const completionLayer = new CompletionLayer('completion', { order: 4, data: completion, referenceSystem });
-    const cementLayer = new CementLayer('cement', { order: 99, data: { cement, casings, holes: holesizes }, referenceSystem });
+    const cementLayer = new CementLayer('cement', { order: 99, data: { cement, casings, holes: holesizes }, referenceSystem, poslog: path });
     const calloutLayer = new CalloutCanvasLayer('callout', { order: 100, data: picksData, referenceSystem });
 
     const layers = [
       gridLayer,
       geomodelLayer,
       wellboreLayer,
-      geomodelLabelsLayer,
+      // geomodelLabelsLayer,
       seismicLayer,
-      completionLayer,
+      // completionLayer,
       holeSizeLayer,
       casingLayer,
       cementLayer,
-      calloutLayer,
+      // calloutLayer,
     ];
 
     const opts = {
@@ -146,6 +146,7 @@ const renderIntersection = (scaleOptions) => {
 
     controller.adjustToSize(width, height);
     controller.setViewport(1000, 1500, 5000);
+    controller.zoomPanHandler.zFactor = 5;
 
     const FPSLabel = createFPSLabel();
 
