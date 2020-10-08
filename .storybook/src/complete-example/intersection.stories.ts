@@ -111,13 +111,13 @@ const renderIntersection = (scaleOptions) => {
       gridLayer,
       geomodelLayer,
       wellboreLayer,
-      // geomodelLabelsLayer,
+      geomodelLabelsLayer,
       seismicLayer,
-      // completionLayer,
+      completionLayer,
       holeSizeLayer,
       casingLayer,
       cementLayer,
-      // calloutLayer,
+      calloutLayer,
     ];
 
     const opts = {
@@ -146,7 +146,7 @@ const renderIntersection = (scaleOptions) => {
 
     controller.adjustToSize(width, height);
     controller.setViewport(1000, 1500, 5000);
-    controller.zoomPanHandler.zFactor = 5;
+    controller.zoomPanHandler.zFactor = 1;
 
     const FPSLabel = createFPSLabel();
 
