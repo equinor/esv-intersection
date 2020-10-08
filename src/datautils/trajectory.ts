@@ -46,7 +46,7 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
 
   const points: number[][] = poslog ? poslog.map((p) => [p.easting, p.northing, p.tvd, p.md]) : [];
 
-  const interpolator: any = new CurveInterpolator(points, 0.75, 5000);
+  const interpolator: any = new CurveInterpolator(points, { tension: 0.75, arcDivisions: 5000 });
   const displacement: number = interpolator.length;
 
   const nPoints: number = Math.round(displacement * pathSteps);

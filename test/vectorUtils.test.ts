@@ -4,14 +4,17 @@ import { createNormals, offsetPoints } from '../src/utils/vectorUtils';
 
 describe('vectorUtils', () => {
   describe('createNormals', () => {
-    let points: Point[];
+    let points: number[][];
 
     beforeEach(() => {
-      points = [new Point(0, 0), new Point(1, 1)];
+      points = [
+        [0, 0],
+        [1, 1],
+      ];
     });
 
     it('should return a 0 vector for list of only 1 point', () => {
-      const normals = createNormals([new Point(1, 1)]);
+      const normals = createNormals([[1, 1]]);
       expect(normals[0].x).toEqual(0);
       expect(normals[0].y).toEqual(0);
       expect(normals[0].magnitude).toEqual(0);
@@ -38,13 +41,17 @@ describe('vectorUtils', () => {
   });
 
   describe('offsetPoints', () => {
-    let points: Point[];
+    let points: number[][];
     let normals: Vector2[];
     let newPoints: Point[];
 
     beforeEach(() => {
       const vector = new Vector2(-0.70710678118, 0.70710678118);
-      points = [new Point(0, 0), new Point(1, 1), new Point(2, 2)];
+      points = [
+        [0, 0],
+        [1, 1],
+        [2, 2],
+      ];
       normals = [vector.clone(), vector.clone(), vector.clone()];
       newPoints = offsetPoints(points, normals, 1);
     });

@@ -93,6 +93,7 @@ export interface WellComponentBaseOptions extends LayerOptions {
   maxFontSize?: number;
   textColor?: string;
   font?: string;
+  maxDiameter?: number;
 }
 
 export interface ZoomAndPanOptions {
@@ -139,7 +140,7 @@ export interface Cement {
 }
 
 export interface MDPoint {
-  point: Point;
+  point: number[];
   normal?: Vector2;
   md: number; // Currently calculated MD
 }
