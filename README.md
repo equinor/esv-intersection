@@ -19,6 +19,15 @@ Part of the [Equinor Subsurface Visualization project](https://github.com/equino
 Using npm:
 ```bash
 npm install --save @equinor/esv-intersection
+
+To run application in your machine :
+
+$ git clone git@github.com:equinor/esv-intersection
+$ cd esv-intersection
+$ git submodule init
+$ git submodule update
+$ npm run storybook
+
 ```
 Using yarn:
 ```bash
