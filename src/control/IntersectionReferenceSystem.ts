@@ -318,7 +318,7 @@ export class IntersectionReferenceSystem {
     const p1 = interp.getPointAt(to);
     const p2 = interp.getPointAt(from);
 
-    return normalize([p1[0] - p2[0], p1[1] - p2[1]]);
+    return normalize([p1[0] - p2[0], p1[1] - p2[1]]) as number[];
   }
 
   get length(): number {
