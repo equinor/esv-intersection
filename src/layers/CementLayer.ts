@@ -114,7 +114,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
     const leftPolygon = makeTubularPolygon(side1Left, side1Right);
     const rightPolygon = makeTubularPolygon(side2Left, side2Right);
 
-    return { leftPolygon, rightPolygon, path: pathPoints };
+    return { leftPolygon, rightPolygon, path: pathPoints.map((p) => new Point(p[0], p[1])) };
   };
 
   createTexture(): Texture {

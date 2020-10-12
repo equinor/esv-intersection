@@ -139,7 +139,7 @@ export interface Cement {
 }
 
 export interface MDPoint {
-  point: Point;
+  point: number[];
   normal?: Vector2;
   md: number; // Currently calculated MD
 }
