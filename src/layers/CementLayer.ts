@@ -39,14 +39,18 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    if (this.data == null) {
+    if (this.data == null || !this.rescaleEvent) {
       return;
     }
+
+    this.clear();
+
+    const { maxTextureDiameterScale, maxDiameter } = this.options;
 
     const { cement, casings, holes } = this.data;
     const cementShapes = cement.map((cement: Cement) => this.createCementShape(cement, casings, holes));
 
-    const texture: Texture = this.createTexture();
+    const texture: Texture = this.createTexture(this.dxScale(maxDiameter * maxTextureDiameterScale));
 
     cementShapes.forEach((cementShape: CementShape) => {
       this.drawRopeWithMask(cementShape.path, cementShape.leftPolygon, texture);
@@ -79,7 +83,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     const diameterAtChangeDepths = changeDepths.map(calculateCementDiameter(attachedCasings, outerCasings, overlappingHoles));
 
-    const path = this.getPathWithNormals(
+    const path = this.getScalePathForPointsWithNormals(
       cement.toc,
       bottomOfCement,
       diameterAtChangeDepths.map((d) => d.md),
@@ -97,10 +101,10 @@ export class CementLayer extends WellboreBaseComponentLayer {
       const intervalPoints = intervalMdPoints.map((s) => s.point);
       const intervalPointNormals = intervalMdPoints.map((s) => s.normal);
 
-      const intervalSide1Left = offsetPoints(intervalPoints, intervalPointNormals, previousDepth.outerDiameter);
-      const intervalSide1Right = offsetPoints(intervalPoints, intervalPointNormals, previousDepth.innerDiameter);
-      const intervalSide2Left = offsetPoints(intervalPoints, intervalPointNormals, -previousDepth.innerDiameter);
-      const intervalSide2Right = offsetPoints(intervalPoints, intervalPointNormals, -previousDepth.outerDiameter);
+      const intervalSide1Left = offsetPoints(intervalPoints, intervalPointNormals, this.dxScale(previousDepth.outerDiameter));
+      const intervalSide1Right = offsetPoints(intervalPoints, intervalPointNormals, this.dxScale(previousDepth.innerDiameter));
+      const intervalSide2Left = offsetPoints(intervalPoints, intervalPointNormals, this.dxScale(-previousDepth.innerDiameter));
+      const intervalSide2Right = offsetPoints(intervalPoints, intervalPointNormals, this.dxScale(-previousDepth.outerDiameter));
 
       side1Left.push(...intervalSide1Left);
       side1Right.push(...intervalSide1Right);
@@ -110,22 +114,20 @@ export class CementLayer extends WellboreBaseComponentLayer {
       previousDepth = depth;
     }
 
-    const pathPoints = path.map((s) => s.point);
+    const pathPoints = path.map((p) => new Point(p.point[0], p.point[1]));
     const leftPolygon = makeTubularPolygon(side1Left, side1Right);
     const rightPolygon = makeTubularPolygon(side2Left, side2Right);
 
-    return { leftPolygon, rightPolygon, path: pathPoints.map((p) => new Point(p[0], p[1])) };
+    return { leftPolygon, rightPolygon, path: pathPoints };
   };
 
-  createTexture(): Texture {
-    const cacheKey = 'cement';
-    if (this._textureCache.hasOwnProperty(cacheKey)) {
-      return this._textureCache[cacheKey];
-    }
+  createTexture(maxWidth: number): Texture {
+    // TODO cache texture in stepped increases or avoid recreating texture on zoom
+    const textureSize = Math.min(maxWidth, 550);
 
     const canvas = document.createElement('canvas');
-    canvas.width = 150;
-    canvas.height = 150;
+    canvas.width = 300;
+    canvas.height = textureSize;
     const canvasCtx = canvas.getContext('2d');
 
     canvasCtx.fillStyle = this.options.firstColor;
@@ -135,8 +137,9 @@ export class CementLayer extends WellboreBaseComponentLayer {
     canvasCtx.fillStyle = this.options.secondColor;
 
     canvasCtx.beginPath();
+    canvasCtx.lineWidth = 1;
 
-    const distanceBetweenLines = 10;
+    const distanceBetweenLines = 30;
     for (let i = -canvas.width; i < canvas.width; i++) {
       canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
       canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
@@ -144,7 +147,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
     canvasCtx.stroke();
 
     const t = Texture.from(canvas);
-    this._textureCache[cacheKey] = t;
 
     return t;
   }

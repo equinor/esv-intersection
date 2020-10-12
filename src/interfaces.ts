@@ -93,6 +93,7 @@ export interface WellComponentBaseOptions extends LayerOptions {
   maxFontSize?: number;
   textColor?: string;
   font?: string;
+  maxDiameter?: number;
 }
 
 export interface ZoomAndPanOptions {

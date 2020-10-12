@@ -1,6 +1,6 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleSize } from '..';
-import { getEndLines, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
+import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { offsetPoints } from '../utils/vectorUtils';
 import { HOLE_OUTLINE } from '../constants';
 import { Point } from 'pixi.js';
@@ -38,34 +38,35 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       return;
     }
 
+    this.clear();
+
     data
       .sort((a: HoleSize, b: HoleSize) => (a.diameter <= b.diameter ? 1 : -1)) // draw smaller casings and holes inside bigger ones if overlapping
       .forEach((hole: HoleSize) => this.drawHoleSize(hole));
   }
 
   drawHoleSize = (holeObject: HoleSize): void => {
-    if (holeObject == null) {
+    if (holeObject == null || !this.rescaleEvent) {
       return;
     }
 
     const { maxTextureDiameterScale } = this.options;
 
-    const texture = this.createTexture(holeObject.diameter * maxTextureDiameterScale);
+    const texture = this.createTexture(this.dxScale(holeObject.diameter * maxTextureDiameterScale));
 
-    const path = this.getPathWithNormals(holeObject.start, holeObject.end, []);
+    const path = this.getScalePathForPointsWithNormals(holeObject.start, holeObject.end, [holeObject.start, holeObject.end]);
     const pathPoints = path.map((p) => p.point);
     const normals = path.map((p) => p.normal);
 
-    const rightPath = offsetPoints(pathPoints, normals, holeObject.diameter);
-    const leftPath = offsetPoints(pathPoints, normals, -holeObject.diameter);
+    const rightPath = offsetPoints(pathPoints, normals, this.dxScale(holeObject.diameter));
+    const leftPath = offsetPoints(pathPoints, normals, this.dxScale(-holeObject.diameter));
 
-    const { lineColor, topBottomLineColor } = this.options;
+    const { lineColor } = this.options;
 
     if (pathPoints.length === 0) {
       return;
     }
 
-    const { top, bottom } = getEndLines(rightPath, leftPath);
     const polygonCoords = makeTubularPolygon(leftPath, rightPath);
 
     this.drawRope(
@@ -73,8 +74,6 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       texture,
     );
 
-    this.drawLine(polygonCoords, lineColor, HOLE_OUTLINE);
-    this.drawLine(top, topBottomLineColor, 1);
-    this.drawLine(bottom, topBottomLineColor, 1);
+    this.drawLine(polygonCoords, lineColor, this.dxScale(HOLE_OUTLINE), true);
   };
 }

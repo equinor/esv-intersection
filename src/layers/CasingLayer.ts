@@ -1,9 +1,8 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Casing } from '..';
 import { Point } from 'pixi.js';
-import { getEndLines, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { offsetPoints, offsetPoint } from '../utils/vectorUtils';
-import { MDPoint } from '../interfaces';
+import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
+import { offsetPoint, offsetPoints } from '../utils/vectorUtils';
 
 export class CasingLayer extends WellboreBaseComponentLayer {
   options: CasingLayerOptions;
@@ -38,28 +37,29 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       return;
     }
 
+    this.clear();
+
     data
       .sort((a: Casing, b: Casing) => b.diameter - a.diameter) // draw smaller casings and holes on top of bigger ones if overlapping
       .forEach((casing: Casing) => this.drawCasing(casing));
   }
 
   drawCasing = (casing: Casing): void => {
-    if (casing == null) {
+    if (casing == null || !this.rescaleEvent) {
       return;
     }
     const pctOffset = 0.35;
-    const { maxTextureDiameterScale, lineColor, topBottomLineColor } = this.options;
+    const { maxTextureDiameterScale, lineColor } = this.options;
 
-    const texture = this.createTexture(casing.diameter * maxTextureDiameterScale, pctOffset);
+    const texture = this.createTexture(this.dxScale(casing.diameter) * maxTextureDiameterScale, pctOffset);
 
-    const path = this.getPathWithNormals(casing.start, casing.end, []);
+    const path = this.getScalePathForPointsWithNormals(casing.start, casing.end, [casing.start, casing.end]);
 
     const pathPoints = path.map((p) => p.point);
     const normals = path.map((p) => p.normal);
-    const rightPath = offsetPoints(pathPoints, normals, casing.diameter);
-    const leftPath = offsetPoints(pathPoints, normals, -casing.diameter);
+    const rightPath = offsetPoints(pathPoints, normals, this.dxScale(casing.diameter));
+    const leftPath = offsetPoints(pathPoints, normals, this.dxScale(-casing.diameter));
 
-    const { top, bottom } = getEndLines(rightPath, leftPath);
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
     const casingWallWidth = Math.abs(casing.diameter - casing.innerDiameter);
@@ -68,28 +68,30 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       pathPoints.map((p) => new Point(p[0], p[1])),
       texture,
     );
-    this.drawLine(polygon, lineColor, casingWallWidth);
-    this.drawLine(top, topBottomLineColor, 1);
-    this.drawLine(bottom, topBottomLineColor, 1);
+    this.drawLine(polygon, lineColor, this.dxScale(casingWallWidth), true);
 
     if (casing.hasShoe === true) {
       this.drawShoe(casing.end, casing.diameter);
     }
   };
 
-  drawShoe(casingEnd: number, casingDiameter: number) {
+  drawShoe(casingEnd: number, casingDiameter: number): void {
     const shoeWidth = 50;
     const shoeLength = 20;
-    const shoeCoords = this.generateShoe(casingEnd, casingDiameter, shoeLength, shoeWidth);
-    const shoeCoords2 = this.generateShoe(casingEnd, casingDiameter, shoeLength, -shoeWidth);
+    const shoeCoords = this.generateShoe(casingEnd, this.dxScale(casingDiameter), shoeLength, this.dxScale(shoeWidth));
+    const shoeCoords2 = this.generateShoe(casingEnd, this.dxScale(casingDiameter), shoeLength, this.dxScale(-shoeWidth));
     this.drawBigPolygon(shoeCoords2);
     this.drawBigPolygon(shoeCoords);
   }
 
   generateShoe = (casingEnd: number, casingDiameter: number, length: number, width: number): Point[] => {
+    if (!this.rescaleEvent) {
+      return;
+    }
+
     const start = casingEnd - length;
     const end = casingEnd;
-    const path: MDPoint[] = this.getPathWithNormals(start, end, [start, end]);
+    const path = this.getScalePathForPointsWithNormals(start, end, [start, end]);
 
     const points = path.map((p) => p.point);
     const normal = path.map((p) => p.normal);
