@@ -30,8 +30,9 @@ describe('vectorUtils', () => {
 
     it('should calculate vectors', () => {
       const normals = createNormals(points);
-      expect(normals[0].x).toBeCloseTo(-0.70710678118, 10);
-      expect(normals[0].y).toBeCloseTo(0.70710678118, 10);
+      const normal45 = new Vector2(-0.70710678118, 0.70710678118);
+      expect(normals[0].x).toBeCloseTo(normal45.x, 10);
+      expect(normals[0].y).toBeCloseTo(normal45.y, 10);
     });
 
     it('should be normalized', () => {
