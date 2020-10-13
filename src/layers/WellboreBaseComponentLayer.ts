@@ -36,7 +36,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
 
   getMdPoint = (md: number): MDPoint => {
     const p = this.referenceSystem.project(md);
-    const point = { point: arrayToPoint(p as [number, number]), md: md };
+    const point = { point: p, md: md };
     return point;
   };
 
@@ -52,7 +52,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   };
 
   getPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
-    const pathPoints = this.referenceSystem.getCurtainPath(start, end).map((p) => ({ point: arrayToPoint(p.point as [number, number]), md: p.md }));
+    const pathPoints = this.referenceSystem.getCurtainPath(start, end);
     const interestMdPoints = interestPoints.map(this.getMdPoint);
 
     const points = merge<MDPoint>([pathPoints, interestMdPoints]);
