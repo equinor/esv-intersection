@@ -99,12 +99,12 @@ const renderIntersection = (scaleOptions) => {
     const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
     const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.6 });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-    const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holesizes, referenceSystem, poslog: path });
-    const casingLayer = new CasingLayer('casing', { order: 5, data: casings, referenceSystem, poslog: path });
+    const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holesizes, referenceSystem });
+    const casingLayer = new CasingLayer('casing', { order: 5, data: casings, referenceSystem });
     const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
     const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
     const completionLayer = new CompletionLayer('completion', { order: 4, data: completion, referenceSystem });
-    const cementLayer = new CementLayer('cement', { order: 99, data: { cement, casings, holes: holesizes }, referenceSystem, poslog: path });
+    const cementLayer = new CementLayer('cement', { order: 99, data: { cement, casings, holes: holesizes }, referenceSystem });
     const calloutLayer = new CalloutCanvasLayer('callout', { order: 100, data: picksData, referenceSystem });
 
     const layers = [
