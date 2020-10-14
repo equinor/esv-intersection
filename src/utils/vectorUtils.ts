@@ -49,6 +49,7 @@ export const createNormals = (points: number[][]): Vector2[] => {
   });
 };
 
+// TODO check if this can be simplified and return Vector/number[]
 export const offsetPoint = (point: number[], vector: Vector2, offset: number): Point => {
   const p = arrayToVector(point);
   return vectorToPoint(p.add(vector.scale(offset)));

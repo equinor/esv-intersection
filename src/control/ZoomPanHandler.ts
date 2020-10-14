@@ -210,7 +210,7 @@ export class ZoomPanHandler {
    * Create an event object from current state
    */
   currentStateAsEvent(): OnRescaleEvent {
-    const { scaleX, scaleY, xBounds, yBounds, zFactor, viewportRatio, currentTransform, xRatio, yRatio } = this;
+    const { scaleX, scaleY, xBounds, yBounds, zFactor, viewportRatio, currentTransform, xRatio, yRatio, width, height } = this;
 
     return {
       xScale: scaleX.copy(),
@@ -221,6 +221,8 @@ export class ZoomPanHandler {
       viewportRatio,
       xRatio: xRatio,
       yRatio: yRatio,
+      width: width,
+      height: height,
       transform: { ...currentTransform },
     };
   }
