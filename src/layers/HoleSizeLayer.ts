@@ -1,7 +1,7 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { HoleSizeLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, HoleSize } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { offsetPoints } from '../utils/vectorUtils';
+import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { HOLE_OUTLINE } from '../constants';
 import { Point } from 'pixi.js';
 
@@ -52,9 +52,9 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
 
     const texture = this.createTexture(holeObject.diameter * maxTextureDiameterScale);
 
-    const path = this.getScalePathForPointsWithNormals(holeObject.start, holeObject.end, [holeObject.start, holeObject.end]);
+    const path = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end, [holeObject.start, holeObject.end]);
     const pathPoints = path.map((p) => p.point);
-    const normals = path.map((p) => p.normal);
+    const normals = createNormals(pathPoints);
 
     const rightPath = offsetPoints(pathPoints, normals, holeObject.diameter);
     const leftPath = offsetPoints(pathPoints, normals, -holeObject.diameter);

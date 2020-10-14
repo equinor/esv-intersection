@@ -2,7 +2,7 @@ import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Casing } from '..';
 import { Point } from 'pixi.js';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { offsetPoint, offsetPoints } from '../utils/vectorUtils';
+import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 
 export class CasingLayer extends WellboreBaseComponentLayer {
   constructor(id?: string, options?: CasingLayerOptions) {
@@ -49,10 +49,10 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     const texture = this.createTexture(casing.diameter * maxTextureDiameterScale, pctOffset);
 
-    const path = this.getScalePathForPointsWithNormals(casing.start, casing.end, [casing.start, casing.end]);
+    const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end]);
 
     const pathPoints = path.map((p) => p.point);
-    const normals = path.map((p) => p.normal);
+    const normals = createNormals(pathPoints);
     const rightPath = offsetPoints(pathPoints, normals, casing.diameter);
     const leftPath = offsetPoints(pathPoints, normals, -casing.diameter);
 
@@ -83,10 +83,10 @@ export class CasingLayer extends WellboreBaseComponentLayer {
   generateShoe = (casingEnd: number, casingDiameter: number, length: number, width: number): Point[] => {
     const start = casingEnd - length;
     const end = casingEnd;
-    const path = this.getScalePathForPointsWithNormals(start, end, [start, end]);
+    const path = this.getZFactorScaledPathForPoints(start, end, [start, end]);
 
     const points = path.map((p) => p.point);
-    const normal = path.map((p) => p.normal);
+    const normal = createNormals(points);
     const shoeEdge: Point[] = offsetPoints(points, normal, casingDiameter * (width < 0 ? -1 : 1));
 
     const shoeTipPoint = points[points.length - 1];

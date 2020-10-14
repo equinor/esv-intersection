@@ -113,26 +113,14 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     return points;
   };
 
-  getScaledPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
-    const { zFactor } = this.rescaleEvent;
-
-    const y = (y: number): number => y * zFactor;
+  getZFactorScaledPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
+    const y = (y: number): number => y * this.rescaleEvent.zFactor;
 
     const path = this.getPathForPoints(start, end, interestPoints);
     return path.map((p) => ({
       point: [p.point[0], y(p.point[1])],
       md: p.md,
     }));
-  };
-
-  getScalePathForPointsWithNormals = (
-    start: number,
-    end: number,
-    interestPoints: number[] = [],
-  ): { point: number[]; md: number; normal: Vector2 }[] => {
-    const points = this.getScaledPathForPoints(start, end, interestPoints);
-    const normals = createNormals(points.map((p) => p.point));
-    return points.map((p, i) => ({ point: p.point, md: p.md, normal: normals[i] }));
   };
 
   drawBigPolygon = (coords: Point[], t?: Texture): Graphics => {
