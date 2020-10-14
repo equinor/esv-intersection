@@ -132,11 +132,15 @@ export interface Casing {
 }
 export interface Cement {
   toc: number;
-  casingId: string; // TODO find the actual ID
+  casingIds: string[];
+  /**
+   * @‌deprecated use casingIds
+   */
+  casingId: string;
 }
 
 export interface MDPoint {
-  point: Point;
+  point: number[];
   normal?: Vector2;
   md: number; // Currently calculated MD
 }

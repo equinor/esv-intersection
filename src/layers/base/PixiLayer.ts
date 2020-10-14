@@ -60,24 +60,11 @@ export abstract class PixiLayer extends Layer {
       return;
     }
 
-    const [, height] = event.yScale.range();
-    const [, width] = event.xScale.range();
-    this.ctx.view.style.height = `${height}px`;
-    this.ctx.view.style.width = `${width}px`;
+    const flippedX = event.xBounds[0] > event.xBounds[1];
+    const flippedY = event.yBounds[0] > event.yBounds[1];
+    this.ctx.stage.position.set(event.xScale(0), event.yScale(0));
+    this.ctx.stage.scale.set(event.xRatio * (flippedX ? -1 : 1), event.yRatio * (flippedY ? -1 : 1));
   }
-
-  setTransform = (width: number, height: number, xScale: any, yScale: any): any => {
-    if (!(width !== 0 && height !== 0 && xScale != null && yScale != null)) {
-      return null;
-    }
-
-    const [xmin, xmax] = xScale.domain();
-    const [ymin, ymax] = yScale.domain();
-    const xRatio = 1 / Math.abs((xmin - xmax) / width);
-    const yRatio = 1 / Math.abs((ymin - ymax) / height);
-
-    return { xRatio, yRatio };
-  };
 
   updateStyle(visible?: boolean): void {
     const isVisible = visible || this.isVisible;

@@ -24,12 +24,6 @@ export class CompletionLayer extends PixiLayer {
     this.render();
   }
 
-  onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-    this.ctx.stage.position.set(event.transform.x, event.transform.y);
-    this.ctx.stage.scale.set(event.xRatio, event.yRatio);
-  }
-
   render(): void {
     const wellborePath = this.referenceSystem ? (this.referenceSystem.projectedPath as [number, number][]) : [];
 

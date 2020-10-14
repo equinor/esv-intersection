@@ -15,27 +15,48 @@ import {
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
 
-import { generateSurfaceData, SurfaceData, getSeismicInfo, generateSeismicSliceImage, transformFormationData, getPicksData } from '../../../src/datautils';
+import {
+  generateSurfaceData,
+  SurfaceData,
+  getSeismicInfo,
+  generateSeismicSliceImage,
+  transformFormationData,
+  getPicksData,
+} from '../../../src/datautils';
 
 //Data
 import { seismicColorMap } from '../exampledata';
 
 import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks } from '../data';
 
-const xBounds: [number, number] = [0, 1000];
-const yBounds: [number, number] = [0, 1000];
+export const intersection = () => {
+  const xBounds: [number, number] = [0, 1000];
+  const yBounds: [number, number] = [0, 1000];
 
-const scaleOptions = { xBounds, yBounds };
-const axisOptions = {
-  xLabel: 'Displacement',
-  yLabel: 'TVD MSL',
-  unitOfMeasure: 'm',
+  const scaleOptions = { xBounds, yBounds };
+
+  return renderIntersection(scaleOptions);
 };
 
-const width = 700;
-const height = 600;
+export const intersectionFlipX = () => {
+  const xBounds: [number, number] = [1000, 0];
+  const yBounds: [number, number] = [0, 1000];
 
-export const intersection = () => {
+  const scaleOptions = { xBounds, yBounds };
+
+  return renderIntersection(scaleOptions);
+};
+
+const renderIntersection = (scaleOptions) => {
+  const axisOptions = {
+    xLabel: 'Displacement',
+    yLabel: 'TVD MSL',
+    unitOfMeasure: 'm',
+  };
+
+  const width = 700;
+  const height = 600;
+
   // helper container elements
   const root = createRootContainer(width);
   const btnToggleContainer = createButtonContainer(width);
@@ -43,10 +64,21 @@ export const intersection = () => {
   const btnMiscContainer = createButtonContainer(width);
   const container = createLayerContainer(width, height);
 
-  const promises = [getWellborePath(), getCompletion(), getSeismic(), getSurfaces(), getStratColumns(), getCasings(), getHolesize(), getCement(), getPicks()];
+  const promises = [
+    getWellborePath(),
+    getCompletion(),
+    getSeismic(),
+    getSurfaces(),
+    getStratColumns(),
+    getCasings(),
+    getHolesize(),
+    getCement(),
+    getPicks(),
+  ];
   Promise.all(promises).then((values) => {
     const [path, completion, seismic, surfaces, stratColumns, casings, holesizes, cement, picks] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
+    referenceSystem.offset = path[0][2]; // Offset should be md at start of path
     const displacement = referenceSystem.displacement || 1;
     const extend = 1000 / displacement;
     const steps = surfaces[0]?.data?.values?.length || 1;
@@ -114,6 +146,7 @@ export const intersection = () => {
 
     controller.adjustToSize(width, height);
     controller.setViewport(1000, 1500, 5000);
+    controller.zoomPanHandler.zFactor = 1;
 
     const FPSLabel = createFPSLabel();
 
@@ -130,19 +163,23 @@ export const intersection = () => {
     const btnPicks = createButton(controller, calloutLayer, 'Picks');
     const btnSetDataForCompletion = createSetLayerButton(cementLayer, casingLayer, cement, casings, holesizes);
     let show = true;
-    const toggleAxis = createButtonWithCb('Axis labels', (btn: HTMLElement) => {
-      if (show) {
-        controller.hideAxisLabels();
-        btn.style.backgroundColor = 'red';
-        btn.style.color = 'white';
-        show = false;
-      } else {
-        controller.showAxisLabels();
-        show = true;
-        btn.style.backgroundColor = 'lightblue';
-        btn.style.color = '';
-      }
-    }, 'background: lightblue;');
+    const toggleAxis = createButtonWithCb(
+      'Axis labels',
+      (btn: HTMLElement) => {
+        if (show) {
+          controller.hideAxisLabels();
+          btn.style.backgroundColor = 'red';
+          btn.style.color = 'white';
+          show = false;
+        } else {
+          controller.showAxisLabels();
+          show = true;
+          btn.style.backgroundColor = 'lightblue';
+          btn.style.color = '';
+        }
+      },
+      'background: lightblue;',
+    );
     const btnLarger = createButtonWithCb('800x600', () => {
       const w = 800;
       const h = 600;
@@ -189,7 +226,11 @@ export const intersection = () => {
     btnAdjustSizeContainer.appendChild(btnDefault);
     btnMiscContainer.appendChild(btnClearData);
 
-    root.appendChild(createHelpText('A complete example of multiple layers comprised of SVG, Canvas, HTML and pixi.js (WebGL). We use a controller to update and display each layer in a container (just a plain div element) on top of each other.'))
+    root.appendChild(
+      createHelpText(
+        'A complete example of multiple layers comprised of SVG, Canvas, HTML and pixi.js (WebGL). We use a controller to update and display each layer in a container (just a plain div element) on top of each other.',
+      ),
+    );
     root.appendChild(container);
     root.appendChild(createHelpText('Toggle'));
     root.appendChild(btnToggleContainer);

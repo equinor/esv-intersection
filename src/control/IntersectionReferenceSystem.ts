@@ -1,7 +1,7 @@
 import Vector2 from '@equinor/videx-vector2';
 import { clamp, radians } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
-import { Interpolator, Trajectory, ReferenceSystemOptions } from '../interfaces';
+import { Interpolator, Trajectory, ReferenceSystemOptions, MDPoint } from '../interfaces';
 
 // determines how curvy the curve is
 const TENSION = 0.75;
@@ -41,7 +41,7 @@ export class IntersectionReferenceSystem {
 
   endVector: number[];
 
-  _curtainPathCache: { point: number[]; md: number }[];
+  _curtainPathCache: MDPoint[];
 
   /**
    * Creates a common reference system that layers and other components can use
@@ -126,7 +126,7 @@ export class IntersectionReferenceSystem {
    * @param start in MD
    * @param end in MD
    */
-  getCurtainPath(start: number, end: number): { point: number[]; md: number }[] {
+  getCurtainPath(start: number, end: number): MDPoint[] {
     if (!this._curtainPathCache) {
       const points = [];
       let prevAngle = Math.PI * 2; // Always add first point
@@ -318,7 +318,7 @@ export class IntersectionReferenceSystem {
     const p1 = interp.getPointAt(to);
     const p2 = interp.getPointAt(from);
 
-    return normalize([p1[0] - p2[0], p1[1] - p2[1]]);
+    return normalize([p1[0] - p2[0], p1[1] - p2[1]]) as number[];
   }
 
   get length(): number {

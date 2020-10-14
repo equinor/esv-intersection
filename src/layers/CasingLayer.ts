@@ -28,10 +28,6 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     this.render(event);
   }
 
-  onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { data }: { data: Casing[] } = this;
@@ -66,7 +62,10 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     const casingWallWidth = Math.abs(casing.diameter - casing.innerDiameter);
 
-    this.drawRope(pathPoints, texture);
+    this.drawRope(
+      pathPoints.map((p) => new Point(p[0], p[1])),
+      texture,
+    );
     this.drawLine(polygon, lineColor, casingWallWidth);
     this.drawLine(top, topBottomLineColor, 1);
     this.drawLine(bottom, topBottomLineColor, 1);

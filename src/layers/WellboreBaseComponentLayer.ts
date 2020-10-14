@@ -48,12 +48,6 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     });
   }
 
-  onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-    this.ctx.stage.position.set(event.transform.x, event.transform.y);
-    this.ctx.stage.scale.set(event.xRatio, event.yRatio);
-  }
-
   // This is overridden by the extended well bore items layers (casing, hole)
   // TODO: Look at this construct; can we do something slightly better here?
   render(
@@ -64,7 +58,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
 
   getMdPoint = (md: number): MDPoint => {
     const p = this.referenceSystem.project(md);
-    const point = { point: arrayToPoint(p as [number, number]), md: md };
+    const point = { point: p, md: md };
     return point;
   };
 
@@ -80,7 +74,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   };
 
   getPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
-    const pathPoints = this.referenceSystem.getCurtainPath(start, end).map((p) => ({ point: arrayToPoint(p.point as [number, number]), md: p.md }));
+    const pathPoints = this.referenceSystem.getCurtainPath(start, end);
     const interestMdPoints = interestPoints.map(this.getMdPoint);
 
     const points = merge<MDPoint>([pathPoints, interestMdPoints]);
