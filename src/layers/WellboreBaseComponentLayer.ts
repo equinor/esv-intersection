@@ -55,16 +55,11 @@ export class WellboreBaseComponentLayer extends PixiLayer {
       return;
     }
 
-    const domain = event.yScale.domain();
-    const ySpan = domain[1] - domain[0];
-    const baseYSpan = ySpan * event.zFactor;
-    const baseDomain = [domain[0], domain[0] + baseYSpan];
-    const ratio: number = Math.abs(event.height / (baseDomain[1] - baseDomain[0]));
-
+    const yRatio = this.yRatio();
     const flippedX = event.xBounds[0] > event.xBounds[1];
     const flippedY = event.yBounds[0] > event.yBounds[1];
     this.ctx.stage.position.set(event.xScale(0), event.yScale(0));
-    this.ctx.stage.scale.set(event.xRatio * (flippedX ? -1 : 1), ratio * (flippedY ? -1 : 1));
+    this.ctx.stage.scale.set(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
 
     if (shouldRender) {
       this.clear();
@@ -86,6 +81,18 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     event: OnRescaleEvent | OnUpdateEvent,
   ): // eslint-disable-next-line @typescript-eslint/no-empty-function
   void {}
+
+  /**
+   * Calculate yRatio without zFactor
+   * TODO consider to move this into ZoomPanHandler
+   */
+  yRatio(): number {
+    const domain = this.rescaleEvent.yScale.domain();
+    const ySpan = domain[1] - domain[0];
+    const baseYSpan = ySpan * this.rescaleEvent.zFactor;
+    const baseDomain = [domain[0], domain[0] + baseYSpan];
+    return Math.abs(this.rescaleEvent.height / (baseDomain[1] - baseDomain[0]));
+  }
 
   getMdPoint = (md: number): MDPoint => {
     const p = this.referenceSystem.project(md);
