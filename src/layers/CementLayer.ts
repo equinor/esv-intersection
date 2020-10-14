@@ -17,7 +17,6 @@ interface CementShape {
 }
 
 export class CementLayer extends WellboreBaseComponentLayer {
-  options: CementLayerOptions;
   constructor(id?: string, options?: CementLayerOptions) {
     super(id, options);
     this.options = {
@@ -119,16 +118,18 @@ export class CementLayer extends WellboreBaseComponentLayer {
       return this._textureCache[cacheKey];
     }
 
+    const { firstColor, secondColor } = this.options as CementLayerOptions;
+
     const canvas = document.createElement('canvas');
     canvas.width = 150;
     canvas.height = 150;
     const canvasCtx = canvas.getContext('2d');
 
-    canvasCtx.fillStyle = this.options.firstColor;
+    canvasCtx.fillStyle = firstColor;
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
     canvasCtx.lineWidth = 1;
-    canvasCtx.fillStyle = this.options.secondColor;
+    canvasCtx.fillStyle = secondColor;
 
     canvasCtx.beginPath();
 
