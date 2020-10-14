@@ -12,6 +12,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     super(id, options);
     this.options = {
       ...this.options,
+      solidColor: 'gray',
       firstColor: '#777788',
       secondColor: '#EEEEFF',
       lineColor: 0x575757,
@@ -73,12 +74,12 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     this.drawLine(top, topBottomLineColor, 1);
     this.drawLine(bottom, topBottomLineColor, 1);
 
-    if (casing.hasShoe === true) {
+    if (casing.hasShoe) {
       this.drawShoe(casing.end, casing.diameter);
     }
   };
 
-  drawShoe(casingEnd: number, casingDiameter: number) {
+  drawShoe(casingEnd: number, casingDiameter: number): void {
     const shoeWidth = 50;
     const shoeLength = 20;
     const shoeCoords = this.generateShoe(casingEnd, casingDiameter, shoeLength, shoeWidth);

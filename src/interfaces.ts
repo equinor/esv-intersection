@@ -83,6 +83,7 @@ export interface CementLayerOptions extends WellComponentBaseOptions {
 }
 
 export interface WellComponentBaseOptions extends LayerOptions {
+  solidColor?: string;
   firstColor?: string;
   secondColor?: string;
   lineColor?: number;

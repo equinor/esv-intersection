@@ -129,7 +129,22 @@ export class WellboreBaseComponentLayer extends PixiLayer {
       return this._textureCache[cacheKey];
     }
 
-    const { firstColor, secondColor } = this.options;
+    const createGradientFill = (
+      canvas: HTMLCanvasElement,
+      canvasCtx: CanvasRenderingContext2D,
+      firstColor: string,
+      secondColor: string,
+    ): CanvasGradient => {
+      const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, firstColor);
+      gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
+      gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
+      gradient.addColorStop(1, firstColor);
+
+      return gradient;
+    };
+
+    const { solidColor, firstColor, secondColor } = this.options;
 
     const halfWayPct = 0.5;
     const canvas = document.createElement('canvas');
@@ -137,13 +152,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     canvas.height = maxWidth > 0 ? maxWidth : canvas.width; // TODO needs to grow with scale
     const canvasCtx = canvas.getContext('2d');
 
-    const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, firstColor);
-    gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
-    gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
-    gradient.addColorStop(1, firstColor);
-
-    canvasCtx.fillStyle = gradient;
+    canvasCtx.fillStyle = solidColor || createGradientFill(canvas, canvasCtx, firstColor, secondColor);
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
     const t = Texture.from(canvas);
