@@ -3,7 +3,6 @@ import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, OnMountEvent } from '../interfaces';
 import Vector2 from '@equinor/videx-vector2';
-import { arrayToPoint } from '../utils/vectorUtils';
 
 const createGradientFill = (
   canvas: HTMLCanvasElement,
@@ -23,8 +22,6 @@ const createGradientFill = (
 };
 
 export class WellboreBaseComponentLayer extends PixiLayer {
-  //options: HoleSizeLayerOptions;
-
   _textureCache: Record<string, Texture> = {};
 
   constructor(id?: string, options?: HoleSizeLayerOptions) {
