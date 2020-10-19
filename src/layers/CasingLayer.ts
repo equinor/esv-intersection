@@ -10,7 +10,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     super(id, options);
     this.options = {
       ...this.options,
-      solidColor: 'gray',
+      solidColor: '#dcdcdc',
       lineColor: 0x575757,
       topBottomLineColor: 0x575757,
       maxTextureDiameterScale: 2,
