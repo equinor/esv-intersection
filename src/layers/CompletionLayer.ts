@@ -1,5 +1,5 @@
 import Vector2 from '@equinor/videx-vector2';
-import { Graphics, Point } from 'pixi.js';
+import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
 import { OnMountEvent, OnUpdateEvent, OnRescaleEvent } from '..';
 import { CompletionLayerOptions } from '../interfaces';
@@ -7,8 +7,6 @@ import { CompletionLayerOptions } from '../interfaces';
 interface CompletionItem {}
 
 export class CompletionLayer extends PixiLayer {
-  options: CompletionLayerOptions;
-
   constructor(id: string, options: CompletionLayerOptions) {
     super(id, options);
     this.options = {
@@ -34,8 +32,8 @@ export class CompletionLayer extends PixiLayer {
     }
 
     // TODO: clear old completion items when there is no data to display
-    const items: CompletionItem[] = this.data?.length > 0 ? this.data.map((d: any) => this.generateCompletionItem(wellborePath, d)) : [];
-    items.map((s: any) => this.drawCompletionItem(s));
+    const items: CompletionItem[] = this.data?.length > 0 ? this.data.map((d: unknown) => this.generateCompletionItem(wellborePath, d)) : [];
+    items.map((s: unknown) => this.drawCompletionItem(s));
   }
 
   getShape(type: string): Graphics {

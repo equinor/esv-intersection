@@ -6,14 +6,11 @@ import { offsetPoints, offsetPoint } from '../utils/vectorUtils';
 import { MDPoint } from '../interfaces';
 
 export class CasingLayer extends WellboreBaseComponentLayer {
-  options: CasingLayerOptions;
-
   constructor(id?: string, options?: CasingLayerOptions) {
     super(id, options);
     this.options = {
       ...this.options,
-      firstColor: '#777788',
-      secondColor: '#EEEEFF',
+      solidColor: '#dcdcdc',
       lineColor: 0x575757,
       topBottomLineColor: 0x575757,
       maxTextureDiameterScale: 2,
@@ -31,6 +28,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     this.render(event);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { data }: { data: Casing[] } = this;
 
@@ -48,7 +46,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       return;
     }
     const pctOffset = 0.35;
-    const { maxTextureDiameterScale, lineColor, topBottomLineColor } = this.options;
+    const { maxTextureDiameterScale, lineColor, topBottomLineColor } = this.options as CasingLayerOptions;
 
     const texture = this.createTexture(casing.diameter * maxTextureDiameterScale, pctOffset);
 
@@ -72,12 +70,12 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     this.drawLine(top, topBottomLineColor, 1);
     this.drawLine(bottom, topBottomLineColor, 1);
 
-    if (casing.hasShoe === true) {
+    if (casing.hasShoe) {
       this.drawShoe(casing.end, casing.diameter);
     }
   };
 
-  drawShoe(casingEnd: number, casingDiameter: number) {
+  drawShoe(casingEnd: number, casingDiameter: number): void {
     const shoeWidth = 50;
     const shoeLength = 20;
     const shoeCoords = this.generateShoe(casingEnd, casingDiameter, shoeLength, shoeWidth);

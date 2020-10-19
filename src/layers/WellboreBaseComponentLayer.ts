@@ -3,11 +3,25 @@ import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, MDPoint, OnMountEvent } from '../interfaces';
 import Vector2 from '@equinor/videx-vector2';
-import { arrayToPoint } from '../utils/vectorUtils';
+
+const createGradientFill = (
+  canvas: HTMLCanvasElement,
+  canvasCtx: CanvasRenderingContext2D,
+  firstColor: string,
+  secondColor: string,
+  startPctOffset: number,
+): CanvasGradient => {
+  const halfWayPct = 0.5;
+  const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, firstColor);
+  gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
+  gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
+  gradient.addColorStop(1, firstColor);
+
+  return gradient;
+};
 
 export class WellboreBaseComponentLayer extends PixiLayer {
-  options: HoleSizeLayerOptions;
-
   _textureCache: Record<string, Texture> = {};
 
   constructor(id?: string, options?: HoleSizeLayerOptions) {
@@ -32,7 +46,12 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   }
 
   // This is overridden by the extended well bore items layers (casing, hole)
-  render(event: OnRescaleEvent | OnUpdateEvent): void {}
+  // TODO: Look at this construct; can we do something slightly better here?
+  render(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    event: OnRescaleEvent | OnUpdateEvent,
+  ): // eslint-disable-next-line @typescript-eslint/no-empty-function
+  void {}
 
   getMdPoint = (md: number): MDPoint => {
     const p = this.referenceSystem.project(md);
@@ -123,21 +142,14 @@ export class WellboreBaseComponentLayer extends PixiLayer {
       return this._textureCache[cacheKey];
     }
 
-    const { firstColor, secondColor } = this.options;
+    const { solidColor, firstColor, secondColor } = this.options as HoleSizeLayerOptions;
 
-    const halfWayPct = 0.5;
     const canvas = document.createElement('canvas');
     canvas.width = 300;
     canvas.height = maxWidth > 0 ? maxWidth : canvas.width; // TODO needs to grow with scale
     const canvasCtx = canvas.getContext('2d');
 
-    const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, firstColor);
-    gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
-    gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
-    gradient.addColorStop(1, firstColor);
-
-    canvasCtx.fillStyle = gradient;
+    canvasCtx.fillStyle = solidColor || createGradientFill(canvas, canvasCtx, firstColor, secondColor, startPctOffset);
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
     const t = Texture.from(canvas);
