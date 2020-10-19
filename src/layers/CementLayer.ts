@@ -1,13 +1,13 @@
 import { Point, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize } from '../interfaces';
+import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, MDPoint } from '../interfaces';
 import {
   calculateCementDiameter,
   cementDiameterChangeDepths,
   findIntersectingItems,
   makeTubularPolygon,
 } from '../datautils/wellboreItemShapeGenerator';
-import { offsetPoints } from '../utils/vectorUtils';
+import { createNormals, offsetPoints } from '../utils/vectorUtils';
 
 interface CementShape {
   rightPolygon: Point[];
@@ -38,7 +38,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    if (this.data == null) {
+    if (this.data == null || !this.rescaleEvent) {
       return;
     }
 
@@ -78,11 +78,16 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     const diameterAtChangeDepths = changeDepths.map(calculateCementDiameter(attachedCasings, outerCasings, overlappingHoles));
 
-    const path = this.getPathWithNormals(
+    const path = this.getZFactorScaledPathForPoints(
       cement.toc,
       bottomOfCement,
       diameterAtChangeDepths.map((d) => d.md),
     );
+    const normals = createNormals(path.map((p) => p.point));
+    const pathWithNormals: MDPoint[] = path.map((p, i) => ({
+      ...p,
+      normal: normals[i],
+    }));
 
     const side1Left: Point[] = [];
     const side1Right: Point[] = [];
@@ -91,7 +96,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
 
     let previousDepth = diameterAtChangeDepths.shift();
     for (const depth of diameterAtChangeDepths) {
-      const intervalMdPoints = path.filter((x) => x.md >= previousDepth.md && x.md <= depth.md);
+      const intervalMdPoints = pathWithNormals.filter((x) => x.md >= previousDepth.md && x.md <= depth.md);
 
       const intervalPoints = intervalMdPoints.map((s) => s.point);
       const intervalPointNormals = intervalMdPoints.map((s) => s.normal);
@@ -109,11 +114,11 @@ export class CementLayer extends WellboreBaseComponentLayer {
       previousDepth = depth;
     }
 
-    const pathPoints = path.map((s) => s.point);
+    const pathPoints = pathWithNormals.map((p) => new Point(p.point[0], p.point[1]));
     const leftPolygon = makeTubularPolygon(side1Left, side1Right);
     const rightPolygon = makeTubularPolygon(side2Left, side2Right);
 
-    return { leftPolygon, rightPolygon, path: pathPoints.map((p) => new Point(p[0], p[1])) };
+    return { leftPolygon, rightPolygon, path: pathPoints };
   };
 
   createTexture(): Texture {
@@ -136,6 +141,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
     canvasCtx.fillStyle = secondColor;
 
     canvasCtx.beginPath();
+    canvasCtx.lineWidth = 1;
 
     const distanceBetweenLines = 10;
     for (let i = -canvas.width; i < canvas.width; i++) {

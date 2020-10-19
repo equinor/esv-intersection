@@ -170,6 +170,10 @@ export abstract class Layer {
   }
 
   onRescale(event: OnRescaleEvent): void {
+    this.optionsRescale(event);
+  }
+
+  optionsRescale(event: OnRescaleEvent): void {
     if (this._options.onRescale) {
       this._options.onRescale(event, this);
     }
