@@ -1,9 +1,7 @@
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { merge } from 'd3-array';
-import Vector2 from '@equinor/videx-vector2';
 import { PixiLayer } from './base/PixiLayer';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent, WellComponentBaseOptions, MDPoint } from '../interfaces';
-import { createNormals } from '../utils/vectorUtils';
 
 const createGradientFill = (
   canvas: HTMLCanvasElement,

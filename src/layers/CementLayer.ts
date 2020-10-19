@@ -8,7 +8,6 @@ import {
   makeTubularPolygon,
 } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
-import { merge } from 'd3';
 
 interface CementShape {
   rightPolygon: Point[];
