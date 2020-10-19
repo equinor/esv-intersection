@@ -159,14 +159,6 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     this.ctx.stage.addChild(rope);
   }
 
-  drawCircle(point: Point, color: number): void {
-    const circle = new Graphics();
-    circle.beginFill(color);
-    circle.drawCircle(point.x, point.y, 2);
-    circle.endFill();
-    this.ctx.stage.addChild(circle);
-  }
-
   drawRope(path: Point[], texture: Texture): void {
     if (path.length === 0) {
       return null;
