@@ -278,8 +278,16 @@ export class IntersectionReferenceSystem {
 
     const totalLength = this.displacement + extensionStart + extensionEnd;
     const preSteps = Math.floor((extensionStart / totalLength) * steps);
-    const curveSteps = Math.max(Math.ceil((this.displacement / totalLength) * steps), 1);
-    const postSteps = steps - curveSteps - preSteps;
+    let curveSteps = Math.max(Math.ceil((this.displacement / totalLength) * steps), 1);
+
+    // The curve interpolator returns steps + 1 number of points
+    // Subtract the extra point from curveSteps if enough points
+    const extraCurveStep = 1;
+    if (curveSteps > 1) {
+      curveSteps -= extraCurveStep;
+    }
+
+    const postSteps = steps - (curveSteps + extraCurveStep) - preSteps;
 
     const points = [];
 
@@ -297,8 +305,8 @@ export class IntersectionReferenceSystem {
     const refEnd = new Vector2(this.interpolators.trajectory.getPointAt(1.0));
     const endVec = new Vector2(this.endVector);
     const postStep = extensionEnd / postSteps;
-    for (let i = 1; i < postSteps; i++) {
-      const f = i * postStep;
+    for (let i = 0; i < postSteps; i++) {
+      const f = (i + 1) * postStep;
       const point = refEnd.add(endVec.scale(f));
       points.push(point.toArray());
     }

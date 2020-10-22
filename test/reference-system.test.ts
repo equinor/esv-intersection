@@ -1,3 +1,4 @@
+import { degrees } from '@equinor/videx-math';
 import { IntersectionReferenceSystem } from '../src';
 
 const wp = [
@@ -95,6 +96,8 @@ describe('Reference system', () => {
       lastPoint = point;
     }
   });
+  */
+
   it('should have correct length on extension', () => {
     const trajectory = rs.getExtendedTrajectory(100, 500.0, 500.0);
     const startExtend = dist(trajectory.points[0], rs.interpolators.trajectory.getPointAt(0.0));
@@ -102,7 +105,6 @@ describe('Reference system', () => {
     expect(startExtend).toBeCloseTo(500.0);
     expect(endExtend).toBeCloseTo(500.0);
   });
-*/
   it('should throw error when parameters are negative', () => {
     expect(() => {
       const trajectory = rs.getExtendedTrajectory(100, -50.0, 500.0);
@@ -111,13 +113,12 @@ describe('Reference system', () => {
       const trajectory = rs.getExtendedTrajectory(100, 50.0, -500.0);
     }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive extensionEnd parameter');
   });
-  /*
   it('should work for vertical wellbore', () => {
     const verticalPosLog = [
       [30, 40, 100],
       [30, 40, 7000],
     ];
-    const options = {trajectoryAngle: 45.0};
+    const options = { trajectoryAngle: 45.0, trajectoryAngleStart: 45.0 + 180 };
     const irs = new IntersectionReferenceSystem(verticalPosLog, options);
 
     const trajectory = irs.getExtendedTrajectory(100, 1500.0, 1500.0);
@@ -128,7 +129,6 @@ describe('Reference system', () => {
     expect(startExtend).toBeCloseTo(1500.0);
     expect(endExtend).toBeCloseTo(1500.0);
     const angle = Math.atan((trajectory.points[99][0] - trajectory.points[0][0]) / (trajectory.points[99][1] - trajectory.points[0][1]));
-    expect(endExtend).toBeCloseTo(45.0);
+    expect(degrees(angle)).toBeCloseTo(45.0);
   });
-  */
 });
