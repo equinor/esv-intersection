@@ -48,7 +48,6 @@ export class IntersectionReferenceSystem {
    * @param path (required) array of 3d coordinates: [x, y, z]
    * @param options (optional)
    * @param options.trajectoryAngle (optional) - trajectory angle in degrees, overrides the calculated value
-   * @param options.trajectoryAngleStart (optional) - trajectory angle in degrees from start, overrides the calculated value
    * @param options.calculateDisplacementFromBottom - (optional) specify if the path is passed from bottom up
    */
   constructor(path: number[][], options?: ReferenceSystemOptions) {
@@ -69,7 +68,7 @@ export class IntersectionReferenceSystem {
 
   private setPath(path: number[][], options: ReferenceSystemOptions = {}): void {
     this.options = options;
-    const { trajectoryAngle, trajectoryAngleStart } = this.options;
+    const { calculateDisplacementFromBottom } = this.options;
 
     this.path = path;
 
@@ -87,20 +86,15 @@ export class IntersectionReferenceSystem {
       curtain: new CurveInterpolator(this.projectedPath, { tension: TENSION, arcDivisions: ARC_DIVISIONS }),
     };
 
-    if (isFinite(trajectoryAngle)) {
-      const angleInRad = radians(trajectoryAngle);
-      const dirVector = new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
-      this.endVector = dirVector;
-    } else {
-      this.endVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1);
-    }
+    const trajVector = this.getTrajectoryVector();
+    const negativeTrajVector = trajVector.map((d: number) => d * -1);
 
-    if (isFinite(trajectoryAngleStart)) {
-      const angleInRad = radians(trajectoryAngleStart);
-      const dirVector = new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
-      this.startVector = dirVector;
+    if (calculateDisplacementFromBottom) {
+      this.endVector = negativeTrajVector;
+      this.startVector = trajVector;
     } else {
-      this.startVector = IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 0 + THRESHOLD_DIRECTION_DISTANCE, 0);
+      this.endVector = trajVector;
+      this.startVector = negativeTrajVector;
     }
 
     this._curtainPathCache = undefined;
@@ -314,6 +308,21 @@ export class IntersectionReferenceSystem {
     const offset = -extensionStart;
 
     return { points, offset };
+  }
+
+  getTrajectoryVector(): number[] {
+    const { trajectoryAngle, calculateDisplacementFromBottom } = this.options;
+
+    if (isFinite(trajectoryAngle)) {
+      const angleInRad = radians(trajectoryAngle);
+      return new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
+    }
+
+    if (calculateDisplacementFromBottom) {
+      return IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 0 + THRESHOLD_DIRECTION_DISTANCE, 0);
+    }
+
+    return IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1);
   }
 
   /**

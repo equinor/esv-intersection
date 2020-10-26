@@ -118,7 +118,7 @@ describe('Reference system', () => {
       [30, 40, 100],
       [30, 40, 7000],
     ];
-    const options = { trajectoryAngle: 45.0, trajectoryAngleStart: 45.0 + 180 };
+    const options = { trajectoryAngle: 45.0 };
     const irs = new IntersectionReferenceSystem(verticalPosLog, options);
 
     const trajectory = irs.getExtendedTrajectory(100, 1500.0, 1500.0);
