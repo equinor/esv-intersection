@@ -107,12 +107,11 @@ export class IntersectionReferenceSystem {
     const { curtain } = this.interpolators;
     const { calculateDisplacementFromBottom } = this.options;
 
-    let l: number;
+    let l = (length - this._offset) / this.length;
     if (calculateDisplacementFromBottom) {
-      l = (this.length - (length - this._offset)) / this.length;
-    } else {
-      l = (length - this._offset) / this.length;
+      l = 1 - l;
     }
+
     const t = clamp(l, 0, 1);
     const p = curtain.getPointAt(t);
     return p;
