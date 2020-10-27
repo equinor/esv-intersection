@@ -132,11 +132,12 @@ export interface Casing {
 }
 export interface Cement {
   toc: number;
-  casingIds: string[];
+  casingIds?: string[];
   /**
+   * Should remove optional on casingIds when casingId is removed in next major release
    * @‌deprecated use casingIds
    */
-  casingId: string;
+  casingId?: string;
 }
 
 export interface MDPoint {
