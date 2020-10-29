@@ -173,6 +173,7 @@ export interface Trajectory {
 
 export interface ReferenceSystemOptions {
   trajectoryAngle?: number;
+  calculateDisplacementFromBottom?: boolean;
 }
 
 export type BoundingBox = {
