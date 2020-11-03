@@ -9,7 +9,8 @@
     "target": "es5",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "lib": ["es5", "DOM", "ES2019.array"],
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

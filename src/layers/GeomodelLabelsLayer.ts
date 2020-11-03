@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { clamp } from '@equinor/videx-math';
 
@@ -24,6 +26,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   isLabelsOnLeftSide: boolean = true;
   maxFontSizeInWorldCoordinates: number = 70;
   isXFlipped: boolean = false;
+  areasWithAvgTopDepth: any[] = null;
 
   constructor(id?: string, options?: GeomodelLayerLabelsOptions) {
     super(id, options);
@@ -31,6 +34,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     this.getMarginsInWorldCoordinates = this.getMarginsInWorldCoordinates.bind(this);
     this.getSurfacesAreaEdges = this.getSurfacesAreaEdges.bind(this);
     this.updateXFlipped = this.updateXFlipped.bind(this);
+    this.generateSurfaceWithAvgDepth = this.generateSurfaceWithAvgDepth.bind(this);
   }
 
   get data(): SurfaceData {
@@ -46,7 +50,36 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   setData(data: SurfaceData): void {
+    this.generateSurfaceWithAvgDepth(data);
     super.setData(data);
+  }
+
+  generateSurfaceWithAvgDepth(data: any): void {
+    const { areas } = data;
+    this.areasWithAvgTopDepth = areas.reduce((acc: any, a: any) => {
+      if (!a.label) {
+        return acc;
+      }
+      let topSum = 0;
+      let count = 0;
+      a.data.forEach((d: any) => {
+        if (d[1] != null) {
+          topSum += d[1];
+          count++;
+        }
+      });
+      if (count === 0) {
+        return acc;
+      }
+      const avgTopDepth = topSum / count;
+      return [
+        ...acc,
+        {
+          ...a,
+          avgTopDepth,
+        },
+      ];
+    }, []);
   }
 
   onMount(event: OnMountEvent): void {
@@ -81,14 +114,28 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   drawAreaLabels(): void {
-    this.data.areas.filter((d: SurfaceArea) => d.label).forEach((s: SurfaceArea) => this.drawAreaLabel(s));
+    this.areasWithAvgTopDepth.forEach((s: any, i: number, array: any[]) => {
+      const topmostSurfaceNotDrawn = array.reduce((acc, v, index) => {
+        if (index > i) {
+          if (acc == null) {
+            acc = v;
+          } else {
+            if (v.avgTopDepth < acc.avgTopDepth) {
+              acc = v;
+            }
+          }
+        }
+        return acc;
+      }, null);
+      this.drawAreaLabel(s, topmostSurfaceNotDrawn, array, i);
+    });
   }
 
   drawLineLabels(): void {
     this.data.lines.filter((d: SurfaceLine) => d.label).forEach((s: SurfaceLine) => this.drawLineLabel(s));
   }
 
-  drawAreaLabel = (s: SurfaceArea): void => {
+  drawAreaLabel = (s: SurfaceArea, nextSurfaceArea: SurfaceArea, surfaces: any[], i: number): void => {
     const { data } = s;
     const { ctx, maxFontSizeInWorldCoordinates, isXFlipped } = this;
     const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
@@ -157,7 +204,17 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     // Sample points from bottom and calculate position
     const bottomData = data.map((d) => [d[0], d[2]]);
-    let bottomPos = this.calcPos(bottomData, startPos, posSteps, posStep, topEdge, bottomEdge);
+    let bottomPos = this.calcPos(
+      bottomData,
+      startPos,
+      posSteps,
+      posStep,
+      topEdge,
+      bottomEdge,
+      nextSurfaceArea ? nextSurfaceArea.data.map((d) => [d[0], d[1]]) : null,
+      surfaces,
+      i,
+    );
     if (!bottomPos) {
       bottomPos = new Vector2(topPos.x, bottomEdge);
     }
@@ -175,10 +232,24 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       labelMetrics = ctx.measureText(s.label);
       labelLengthInWorldCoords = labelMetrics.width / xRatio;
     }
-
     // Sample points from top and bottom and calculate direction vector
     const initialDirVec = isLabelsOnLeftSide !== isXFlipped ? Vector2.right : Vector2.left;
-    const areaDir = this.calcAreaDir(topData, bottomData, startPos, dirSteps, dirStep, initialDirVec, topEdge, bottomEdge);
+    const areaDir = this.calcAreaDir(
+      topData,
+      bottomData,
+      startPos,
+      dirSteps,
+      dirStep,
+      initialDirVec,
+      topEdge,
+      bottomEdge,
+      0,
+      Math.PI / 4,
+      4,
+      nextSurfaceArea ? nextSurfaceArea.data.map((d) => [d[0], d[1]]) : null,
+      surfaces,
+      i,
+    );
     const scaledAngle = Math.atan(Math.tan(areaDir) * zFactor);
 
     // Draw label
@@ -191,7 +262,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     ctx.fillStyle = this.options.textColor || this.defaultTextColor;
     ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
     ctx.textBaseline = 'middle';
-    ctx.fillText(s.id, 0, 0);
+    ctx.fillText(s.label, 0, 0);
 
     ctx.restore();
   };
@@ -260,7 +331,17 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     return `#${hexString}`;
   }
 
-  calcPos(data: number[][], offset: number, count: number, step: number, topLimit: number = null, bottomLimit: number = null): Vector2 {
+  calcPos(
+    data: number[][],
+    offset: number,
+    count: number,
+    step: number,
+    topLimit: number = null,
+    bottomLimit: number = null,
+    altData: number[][] = null,
+    surfaces: any[] = null,
+    index: number = null,
+  ): Vector2 {
     const pos = Vector2.zero.mutable;
     let samples = 0;
     for (let i = 0; i < count; i++) {
@@ -268,7 +349,25 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
       const y = findSampleAtPos(data, x, topLimit, bottomLimit);
       if (y) {
-        pos.add(x, y);
+        let altY;
+        if (altData) {
+          altY = findSampleAtPos(altData, x, topLimit, bottomLimit);
+          if (altY == null && surfaces && index != null) {
+            //Find topmost surface after current which gives us data
+            let si = index + 1;
+            while (altY == null && si < surfaces.length) {
+              const altSurface = surfaces[si++];
+              altY = findSampleAtPos(
+                altSurface.data.map((d: any) => [d[0], d[1]]),
+                x,
+                topLimit,
+                bottomLimit,
+              );
+            }
+          }
+        }
+        const usedY = altY ? Math.min(y, altY) : y;
+        pos.add(x, usedY);
         samples++;
       }
     }
@@ -324,29 +423,53 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     minReductionAngle: number = 0,
     maxReductionAngle: number = Math.PI / 4,
     angleReductionExponent: number = 4,
+    altBottomData: number[][] = null,
+    surfaces: any[] = null,
+    index: number = null,
   ): number {
     const angles: number[] = [];
-
-    const startTopY = findSampleAtPos(top, offset, topLimit, bottomLimit);
-    if (startTopY === null) {
-      return Vector2.angleRight(initalVector);
-    }
-    const startBottomY = findSampleAtPos(bottom, offset, topLimit, bottomLimit) || bottomLimit;
-    const startY = (startTopY + startBottomY) / 2;
-    const vecAtEnd = new Vector2(offset, startY);
-
     const tmpVec = Vector2.zero.mutable;
-    for (let i = 1; i <= count; i++) {
+    let vecAtEnd;
+    for (let i = 0; i <= count; i++) {
       const x = offset + i * step;
       const topY = findSampleAtPos(top, x, topLimit, bottomLimit);
       const bottomY = findSampleAtPos(bottom, x, topLimit, bottomLimit) || bottomLimit;
-      if (topY !== null) {
-        tmpVec.set(x, (topY + bottomY) / 2);
-        tmpVec.sub(vecAtEnd);
+      let altBottomY;
+      if (bottomY) {
+        if (altBottomData) {
+          altBottomY = findSampleAtPos(altBottomData, x, topLimit, bottomLimit);
+          if (altBottomY == null && surfaces && index != null) {
+            //Find topmost surface after current which gives us data
+            let si = index + 1;
+            while (altBottomY == null && si < surfaces.length) {
+              const altSurface = surfaces[si++];
+              altBottomY = findSampleAtPos(
+                altSurface.data.map((d: any) => [d[0], d[1]]),
+                x,
+                topLimit,
+                bottomLimit,
+              );
+            }
+          }
+        }
+      }
+      const usedBottomY = altBottomY ? Math.min(bottomY, altBottomY) : bottomY;
 
-        angles.push(Vector2.angleRight(tmpVec));
+      if (i === 0) {
+        if (topY === null) {
+          return Vector2.angleRight(initalVector);
+        }
+        const startY = (topY + usedBottomY) / 2;
+        vecAtEnd = new Vector2(offset, startY);
       } else {
-        angles.push(Vector2.angleRight(initalVector));
+        if (topY !== null) {
+          tmpVec.set(x, (topY + usedBottomY) / 2);
+          tmpVec.sub(vecAtEnd);
+
+          angles.push(Vector2.angleRight(tmpVec));
+        } else {
+          angles.push(Vector2.angleRight(initalVector));
+        }
       }
     }
 
