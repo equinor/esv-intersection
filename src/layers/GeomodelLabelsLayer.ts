@@ -56,28 +56,34 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
   generateSurfaceWithAvgDepth(data: any): void {
     const { areas } = data;
-    this.areasWithAvgTopDepth = areas.reduce((acc: any, a: any) => {
+    this.areasWithAvgTopDepth = areas.reduce((acc: any, area: any) => {
       // Filter surfaces without label
-      if (!a.label) {
+      if (!area.label) {
         return acc;
       }
-      let topSum = 0;
-      let count = 0;
-      a.data.forEach((d: any) => {
-        if (d[1] != null) {
-          topSum += d[1];
-          count++;
-        }
-      });
-      // Filter surfaces without no data
-      if (count === 0) {
+      const { avgTopDepth } = area.data.reduce(
+        (a: any, d: any) => {
+          if (d[1] != null) {
+            a.topSum += d[1];
+            a.count++;
+            a.avgTopDepth = a.topSum / a.count;
+          }
+          return a;
+        },
+        {
+          topSum: 0,
+          count: 0,
+          avgTopDepth: null,
+        },
+      );
+      // Filter surfaces without data
+      if (avgTopDepth == null) {
         return acc;
       }
-      const avgTopDepth = topSum / count;
       return [
         ...acc,
         {
-          ...a,
+          ...area,
           avgTopDepth,
         },
       ];
@@ -134,11 +140,11 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   drawLineLabels(): void {
-    this.data.lines.filter((d: SurfaceLine) => d.label).forEach((s: SurfaceLine) => this.drawLineLabel(s));
+    this.data.lines.filter((surfaceLine: SurfaceLine) => surfaceLine.label).forEach((surfaceLine: SurfaceLine) => this.drawLineLabel(surfaceLine));
   }
 
-  drawAreaLabel = (s: SurfaceArea, nextSurfaceArea: SurfaceArea, surfaces: any[], i: number): void => {
-    const { data } = s;
+  drawAreaLabel = (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea, surfaces: any[], i: number): void => {
+    const { data } = surfaceArea;
     const { ctx, maxFontSizeInWorldCoordinates, isXFlipped } = this;
     const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
     let isLabelsOnLeftSide = this.checkDrawLabelsOnLeftSide();
@@ -162,7 +168,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     // Get label metrics
     ctx.save();
     ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
-    let labelMetrics = ctx.measureText(s.label);
+    let labelMetrics = ctx.measureText(surfaceArea.label);
     let labelLengthInWorldCoords = labelMetrics.width / xRatio;
 
     // Check if label will fit horizontally
@@ -231,7 +237,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       // Use reduced fontsize
       fontSizeInWorldCoords = thickness;
       ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
-      labelMetrics = ctx.measureText(s.label);
+      labelMetrics = ctx.measureText(surfaceArea.label);
       labelLengthInWorldCoords = labelMetrics.width / xRatio;
     }
     // Sample points from top and bottom and calculate direction vector
@@ -264,7 +270,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     ctx.fillStyle = this.options.textColor || this.defaultTextColor;
     ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
     ctx.textBaseline = 'middle';
-    ctx.fillText(s.label, 0, 0);
+    ctx.fillText(surfaceArea.label, 0, 0);
 
     ctx.restore();
   };
@@ -340,37 +346,19 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     step: number,
     topLimit: number = null,
     bottomLimit: number = null,
-    altData: number[][] = null,
+    alternativeSurfaceData: number[][] = null,
     surfaces: any[] = null,
-    index: number = null,
+    currentSurfaceIndex: number = null,
   ): Vector2 {
     const pos = Vector2.zero.mutable;
     let samples = 0;
     for (let i = 0; i < count; i++) {
       const x = offset + i * step;
-
       const y = findSampleAtPos(data, x, topLimit, bottomLimit);
       if (y) {
-        let altY;
-        if (altData) {
-          // Find sample from passed in surface
-          altY = findSampleAtPos(altData, x, topLimit, bottomLimit);
-          if (altY == null && surfaces && index != null) {
-            //Find topmost surface after current which gives us data
-            let si = index + 1;
-            while (altY == null && si < surfaces.length) {
-              const altSurface = surfaces[si++];
-              altY = findSampleAtPos(
-                altSurface.data.map((d: any) => [d[0], d[1]]),
-                x,
-                topLimit,
-                bottomLimit,
-              );
-            }
-          }
-        }
+        const alternativeY = this.getAlternativeYValueIfAvailable(x, topLimit, bottomLimit, alternativeSurfaceData, surfaces, currentSurfaceIndex);
         // Use topmost of value from current surface and alternative surface
-        const usedY = altY ? Math.min(y, altY) : y;
+        const usedY = alternativeY ? Math.min(y, alternativeY) : y;
         pos.add(x, usedY);
         samples++;
       }
@@ -381,6 +369,35 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     }
 
     return Vector2.divide(pos, samples);
+  }
+
+  getAlternativeYValueIfAvailable(
+    x: number,
+    topLimit: number,
+    bottomLimit: number,
+    alternativeSurfaceData: number[][],
+    surfaces: any[],
+    currentSurfaceIndex: number,
+  ): number {
+    if (!alternativeSurfaceData) {
+      return null;
+    }
+    // Find sample from passed in surface data
+    let altY = findSampleAtPos(alternativeSurfaceData, x, topLimit, bottomLimit);
+    if (altY == null && surfaces && currentSurfaceIndex != null) {
+      //Find topmost surface after current which gives us data
+      let si = currentSurfaceIndex + 1;
+      while (altY == null && si < surfaces.length) {
+        const altSurface = surfaces[si++];
+        altY = findSampleAtPos(
+          altSurface.data.map((d: any) => [d[0], d[1]]),
+          x,
+          topLimit,
+          bottomLimit,
+        );
+      }
+    }
+    return altY;
   }
 
   calcLineDir(
@@ -427,9 +444,9 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     minReductionAngle: number = 0,
     maxReductionAngle: number = Math.PI / 4,
     angleReductionExponent: number = 4,
-    altBottomData: number[][] = null,
+    alternativeSurfaceBottomData: number[][] = null,
     surfaces: any[] = null,
-    index: number = null,
+    currentSurfaceIndex: number = null,
   ): number {
     const angles: number[] = [];
     const tmpVec = Vector2.zero.mutable;
@@ -438,29 +455,17 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       const x = offset + i * step;
       const topY = findSampleAtPos(top, x, topLimit, bottomLimit);
       const bottomY = findSampleAtPos(bottom, x, topLimit, bottomLimit) || bottomLimit;
-      let altBottomY;
-      if (bottomY) {
-        if (altBottomData) {
-          // Find position of next surface in case it's higher than current base
-          altBottomY = findSampleAtPos(altBottomData, x, topLimit, bottomLimit);
-          if (altBottomY == null && surfaces && index != null) {
-            //Find topmost surface after current which gives us data
-            let si = index + 1;
-            while (altBottomY == null && si < surfaces.length) {
-              const altSurface = surfaces[si++];
-              altBottomY = findSampleAtPos(
-                altSurface.data.map((d: any) => [d[0], d[1]]),
-                x,
-                topLimit,
-                bottomLimit,
-              );
-            }
-          }
-        }
-      }
+      // Find position of next surface in case it's higher than current base
+      const alternativeBottomY = this.getAlternativeYValueIfAvailable(
+        x,
+        topLimit,
+        bottomLimit,
+        alternativeSurfaceBottomData,
+        surfaces,
+        currentSurfaceIndex,
+      );
       // Use topmost of value from current surface and alternative surface
-      const usedBottomY = altBottomY ? Math.min(bottomY, altBottomY) : bottomY;
-
+      const usedBottomY = alternativeBottomY ? Math.min(bottomY, alternativeBottomY) : bottomY;
       if (i === 0) {
         if (topY === null) {
           return Vector2.angleRight(initalVector);
