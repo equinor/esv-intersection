@@ -61,25 +61,24 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       if (!area.label) {
         return acc;
       }
-      const { avgTopDepth } = area.data.reduce(
+      const sumAndCount = area.data.reduce(
         (a: any, d: any) => {
           if (d[1] != null) {
-            a.topSum += d[1];
+            a.sum += d[1];
             a.count++;
-            a.avgTopDepth = a.topSum / a.count;
           }
           return a;
         },
         {
-          topSum: 0,
+          sum: 0,
           count: 0,
-          avgTopDepth: null,
         },
       );
-      // Filter surfaces without data
-      if (avgTopDepth == null) {
+      if (sumAndCount.count === 0) {
         return acc;
       }
+      const avgTopDepth = sumAndCount.sum / sumAndCount.count;
+      // Filter surfaces without data
       return [
         ...acc,
         {
