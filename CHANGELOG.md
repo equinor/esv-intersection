@@ -2,6 +2,11 @@
 
 ## New changes not yet released
 
+
+## v1.2.1
+
+- improved surface and surface label rendering order
+
 ## v1.2.0
 
 - deprecate GeomodelLayer (keeping api util next major release)
