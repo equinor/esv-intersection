@@ -93,6 +93,7 @@ function mapGroups(stratGroups: any, surfaceAreas: SurfaceArea[][]): any {
       const top = surface[0];
       return {
         id: g.name,
+        label: g.name,
         color: unassignedColorScale(i),
         top: top.data.map((d: number[]) => d[1]),
       };
