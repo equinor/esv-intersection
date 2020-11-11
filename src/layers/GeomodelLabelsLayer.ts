@@ -323,7 +323,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     ctx.rotate(textDir);
     ctx.fillStyle = this.colorToCSSColor(s.color);
     ctx.textBaseline = 'middle';
-    ctx.fillText(s.id, 0, 0);
+    ctx.fillText(s.label, 0, 0);
 
     ctx.restore();
   };
