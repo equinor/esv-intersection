@@ -26,7 +26,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   isLabelsOnLeftSide: boolean = true;
   maxFontSizeInWorldCoordinates: number = 70;
   isXFlipped: boolean = false;
-  areasWithAvgTopDepth: any[] = null;
+  areasWithAvgTopDepth: any[] = [];
 
   constructor(id?: string, options?: GeomodelLayerLabelsOptions) {
     super(id, options);
