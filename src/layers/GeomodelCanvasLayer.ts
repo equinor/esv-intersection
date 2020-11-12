@@ -1,6 +1,6 @@
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
-import { colorToCSSColor } from '../utils/render';
+import { colorToCSSColor } from '../utils/color';
 import { CanvasLayer } from './base/CanvasLayer';
 
 const DEFAULT_MAX_DEPTH = 10000;

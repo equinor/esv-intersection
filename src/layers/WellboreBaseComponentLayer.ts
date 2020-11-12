@@ -2,7 +2,7 @@ import { Graphics, Texture, Point, SimpleRope, RENDERER_TYPE } from 'pixi.js';
 import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent, WellComponentBaseOptions, MDPoint } from '../interfaces';
-import { convertColor } from '../utils/render';
+import { convertColor } from '../utils/color';
 
 const createGradientFill = (
   canvas: HTMLCanvasElement,
