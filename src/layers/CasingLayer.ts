@@ -1,6 +1,6 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Casing } from '..';
-import { Point } from 'pixi.js';
+import { Point, RENDERER_TYPE } from 'pixi.js';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 
@@ -45,7 +45,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       return;
     }
     const pctOffset = 0.35;
-    const { maxTextureDiameterScale, lineColor } = this.options as CasingLayerOptions;
+    const { maxTextureDiameterScale, lineColor, solidColor } = this.options as CasingLayerOptions;
 
     const texture = this.createTexture(casing.diameter * maxTextureDiameterScale, pctOffset);
 
@@ -60,10 +60,16 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     const casingWallWidth = Math.abs(casing.diameter - casing.innerDiameter);
 
-    this.drawRope(
-      pathPoints.map((p) => new Point(p[0], p[1])),
-      texture,
-    );
+    // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
+    if (this.renderType === RENDERER_TYPE.CANVAS) {
+      this.drawBigPolygon(polygon, solidColor);
+    } else {
+      this.drawRope(
+        pathPoints.map((p) => new Point(p[0], p[1])),
+        texture,
+      );
+    }
+
     this.drawLine(polygon, lineColor, casingWallWidth, true);
 
     if (casing.hasShoe) {

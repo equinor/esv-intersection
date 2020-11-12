@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { interpolateRgb, quantize } from 'd3-interpolate';
 import { scaleOrdinal } from 'd3-scale';
-import { color, Color } from 'd3-color';
+import { convertColor } from '../utils/color';
 import { StratUnit, SurfaceMetaAndValues, SurfaceLine, SurfaceArea, SurfaceData } from './interfaces';
 
 /**
@@ -192,16 +192,6 @@ function mapSurfaceData(surfaces: SurfaceMetaAndValues[]): any {
       visualization: s.visualSettings.crossSection.toLowerCase(),
     };
   });
-}
-
-/**
- * Convert color string to number
- */
-function convertColor(colorStr: string): number {
-  const c: Color = color(colorStr);
-  const d: string = c.hex();
-  const n: number = parseInt(d.replace('#', '0x'));
-  return n;
 }
 
 function getColorFromUnit(unit: any): number {

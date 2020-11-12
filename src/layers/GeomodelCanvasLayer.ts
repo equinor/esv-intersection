@@ -1,5 +1,6 @@
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import { colorToCSSColor } from '../utils/color';
 import { CanvasLayer } from './base/CanvasLayer';
 
 const DEFAULT_MAX_DEPTH = 10000;
@@ -72,13 +73,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
   }
 
   colorToCSSColor(color: number | string): string {
-    if (typeof color === 'string') {
-      return color;
-    }
-
-    let hexString = color.toString(16);
-    hexString = '000000'.substr(0, 6 - hexString.length) + hexString;
-    return `#${hexString}`;
+    return colorToCSSColor(color);
   }
 
   generateSurfaceAreasPaths(): void {

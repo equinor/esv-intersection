@@ -1,7 +1,8 @@
-import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
+import { Graphics, Texture, Point, SimpleRope, RENDERER_TYPE } from 'pixi.js';
 import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
 import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent, WellComponentBaseOptions, MDPoint } from '../interfaces';
+import { convertColor } from '../utils/color';
 
 const createGradientFill = (
   canvas: HTMLCanvasElement,
@@ -121,21 +122,23 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     }));
   };
 
-  drawBigPolygon = (coords: Point[], t?: Texture): Graphics => {
-    if (!this.rescaleEvent) {
-      return;
-    }
-
-    coords.forEach((point) => point.set(point.x, point.y));
-
+  drawBigPolygon = (coords: Point[], color = '#000000'): Graphics => {
     const polygon = new Graphics();
-    if (t != null) {
-      polygon.beginTextureFill({ texture: t });
-    } else {
-      polygon.beginFill(0);
-    }
+    polygon.beginFill(convertColor(color));
     polygon.drawPolygon(coords);
     polygon.endFill();
+
+    this.ctx.stage.addChild(polygon);
+
+    return polygon;
+  };
+
+  drawBigTexturedPolygon = (coords: Point[], t: Texture): Graphics => {
+    const polygon = new Graphics();
+    polygon.beginTextureFill({ texture: t });
+    polygon.drawPolygon(coords);
+    polygon.endFill();
+
     this.ctx.stage.addChild(polygon);
 
     return polygon;
@@ -199,5 +202,9 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     this._textureCache[cacheKey] = t;
 
     return this._textureCache[cacheKey];
+  }
+
+  get renderType(): RENDERER_TYPE {
+    return this.ctx.renderer.type;
   }
 }

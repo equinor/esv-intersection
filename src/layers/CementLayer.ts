@@ -1,4 +1,4 @@
-import { Point, Texture } from 'pixi.js';
+import { Point, Texture, RENDERER_TYPE } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, MDPoint } from '../interfaces';
 import {
@@ -48,8 +48,13 @@ export class CementLayer extends WellboreBaseComponentLayer {
     const texture: Texture = this.createTexture();
 
     cementShapes.forEach((cementShape: CementShape) => {
-      this.drawRopeWithMask(cementShape.path, cementShape.leftPolygon, texture);
-      this.drawRopeWithMask(cementShape.path, cementShape.rightPolygon, texture);
+      if (this.renderType === RENDERER_TYPE.CANVAS) {
+        this.drawBigTexturedPolygon(cementShape.leftPolygon, texture);
+        this.drawBigTexturedPolygon(cementShape.rightPolygon, texture);
+      } else {
+        this.drawRopeWithMask(cementShape.path, cementShape.leftPolygon, texture);
+        this.drawRopeWithMask(cementShape.path, cementShape.rightPolygon, texture);
+      }
     });
   }
 
