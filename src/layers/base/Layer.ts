@@ -32,7 +32,9 @@ export abstract class Layer {
     this._visible = true;
     this._interactive = opts.interactive || false;
 
-    this._data = options && options.data;
+    if (options && options.data) {
+      this.setData(options.data);
+    }
     this._referenceSystem = options && options.referenceSystem;
 
     this.onMount = this.onMount.bind(this);
@@ -122,7 +124,10 @@ export abstract class Layer {
 
   setData(data: any): void {
     this._data = data;
-    this.onUpdate({ data });
+    // should not be called when there is no visual element to work with
+    if (this.element) {
+      this.onUpdate({ data });
+    }
   }
 
   /**
