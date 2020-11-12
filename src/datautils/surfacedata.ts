@@ -70,6 +70,7 @@ function generateGroupAreas(groups: any, trajectory: number[][]): any {
     const next: any = i + 1 < groups.length ? groups[i + 1] : null;
     return {
       id: g.id,
+      label: g.label,
       color: convertColor(g.color),
       data: trajectory.map((p: any, j: any) => [p[0], g.top[j], next ? next.top[j] : null]),
     };
@@ -93,6 +94,7 @@ function mapGroups(stratGroups: any, surfaceAreas: SurfaceArea[][]): any {
       const top = surface[0];
       return {
         id: g.name,
+        label: g.name,
         color: unassignedColorScale(i),
         top: top.data.map((d: number[]) => d[1]),
       };
