@@ -1,11 +1,13 @@
 # Changelog
 
 ## New changes not yet released
-- improved setting data on layer creation
+
 
 ## v1.2.1
 
 - improved surface and surface label rendering order
+- improved setting data on layer creation
+- added fallback for various rendering functions when webGL is not available
 
 ## v1.2.0
 
