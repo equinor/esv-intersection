@@ -1,7 +1,7 @@
 # Changelog
 
 ## New changes not yet released
-
+- improved setting data on layer creation
 
 ## v1.2.1
 
