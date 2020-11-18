@@ -10,7 +10,7 @@ const defaultOptions = {
 export abstract class Layer {
   private _id: string;
   private _order: number;
-  private _options: LayerOptions;
+  protected _options: LayerOptions;
   private loading: boolean;
   private _element?: HTMLElement;
   private _opacity: number;

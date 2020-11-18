@@ -21,12 +21,11 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   defaultTextColor: string = DEFAULT_TEXT_COLOR;
   defaultFont: string = DEFAULT_FONT;
 
-  options: GeomodelLayerLabelsOptions;
   rescaleEvent: OnRescaleEvent;
   isLabelsOnLeftSide: boolean = true;
   maxFontSizeInWorldCoordinates: number = 70;
   isXFlipped: boolean = false;
-  areasWithAvgTopDepth: any[] = [];
+  areasWithAvgTopDepth: any[] = null;
 
   constructor(id?: string, options?: GeomodelLayerLabelsOptions) {
     super(id, options);
@@ -34,28 +33,15 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     this.getMarginsInWorldCoordinates = this.getMarginsInWorldCoordinates.bind(this);
     this.getSurfacesAreaEdges = this.getSurfacesAreaEdges.bind(this);
     this.updateXFlipped = this.updateXFlipped.bind(this);
-    this.generateSurfaceWithAvgDepth = this.generateSurfaceWithAvgDepth.bind(this);
+    this.generateSurfacesWithAvgDepth = this.generateSurfacesWithAvgDepth.bind(this);
   }
 
-  get data(): SurfaceData {
-    return super.getData();
+  get options(): GeomodelLayerLabelsOptions {
+    return this._options;
   }
 
-  set data(data: SurfaceData) {
-    this.setData(data);
-  }
-
-  getData(): SurfaceData {
-    return super.getData();
-  }
-
-  setData(data: SurfaceData): void {
-    this.generateSurfaceWithAvgDepth(data);
-    super.setData(data);
-  }
-
-  generateSurfaceWithAvgDepth(data: any): void {
-    const { areas } = data;
+  generateSurfacesWithAvgDepth(): any {
+    const { areas } = this.data;
     this.areasWithAvgTopDepth = areas.reduce((acc: any, area: any) => {
       // Filter surfaces without label
       if (!area.label) {
@@ -114,6 +100,10 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     if (!this.data) {
       return;
+    }
+
+    if (!this.areasWithAvgTopDepth) {
+      this.generateSurfacesWithAvgDepth();
     }
 
     this.drawAreaLabels();
