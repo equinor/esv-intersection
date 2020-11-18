@@ -39,7 +39,6 @@ type Callout = {
 
 export class CalloutCanvasLayer extends CanvasLayer {
   rescaleEvent: OnRescaleEvent;
-  isPanning: boolean;
   xRatio: number;
   callouts: Callout[];
   groupFilter: string[] = null;
@@ -50,7 +49,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
   offsetMax: number;
   offsetFactor: number;
 
-  constructor(id?: string, options?: CalloutOptions){
+  constructor(id?: string, options?: CalloutOptions) {
     super(id, options);
     this.minFontSize = options.minFontSize || DEFAULT_MIN_FONT_SIZE;
     this.maxFontSize = options.maxFontSize || DEFAULT_MAX_FONT_SIZE;
@@ -68,21 +67,21 @@ export class CalloutCanvasLayer extends CanvasLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    if (!this.data) {
-      this.callouts = null;
-    }
+
+    this.callouts = null;
+
     this.render();
   }
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
-    this.isPanning = this.rescaleEvent && this.rescaleEvent.xRatio === event.xRatio;
+    const isPanning = this.rescaleEvent && this.rescaleEvent.xRatio === event.xRatio;
     this.rescaleEvent = event;
 
-    this.render();
+    this.render(isPanning);
   }
 
-  render(): void {
+  render(isPanning = false): void {
     this.clearCanvas();
 
     if (!this.data || !this.rescaleEvent) {
@@ -96,7 +95,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
 
     const fontSize = calcSize(this.fontSizeFactor, this.minFontSize, this.maxFontSize, xScale);
 
-    if (!this.isPanning || !this.callouts) {
+    if (!isPanning || !this.callouts) {
       ctx.font = `bold ${fontSize}px arial`;
       const filtered = data.filter((d: Annotation) => !groupFilter || groupFilter.includes(d.group));
       const offset = calcSize(this.offsetFactor, this.offsetMin, this.offsetMax, xScale);
