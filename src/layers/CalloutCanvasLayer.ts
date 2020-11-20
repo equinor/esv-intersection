@@ -61,14 +61,14 @@ export class CalloutCanvasLayer extends CanvasLayer {
 
   setGroupFilter(filter: string[]): void {
     this.groupFilter = filter;
-    this.callouts = null;
+    this.callouts = undefined;
     this.render();
   }
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
 
-    this.callouts = null;
+    this.callouts = undefined;
 
     this.render();
   }
