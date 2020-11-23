@@ -90,7 +90,8 @@ export class CalloutCanvasLayer extends CanvasLayer {
 
     const { xScale, yScale, xBounds } = this.rescaleEvent;
     const { data, ctx, groupFilter } = this;
-    const isLeftToRight = xBounds[0] > xBounds[1];
+    const { calculateDisplacementFromBottom } = this.options.referenceSystem.options;
+    const isLeftToRight = calculateDisplacementFromBottom ? xBounds[0] < xBounds[1] : xBounds[0] > xBounds[1];
     const scale = 0;
 
     const fontSize = calcSize(this.fontSizeFactor, this.minFontSize, this.maxFontSize, xScale);
