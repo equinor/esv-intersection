@@ -40,6 +40,11 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     return this._options;
   }
 
+  setData(data: SurfaceData): void {
+    super.setData(data);
+    this.areasWithAvgTopDepth = null;
+  }
+
   generateSurfacesWithAvgDepth(): any {
     const { areas } = this.data;
     this.areasWithAvgTopDepth = areas.reduce((acc: any, area: any) => {
