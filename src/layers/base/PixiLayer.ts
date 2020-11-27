@@ -41,6 +41,7 @@ export abstract class PixiLayer extends Layer {
   onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
 
+    const { renderType } = this;
     const glContext = this.ctx.renderer?.gl;
 
     this.ctx.stop();
@@ -52,7 +53,7 @@ export abstract class PixiLayer extends Layer {
      *
      * Cleaning up our self since it still seems to work and fix issue with lingering contexts
      */
-    if (this.renderType === RENDERER_TYPE.WEBGL) {
+    if (renderType === RENDERER_TYPE.WEBGL) {
       glContext?.getExtension('WEBGL_lose_context')?.loseContext();
     }
 
