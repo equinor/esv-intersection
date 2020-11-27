@@ -109,6 +109,10 @@ class Overlay {
   setZIndex(zIndex: number): void {
     this.elm.style('z-index', zIndex);
   }
+
+  destroy(): void {
+    this.source.remove();
+  }
 }
 
 const overlay = (caller: any, container: HTMLElement): Overlay => new Overlay(caller, container);
