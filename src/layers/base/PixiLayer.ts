@@ -41,7 +41,8 @@ export abstract class PixiLayer extends Layer {
   onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
 
-    const { renderType } = this;
+    // Get renderType and clContext before we destroy the renderer
+    const renderType = this.renderType();
     const glContext = this.ctx.renderer?.gl;
 
     this.ctx.stop();
@@ -115,7 +116,7 @@ export abstract class PixiLayer extends Layer {
     }
   }
 
-  get renderType(): RENDERER_TYPE {
+  renderType(): RENDERER_TYPE {
     return this.ctx.renderer.type;
   }
 }

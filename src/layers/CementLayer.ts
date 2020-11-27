@@ -48,7 +48,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
     const texture: Texture = this.createTexture();
 
     cementShapes.forEach((cementShape: CementShape) => {
-      if (this.renderType === RENDERER_TYPE.CANVAS) {
+      if (this.renderType() === RENDERER_TYPE.CANVAS) {
         this.drawBigTexturedPolygon(cementShape.leftPolygon, texture);
         this.drawBigTexturedPolygon(cementShape.rightPolygon, texture);
       } else {
