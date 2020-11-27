@@ -11,7 +11,7 @@ export const createRootContainer = (width: number) => {
 
 export const createLayerContainer = (width: number, height: number) => {
   const container = document.createElement('div');
-  container.className = 'layer-container';
+  container.className = 'story-layer-container';
   container.setAttribute('style', `height: ${height}px; width: ${width}px;background-color: #eee;`);
   container.setAttribute('height', `${height}`);
   container.setAttribute('width', `${width}`);
