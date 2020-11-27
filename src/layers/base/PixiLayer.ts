@@ -1,12 +1,10 @@
-import { Application, Transform } from 'pixi.js';
+import { Application, Transform, RENDERER_TYPE } from 'pixi.js';
 import { Layer } from './Layer';
-import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class PixiLayer extends Layer {
   elm: HTMLElement;
-
-  container: HTMLElement;
 
   ctx: Application;
 
@@ -15,14 +13,14 @@ export abstract class PixiLayer extends Layer {
   onMount(event: OnMountEvent): void {
     super.onMount(event);
 
-    if (!this.container) {
-      this.container = document.createElement('div');
-      this.container.setAttribute('id', `${this.id}`);
-      this.container.setAttribute('class', 'webgl-layer');
+    if (!this.elm) {
+      const container = document.createElement('div');
+      container.setAttribute('id', `${this.id}`);
+      container.setAttribute('class', 'webgl-layer');
+      this.elm = container;
       this.updateStyle();
 
       const { elm, height, width } = event;
-      this.elm = elm;
 
       const pixiOptions = {
         width: width || parseInt(this.elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH,
@@ -35,18 +33,33 @@ export abstract class PixiLayer extends Layer {
       };
 
       this.ctx = new Application(pixiOptions);
-      this.container.appendChild(this.ctx.view);
-      this.elm.appendChild(this.container);
+      container.appendChild(this.ctx.view);
+      elm.appendChild(container);
     }
   }
 
-  onUnmount(): void {
-    super.onUnmount();
+  onUnmount(event?: OnUnmountEvent): void {
+    super.onUnmount(event);
+
+    const glContext = this.ctx.renderer?.gl;
+
     this.ctx.stop();
-    this.ctx.destroy(true);
-    this.container.remove();
-    this.container = null;
+    this.ctx.destroy(true, { children: true, texture: true, baseTexture: true });
+
+    /**
+     * WebGL v2 does supposedly not have WEBGL_lose_context
+     * so Pixi.js does not use it to "clean up" on v2.
+     *
+     * Cleaning up our self since it still seems to work and fix issue with lingering contexts
+     */
+    if (this.renderType === RENDERER_TYPE.WEBGL) {
+      glContext?.getExtension('WEBGL_lose_context')?.loseContext();
+    }
+
+    this.elm.remove();
+    this.elm = null;
     this.ctx = null;
+    this.transform = null;
   }
 
   onResize(event: OnResizeEvent): void {
@@ -70,7 +83,7 @@ export abstract class PixiLayer extends Layer {
     const isVisible = visible || this.isVisible;
     const visibility = isVisible ? 'visible' : 'hidden';
     const interactive = this.interactive ? 'auto' : 'none';
-    this.container.setAttribute(
+    this.elm.setAttribute(
       'style',
       `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`,
     );
@@ -78,26 +91,30 @@ export abstract class PixiLayer extends Layer {
 
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
-    if (this.container) {
+    if (this.elm) {
       this.updateStyle(visible);
     }
   }
 
   onOpacityChanged(opacity: number): void {
-    if (this.container) {
+    if (this.elm) {
       this.updateStyle();
     }
   }
 
   onOrderChanged(order: number): void {
-    if (this.container) {
+    if (this.elm) {
       this.updateStyle();
     }
   }
 
   onInteractivityChanged(interactive: boolean): void {
-    if (this.container) {
+    if (this.elm) {
       this.updateStyle();
     }
+  }
+
+  get renderType(): RENDERER_TYPE {
+    return this.ctx.renderer.type;
   }
 }
