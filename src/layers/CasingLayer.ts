@@ -1,5 +1,5 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CasingLayerOptions, OnMountEvent, OnUpdateEvent, OnRescaleEvent, Casing } from '..';
+import { CasingLayerOptions, OnUpdateEvent, OnRescaleEvent, Casing } from '..';
 import { Point, RENDERER_TYPE } from 'pixi.js';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
@@ -16,10 +16,6 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       ...options,
     };
     this.render = this.render.bind(this);
-  }
-
-  onMount(event: OnMountEvent): void {
-    super.onMount(event);
   }
 
   onUpdate(event: OnUpdateEvent): void {

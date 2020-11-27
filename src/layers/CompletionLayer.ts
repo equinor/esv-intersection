@@ -1,7 +1,7 @@
 import Vector2 from '@equinor/videx-vector2';
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { OnMountEvent, OnUpdateEvent, OnRescaleEvent } from '..';
+import { OnUpdateEvent } from '..';
 import { CompletionLayerOptions } from '../interfaces';
 
 interface CompletionItem {}
@@ -13,10 +13,6 @@ export class CompletionLayer extends PixiLayer {
       ...options,
     };
     this.render = this.render.bind(this);
-  }
-
-  onMount(event: OnMountEvent): void {
-    super.onMount(event);
   }
 
   onUpdate(event: OnUpdateEvent): void {
