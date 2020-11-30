@@ -5,12 +5,7 @@ import { ScaleOptions, OnMountEvent, OnRescaleEvent } from '../interfaces';
 import { Axis } from '../components';
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
 import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';
-
-interface AxisOptions {
-  xLabel: string;
-  yLabel: string;
-  unitOfMeasure: string;
-}
+import { AxisOptions } from './interfaces';
 
 export class LayerManager {
   private container: HTMLElement;
