@@ -86,11 +86,19 @@ export class Controller {
   }
 
   /**
-   * Remove layer from list
+   * Remove and unmount layer from list
    * @param layerId string id
    */
   removeLayer(layerId: string): Controller {
     this.layerManager.removeLayer(layerId);
+    return this;
+  }
+
+  /**
+   * Remove and unmount all layers from list
+   */
+  removeAllLayers(): Controller {
+    this.layerManager.removeAllLayers();
     return this;
   }
 
@@ -240,6 +248,19 @@ export class Controller {
    */
   setMinZoomLevel(zoomlevel: number): Controller {
     this.zoomPanHandler.setMinZoomLevel(zoomlevel);
+    return this;
+  }
+
+  /**
+   * Destroy Controller
+   * Convenience method for removing from DOM and clearing references
+   */
+  destroy(): Controller {
+    this.layerManager.destroy();
+    this._overlay.destroy();
+    this._referenceSystem = undefined;
+    this.layerManager = undefined;
+    this._overlay = undefined;
     return this;
   }
 

@@ -57,7 +57,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     const casingWallWidth = Math.abs(casing.diameter - casing.innerDiameter);
 
     // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
-    if (this.renderType === RENDERER_TYPE.CANVAS) {
+    if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigPolygon(polygon, solidColor);
     } else {
       this.drawRope(

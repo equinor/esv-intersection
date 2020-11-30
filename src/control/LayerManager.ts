@@ -89,16 +89,27 @@ export class LayerManager {
   }
 
   /**
-   * Remove layer from manager, and unmounts it
+   * Remove and unmount layer from manager
    * @param layerId name of layer
    */
   removeLayer(layerId: string): LayerManager {
-    const idx = this.layers.findIndex((l) => l.id === layerId);
-    if (idx !== -1) {
-      this.layers[idx].onUnmount();
-      this.layers.splice(idx, 1);
+    const layer = this.layers.find((l) => l.id === layerId);
+    if (layer) {
+      layer.onUnmount();
+      this.layers = this.layers.filter((l) => l.id !== layerId);
     }
 
+    return this;
+  }
+
+  /**
+   * Remove and unmount all layers from manager
+   */
+  removeAllLayers(): LayerManager {
+    const { layers } = this;
+    layers.forEach((layer) => {
+      this.removeLayer(layer.id);
+    });
     return this;
   }
 
@@ -222,6 +233,20 @@ export class LayerManager {
 
   setMinZoomLevel(zoomlevel: number): LayerManager {
     this._zoomPanHandler.setMinZoomLevel(zoomlevel);
+    return this;
+  }
+
+  destroy(): LayerManager {
+    this.clearAllData(true);
+    this.removeAllLayers();
+    this.layerContainer.remove();
+    this.layerContainer = undefined;
+    this.container = undefined;
+    this.layers = undefined;
+    this._zoomPanHandler = undefined;
+    this._axis = undefined;
+    this._svgContainer = undefined;
+
     return this;
   }
 

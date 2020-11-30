@@ -62,7 +62,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
     }
 
     const polygonCoords = makeTubularPolygon(leftPath, rightPath);
-    if (this.renderType === RENDERER_TYPE.CANVAS) {
+    if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigPolygon(polygonCoords, firstColor);
     } else {
       this.drawRope(
