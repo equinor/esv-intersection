@@ -1,1 +1,1 @@
-export * as seismicColorMap from './seismic-colormap.json';
+export { default as seismicColorMap } from './seismic-colormap.json';
