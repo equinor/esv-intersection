@@ -3,6 +3,14 @@
 ## New changes not yet released
 
 
+## v1.3.0
+- fix CalloutCanvasLayer to always render on data update
+- fix position callout with displacement calculated from bottom
+- fix issue with missing labels in geomodel
+- fix onUnmount on PixiLayers
+- add export of interfaces AxisOptions, ControllerOptions, OverlayEvents and OverlayCallbacks
+- add destroy method to Controller
+
 ## v1.2.1
 
 - improved surface and surface label rendering order
