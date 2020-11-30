@@ -1,1 +1,2 @@
-export * as seismicColorMap from './seismic-colormap.json';
+import seismicColorMap from './seismic-colormap.json';
+export { seismicColorMap };
