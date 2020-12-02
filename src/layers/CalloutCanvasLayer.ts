@@ -84,7 +84,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
   render(isPanning = false): void {
     this.clearCanvas();
 
-    if (!this.data || !this.rescaleEvent) {
+    if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
       return;
     }
 
