@@ -2,8 +2,12 @@
 
 ## New changes not yet released
 
+## v1.3.1
+
+- fix skip render without referenceSystem in CalloutCanvasLayer
 
 ## v1.3.0
+
 - fix CalloutCanvasLayer to always render on data update
 - fix position callout with displacement calculated from bottom
 - fix issue with missing labels in geomodel
