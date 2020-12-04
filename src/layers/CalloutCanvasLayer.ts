@@ -84,19 +84,20 @@ export class CalloutCanvasLayer extends CanvasLayer {
   render(isPanning = false): void {
     this.clearCanvas();
 
-    if (!this.data || !this.rescaleEvent) {
+    if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
       return;
     }
 
     const { xScale, yScale, xBounds } = this.rescaleEvent;
-    const { data, ctx, groupFilter } = this;
-    const { calculateDisplacementFromBottom } = this.options.referenceSystem.options;
-    const isLeftToRight = calculateDisplacementFromBottom ? xBounds[0] < xBounds[1] : xBounds[0] > xBounds[1];
-    const scale = 0;
 
     const fontSize = calcSize(this.fontSizeFactor, this.minFontSize, this.maxFontSize, xScale);
 
     if (!isPanning || !this.callouts) {
+      const { data, ctx, groupFilter } = this;
+      const { calculateDisplacementFromBottom } = this.referenceSystem.options;
+      const isLeftToRight = calculateDisplacementFromBottom ? xBounds[0] < xBounds[1] : xBounds[0] > xBounds[1];
+      const scale = 0;
+
       ctx.font = `bold ${fontSize}px arial`;
       const filtered = data.filter((d: Annotation) => !groupFilter || groupFilter.includes(d.group));
       const offset = calcSize(this.offsetFactor, this.offsetMin, this.offsetMax, xScale);
