@@ -1,46 +1,13 @@
-import { Graphics, Container } from 'pixi.js';
+import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
-import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
+import { OnUpdateEvent } from '../interfaces';
+import { SurfaceArea, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
 
 export class GeomodelLayerV2 extends PixiLayer {
-  options: GeomodelLayerOptions;
-
-  pixiContainer: Container;
-
-  polygons: any;
-
-  get data(): SurfaceData {
-    return super.getData();
-  }
-
-  set data(data: SurfaceData) {
-    this.setData(data);
-  }
-
-  getData(): SurfaceData {
-    return super.getData();
-  }
-
-  setData(data: SurfaceData): void {
-    super.setData(data);
-  }
-
-  onMount(event: OnMountEvent): void {
-    super.onMount(event);
-    this.pixiContainer = new Container();
-    this.ctx.stage.addChild(this.pixiContainer);
-  }
-
-  onUnmount(): void {
-    super.onUnmount();
-    this.pixiContainer = null;
-  }
-
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.cleanUpContainer();
+    this.cleanUpStage();
     if (!this.data) {
       return;
     }
@@ -49,9 +16,9 @@ export class GeomodelLayerV2 extends PixiLayer {
     this.data.lines.forEach((l: any) => this.generateSurfaceLine(l));
   }
 
-  cleanUpContainer(): void {
-    this.pixiContainer.children.forEach((g: Graphics) => g.destroy());
-    this.pixiContainer.removeChildren();
+  cleanUpStage(): void {
+    this.ctx.stage.children.forEach((g: Graphics) => g.destroy());
+    this.ctx.stage.removeChildren();
   }
 
   createPolygons = (data: any): number[][] => {
@@ -92,7 +59,7 @@ export class GeomodelLayerV2 extends PixiLayer {
     const polygons = this.createPolygons(s.data);
     polygons.forEach((polygon: any) => g.drawPolygon(polygon));
     g.endFill();
-    this.pixiContainer.addChild(g);
+    this.ctx.stage.addChild(g);
   };
 
   generateSurfaceLine = (s: SurfaceLine): void => {
@@ -115,6 +82,6 @@ export class GeomodelLayerV2 extends PixiLayer {
         penDown = false;
       }
     }
-    this.pixiContainer.addChild(g);
+    this.ctx.stage.addChild(g);
   };
 }
