@@ -6,8 +6,6 @@ import { HOLE_OUTLINE } from '../constants';
 import { Point, RENDERER_TYPE } from 'pixi.js';
 
 export class HoleSizeLayer extends WellboreBaseComponentLayer {
-  options: HoleSizeLayerOptions;
-
   constructor(id?: string, options?: HoleSizeLayerOptions) {
     super(id, options);
     this.options = {
@@ -38,7 +36,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       return;
     }
 
-    const { maxTextureDiameterScale, firstColor } = this.options;
+    const { maxTextureDiameterScale, firstColor, lineColor } = this.options as HoleSizeLayerOptions;
 
     const texture = this.createTexture(holeObject.diameter * maxTextureDiameterScale);
 
@@ -48,8 +46,6 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
 
     const rightPath = offsetPoints(pathPoints, normals, holeObject.diameter);
     const leftPath = offsetPoints(pathPoints, normals, -holeObject.diameter);
-
-    const { lineColor } = this.options;
 
     if (pathPoints.length === 0) {
       return;
