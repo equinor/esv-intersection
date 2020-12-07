@@ -21,7 +21,7 @@ const createGradientFill = (
   return gradient;
 };
 
-export class WellboreBaseComponentLayer extends PixiLayer {
+export abstract class WellboreBaseComponentLayer extends PixiLayer {
   _textureCache: Record<string, Texture> = {};
 
   rescaleEvent: OnRescaleEvent;
@@ -44,6 +44,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
     this.clear();
+    this.render();
   }
 
   onRescale(event: OnRescaleEvent): void {
@@ -64,7 +65,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
 
     if (shouldRender) {
       this.clear();
-      this.render(event);
+      this.render();
     }
   }
 
@@ -75,13 +76,7 @@ export class WellboreBaseComponentLayer extends PixiLayer {
     });
   }
 
-  // This is overridden by the extended well bore items layers (casing, hole)
-  // TODO: Look at this construct; can we do something slightly better here?
-  render(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    event: OnRescaleEvent | OnUpdateEvent,
-  ): // eslint-disable-next-line @typescript-eslint/no-empty-function
-  void {}
+  abstract render(): void;
 
   /**
    * Calculate yRatio without zFactor

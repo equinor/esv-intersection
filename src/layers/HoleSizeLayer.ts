@@ -1,5 +1,5 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, HoleSize } from '..';
+import { HoleSizeLayerOptions, HoleSize } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { HOLE_OUTLINE } from '../constants';
@@ -19,15 +19,9 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       maxTextureDiameterScale: 2,
       ...options,
     };
-    this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
-    super.onUpdate(event);
-    this.render(event);
-  }
-
-  render(event: OnRescaleEvent | OnUpdateEvent): void {
+  render(): void {
     const { data } = this;
 
     if (!data || !this.rescaleEvent || !this.referenceSystem) {
