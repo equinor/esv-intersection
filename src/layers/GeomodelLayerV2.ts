@@ -1,24 +1,44 @@
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { OnUpdateEvent } from '../interfaces';
-import { SurfaceArea, SurfaceLine } from '../datautils';
+import { OnRescaleEvent, OnUpdateEvent } from '../interfaces';
+import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
 
 export class GeomodelLayerV2 extends PixiLayer {
+  private isRendered: boolean = false;
+
+  onRescale(event: OnRescaleEvent): void {
+    super.onRescale(event);
+
+    if (!this.isRendered) {
+      this.render();
+    }
+  }
+
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.cleanUpStage();
-    if (!this.data) {
-      return;
-    }
 
-    this.data.areas.forEach((p: any) => this.generateAreaPolygon(p));
-    this.data.lines.forEach((l: any) => this.generateSurfaceLine(l));
+    this.isRendered = false;
+    this.cleanUpStage();
+    this.render();
   }
 
   cleanUpStage(): void {
     this.ctx.stage.children.forEach((g: Graphics) => g.destroy());
     this.ctx.stage.removeChildren();
+  }
+
+  render(): void {
+    const { data }: { data: SurfaceData } = this;
+
+    if (!data) {
+      return;
+    }
+
+    data.areas.forEach((a: SurfaceArea) => this.generateAreaPolygon(a));
+    data.lines.forEach((l: SurfaceLine) => this.generateSurfaceLine(l));
+
+    this.isRendered = true;
   }
 
   createPolygons = (data: any): number[][] => {

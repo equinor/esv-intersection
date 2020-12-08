@@ -97,7 +97,7 @@ const renderIntersection = (scaleOptions) => {
 
     // Instantiate layers
     const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
-    const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.6 });
+    const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.6, data: geolayerdata });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
     const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holesizes, referenceSystem });
     const casingLayer = new CasingLayer('casing', { order: 5, data: casings, referenceSystem });
@@ -130,8 +130,6 @@ const renderIntersection = (scaleOptions) => {
     const controller = new Controller({ layers, ...opts });
 
     addMDOverlay(controller);
-
-    controller.getLayer('geomodel').onUpdate({ data: geolayerdata });
 
     const seismicOptions = {
       x: seismicInfo.minX,
