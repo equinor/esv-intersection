@@ -1,7 +1,6 @@
-import { scaleLinear } from 'd3-scale';
-import { zoomIdentity } from 'd3-zoom';
 import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
 import { CalloutCanvasLayer, IntersectionReferenceSystem } from '../src/index';
+import { rescaleEventStub } from './test-helpers';
 
 describe('CalloutCanvasLayer', () => {
   let elm: HTMLElement;
@@ -28,21 +27,6 @@ describe('CalloutCanvasLayer', () => {
         md: 91.1,
       },
     ];
-    const xBounds = [0, 1000] as [number, number];
-    const yBounds = [0, 1000] as [number, number];
-    const layerEvent = {
-      xBounds,
-      yBounds,
-      zFactor: 1,
-      viewportRatio: 1,
-      xRatio: 1,
-      yRatio: 1,
-      width: 1,
-      height: 1,
-      transform: zoomIdentity,
-      xScale: scaleLinear().domain(xBounds).range([0, 1]),
-      yScale: scaleLinear().domain(yBounds).range([0, 1]),
-    };
 
     it('should render when reference system is set in constructor', () => {
       // Arrange
@@ -50,7 +34,7 @@ describe('CalloutCanvasLayer', () => {
       const layer = new CalloutCanvasLayer('calloutcanvaslayer', { referenceSystem });
       layer.onMount({ elm });
       layer.onUpdate({});
-      layer.onRescale(layerEvent);
+      layer.onRescale(rescaleEventStub(data));
 
       layer.ctx.__clearEvents();
 
@@ -70,7 +54,7 @@ describe('CalloutCanvasLayer', () => {
       layer.referenceSystem = referenceSystem;
       layer.onMount({ elm });
       layer.onUpdate({});
-      layer.onRescale(layerEvent);
+      layer.onRescale(rescaleEventStub(data));
 
       layer.ctx.__clearEvents();
 
@@ -88,7 +72,7 @@ describe('CalloutCanvasLayer', () => {
       const layer = new CalloutCanvasLayer('calloutcanvaslayer', {});
       layer.onMount({ elm });
       layer.onUpdate({});
-      layer.onRescale(layerEvent);
+      layer.onRescale(rescaleEventStub(data));
 
       layer.ctx.__clearEvents();
 

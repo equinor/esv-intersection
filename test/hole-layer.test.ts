@@ -1,6 +1,5 @@
-import { scaleLinear } from 'd3-scale';
-import { zoomIdentity } from 'd3-zoom';
 import { HoleSizeLayer, IntersectionReferenceSystem } from '../src/index';
+import { rescaleEventStub } from './test-helpers';
 
 describe('HoleSizeLayer', () => {
   let elm: HTMLElement;
@@ -19,21 +18,6 @@ describe('HoleSizeLayer', () => {
   });
   describe('when setting reference system', () => {
     const data = [{ casingId: '1', diameter: 30, end: 202, hasShoe: true, innerDiameter: 28, start: 139.7 }];
-    const xBounds = [0, 1000] as [number, number];
-    const yBounds = [0, 1000] as [number, number];
-    const layerEvent = {
-      xBounds,
-      yBounds,
-      zFactor: 1,
-      viewportRatio: 1,
-      xRatio: 1,
-      yRatio: 1,
-      width: 1,
-      height: 1,
-      transform: zoomIdentity,
-      xScale: scaleLinear().domain(xBounds).range([0, 1]),
-      yScale: scaleLinear().domain(yBounds).range([0, 1]),
-    };
 
     it('should render when reference system is set in constructor', () => {
       // Arrange
@@ -41,7 +25,7 @@ describe('HoleSizeLayer', () => {
       const layer = new HoleSizeLayer('casing-layer', { referenceSystem });
       layer.onMount({ elm });
       layer.onUpdate({});
-      layer.onRescale(layerEvent);
+      layer.onRescale(rescaleEventStub(data));
 
       // Act
       layer.data = data;
@@ -57,7 +41,7 @@ describe('HoleSizeLayer', () => {
       layer.referenceSystem = referenceSystem;
       layer.onMount({ elm });
       layer.onUpdate({});
-      layer.onRescale(layerEvent);
+      layer.onRescale(rescaleEventStub(data));
 
       // Act
       layer.data = data;
@@ -71,7 +55,7 @@ describe('HoleSizeLayer', () => {
       const layer = new HoleSizeLayer('casing-layer', {});
       layer.onMount({ elm });
       layer.onUpdate({});
-      layer.onRescale(layerEvent);
+      layer.onRescale(rescaleEventStub(data));
 
       // Act
       // Assert
