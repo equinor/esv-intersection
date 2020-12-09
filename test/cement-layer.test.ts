@@ -1,14 +1,13 @@
-import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
-import { CalloutCanvasLayer, IntersectionReferenceSystem } from '../src/index';
+import { CementLayer, IntersectionReferenceSystem } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
 
-describe('CalloutCanvasLayer', () => {
+describe('CementLayer', () => {
   let elm: HTMLElement;
   const wp = [
-    [30, 40, 4],
-    [40, 70, 6],
-    [45, 100, 8],
-    [50, 110, 10],
+    [30, 40, 0],
+    [40, 70, 600],
+    [45, 100, 800],
+    [50, 110, 1000],
   ];
 
   beforeEach(() => {
@@ -18,63 +17,49 @@ describe('CalloutCanvasLayer', () => {
     elm.remove();
   });
   describe('when setting reference system', () => {
-    const data = [
-      {
-        title: 'Seabed',
-        group: 'ref-picks',
-        label: '91.1 m RKB',
-        color: 'rgba(0,0,0,0.8)',
-        md: 91.1,
-      },
-    ];
+    const data = {
+      casings: [{ casingId: '1', diameter: 30, end: 200, hasShoe: true, innerDiameter: 28, start: 100 }],
+      cement: [{ casingIds: ['1'], toc: 250 }],
+      holes: [{ start: 50, end: 250, diameter: 36 }],
+    };
 
     it('should render when reference system is set in constructor', () => {
       // Arrange
       const referenceSystem = new IntersectionReferenceSystem(wp);
-      const layer = new CalloutCanvasLayer('calloutcanvaslayer', { referenceSystem });
+      const layer = new CementLayer('casing-layer', { referenceSystem });
       layer.onMount({ elm });
       layer.onUpdate({});
       layer.onRescale(rescaleEventStub(data));
-
-      layer.ctx.__clearEvents();
 
       // Act
       layer.data = data;
 
       // Assert
-      const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
-      const fillTextCalls = events.filter((call: any) => call.type === 'fillText');
-      expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
+      expect(layer.ctx.stage.addChild).toHaveBeenCalled();
     });
 
     it('should render when reference system is set after constructor', () => {
       // Arrange
-      const layer = new CalloutCanvasLayer('calloutcanvaslayer', {});
+      const layer = new CementLayer('casing-layer', {});
       const referenceSystem = new IntersectionReferenceSystem(wp);
       layer.referenceSystem = referenceSystem;
       layer.onMount({ elm });
       layer.onUpdate({});
       layer.onRescale(rescaleEventStub(data));
 
-      layer.ctx.__clearEvents();
-
       // Act
       layer.data = data;
 
       // Assert
-      const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
-      const fillTextCalls = events.filter((call: any) => call.type === 'fillText');
-      expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
+      expect(layer.ctx.stage.addChild).toHaveBeenCalled();
     });
 
     it('should not throw exception when setting data without reference system', () => {
       // Arrange
-      const layer = new CalloutCanvasLayer('calloutcanvaslayer', {});
+      const layer = new CementLayer('casing-layer', {});
       layer.onMount({ elm });
       layer.onUpdate({});
       layer.onRescale(rescaleEventStub(data));
-
-      layer.ctx.__clearEvents();
 
       // Act
       // Assert

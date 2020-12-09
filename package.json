@@ -76,7 +76,7 @@
     "setupFiles": [
       "jest-canvas-mock"
     ],
-    "testRegex": "/test/.*",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$",
     "moduleFileExtensions": [
       "ts",
       "tsx",

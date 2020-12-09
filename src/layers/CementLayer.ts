@@ -38,7 +38,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    if (this.data == null || !this.rescaleEvent) {
+    if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
       return;
     }
 

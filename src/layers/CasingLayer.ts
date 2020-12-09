@@ -27,7 +27,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { data }: { data: Casing[] } = this;
 
-    if (data == null || !this.rescaleEvent) {
+    if (!data || !this.rescaleEvent || !this.referenceSystem) {
       return;
     }
 
