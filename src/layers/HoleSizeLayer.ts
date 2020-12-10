@@ -1,13 +1,11 @@
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, HoleSize } from '..';
+import { HoleSizeLayerOptions, HoleSize } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { HOLE_OUTLINE } from '../constants';
 import { Point, RENDERER_TYPE } from 'pixi.js';
 
 export class HoleSizeLayer extends WellboreBaseComponentLayer {
-  options: HoleSizeLayerOptions;
-
   constructor(id?: string, options?: HoleSizeLayerOptions) {
     super(id, options);
     this.options = {
@@ -19,15 +17,9 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       maxTextureDiameterScale: 2,
       ...options,
     };
-    this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
-    super.onUpdate(event);
-    this.render(event);
-  }
-
-  render(event: OnRescaleEvent | OnUpdateEvent): void {
+  render(): void {
     const { data } = this;
 
     if (!data || !this.rescaleEvent || !this.referenceSystem) {
@@ -44,7 +36,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       return;
     }
 
-    const { maxTextureDiameterScale, firstColor } = this.options;
+    const { maxTextureDiameterScale, firstColor, lineColor } = this.options as HoleSizeLayerOptions;
 
     const texture = this.createTexture(holeObject.diameter * maxTextureDiameterScale);
 
@@ -54,8 +46,6 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
 
     const rightPath = offsetPoints(pathPoints, normals, holeObject.diameter);
     const leftPath = offsetPoints(pathPoints, normals, -holeObject.diameter);
-
-    const { lineColor } = this.options;
 
     if (pathPoints.length === 0) {
       return;

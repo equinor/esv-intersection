@@ -1,4 +1,4 @@
-import { Application, Transform, RENDERER_TYPE } from 'pixi.js';
+import { Application, RENDERER_TYPE } from 'pixi.js';
 import { Layer } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
@@ -7,8 +7,6 @@ export abstract class PixiLayer extends Layer {
   elm: HTMLElement;
 
   ctx: Application;
-
-  transform: Transform;
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
@@ -61,7 +59,6 @@ export abstract class PixiLayer extends Layer {
     this.elm.remove();
     this.elm = null;
     this.ctx = null;
-    this.transform = null;
   }
 
   onResize(event: OnResizeEvent): void {

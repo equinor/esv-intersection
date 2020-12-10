@@ -1,6 +1,6 @@
 import { Point, Texture, RENDERER_TYPE } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CementLayerOptions, OnUpdateEvent, OnRescaleEvent, Cement, Casing, HoleSize, MDPoint } from '../interfaces';
+import { CementLayerOptions, Cement, Casing, HoleSize, MDPoint } from '../interfaces';
 import {
   calculateCementDiameter,
   cementDiameterChangeDepths,
@@ -29,15 +29,9 @@ export class CementLayer extends WellboreBaseComponentLayer {
       maxTextureDiameterScale: 2,
       ...options,
     };
-    this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
-    super.onUpdate(event);
-    this.render(event);
-  }
-
-  render(event: OnRescaleEvent | OnUpdateEvent): void {
+  render(): void {
     if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
       return;
     }
