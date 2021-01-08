@@ -70,7 +70,6 @@ function generateGroupAreas(groups: any, trajectory: number[][]): any {
     const next: any = i + 1 < groups.length ? groups[i + 1] : null;
     return {
       id: g.id,
-      label: g.label,
       color: convertColor(g.color),
       data: trajectory.map((p: any, j: any) => [p[0], g.top[j], next ? next.top[j] : null]),
     };
