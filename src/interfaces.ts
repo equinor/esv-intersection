@@ -172,6 +172,9 @@ export interface Trajectory {
 }
 
 export interface ReferenceSystemOptions {
+  normalizedLength?: number;
+  arcDivisions?: number;
+  tension?: number;
   trajectoryAngle?: number;
   calculateDisplacementFromBottom?: boolean;
 }
