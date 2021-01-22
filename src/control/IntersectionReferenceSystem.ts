@@ -68,7 +68,7 @@ export class IntersectionReferenceSystem {
 
   private setPath(path: number[][], options: ReferenceSystemOptions = {}): void {
     this.options = options;
-    const { calculateDisplacementFromBottom } = this.options;
+    const { arcDivisions, tension, calculateDisplacementFromBottom } = this.options;
 
     this.path = path;
 
@@ -81,9 +81,9 @@ export class IntersectionReferenceSystem {
       curve: new CurveInterpolator(path),
       trajectory: new CurveInterpolator(
         path.map((d: number[]) => [d[0], d[1]]),
-        { tension: TENSION, arcDivisions: ARC_DIVISIONS },
+        { tension: tension || TENSION, arcDivisions: arcDivisions || ARC_DIVISIONS },
       ),
-      curtain: new CurveInterpolator(this.projectedPath, { tension: TENSION, arcDivisions: ARC_DIVISIONS }),
+      curtain: new CurveInterpolator(this.projectedPath, { tension: tension || TENSION, arcDivisions: arcDivisions || ARC_DIVISIONS }),
     };
 
     const trajVector = this.getTrajectoryVector();
@@ -105,10 +105,10 @@ export class IntersectionReferenceSystem {
    */
   project(length: number): number[] {
     const { curtain } = this.interpolators;
-    const { calculateDisplacementFromBottom } = this.options;
+    const { normalizedLength, calculateDisplacementFromBottom } = this.options;
 
-    const normalizedLength = (length - this._offset) / this.length;
-    const l = calculateDisplacementFromBottom ? 1 - normalizedLength : normalizedLength;
+    const factor = (length - this._offset) / (normalizedLength || this.length);
+    const l = calculateDisplacementFromBottom ? 1 - factor : factor;
 
     const t = clamp(l, 0, 1);
     const p = curtain.getPointAt(t);
@@ -157,19 +157,20 @@ export class IntersectionReferenceSystem {
    * Map a displacement back to length along the curve
    */
   unproject(displacement: number): number {
-    const { calculateDisplacementFromBottom } = this.options;
+    const { normalizedLength, calculateDisplacementFromBottom } = this.options;
     const displacementFromStart = calculateDisplacementFromBottom ? this.displacement - displacement : displacement;
+    const length = normalizedLength || this.length;
 
     if (displacementFromStart < 0) {
       return displacementFromStart;
     }
     if (displacementFromStart > this.displacement) {
-      return this.length + (displacementFromStart - this.displacement);
+      return length + (displacementFromStart - this.displacement);
     }
 
     const ls = this.interpolators.curtain.lookupPositions(displacementFromStart, 0, 1);
     if (ls && ls.length) {
-      return ls[0] * this.length + this._offset;
+      return ls[0] * length + this._offset;
     }
     return null;
   }
@@ -259,26 +260,30 @@ export class IntersectionReferenceSystem {
   /**
    * Generate a set of coordinates along the trajectory of the curve
    */
-  getExtendedTrajectory(steps: number, extensionStart = DEFAULT_START_EXTEND_LENGTH, extensionEnd = DEFAULT_END_EXTEND_LENGTH): Trajectory {
-    if (!isFinite(extensionStart) || extensionStart < 0.0) {
-      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive extensionStart parameter');
+  getExtendedTrajectory(
+    numPoints: number,
+    startExtensionLength = DEFAULT_START_EXTEND_LENGTH,
+    endExtensionLength = DEFAULT_END_EXTEND_LENGTH,
+  ): Trajectory {
+    if (!isFinite(startExtensionLength) || startExtensionLength < 0.0) {
+      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive startExtensionLength parameter');
     }
-    if (!isFinite(extensionEnd) || extensionEnd < 0.0) {
-      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive extensionEnd parameter');
+    if (!isFinite(endExtensionLength) || endExtensionLength < 0.0) {
+      throw new Error('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive endExtensionLength parameter');
     }
 
-    const totalLength = this.displacement + extensionStart + extensionEnd;
-    const preSteps = Math.floor((extensionStart / totalLength) * steps);
-    const curveSteps = Math.max(Math.ceil((this.displacement / totalLength) * steps), 1);
-    const postSteps = steps - curveSteps - preSteps;
+    const totalLength = this.displacement + startExtensionLength + endExtensionLength;
+    const startExtensionNumPoints = Math.floor((startExtensionLength / totalLength) * numPoints);
+    const curveSteps = Math.max(Math.ceil((this.displacement / totalLength) * numPoints), 1);
+    const endExtensionNumPoints = numPoints - curveSteps - startExtensionNumPoints;
 
     const points = [];
 
     const refStart = new Vector2(this.interpolators.trajectory.getPointAt(0.0));
     const startVec = new Vector2(this.startVector);
-    const preStep = extensionStart / preSteps;
-    for (let i = preSteps; i > 0; i--) {
-      const f = i * preStep;
+    const startExtensionStepLength = startExtensionLength / startExtensionNumPoints;
+    for (let i = startExtensionNumPoints; i > 0; i--) {
+      const f = i * startExtensionStepLength;
       const point = refStart.add(startVec.scale(f));
       points.push(point.toArray());
     }
@@ -287,14 +292,14 @@ export class IntersectionReferenceSystem {
 
     const refEnd = new Vector2(this.interpolators.trajectory.getPointAt(1.0));
     const endVec = new Vector2(this.endVector);
-    const postStep = extensionEnd / postSteps;
-    for (let i = 1; i < postSteps; i++) {
-      const f = i * postStep;
+    const endExtensionStepLength = endExtensionLength / (endExtensionNumPoints - 1); // -1 so last point is at end of extension
+    for (let i = 1; i < endExtensionNumPoints; i++) {
+      const f = i * endExtensionStepLength;
       const point = refEnd.add(endVec.scale(f));
       points.push(point.toArray());
     }
 
-    const offset = -extensionStart;
+    const offset = -startExtensionLength;
 
     return { points, offset };
   }

@@ -1,3 +1,4 @@
+import { degrees } from '@equinor/videx-math';
 import { IntersectionReferenceSystem } from '../src';
 
 const wp = [
@@ -16,7 +17,7 @@ function dist(a: number[], b: number[]): number {
 describe('Reference system', () => {
   let rs: IntersectionReferenceSystem;
   beforeEach(() => {
-    rs = new IntersectionReferenceSystem(wp);
+    rs = new IntersectionReferenceSystem(wp, { trajectoryAngle: 0 });
   });
   it('should set path on creation', () => {
     expect(rs.path).not.toEqual(undefined);
@@ -82,8 +83,7 @@ describe('Reference system', () => {
     expect(trajectory.points.length).toEqual(100);
   });
 
-  /* TODO: Issue is now solved and tests can be fixed and uncommented
-   * Jest failed previously due to not finding Vector2 constructor.
+
   it('should have same distance between points in extended trajectory', () => {
     const trajectory = rs.getExtendedTrajectory(200, 500.0, 500.0);
     const firstDistance = dist(trajectory.points[0], trajectory.points[1]);
@@ -91,7 +91,7 @@ describe('Reference system', () => {
     for(let i = 2; i < trajectory.points.length; i++){
       const point = trajectory.points[i];
       const currentDistance = dist(point, lastPoint);
-      expect(currentDistance).toBeCloseTo(firstDistance);
+      expect(currentDistance).toBeCloseTo(firstDistance, 0);
       lastPoint = point;
     }
   });
@@ -102,16 +102,16 @@ describe('Reference system', () => {
     expect(startExtend).toBeCloseTo(500.0);
     expect(endExtend).toBeCloseTo(500.0);
   });
-*/
+
   it('should throw error when parameters are negative', () => {
     expect(() => {
       const trajectory = rs.getExtendedTrajectory(100, -50.0, 500.0);
-    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive extensionStart parameter');
+    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive startExtensionLength parameter');
     expect(() => {
       const trajectory = rs.getExtendedTrajectory(100, 50.0, -500.0);
-    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive extensionEnd parameter');
+    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive endExtensionLength parameter');
   });
-  /*
+
   it('should work for vertical wellbore', () => {
     const verticalPosLog = [
       [30, 40, 100],
@@ -127,8 +127,44 @@ describe('Reference system', () => {
     const endExtend = dist(trajectory.points[99], irs.interpolators.trajectory.getPointAt(1.0));
     expect(startExtend).toBeCloseTo(1500.0);
     expect(endExtend).toBeCloseTo(1500.0);
-    const angle = Math.atan((trajectory.points[99][0] - trajectory.points[0][0]) / (trajectory.points[99][1] - trajectory.points[0][1]));
-    expect(endExtend).toBeCloseTo(45.0);
+    const angle = degrees(Math.atan((trajectory.points[99][0] - trajectory.points[0][0]) / (trajectory.points[99][1] - trajectory.points[0][1])));
+    expect(angle).toBeCloseTo(45.0);
   });
-  */
+
+  it('should project to right depths on vertical wellbores', () => {  // Note: this is used for picks
+    const verticalPosLog = [
+      [30, 40, 50],
+      [30, 40, 6500],
+    ];
+    const options = {trajectoryAngle: 45.0};
+    const irs = new IntersectionReferenceSystem(verticalPosLog, options);
+    irs.offset = 50;
+
+    expect(irs.project(0)[1]).toBeCloseTo(50);
+    expect(irs.project(7000)[1]).toBeCloseTo(6500);
+
+    expect(irs.project(200)[1]).toBeCloseTo(200);
+    expect(irs.project(6000)[1]).toBeCloseTo(6000);
+
+  });
+
+  it('should project to right depths on vertical wellbores with negative offset', () => {  // Note: this is used for picks
+    const verticalPosLog = [
+      [80, 40, -25],
+      [80, 40, 5000],
+    ];
+    const options = {trajectoryAngle: 45.0};
+    const irs = new IntersectionReferenceSystem(verticalPosLog, options);
+    irs.offset = -25;
+
+    expect(irs.project(-100)[1]).toBeCloseTo(-25);
+    expect(irs.project(0)[1]).toBeCloseTo(0);
+    expect(irs.project(7000)[1]).toBeCloseTo(5000);
+
+    expect(irs.project(200)[1]).toBeCloseTo(200);
+    expect(irs.project(4000)[1]).toBeCloseTo(4000);
+
+  });
+
+
 });
