@@ -2,6 +2,14 @@
 
 ## New changes not yet released
 
+## v1.4.0
+- added option to override arc division and tension in the reference system
+- removed group labels from being render in surface labels
+- pixi-layers skip render without referenceSystem
+- upgrade vulnerable packages
+- cleanup GeomodelLayerV2
+- cleanup render method on WellboreBaseComponentLayers
+
 ## v1.3.1
 
 - fix skip render without referenceSystem in CalloutCanvasLayer
