@@ -25,10 +25,11 @@ Using yarn:
 yarn add @equinor/esv-intersection
 ```
 To run application in your machine :
+```bash
 $ git clone git@github.com:equinor/esv-intersection
 $ git submodule update --init --recursive
 $ npm run storybook
-
+```
 #### Usage
 
 ```javascript
