@@ -1,8 +1,8 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report a bug
 title: ''
-labels: ''
+labels: "\U0001F41B bug"
 assignees: ''
 
 ---
@@ -36,3 +36,5 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+
+_Remember to add priority using the priority lables_
