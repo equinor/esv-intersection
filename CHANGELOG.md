@@ -2,6 +2,10 @@
 
 ## New changes not yet released
 
+## v1.4.1
+- Matching surface name checks are now case insensitive
+- Bumped d3-array package
+
 ## v1.4.0
 - added option to override arc division and tension in the reference system
 - removed group labels from being render in surface labels
