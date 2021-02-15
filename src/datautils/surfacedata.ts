@@ -110,7 +110,7 @@ function combineSurfacesAndStratColumn(mappedSurfaces: any, stratColumn: StratUn
       const path: StratUnit[] = [];
       const stratUnit: StratUnit = findStratcolumnUnit(stratColumn, s.name, path);
       if (!stratUnit) {
-        console.warn(`Not able to map ${s.name} to a strat column`);
+        console.warn(`No match for ${s.name} in strat column`);
       }
       const group: StratUnit = path[0] || stratUnit;
       const groupName: string = (group && group.identifier) || defaultGroupName;
@@ -182,10 +182,11 @@ function findStratcolumnUnit(units: StratUnit[], unitname: string, path: StratUn
 function mapSurfaceData(surfaces: SurfaceMetaAndValues[]): any {
   return surfaces.map((s: SurfaceMetaAndValues) => {
     const displayName: string = s.visualSettings.displayName;
-    const mappedName: string = displayName;
+    const name: string = displayName.replace(/\s(Base|Top)/gi, '');
+    const isBase: boolean = displayName.toLowerCase().endsWith('base');
     return {
-      name: mappedName.replace(/\s(Base|Top)/g, ''),
-      isBase: mappedName.endsWith('Base'),
+      name,
+      isBase,
       values: s.data.values,
       color: s.visualSettings.colors.crossSection,
       visualization: s.visualSettings.crossSection.toLowerCase(),
