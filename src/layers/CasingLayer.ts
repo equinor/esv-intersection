@@ -64,7 +64,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       );
     }
 
-    this.drawLine(polygon, lineColor, casingWallWidth, true);
+    this.drawOutline(leftPath, rightPath, lineColor, casingWallWidth, true);
 
     if (casing.hasShoe) {
       this.drawShoe(casing.end, radius);

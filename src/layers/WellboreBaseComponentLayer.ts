@@ -167,14 +167,29 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
     this.ctx.stage.addChild(rope);
   }
 
-  drawLine(coords: Point[], lineColor: number, lineWidth = 1, close: boolean = false): void {
+  drawOutline(leftPath: Point[], rightPath: Point[], lineColor: number, lineWidth = 1, close: boolean = false): void {
     const DRAW_ALIGNMENT_INSIDE = 1;
-    const startPoint = coords[0];
+
+    const leftPathReverse = leftPath
+      .map<Point>((d) => d.clone())
+      .reverse();
+
+    const startPointRight = rightPath[0];
+    const startPointLeft = leftPathReverse[0];
+
     const line = new Graphics();
-    line.lineStyle(lineWidth, lineColor, undefined, DRAW_ALIGNMENT_INSIDE).moveTo(startPoint.x, startPoint.y);
-    coords.map((p: Point) => line.lineTo(p.x, p.y));
+    line.lineStyle(lineWidth, lineColor, undefined, DRAW_ALIGNMENT_INSIDE);
+    line.moveTo(startPointRight.x, startPointRight.y);
+    rightPath.forEach((p: Point) => line.lineTo(p.x, p.y));
+
+    if (!close) {
+      line.moveTo(startPointLeft.x, startPointLeft.y);
+    }
+
+    leftPathReverse.forEach((p: Point) => line.lineTo(p.x, p.y));
+
     if (close) {
-      line.lineTo(coords[0].x, coords[0].y);
+      line.lineTo(startPointRight.x, startPointRight.y);
     }
 
     this.ctx.stage.addChild(line);

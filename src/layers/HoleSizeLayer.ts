@@ -62,6 +62,6 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       );
     }
 
-    this.drawLine(polygonCoords, lineColor, HOLE_OUTLINE, true);
+    this.drawOutline(leftPath, rightPath, lineColor, HOLE_OUTLINE, false);
   };
 }
