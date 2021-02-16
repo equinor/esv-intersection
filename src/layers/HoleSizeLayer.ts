@@ -38,14 +38,16 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
 
     const { maxTextureDiameterScale, firstColor, lineColor } = this.options as HoleSizeLayerOptions;
 
-    const texture = this.createTexture(holeObject.diameter * maxTextureDiameterScale);
+    const { diameter } = holeObject;
+    const radius = diameter / 2;
+    const texture = this.createTexture(diameter);
 
     const path = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end, [holeObject.start, holeObject.end]);
     const pathPoints = path.map((p) => p.point);
     const normals = createNormals(pathPoints);
 
-    const rightPath = offsetPoints(pathPoints, normals, holeObject.diameter);
-    const leftPath = offsetPoints(pathPoints, normals, -holeObject.diameter);
+    const rightPath = offsetPoints(pathPoints, normals, radius);
+    const leftPath = offsetPoints(pathPoints, normals, -radius);
 
     if (pathPoints.length === 0) {
       return;

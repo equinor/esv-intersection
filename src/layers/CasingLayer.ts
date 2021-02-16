@@ -36,18 +36,21 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     const pctOffset = 0.35;
     const { maxTextureDiameterScale, lineColor, solidColor } = this.options as CasingLayerOptions;
 
-    const texture = this.createTexture(casing.diameter * maxTextureDiameterScale, pctOffset);
+    const { diameter, innerDiameter } = casing;
+    const radius = diameter / 2;
+    const innerRadius = innerDiameter / 2;
+    const texture = this.createTexture(diameter, pctOffset);
 
     const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end]);
 
     const pathPoints = path.map((p) => p.point);
     const normals = createNormals(pathPoints);
-    const rightPath = offsetPoints(pathPoints, normals, casing.diameter);
-    const leftPath = offsetPoints(pathPoints, normals, -casing.diameter);
+    const rightPath = offsetPoints(pathPoints, normals, radius);
+    const leftPath = offsetPoints(pathPoints, normals, -radius);
 
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
-    const casingWallWidth = Math.abs(casing.diameter - casing.innerDiameter);
+    const casingWallWidth = Math.abs(radius - innerRadius);
 
     // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
@@ -62,27 +65,27 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     this.drawLine(polygon, lineColor, casingWallWidth, true);
 
     if (casing.hasShoe) {
-      this.drawShoe(casing.end, casing.diameter);
+      this.drawShoe(casing.end, radius);
     }
   };
 
-  drawShoe(casingEnd: number, casingDiameter: number): void {
-    const shoeWidth = 50;
-    const shoeLength = 20;
-    const shoeCoords = this.generateShoe(casingEnd, casingDiameter, shoeLength, shoeWidth);
-    const shoeCoords2 = this.generateShoe(casingEnd, casingDiameter, shoeLength, -shoeWidth);
+  drawShoe(casingEnd: number, casingRadius: number): void {
+    const shoeWidth = 25;
+    const shoeLength = 10;
+    const shoeCoords = this.generateShoe(casingEnd, casingRadius, shoeLength, shoeWidth);
+    const shoeCoords2 = this.generateShoe(casingEnd, casingRadius, shoeLength, -shoeWidth);
     this.drawBigPolygon(shoeCoords2);
     this.drawBigPolygon(shoeCoords);
   }
 
-  generateShoe = (casingEnd: number, casingDiameter: number, length: number, width: number): Point[] => {
+  generateShoe = (casingEnd: number, casingRadius: number, length: number, width: number): Point[] => {
     const start = casingEnd - length;
     const end = casingEnd;
     const path = this.getZFactorScaledPathForPoints(start, end, [start, end]);
 
     const points = path.map((p) => p.point);
     const normal = createNormals(points);
-    const shoeEdge: Point[] = offsetPoints(points, normal, casingDiameter * (width < 0 ? -1 : 1));
+    const shoeEdge: Point[] = offsetPoints(points, normal, casingRadius * (width < 0 ? -1 : 1));
 
     const shoeTipPoint = points[points.length - 1];
     const shoeTipNormal = normal[normal.length - 1];

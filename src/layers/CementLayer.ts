@@ -100,10 +100,13 @@ export class CementLayer extends WellboreBaseComponentLayer {
       const intervalPoints = intervalMdPoints.map((s) => s.point);
       const intervalPointNormals = intervalMdPoints.map((s) => s.normal);
 
-      const intervalSide1Left = offsetPoints(intervalPoints, intervalPointNormals, previousDepth.outerDiameter);
-      const intervalSide1Right = offsetPoints(intervalPoints, intervalPointNormals, previousDepth.innerDiameter);
-      const intervalSide2Left = offsetPoints(intervalPoints, intervalPointNormals, -previousDepth.innerDiameter);
-      const intervalSide2Right = offsetPoints(intervalPoints, intervalPointNormals, -previousDepth.outerDiameter);
+      const outerRadius = previousDepth.outerDiameter / 2;
+      const innerRadius = previousDepth.innerDiameter / 2;
+
+      const intervalSide1Left = offsetPoints(intervalPoints, intervalPointNormals, outerRadius);
+      const intervalSide1Right = offsetPoints(intervalPoints, intervalPointNormals, innerRadius);
+      const intervalSide2Left = offsetPoints(intervalPoints, intervalPointNormals, -innerRadius);
+      const intervalSide2Right = offsetPoints(intervalPoints, intervalPointNormals, -outerRadius);
 
       side1Left.push(...intervalSide1Left);
       side1Right.push(...intervalSide1Right);
