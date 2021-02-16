@@ -13,7 +13,6 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       solidColor: '#dcdcdc',
       lineColor: 0x575757,
       topBottomLineColor: 0x575757,
-      exaggerationFactor: 2,
       ...options,
     };
   }

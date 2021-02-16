@@ -14,7 +14,6 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       secondColor: 'rgb(255, 255, 255)',
       lineColor: 0x8b4513,
       topBottomLineColor: 0x8b4513,
-      exaggerationFactor: 2,
       ...options,
     };
   }

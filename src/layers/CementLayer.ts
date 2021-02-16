@@ -26,7 +26,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
       percentFirstColor: 0.05,
       rotation: 45,
       topBottomLineColor: 0x575757,
-      exaggerationFactor: 2,
       ...options,
     };
   }

@@ -30,6 +30,7 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
     super(id, options);
     this.options = {
       ...this.options,
+      exaggerationFactor: 2,
       ...options,
     };
     this.render = this.render.bind(this);
