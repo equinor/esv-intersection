@@ -14,7 +14,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       secondColor: 'rgb(255, 255, 255)',
       lineColor: 0x8b4513,
       topBottomLineColor: 0x8b4513,
-      maxTextureDiameterScale: 2,
+      exaggerationFactor: 2,
       ...options,
     };
   }
@@ -36,9 +36,9 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       return;
     }
 
-    const { maxTextureDiameterScale, firstColor, lineColor } = this.options as HoleSizeLayerOptions;
+    const { exaggerationFactor, firstColor, lineColor } = this.options as HoleSizeLayerOptions;
 
-    const { diameter } = holeObject;
+    const diameter = holeObject.diameter * exaggerationFactor;
     const radius = diameter / 2;
     const texture = this.createTexture(diameter);
 

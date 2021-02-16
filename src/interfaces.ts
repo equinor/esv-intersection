@@ -88,7 +88,7 @@ export interface WellComponentBaseOptions extends LayerOptions {
   secondColor?: string;
   lineColor?: number;
   topBottomLineColor?: number;
-  maxTextureDiameterScale?: number;
+  exaggerationFactor?: number;
   margins?: number;
   minFontSize?: number;
   maxFontSize?: number;
