@@ -1,6 +1,6 @@
+import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, Casing } from '..';
-import { Point, RENDERER_TYPE } from 'pixi.js';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { SHOE_LENGTH, SHOE_WIDTH } from '../constants';
@@ -10,9 +10,8 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     super(id, options);
     this.options = {
       ...this.options,
-      solidColor: '#dcdcdc',
+      solidColor: 0xdcdcdc,
       lineColor: 0x575757,
-      topBottomLineColor: 0x575757,
       ...options,
     };
   }
@@ -33,7 +32,6 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     if (casing == null) {
       return;
     }
-    const pctOffset = 0.35;
     const { exaggerationFactor, lineColor, solidColor } = this.options as CasingLayerOptions;
 
     const diameter = casing.diameter * exaggerationFactor;
@@ -41,7 +39,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     const radius = diameter / 2;
     const innerRadius = innerDiameter / 2;
-    const texture = this.createTexture(diameter, pctOffset);
+    const texture = this.createTexture(diameter);
 
     const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end]);
 
@@ -61,6 +59,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       this.drawRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
+        solidColor,
       );
     }
 
@@ -97,4 +96,9 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     return [...shoeEdge, shoeTip];
   };
+
+  createTexture(diameter: number): Texture {
+    const textureWidthPO2 = 16;
+    return new Texture(Texture.WHITE.baseTexture, null, new Rectangle(0, 0, textureWidthPO2, diameter));
+  }
 }

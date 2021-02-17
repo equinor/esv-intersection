@@ -1,28 +1,10 @@
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
-import { HoleSizeLayerOptions, OnUpdateEvent, OnRescaleEvent, WellComponentBaseOptions, MDPoint, OnUnmountEvent } from '../interfaces';
-import { convertColor } from '../utils/color';
-
-const createGradientFill = (
-  canvas: HTMLCanvasElement,
-  canvasCtx: CanvasRenderingContext2D,
-  firstColor: string,
-  secondColor: string,
-  startPctOffset: number,
-): CanvasGradient => {
-  const halfWayPct = 0.5;
-  const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, firstColor);
-  gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
-  gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
-  gradient.addColorStop(1, firstColor);
-
-  return gradient;
-};
+import { OnUpdateEvent, OnRescaleEvent, WellComponentBaseOptions, MDPoint, OnUnmountEvent } from '../interfaces';
 
 export abstract class WellboreBaseComponentLayer extends PixiLayer {
-  _textureCache: Record<string, Texture> = {};
+  _textureCache: Texture;
 
   rescaleEvent: OnRescaleEvent;
 
@@ -120,9 +102,9 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
     }));
   };
 
-  drawBigPolygon = (coords: Point[], color = '#000000'): Graphics => {
+  drawBigPolygon = (coords: Point[], color = 0x000000): Graphics => {
     const polygon = new Graphics();
-    polygon.beginFill(convertColor(color));
+    polygon.beginFill(color);
     polygon.drawPolygon(coords);
     polygon.endFill();
 
@@ -158,12 +140,17 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
     this.ctx.stage.addChild(rope);
   }
 
-  drawRope(path: Point[], texture: Texture): void {
+  drawRope(path: Point[], texture: Texture, tint?: number): void {
     if (path.length === 0) {
       return null;
     }
 
     const rope: SimpleRope = new SimpleRope(texture, path, 1);
+
+    if (tint) {
+      rope.tint = tint;
+    }
+
     this.ctx.stage.addChild(rope);
   }
 
@@ -193,27 +180,5 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
     }
 
     this.ctx.stage.addChild(line);
-  }
-
-  createTexture(maxWidth: number, startPctOffset: number = 0): Texture {
-    const cacheKey = `${maxWidth}X${startPctOffset}`;
-    if (this._textureCache.hasOwnProperty(cacheKey)) {
-      return this._textureCache[cacheKey];
-    }
-
-    const { solidColor, firstColor, secondColor } = this.options as HoleSizeLayerOptions;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = 300;
-    canvas.height = maxWidth > 0 ? maxWidth : canvas.width; // TODO needs to grow with scale
-    const canvasCtx = canvas.getContext('2d');
-
-    canvasCtx.fillStyle = solidColor || createGradientFill(canvas, canvasCtx, firstColor, secondColor, startPctOffset);
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const t = Texture.from(canvas);
-    this._textureCache[cacheKey] = t;
-
-    return this._textureCache[cacheKey];
   }
 }

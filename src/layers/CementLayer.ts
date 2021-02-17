@@ -22,10 +22,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
       ...this.options,
       firstColor: '#c7b9ab',
       secondColor: '#5b5b5b',
-      lineColor: 0x5b5b5b,
-      percentFirstColor: 0.05,
-      rotation: 45,
-      topBottomLineColor: 0x575757,
       ...options,
     };
   }
@@ -125,9 +121,8 @@ export class CementLayer extends WellboreBaseComponentLayer {
   };
 
   createTexture(): Texture {
-    const cacheKey = 'cement';
-    if (this._textureCache.hasOwnProperty(cacheKey)) {
-      return this._textureCache[cacheKey];
+    if (this._textureCache) {
+      return this._textureCache;
     }
 
     const { firstColor, secondColor } = this.options as CementLayerOptions;
@@ -153,9 +148,8 @@ export class CementLayer extends WellboreBaseComponentLayer {
     }
     canvasCtx.stroke();
 
-    const t = Texture.from(canvas);
-    this._textureCache[cacheKey] = t;
+    this._textureCache = Texture.from(canvas);
 
-    return t;
+    return this._textureCache;
   }
 }
