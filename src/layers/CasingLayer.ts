@@ -39,7 +39,6 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     const radius = diameter / 2;
     const innerRadius = innerDiameter / 2;
-    const texture = this.createTexture(diameter);
 
     const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end]);
 
@@ -56,6 +55,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigPolygon(polygon, solidColor);
     } else {
+      const texture = this.createTexture(diameter);
       this.drawRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,

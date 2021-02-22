@@ -85,20 +85,12 @@ export interface CasingLayerOptions extends WellComponentBaseOptions {
 }
 
 export interface CementLayerOptions extends WellComponentBaseOptions {
-  solidColor?: string;
   firstColor?: string;
   secondColor?: string;
-  lineColor?: number;
 }
 
 export interface WellComponentBaseOptions extends LayerOptions {
-  topBottomLineColor?: number;
   exaggerationFactor?: number;
-  margins?: number;
-  minFontSize?: number;
-  maxFontSize?: number;
-  textColor?: string;
-  font?: string;
 }
 
 export interface ZoomAndPanOptions {

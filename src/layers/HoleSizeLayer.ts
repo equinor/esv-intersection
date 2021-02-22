@@ -95,9 +95,10 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       this._textureCache = this.createBaseTexture(width, height);
     }
 
+    const baseTexture = this._textureCache.baseTexture;
     const sidePadding = Math.floor((height - diameter) / 2);
     const frame = new Rectangle(0, sidePadding, width, diameter);
-    const texture = new Texture(this._textureCache.baseTexture, frame);
+    const texture = new Texture(baseTexture, frame);
 
     return texture;
   }
