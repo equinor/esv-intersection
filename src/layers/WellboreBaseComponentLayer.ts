@@ -147,9 +147,7 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
 
     const rope: SimpleRope = new SimpleRope(texture, path, 1);
 
-    if (tint) {
-      rope.tint = tint;
-    }
+    rope.tint = tint || rope.tint;
 
     this.ctx.stage.addChild(rope);
   }
