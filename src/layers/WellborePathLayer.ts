@@ -3,13 +3,12 @@ import { SVGLayer } from './base/SVGLayer';
 import { WellborepathLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
 export class WellborepathLayer extends SVGLayer {
-  options: WellborepathLayerOptions;
-
   rescaleEvent: OnRescaleEvent;
 
   constructor(id?: string, options?: WellborepathLayerOptions) {
     super(id, options);
     this.options = {
+      ...this.options,
       ...options,
     };
     this.render = this.render.bind(this);
@@ -30,6 +29,8 @@ export class WellborepathLayer extends SVGLayer {
   }
 
   render(): void {
+    const { strokeWidth, stroke } = this.options as WellborepathLayerOptions;
+
     if (!this.elm) {
       return;
     }
@@ -45,8 +46,8 @@ export class WellborepathLayer extends SVGLayer {
       .attr('class', 'well-path')
       .append('path')
       .attr('d', this.renderWellborePath(data))
-      .attr('stroke-width', this.options.strokeWidth || '2px')
-      .attr('stroke', this.options.stroke || 'red')
+      .attr('stroke-width', strokeWidth || '2px')
+      .attr('stroke', stroke || 'red')
       .attr('fill', 'none');
   }
 

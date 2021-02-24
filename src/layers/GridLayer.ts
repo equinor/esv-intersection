@@ -15,13 +15,13 @@ const defaultOptions = {
 };
 
 export class GridLayer extends CanvasLayer {
-  options: GridLayerOptions;
   private _offsetX: number = 0;
   private _offsetY: number = 0;
 
   constructor(id?: string, options?: GridLayerOptions) {
     super(id, options);
     this.options = {
+      ...this.options,
       ...(options || defaultOptions),
     };
     this.render = this.render.bind(this);
@@ -38,7 +38,8 @@ export class GridLayer extends CanvasLayer {
   }
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
-    const { ctx, options } = this;
+    const { ctx } = this;
+    const { minorWidth, minorColor, majorWidth, majorColor } = this.options as GridLayerOptions;
 
     if (!ctx) {
       return;
@@ -65,8 +66,8 @@ export class GridLayer extends CanvasLayer {
     const [rx1, rx2] = xScale.range();
     const [ry1, ry2] = yScale.range();
 
-    ctx.lineWidth = options.minorWidth || MINORWIDTH;
-    ctx.strokeStyle = options.minorColor || MINORCOLOR;
+    ctx.lineWidth = minorWidth || MINORWIDTH;
+    ctx.strokeStyle = minorColor || MINORCOLOR;
 
     // minor grid lines
     const xminticks = this.mapMinorTicks(xScale.ticks());
@@ -74,8 +75,8 @@ export class GridLayer extends CanvasLayer {
     this.renderTicksX(xScale, xminticks, ry1, ry2);
     this.renderTicksY(yScale, yminticks, rx1, rx2);
 
-    ctx.lineWidth = options.majorWidth || MAJORWIDTH;
-    ctx.strokeStyle = options.majorColor || MAJORCOLOR;
+    ctx.lineWidth = majorWidth || MAJORWIDTH;
+    ctx.strokeStyle = majorColor || MAJORCOLOR;
 
     // major grid lines
     this.renderTicksX(xScale, xScale.ticks(), ry1, ry2);
