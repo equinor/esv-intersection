@@ -22,11 +22,6 @@ export class CementLayer extends WellboreBaseComponentLayer {
       ...this.options,
       firstColor: '#c7b9ab',
       secondColor: '#5b5b5b',
-      lineColor: 0x5b5b5b,
-      percentFirstColor: 0.05,
-      rotation: 45,
-      topBottomLineColor: 0x575757,
-      maxTextureDiameterScale: 2,
       ...options,
     };
   }
@@ -53,6 +48,8 @@ export class CementLayer extends WellboreBaseComponentLayer {
   }
 
   createCementShape = (cement: Cement, casings: Casing[], holes: HoleSize[]): CementShape => {
+    const { exaggerationFactor } = this.options as CementLayerOptions;
+
     // Merge deprecated casingId and casingIds array
     const casingIds = [cement.casingId, ...(cement.casingIds || [])].filter((id) => id);
 
@@ -100,10 +97,13 @@ export class CementLayer extends WellboreBaseComponentLayer {
       const intervalPoints = intervalMdPoints.map((s) => s.point);
       const intervalPointNormals = intervalMdPoints.map((s) => s.normal);
 
-      const intervalSide1Left = offsetPoints(intervalPoints, intervalPointNormals, previousDepth.outerDiameter);
-      const intervalSide1Right = offsetPoints(intervalPoints, intervalPointNormals, previousDepth.innerDiameter);
-      const intervalSide2Left = offsetPoints(intervalPoints, intervalPointNormals, -previousDepth.innerDiameter);
-      const intervalSide2Right = offsetPoints(intervalPoints, intervalPointNormals, -previousDepth.outerDiameter);
+      const outerRadius = (previousDepth.outerDiameter / 2) * exaggerationFactor;
+      const innerRadius = (previousDepth.innerDiameter / 2) * exaggerationFactor;
+
+      const intervalSide1Left = offsetPoints(intervalPoints, intervalPointNormals, outerRadius);
+      const intervalSide1Right = offsetPoints(intervalPoints, intervalPointNormals, innerRadius);
+      const intervalSide2Left = offsetPoints(intervalPoints, intervalPointNormals, -innerRadius);
+      const intervalSide2Right = offsetPoints(intervalPoints, intervalPointNormals, -outerRadius);
 
       side1Left.push(...intervalSide1Left);
       side1Right.push(...intervalSide1Right);
@@ -121,9 +121,8 @@ export class CementLayer extends WellboreBaseComponentLayer {
   };
 
   createTexture(): Texture {
-    const cacheKey = 'cement';
-    if (this._textureCache.hasOwnProperty(cacheKey)) {
-      return this._textureCache[cacheKey];
+    if (this._textureCache) {
+      return this._textureCache;
     }
 
     const { firstColor, secondColor } = this.options as CementLayerOptions;
@@ -149,9 +148,8 @@ export class CementLayer extends WellboreBaseComponentLayer {
     }
     canvasCtx.stroke();
 
-    const t = Texture.from(canvas);
-    this._textureCache[cacheKey] = t;
+    this._textureCache = Texture.from(canvas);
 
-    return t;
+    return this._textureCache;
   }
 }

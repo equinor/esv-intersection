@@ -1,5 +1,5 @@
 import { ZoomTransform } from 'd3-zoom';
-import { Point, Graphics } from 'pixi.js';
+import { Graphics } from 'pixi.js';
 import { Layer } from './layers/base/Layer';
 import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
 import Vector2 from '@equinor/videx-vector2';
@@ -73,27 +73,24 @@ export interface GeomodelLayerLabelsOptions extends LayerOptions {
   font?: string;
 }
 
-export interface HoleSizeLayerOptions extends WellComponentBaseOptions {}
-
-export interface CasingLayerOptions extends WellComponentBaseOptions {}
-
-export interface CementLayerOptions extends WellComponentBaseOptions {
-  percentFirstColor?: number;
-  rotation?: number;
-}
-
-export interface WellComponentBaseOptions extends LayerOptions {
-  solidColor?: string;
+export interface HoleSizeLayerOptions extends WellComponentBaseOptions {
   firstColor?: string;
   secondColor?: string;
   lineColor?: number;
-  topBottomLineColor?: number;
-  maxTextureDiameterScale?: number;
-  margins?: number;
-  minFontSize?: number;
-  maxFontSize?: number;
-  textColor?: string;
-  font?: string;
+}
+
+export interface CasingLayerOptions extends WellComponentBaseOptions {
+  solidColor?: number;
+  lineColor?: number;
+}
+
+export interface CementLayerOptions extends WellComponentBaseOptions {
+  firstColor?: string;
+  secondColor?: string;
+}
+
+export interface WellComponentBaseOptions extends LayerOptions {
+  exaggerationFactor?: number;
 }
 
 export interface ZoomAndPanOptions {
