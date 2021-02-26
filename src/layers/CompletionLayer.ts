@@ -10,6 +10,7 @@ export class CompletionLayer extends PixiLayer {
   constructor(id: string, options: CompletionLayerOptions) {
     super(id, options);
     this.options = {
+      ...this.options,
       ...options,
     };
     this.render = this.render.bind(this);

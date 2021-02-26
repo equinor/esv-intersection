@@ -3,3 +3,4 @@ dist
 .storybook/src/exampledata/**
 storybook-static
 report*
+docs_out
