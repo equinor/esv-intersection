@@ -2,6 +2,9 @@
 
 ## New changes not yet released
 
+## v1.4.3
+- Add option to use a optional range for generating seismic image
+
 ## v1.4.2
 
 - Improve wellborelayers textures
