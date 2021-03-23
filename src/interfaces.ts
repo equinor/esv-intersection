@@ -59,6 +59,8 @@ export interface GridLayerOptions extends LayerOptions {
 export interface WellborepathLayerOptions extends LayerOptions {
   stroke: string;
   strokeWidth: string;
+  curveType?: string;
+  tension?: number;
 }
 
 export interface GeomodelLayerOptions extends LayerOptions {}
@@ -156,12 +158,14 @@ export interface ScaleOptions {
   yBounds?: [number, number];
 }
 
-export interface Interpolator {
+export interface Interpolators {
   trajectory: any;
   curtain: any;
   position?: any;
   curve?: any;
 }
+
+export interface Interpolator {}
 
 export interface Trajectory {
   points: number[][];
@@ -174,6 +178,9 @@ export interface ReferenceSystemOptions {
   tension?: number;
   trajectoryAngle?: number;
   calculateDisplacementFromBottom?: boolean;
+  curveInterpolator?: Interpolator;
+  trajectoryInterpolator?: Interpolator;
+  curtainInterpolator?: Interpolator;
 }
 
 export type BoundingBox = {

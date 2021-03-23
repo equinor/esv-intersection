@@ -49,19 +49,23 @@ describe('Reference system', () => {
   });
   it('should get start position at 0', () => {
     const pos = rs.getPosition(0);
-    expect(pos).toEqual([30, 40]);
+    expect(pos[0]).toBeCloseTo(30, 1);
+    expect(pos[1]).toBeCloseTo(40, 1);
   });
   it('should clamp position to start position', () => {
     const pos = rs.getPosition(-10);
-    expect(pos).toEqual([30, 40]);
+    expect(pos[0]).toBeCloseTo(30, 1);
+    expect(pos[1]).toBeCloseTo(40, 1);
   });
   it('should get end position', () => {
     const pos = rs.getPosition(110);
-    expect(pos).toEqual([50, 110]);
+    expect(pos[0]).toBeCloseTo(50, 1);
+    expect(pos[1]).toBeCloseTo(110, 1);
   });
   it('should clamp position to end position', () => {
     const pos = rs.getPosition(120);
-    expect(pos).toEqual([50, 110]);
+    expect(pos[0]).toBeCloseTo(50, 1);
+    expect(pos[1]).toBeCloseTo(110, 1);
   });
   it('should have correct number of points', () => {
     const trajectory = rs.getTrajectory(100);
@@ -140,11 +144,11 @@ describe('Reference system', () => {
     const irs = new IntersectionReferenceSystem(verticalPosLog, options);
     irs.offset = 50;
 
-    expect(irs.project(0)[1]).toBeCloseTo(50);
-    expect(irs.project(7000)[1]).toBeCloseTo(6500);
+    expect(irs.project(0)[1]).toBeCloseTo(50, 1);
+    expect(irs.project(7000)[1]).toBeCloseTo(6500, 1);
 
-    expect(irs.project(200)[1]).toBeCloseTo(200);
-    expect(irs.project(6000)[1]).toBeCloseTo(6000);
+    expect(irs.project(200)[1]).toBeCloseTo(200, 1);
+    expect(irs.project(6000)[1]).toBeCloseTo(6000, 1);
 
   });
 
@@ -157,12 +161,12 @@ describe('Reference system', () => {
     const irs = new IntersectionReferenceSystem(verticalPosLog, options);
     irs.offset = -25;
 
-    expect(irs.project(-100)[1]).toBeCloseTo(-25);
-    expect(irs.project(0)[1]).toBeCloseTo(0);
-    expect(irs.project(7000)[1]).toBeCloseTo(5000);
+    expect(irs.project(-100)[1]).toBeCloseTo(-25, 1);
+    expect(irs.project(0)[1]).toBeCloseTo(0, 1);
+    expect(irs.project(7000)[1]).toBeCloseTo(5000, 1);
 
-    expect(irs.project(200)[1]).toBeCloseTo(200);
-    expect(irs.project(4000)[1]).toBeCloseTo(4000);
+    expect(irs.project(200)[1]).toBeCloseTo(200, 1);
+    expect(irs.project(4000)[1]).toBeCloseTo(4000, 1);
 
   });
 
