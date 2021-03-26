@@ -1,7 +1,67 @@
+/* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { clamp, radians } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
-import { Interpolator, Trajectory, ReferenceSystemOptions, MDPoint } from '../interfaces';
+import { Interpolators, Trajectory, ReferenceSystemOptions, MDPoint } from '../interfaces';
+import { Vector } from 'curve-interpolator/dist/src/interfaces';
+
+class ExtendedCurveInterpolator extends CurveInterpolator {
+  /**
+   * Function which finds t value for arc length using binary search
+   * Note that this is slow and not helped by calculating length for each iteration.
+   * @param {GeoProjection} projection Projection to use for translation between lat/long and utm
+   * @param {Number} steps Amount of steps to use for estimation
+   */
+  findTForArcLength(arcLength: number, tolerance = 0.02, iterations = 100): number {
+    let tl = 0;
+    let th = 1;
+    let t = 0.5;
+    for (let i = 0; i < iterations; i++) {
+      const tDisp = this.getArcLength(0, t);
+      if (Math.abs(tDisp - arcLength) < tolerance) {
+        return t;
+      }
+      if (tDisp > arcLength) {
+        th = t;
+      } else {
+        tl = t;
+      }
+      t = (th + tl) / 2;
+    }
+    return t;
+  }
+
+  /**
+   * Function calculating length along curve using interpolator.
+   * @param {Number} from t at start (default = 0)
+   * @param {Number} to t at end (default = 1)
+   * @param {Number} steps Amount of steps to use for estimation
+   */
+  getArcLength(from = 0, to = 1, steps = 100): number {
+    // TODO: Implement dynamic instead of fixed steps, f.ex. splitting in halves until change in length is under a treshold
+    let length = 0;
+    const range = to - from;
+    let point = this.getPointAt(from);
+    let lastPoint = point; // Set first
+    for (let i = 1; i < steps; i++) {
+      point = this.getPointAt((i / (steps - 1)) * range + from);
+      length += Vector2.distance(lastPoint as number[], point as number[]);
+      lastPoint = point; // Set first
+    }
+    return length;
+  }
+
+  /**
+   * Function getting a point at curve length.
+   * @param {Number} length
+   */
+  getPointAtArcLength(length: number): Vector {
+    // TODO: Ideally the CurveInterpolator should be able to provide t but didn't work. Might be worth investigating.
+    //  const t = this.getT(length);
+    const t = this.findTForArcLength(length);
+    return this.getPointAt(t);
+  }
+}
 
 // determines how curvy the curve is
 const TENSION = 0.75;
@@ -35,7 +95,7 @@ export class IntersectionReferenceSystem {
 
   trajectoryOffset: number;
 
-  interpolators: Interpolator;
+  interpolators: Interpolators;
 
   startVector: number[];
 
@@ -78,12 +138,16 @@ export class IntersectionReferenceSystem {
     this.displacement = displacement;
 
     this.interpolators = {
-      curve: new CurveInterpolator(path),
-      trajectory: new CurveInterpolator(
-        path.map((d: number[]) => [d[0], d[1]]),
-        { tension: tension || TENSION, arcDivisions: arcDivisions || ARC_DIVISIONS },
-      ),
-      curtain: new CurveInterpolator(this.projectedPath, { tension: tension || TENSION, arcDivisions: arcDivisions || ARC_DIVISIONS }),
+      curve: options.curveInterpolator || new ExtendedCurveInterpolator(path),
+      trajectory:
+        options.trajectoryInterpolator ||
+        new ExtendedCurveInterpolator(
+          path.map((d: number[]) => [d[0], d[1]]),
+          { tension: tension || TENSION, arcDivisions: arcDivisions || ARC_DIVISIONS },
+        ),
+      curtain:
+        options.curtainInterpolator ||
+        new ExtendedCurveInterpolator(this.projectedPath, { tension: tension || TENSION, arcDivisions: arcDivisions || ARC_DIVISIONS }),
     };
 
     const trajVector = this.getTrajectoryVector();
@@ -105,21 +169,16 @@ export class IntersectionReferenceSystem {
    */
   project(length: number): number[] {
     const { curtain } = this.interpolators;
-    const { normalizedLength, calculateDisplacementFromBottom } = this.options;
-
-    const factor = (length - this._offset) / (normalizedLength || this.length);
-    const l = calculateDisplacementFromBottom ? 1 - factor : factor;
-
-    const t = clamp(l, 0, 1);
-    const p = curtain.getPointAt(t);
+    const { calculateDisplacementFromBottom } = this.options;
+    const cl = clamp(calculateDisplacementFromBottom ? this.length - length : length - this._offset, 0, this.length);
+    const p = curtain.getPointAtArcLength(cl);
     return p;
   }
 
   curtainTangent(length: number): number[] {
     const { curtain } = this.interpolators;
-    const l = (length - this._offset) / this.length;
-    const clampedL = clamp(l, 0, 1);
-    const tangent = curtain.getTangentAt(clampedL);
+    const t = curtain.findTForArcLength(length - this._offset);
+    const tangent = t && curtain.getTangentAt(t);
     return tangent;
   }
 
@@ -196,8 +255,8 @@ export class IntersectionReferenceSystem {
    */
   getPosition(length: number): number[] {
     const { trajectory } = this.interpolators;
-    const l = this.getProjectedLength(length);
-    const p = trajectory.getPointAt(l);
+    const t = this.getProjectedLength(length);
+    const p = trajectory.getPointAt(t);
     return p;
   }
 
@@ -301,7 +360,8 @@ export class IntersectionReferenceSystem {
 
     const offset = -startExtensionLength;
 
-    return { points, offset };
+    const trajectory = { points, offset };
+    return trajectory;
   }
 
   getTrajectoryVector(): number[] {
@@ -312,11 +372,12 @@ export class IntersectionReferenceSystem {
       return new Vector2(Math.cos(angleInRad), Math.sin(angleInRad)).toArray();
     }
 
-    if (calculateDisplacementFromBottom) {
-      return IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 0 + THRESHOLD_DIRECTION_DISTANCE, 0);
-    }
-
-    return IntersectionReferenceSystem.getDirectionVector(this.interpolators.trajectory, 1 - THRESHOLD_DIRECTION_DISTANCE, 1);
+    const trajectoryVec = IntersectionReferenceSystem.getDirectionVector(
+      this.interpolators.trajectory,
+      calculateDisplacementFromBottom ? THRESHOLD_DIRECTION_DISTANCE : 1 - THRESHOLD_DIRECTION_DISTANCE,
+      calculateDisplacementFromBottom ? 0 : 1,
+    );
+    return trajectoryVec;
   }
 
   /**
