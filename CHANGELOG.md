@@ -2,6 +2,10 @@
 
 ## New changes not yet released
 
+## v1.4.4
+- Add option to override interpolators in the IntersectionReferenceSystem
+- Update react-dev-utils to 11.0.4
+
 ## v1.4.3
 - Add option to use a optional range for generating seismic image
 
