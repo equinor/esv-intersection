@@ -1,3 +1,4 @@
+import createMockRaf from 'mock-raf';
 import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
 import { CalloutCanvasLayer, IntersectionReferenceSystem } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
@@ -11,11 +12,19 @@ describe('CalloutCanvasLayer', () => {
     [50, 110, 10],
   ];
 
+  const mockRaf = createMockRaf();
+
+  let mockRequestAnimationFrame: any;
+
   beforeEach(() => {
     elm = document.createElement('div');
+    mockRequestAnimationFrame = jest.spyOn(window, 'requestAnimationFrame');
+    mockRequestAnimationFrame.mockImplementation(mockRaf.raf);
   });
+
   afterEach(() => {
     elm.remove();
+    mockRequestAnimationFrame.mockRestore();
   });
   describe('when setting reference system', () => {
     const data = [
@@ -40,6 +49,7 @@ describe('CalloutCanvasLayer', () => {
 
       // Act
       layer.data = data;
+      mockRaf.step();
 
       // Assert
       const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
@@ -60,6 +70,7 @@ describe('CalloutCanvasLayer', () => {
 
       // Act
       layer.data = data;
+      mockRaf.step();
 
       // Assert
       const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
