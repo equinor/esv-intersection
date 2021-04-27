@@ -101,18 +101,20 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       return;
     }
 
-    this.clearCanvas();
+    requestAnimationFrame(() => {
+      this.clearCanvas();
 
-    if (!this.data) {
-      return;
-    }
+      if (!this.data) {
+        return;
+      }
 
-    if (!this.areasWithAvgTopDepth) {
-      this.generateSurfacesWithAvgDepth();
-    }
+      if (!this.areasWithAvgTopDepth) {
+        this.generateSurfacesWithAvgDepth();
+      }
 
-    this.drawAreaLabels();
-    this.drawLineLabels();
+      this.drawAreaLabels();
+      this.drawLineLabels();
+    });
   }
 
   drawAreaLabels(): void {

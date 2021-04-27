@@ -82,43 +82,45 @@ export class CalloutCanvasLayer extends CanvasLayer {
   }
 
   render(isPanning = false): void {
-    this.clearCanvas();
+    requestAnimationFrame(() => {
+      this.clearCanvas();
 
-    if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
-      return;
-    }
+      if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
+        return;
+      }
 
-    const { xScale, yScale, xBounds } = this.rescaleEvent;
+      const { xScale, yScale, xBounds } = this.rescaleEvent;
 
-    const fontSize = calcSize(this.fontSizeFactor, this.minFontSize, this.maxFontSize, xScale);
+      const fontSize = calcSize(this.fontSizeFactor, this.minFontSize, this.maxFontSize, xScale);
 
-    if (!isPanning || !this.callouts) {
-      const { data, ctx, groupFilter } = this;
-      const { calculateDisplacementFromBottom } = this.referenceSystem.options;
-      const isLeftToRight = calculateDisplacementFromBottom ? xBounds[0] < xBounds[1] : xBounds[0] > xBounds[1];
-      const scale = 0;
+      if (!isPanning || !this.callouts) {
+        const { data, ctx, groupFilter } = this;
+        const { calculateDisplacementFromBottom } = this.referenceSystem.options;
+        const isLeftToRight = calculateDisplacementFromBottom ? xBounds[0] < xBounds[1] : xBounds[0] > xBounds[1];
+        const scale = 0;
 
-      ctx.font = `bold ${fontSize}px arial`;
-      const filtered = data.filter((d: Annotation) => !groupFilter || groupFilter.includes(d.group));
-      const offset = calcSize(this.offsetFactor, this.offsetMin, this.offsetMax, xScale);
-      this.callouts = this.positionCallouts(filtered, isLeftToRight, xScale, yScale, scale, fontSize, offset);
-    }
+        ctx.font = `bold ${fontSize}px arial`;
+        const filtered = data.filter((d: Annotation) => !groupFilter || groupFilter.includes(d.group));
+        const offset = calcSize(this.offsetFactor, this.offsetMin, this.offsetMax, xScale);
+        this.callouts = this.positionCallouts(filtered, isLeftToRight, xScale, yScale, scale, fontSize, offset);
+      }
 
-    this.callouts.forEach((callout) => {
-      const { pos, title, color } = callout;
-      const x = xScale(pos.x);
-      const y = yScale(pos.y);
+      this.callouts.forEach((callout) => {
+        const { pos, title, color } = callout;
+        const x = xScale(pos.x);
+        const y = yScale(pos.y);
 
-      const calloutBB = {
-        x,
-        y,
-        width: callout.boundingBox.width,
-        height: fontSize,
-        offsetX: callout.dx,
-        offsetY: callout.dy,
-      };
+        const calloutBB = {
+          x,
+          y,
+          width: callout.boundingBox.width,
+          height: fontSize,
+          offsetX: callout.dx,
+          offsetY: callout.dy,
+        };
 
-      this.renderCallout(title, callout.label, calloutBB, color, callout.alignment);
+        this.renderCallout(title, callout.label, calloutBB, color, callout.alignment);
+      });
     });
   }
 
