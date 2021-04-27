@@ -22,6 +22,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
     this.generateSurfaceLinesPaths = this.generateSurfaceLinesPaths.bind(this);
     this.drawPolygonPath = this.drawPolygonPath.bind(this);
     this.drawLinePath = this.drawLinePath.bind(this);
+    this.updatePaths = this.updatePaths.bind(this);
   }
 
   get data(): SurfaceData {
@@ -38,6 +39,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
 
   setData(data: SurfaceData): void {
     super.setData(data);
+    this.updatePaths();
   }
 
   onMount(event: OnMountEvent): void {
@@ -46,13 +48,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    if (!this.data) {
-      this.surfaceAreasPaths = [];
-      this.surfaceLinesPaths = [];
-    } else {
-      this.generateSurfaceAreasPaths();
-      this.generateSurfaceLinesPaths();
-    }
+    this.updatePaths();
     this.render();
   }
 
@@ -62,14 +58,26 @@ export class GeomodelCanvasLayer extends CanvasLayer {
     this.render();
   }
 
+  updatePaths(): void {
+    if (!this.data) {
+      this.surfaceAreasPaths = [];
+      this.surfaceLinesPaths = [];
+    } else {
+      this.generateSurfaceAreasPaths();
+      this.generateSurfaceLinesPaths();
+    }
+  }
+
   render(): void {
     if (!this.ctx || !this.rescaleEvent) {
       return;
     }
 
-    this.clearCanvas();
-    this.surfaceAreasPaths.forEach((p: any) => this.drawPolygonPath(p.color, p.path));
-    this.surfaceLinesPaths.forEach((l: any) => this.drawLinePath(l.color, l.path));
+    requestAnimationFrame(() => {
+      this.clearCanvas();
+      this.surfaceAreasPaths.forEach((p: any) => this.drawPolygonPath(p.color, p.path));
+      this.surfaceLinesPaths.forEach((l: any) => this.drawLinePath(l.color, l.path));
+    });
   }
 
   colorToCSSColor(color: number | string): string {
