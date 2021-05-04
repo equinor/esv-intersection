@@ -1,9 +1,20 @@
 import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
+import { zip } from 'd3-array';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, Casing } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { SHOE_LENGTH, SHOE_WIDTH } from '../constants';
+
+export interface CasingRenderObject {
+  pathPoints: number[][];
+  polygon: Point[];
+  leftPath: Point[];
+  rightPath: Point[];
+  radius: number;
+  diameter: number;
+  casingWallWidth: number;
+}
 
 export class CasingLayer extends WellboreBaseComponentLayer {
   constructor(id?: string, options?: CasingLayerOptions) {
@@ -23,16 +34,19 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       return;
     }
 
-    data
-      .sort((a: Casing, b: Casing) => b.diameter - a.diameter) // draw smaller casings and holes on top of bigger ones if overlapping
-      .forEach((casing: Casing) => this.drawCasing(casing));
+    // draw smaller casings and holes on top of bigger ones if overlapping
+    const sortedCasings = data.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
+    const casingRenderObjects = sortedCasings.map((casing: Casing) => this.prepareCasingRenderObject(casing));
+    // @ts-ignore
+    const zippedRenderObjects: [Casing, CasingRenderObject][] = zip(sortedCasings, casingRenderObjects);
+    zippedRenderObjects.forEach((zippedRenderObject) => this.drawCasing(zippedRenderObject));
   }
 
-  drawCasing = (casing: Casing): void => {
+  prepareCasingRenderObject = (casing: Casing): CasingRenderObject => {
     if (casing == null) {
       return;
     }
-    const { exaggerationFactor, lineColor, solidColor } = this.options as CasingLayerOptions;
+    const { exaggerationFactor } = this.options as CasingLayerOptions;
 
     const diameter = casing.diameter * exaggerationFactor;
     const innerDiameter = casing.innerDiameter * exaggerationFactor;
@@ -50,6 +64,21 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
     const casingWallWidth = Math.abs(radius - innerRadius);
+
+    return {
+      pathPoints,
+      polygon,
+      leftPath,
+      rightPath,
+      radius,
+      diameter,
+      casingWallWidth,
+    };
+  };
+
+  drawCasing = (zippedRenderObject: [Casing, CasingRenderObject]): void => {
+    const { lineColor, solidColor } = this.options as CasingLayerOptions;
+    const [casing, { pathPoints, polygon, leftPath, rightPath, radius, diameter, casingWallWidth }] = zippedRenderObject;
 
     // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
