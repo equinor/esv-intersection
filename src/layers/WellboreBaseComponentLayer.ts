@@ -86,7 +86,7 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
     const uniqueInterestPoints = interestPoints.filter((ip) => !pathPoints.some((p) => p.md === ip));
     const interestMdPoints = uniqueInterestPoints.map(this.getMdPoint);
 
-    const points = merge<MDPoint>([pathPoints, interestMdPoints]);
+    const points = [...pathPoints, ...interestMdPoints];
     points.sort((a, b) => a.md - b.md);
 
     return points;

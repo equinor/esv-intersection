@@ -1,67 +1,10 @@
 /* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { clamp, radians } from '@equinor/videx-math';
-import { CurveInterpolator, normalize } from 'curve-interpolator';
+import { normalize } from 'curve-interpolator';
+
 import { Interpolators, Trajectory, ReferenceSystemOptions, MDPoint } from '../interfaces';
-import { Vector } from 'curve-interpolator/dist/src/interfaces';
-
-class ExtendedCurveInterpolator extends CurveInterpolator {
-  /**
-   * Function which finds t value for arc length using binary search
-   * Note that this is slow and not helped by calculating length for each iteration.
-   * @param {GeoProjection} projection Projection to use for translation between lat/long and utm
-   * @param {Number} steps Amount of steps to use for estimation
-   */
-  findTForArcLength(arcLength: number, tolerance = 0.02, iterations = 100): number {
-    let tl = 0;
-    let th = 1;
-    let t = 0.5;
-    for (let i = 0; i < iterations; i++) {
-      const tDisp = this.getArcLength(0, t);
-      if (Math.abs(tDisp - arcLength) < tolerance) {
-        return t;
-      }
-      if (tDisp > arcLength) {
-        th = t;
-      } else {
-        tl = t;
-      }
-      t = (th + tl) / 2;
-    }
-    return t;
-  }
-
-  /**
-   * Function calculating length along curve using interpolator.
-   * @param {Number} from t at start (default = 0)
-   * @param {Number} to t at end (default = 1)
-   * @param {Number} steps Amount of steps to use for estimation
-   */
-  getArcLength(from = 0, to = 1, steps = 100): number {
-    // TODO: Implement dynamic instead of fixed steps, f.ex. splitting in halves until change in length is under a treshold
-    let length = 0;
-    const range = to - from;
-    let point = this.getPointAt(from);
-    let lastPoint = point; // Set first
-    for (let i = 1; i < steps; i++) {
-      point = this.getPointAt((i / (steps - 1)) * range + from);
-      length += Vector2.distance(lastPoint as number[], point as number[]);
-      lastPoint = point; // Set first
-    }
-    return length;
-  }
-
-  /**
-   * Function getting a point at curve length.
-   * @param {Number} length
-   */
-  getPointAtArcLength(length: number): Vector {
-    // TODO: Ideally the CurveInterpolator should be able to provide t but didn't work. Might be worth investigating.
-    //  const t = this.getT(length);
-    const t = this.findTForArcLength(length);
-    return this.getPointAt(t);
-  }
-}
+import { ExtendedCurveInterpolator } from './ExtendedCurveInterpolator';
 
 // determines how curvy the curve is
 const TENSION = 0.75;
@@ -75,6 +18,10 @@ const DEFAULT_END_EXTEND_LENGTH = 1000.0;
 
 const CURTAIN_SAMPLING_ANGLE_THRESHOLD = 0.0005;
 const CURTAIN_SAMPLING_INTERVAL = 0.1;
+
+const defaultOptions = {
+  approxT: true,
+};
 
 export class IntersectionReferenceSystem {
   options: ReferenceSystemOptions;
@@ -127,7 +74,7 @@ export class IntersectionReferenceSystem {
   }
 
   private setPath(path: number[][], options: ReferenceSystemOptions = {}): void {
-    this.options = options;
+    this.options = { ...defaultOptions, ...options };
     const { arcDivisions, tension, calculateDisplacementFromBottom } = this.options;
 
     this.path = path;
@@ -171,13 +118,14 @@ export class IntersectionReferenceSystem {
     const { curtain } = this.interpolators;
     const { calculateDisplacementFromBottom } = this.options;
     const cl = clamp(calculateDisplacementFromBottom ? this.length - length : length - this._offset, 0, this.length);
-    const p = curtain.getPointAtArcLength(cl);
+    const p = curtain.getPointAtArcLength(cl, this.options);
     return p;
   }
 
   curtainTangent(length: number): number[] {
     const { curtain } = this.interpolators;
-    const t = curtain.findTForArcLength(length - this._offset);
+    const l = length - this._offset;
+    const t = curtain.findTForArcLength(l, this.options);
     const tangent = t && curtain.getTangentAt(t);
     return tangent;
   }
@@ -241,13 +189,7 @@ export class IntersectionReferenceSystem {
     const { curtain } = this.interpolators;
     const pl = this.project(length);
     const l = pl[0] / curtain.maxX;
-    if (Number.isNaN(l) || l < 0) {
-      return 0;
-    }
-    if (l > 1) {
-      return 1;
-    }
-    return l;
+    return Number.isFinite(l) ? clamp(l, 0, 1) : 0;
   }
 
   /**
@@ -402,13 +344,13 @@ export class IntersectionReferenceSystem {
 
   /**
    * returns a normalized vector
-   * @param interp interpolated curve
+   * @param interpolator interpolated curve
    * @param from number between 0 and 1
    * @param to number between 0 and 1
    */
-  static getDirectionVector(interp: any, from: number, to: number): number[] {
-    const p1 = interp.getPointAt(to);
-    const p2 = interp.getPointAt(from);
+  static getDirectionVector(interpolator: any, from: number, to: number): number[] {
+    const p1 = interpolator.getPointAt(to);
+    const p2 = interpolator.getPointAt(from);
 
     return normalize([p1[0] - p2[0], p1[1] - p2[1]]) as number[];
   }
