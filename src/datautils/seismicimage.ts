@@ -62,7 +62,7 @@ export async function generateSeismicSliceImage(
   data: { datapoints: number[][]; yAxisValues: number[] },
   trajectory: number[][],
   colormap: string[],
-  options: {
+  options?: {
     isLeftToRight: true;
     seismicRange?: number;
     seismicMin?: number;

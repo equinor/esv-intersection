@@ -17,7 +17,11 @@ function dist(a: number[], b: number[]): number {
 describe('Reference system', () => {
   let rs: IntersectionReferenceSystem;
   beforeEach(() => {
-    rs = new IntersectionReferenceSystem(wp, { trajectoryAngle: 0 });
+    const options = {
+      trajectoryAngle: 0,
+      quickT: true,
+    };
+    rs = new IntersectionReferenceSystem(wp, options);
   });
   it('should set path on creation', () => {
     expect(rs.path).not.toEqual(undefined);
@@ -53,17 +57,12 @@ describe('Reference system', () => {
     expect(pos[1]).toBeCloseTo(40, 1);
   });
   it('should clamp position to start position', () => {
-    const pos = rs.getPosition(-10);
+    const pos = rs.getPosition(-100);
     expect(pos[0]).toBeCloseTo(30, 1);
     expect(pos[1]).toBeCloseTo(40, 1);
   });
-  it('should get end position', () => {
-    const pos = rs.getPosition(110);
-    expect(pos[0]).toBeCloseTo(50, 1);
-    expect(pos[1]).toBeCloseTo(110, 1);
-  });
   it('should clamp position to end position', () => {
-    const pos = rs.getPosition(120);
+    const pos = rs.getPosition(1000);
     expect(pos[0]).toBeCloseTo(50, 1);
     expect(pos[1]).toBeCloseTo(110, 1);
   });

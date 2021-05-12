@@ -181,6 +181,8 @@ export interface ReferenceSystemOptions {
   curveInterpolator?: Interpolator;
   trajectoryInterpolator?: Interpolator;
   curtainInterpolator?: Interpolator;
+  approxT?: boolean;
+  quickT?: boolean;
 }
 
 export type BoundingBox = {

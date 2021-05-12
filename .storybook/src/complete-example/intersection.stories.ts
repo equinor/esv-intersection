@@ -47,7 +47,7 @@ export const intersectionFlipX = () => {
   return renderIntersection(scaleOptions);
 };
 
-const renderIntersection = (scaleOptions) => {
+const renderIntersection = (scaleOptions: any) => {
   const axisOptions = {
     xLabel: 'Displacement',
     yLabel: 'TVD MSL',

@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import { Point } from 'pixi.js';
 import { merge } from 'd3-array';
 import { Cement, Casing, HoleSize } from '..';
