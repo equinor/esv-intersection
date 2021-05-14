@@ -2,11 +2,22 @@
 
 ## New changes not yet released
 
+## v1.5.0
+
+- Bump hosted-git-info from 2.8.8 to 2.8.9
+- Bump lodash from 4.17.19 to 4.17.21
+- Improve responsiveness of rendering
+- Refactoring
+- Fix issue with interpolators which was causing rendering artifacts in cement layer
+- Make CasingLayer easier to extend (#438)
+
 ## v1.4.4
+
 - Add option to override interpolators in the IntersectionReferenceSystem
 - Update react-dev-utils to 11.0.4
 
 ## v1.4.3
+
 - Add option to use a optional range for generating seismic image
 
 ## v1.4.2
