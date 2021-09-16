@@ -91,7 +91,7 @@
     "@equinor/videx-vector2": "^1.0.44",
     "@types/d3": "^5.7.2",
     "curve-interpolator": "2.0.8",
-    "d3-array": "^2.11.0",
+    "d3-array": "^2.12.0",
     "d3-axis": "^1.0.12",
     "d3-scale": "^3.2.1",
     "d3-selection": "^1.4.1",
