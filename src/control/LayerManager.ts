@@ -237,7 +237,6 @@ export class LayerManager {
   }
 
   destroy(): LayerManager {
-    this.clearAllData(true);
     this.removeAllLayers();
     this.layerContainer.remove();
     this.layerContainer = undefined;
