@@ -13,6 +13,9 @@ jobs:
       with:
         submodules: true
         persist-credentials: false
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
 
     - name: Info
       run: echo "Running on branch $(basename ${{ github.ref }})"
@@ -24,7 +27,7 @@ jobs:
       run: mkdir docs_out
 
     - name: Build documentation # only if this was triggered from latest
-      if: github.ref == 'refs/heads/latest' 
+      if: github.ref == 'refs/heads/latest'
       run: |
         npm run docs
         npm run postdocs
