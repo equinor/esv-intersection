@@ -2,6 +2,12 @@
 
 ## New changes not yet released
 
+## v1.5.1
+
+- Update node to v.16
+- Update dependencies
+- Fix: Stop clearing data before unmounting layers (#449)
+
 ## v1.5.0
 
 - Bump hosted-git-info from 2.8.8 to 2.8.9
