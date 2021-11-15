@@ -36,7 +36,7 @@ $ npm run storybook
 import { Controller, GridLayer } from '@equinor/esv-intersection';
 
 const container = document.createElement('div');
-const controller = new Controller(container);
+const controller = new Controller({container: container});
 
 // the controller initially has zero height
 controller.adjustToSize(400, 400);
