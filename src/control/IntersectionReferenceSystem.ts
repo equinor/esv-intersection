@@ -117,7 +117,7 @@ export class IntersectionReferenceSystem {
   project(length: number): number[] {
     const { curtain } = this.interpolators;
     const { calculateDisplacementFromBottom } = this.options;
-    const cl = clamp(calculateDisplacementFromBottom ? this.length - length : length - this._offset, 0, this.length);
+    const cl = clamp(calculateDisplacementFromBottom ? this.length - (length - this._offset) : length - this._offset, 0, this.length);
     const p = curtain.getPointAtArcLength(cl, this.options);
     return p;
   }
