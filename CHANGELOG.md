@@ -2,6 +2,11 @@
 
 ## New changes not yet released
 
+## v1.5.2
+
+- Fix bug in IntersectionReferenceSystem::project for calculateDisplacementFromBottom
+- Fix simple demo in readme
+
 ## v1.5.1
 
 - Update node to v.16
