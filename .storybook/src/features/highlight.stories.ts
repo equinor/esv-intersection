@@ -1,4 +1,4 @@
-import { Selection } from 'd3-selection';
+import { Selection } from 'd3';
 
 import { WellborepathLayer, HTMLLayer } from '../../../src/layers';
 import { OnRescaleEvent, OnMountEvent } from '../../../src/interfaces';

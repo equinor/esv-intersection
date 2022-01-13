@@ -1,7 +1,6 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { interpolateRgb, quantize } from 'd3-interpolate';
-import { scaleOrdinal } from 'd3-scale';
+import { interpolateRgb, quantize, scaleOrdinal } from 'd3';
 import { convertColor } from '../utils/color';
 import { StratUnit, SurfaceMetaAndValues, SurfaceLine, SurfaceArea, SurfaceData } from './interfaces';
 

@@ -1,5 +1,4 @@
-import { scaleLinear } from 'd3-scale';
-import { zoomIdentity } from 'd3-zoom';
+import { scaleLinear, zoomIdentity } from 'd3';
 import { OnRescaleEvent } from '../src';
 
 export function rescaleEventStub(data: any): OnRescaleEvent {
