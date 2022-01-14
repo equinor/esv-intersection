@@ -1,5 +1,5 @@
 import { Axis } from '../../../src/components';
-import { select } from 'd3';
+import { select } from 'd3-selection';
 import { ZoomPanHandler, OnRescaleEvent, Controller } from '../../../src';
 import { createFPSLabel, createRootContainer, createLayerContainer, createHelpText } from '../utils';
 import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../../../src/constants';

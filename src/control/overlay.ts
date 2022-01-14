@@ -1,4 +1,4 @@
-import { select, Selection, pointer, ContainerElement } from 'd3';
+import { select, event, Selection, mouse, ContainerElement } from 'd3-selection';
 import { OverlayCallbacks } from './interfaces';
 
 class Overlay {

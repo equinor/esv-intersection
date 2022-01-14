@@ -1,4 +1,4 @@
-import { select, Selection } from 'd3';
+import { select, Selection } from 'd3-selection';
 import { ZoomPanHandler } from './ZoomPanHandler';
 import { Layer, GridLayer } from '../layers';
 import { ScaleOptions, OnMountEvent, OnRescaleEvent } from '../interfaces';

@@ -1,4 +1,5 @@
-import { scaleLinear, color } from 'd3';
+import { scaleLinear } from 'd3-scale';
+import { color } from 'd3-color';
 
 export function createColorTable(colorMap: string[], size: number): number[][] {
   const colorDomain = colorMap.map((v, i) => (i * size) / colorMap.length);

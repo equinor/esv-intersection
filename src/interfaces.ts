@@ -1,4 +1,4 @@
-import { ZoomTransform } from 'd3';
+import { ZoomTransform } from 'd3-zoom';
 import { Graphics } from 'pixi.js';
 import { Layer } from './layers/base/Layer';
 import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';

@@ -1,4 +1,4 @@
-import { select } from 'd3';
+import { select } from 'd3-selection';
 import { CanvasLayer } from '../../../src/layers';
 import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../../../src/interfaces';
 import { GridLayer } from '../../../src/layers';

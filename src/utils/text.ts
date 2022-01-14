@@ -1,7 +1,7 @@
 import { clamp } from '@equinor/videx-math';
 
 import { BoundingBox } from '../interfaces';
-import { ScaleLinear } from 'd3';
+import { ScaleLinear } from 'd3-scale';
 
 const DEFAULT_HORIZONTAL_PADDING = 4;
 const DEFAULT_VERTICAL_PADDING = 2;

@@ -1,4 +1,6 @@
-import { select, Selection, scaleLinear, ScaleLinear, zoom, zoomIdentity, ZoomBehavior, ZoomTransform } from 'd3';
+import { event, select, Selection } from 'd3-selection';
+import { scaleLinear, ScaleLinear } from 'd3-scale';
+import { zoom, zoomIdentity, ZoomBehavior, ZoomTransform } from 'd3-zoom';
 
 import { ZoomAndPanOptions, OnRescaleEvent, OnUpdateEvent } from '../interfaces';
 

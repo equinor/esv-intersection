@@ -1,4 +1,4 @@
-import { color, Color } from 'd3';
+import { color, Color } from 'd3-color';
 
 /**
  * Convert color string to number

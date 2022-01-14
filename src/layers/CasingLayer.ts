@@ -1,5 +1,5 @@
 import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
-import { zip } from 'd3';
+import { zip } from 'd3-array';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, Casing } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';

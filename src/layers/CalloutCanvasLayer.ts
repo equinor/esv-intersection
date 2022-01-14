@@ -1,5 +1,5 @@
 /* eslint-disable no-magic-numbers */
-import { ScaleLinear } from 'd3';
+import { ScaleLinear } from 'd3-scale';
 
 import { CanvasLayer } from './base/CanvasLayer';
 import { OnUpdateEvent, Annotation, OnRescaleEvent, BoundingBox, CalloutOptions } from '../interfaces';

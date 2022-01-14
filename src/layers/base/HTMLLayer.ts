@@ -1,4 +1,4 @@
-import { select, Selection } from 'd3';
+import { select, Selection } from 'd3-selection';
 import { Layer } from './Layer';
 import { OnMountEvent, OnResizeEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
