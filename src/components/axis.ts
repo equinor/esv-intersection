@@ -1,7 +1,6 @@
 import { axisRight, axisBottom } from 'd3-axis';
-import { Selection } from 'd3-selection';
+import { BaseType, Selection } from 'd3-selection';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
-import { BaseType } from 'd3';
 import { OnResizeEvent, OnRescaleEvent } from '../interfaces';
 
 type Options = {
