@@ -15,7 +15,7 @@
     "prepub": "npm run build",
     "pub": "npm publish --access=public",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
-    "test": "jest",
+    "test": "tsc --project tsconfig.test.json && jest",
     "test:watch": "jest --watchAll",
     "predocs": "rimraf docs_out",
     "docs": "typedoc --out docs_out src",
