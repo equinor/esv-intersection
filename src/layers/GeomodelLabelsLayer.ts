@@ -69,14 +69,12 @@ export class GeomodelLabelsLayer extends CanvasLayer {
         return acc;
       }
       const avgTopDepth = sumAndCount.sum / sumAndCount.count;
-      // Filter surfaces without data
-      return [
-        ...acc,
-        {
-          ...area,
-          avgTopDepth,
-        },
-      ];
+
+      acc.push({
+        ...area,
+        avgTopDepth,
+      });
+      return acc;
     }, []);
   }
 

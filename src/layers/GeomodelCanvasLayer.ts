@@ -39,7 +39,6 @@ export class GeomodelCanvasLayer extends CanvasLayer {
 
   setData(data: SurfaceData): void {
     super.setData(data);
-    this.updatePaths();
   }
 
   onMount(event: OnMountEvent): void {
@@ -91,7 +90,8 @@ export class GeomodelCanvasLayer extends CanvasLayer {
         color: this.colorToCSSColor(s.color),
         path: this.generatePolygonPath(polygon),
       }));
-      return [...acc, ...mapped];
+      acc.push(...mapped);
+      return acc;
     }, []);
   }
 
@@ -99,7 +99,8 @@ export class GeomodelCanvasLayer extends CanvasLayer {
     this.surfaceLinesPaths = this.data.lines.reduce((acc: any, l: SurfaceLine) => {
       const lines = this.generateLinePaths(l);
       const mapped = lines.map((path: Path2D) => ({ color: this.colorToCSSColor(l.color), path }));
-      return [...acc, ...mapped];
+      acc.push(...mapped);
+      return acc;
     }, []);
   }
 

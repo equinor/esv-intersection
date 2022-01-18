@@ -15,15 +15,13 @@ export function convertToCamelCase(data: any): any {
     });
   }
 
-  const res = Object.keys(data).reduce((obj, key) => {
+  const res = Object.keys(data).reduce((obj: any, key) => {
     let d = data[key];
     if (typeof d === 'object' && d != null) {
       d = convertToCamelCase(d);
     }
-    return {
-      ...obj,
-      [camelCase(key)]: d,
-    };
+    obj[camelCase(key)] = d;
+    return obj;
   }, {});
 
   return res;
