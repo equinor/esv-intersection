@@ -110,6 +110,7 @@ export class IntersectionReferenceSystem {
 
     this._curtainPathCache = undefined;
   }
+
   /**
    * Map a length along the curve to intersection coordinates
    * @param length length along the curve
@@ -246,8 +247,8 @@ export class IntersectionReferenceSystem {
         points.push([p0[0] - this.startVector[0] * f, p0[1] - this.startVector[1] * f]);
       }
     }
-    const cuvePoints = this.interpolators.trajectory.getPoints(curveSteps - 1, null, t0, t1); // returns steps + 1 points
-    points.push(...cuvePoints);
+    const curvePoints = this.interpolators.trajectory.getPoints(curveSteps - 1, null, t0, t1); // returns steps + 1 points
+    points.push(...curvePoints);
     if (p3) {
       for (let i = 1; i < postSteps - 1; i++) {
         const f = (i / postSteps) * extensionEnd * this.displacement;

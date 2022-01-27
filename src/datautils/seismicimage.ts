@@ -93,14 +93,14 @@ export async function generateSeismicSliceImage(
   const height = data.yAxisValues.length;
 
   // Generate color table
-  const steps = 1000;
-  const colorTable = createColorTable(colormap, steps);
+  const colorTableSize = 1000;
+  const colorTable = createColorTable(colormap, colorTableSize);
 
   // Generate image
   const d = new Uint8ClampedArray(width * height * 4);
 
   let offset = 0;
-  const colorFactor = (steps - 1) / domain.difference;
+  const colorFactor = (colorTableSize - 1) / domain.difference;
 
   let pos = options?.isLeftToRight ? trajectory[0][0] : trajectory[trajectory.length - 1][0];
 
@@ -132,7 +132,7 @@ export async function generateSeismicSliceImage(
       } else {
         val = val1 * (1 - ratio) + val2 * ratio;
         i = (val - domain.min) * colorFactor;
-        i = clamp(Math.floor(i), 0, steps - 1);
+        i = clamp(~~i, 0, colorTableSize - 1);
         col = colorTable[i];
         opacity = 255;
       }

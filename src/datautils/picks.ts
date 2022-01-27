@@ -287,8 +287,8 @@ export function transformFormationData(picks: any, stratColumn: any) {
     group.forEach((itm) => {
       const gaps = findGaps(itm.mdEntry, itm.mdExit, arr);
       arr.push(...gaps.map((g) => ({ from: g[0], to: g[1], itm })));
-      arr.sort((a, b) => a.from - b.from);
     });
+    arr.sort((a, b) => a.from - b.from);
     unitPicks.push(
       ...arr.map((d) => ({
         from: d.from,
