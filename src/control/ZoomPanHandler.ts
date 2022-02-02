@@ -1,8 +1,8 @@
-import { event, select, Selection } from 'd3-selection';
+import { select, Selection } from 'd3-selection';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
 import { zoom, zoomIdentity, ZoomBehavior, ZoomTransform } from 'd3-zoom';
 
-import { ZoomAndPanOptions, OnRescaleEvent, OnUpdateEvent } from '../interfaces';
+import { ZoomAndPanOptions, OnRescaleEvent } from '../interfaces';
 
 const DEFAULT_MIN_ZOOM_LEVEL = 0.1;
 const DEFAULT_MAX_ZOOM_LEVEL = 256;
@@ -223,7 +223,7 @@ export class ZoomPanHandler {
       yRatio: yRatio,
       width: width,
       height: height,
-      transform: { ...currentTransform },
+      transform: Object.assign({}, currentTransform),
     };
   }
 
@@ -248,7 +248,7 @@ export class ZoomPanHandler {
   /**
    * Handle zoom
    */
-  onZoom(): void {
+  onZoom(event: any): void {
     const { transform } = event;
     if (!transform) {
       return;

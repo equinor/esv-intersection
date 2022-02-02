@@ -1,4 +1,4 @@
-import { select, event, Selection, mouse, ContainerElement } from 'd3-selection';
+import { select, Selection, pointer, ContainerElement } from 'd3-selection';
 import { OverlayCallbacks } from './interfaces';
 
 class Overlay {
@@ -15,7 +15,7 @@ class Overlay {
     this.source = this.elm.node();
 
     const { elm } = this;
-    elm.on('resize', () => {
+    elm.on('resize', (event) => {
       const { width, height } = event.detail;
       elm.style('width', `${width}px`).style('height', `${height}px`);
 
@@ -40,12 +40,12 @@ class Overlay {
       });
     });
 
-    elm.on('mousemove', () => {
+    elm.on('mousemove', (event) => {
       if (!this.enabled) {
         return;
       }
 
-      const [mx, my] = mouse(this.elm.node() as ContainerElement);
+      const [mx, my] = pointer(event, this.elm.node() as ContainerElement);
       Object.keys(this.listeners).forEach((key: string) => {
         const target = this.elements[key] || null;
         const ops = this.listeners[key];

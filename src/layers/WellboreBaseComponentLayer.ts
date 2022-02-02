@@ -1,5 +1,4 @@
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
-import { merge } from 'd3-array';
 import { PixiLayer } from './base/PixiLayer';
 import { OnUpdateEvent, OnRescaleEvent, WellComponentBaseOptions, MDPoint, OnUnmountEvent } from '../interfaces';
 

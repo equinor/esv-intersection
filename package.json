@@ -15,7 +15,7 @@
     "prepub": "npm run build",
     "pub": "npm publish --access=public",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
-    "test": "jest",
+    "test": "tsc --project tsconfig.test.json && jest",
     "test:watch": "jest --watchAll",
     "predocs": "rimraf docs_out",
     "docs": "typedoc --out docs_out src",
@@ -40,18 +40,23 @@
   },
   "homepage": "https://github.com/equinor/esv-intersection#readme",
   "devDependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/preset-env": "^7.16.8",
+    "@babel/preset-typescript": "^7.16.7",
     "@storybook/addon-docs": "^6.3.11",
     "@storybook/addon-storysource": "^6.3.11",
     "@storybook/html": "^6.3.11",
-    "@types/jest": "^27.0.2",
+    "@types/d3": "^7.1.0",
+    "@types/jest": "^27.4.0",
     "@types/mock-raf": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
+    "babel-jest": "^27.4.6",
     "copyfiles": "^2.4.1",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
-    "jest": "^27.2.5",
+    "jest": "^27.4.7",
     "jest-canvas-mock": "^2.3.1",
     "mock-raf": "^1.0.1",
     "pixi.js": "^5.3.8",
@@ -63,15 +68,11 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.30.0",
     "storybook-dark-mode": "^1.0.8",
-    "ts-jest": "^27.0.5",
     "tslib": "^2.1.0",
     "typedoc": "^0.20.28",
     "typescript": "^4.2.2"
   },
   "jest": {
-    "transform": {
-      ".(ts|tsx)": "ts-jest"
-    },
     "setupFiles": [
       "jest-canvas-mock"
     ],
@@ -81,7 +82,8 @@
       "tsx",
       "js"
     ],
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    "transformIgnorePatterns": ["/node_modules/(?!d3)"]
   },
   "peerDependencies": {
     "pixi.js": "^5.2.1"
@@ -89,13 +91,12 @@
   "dependencies": {
     "@equinor/videx-math": "^1.0.12",
     "@equinor/videx-vector2": "^1.0.44",
-    "@types/d3": "^5.7.2",
     "curve-interpolator": "2.0.8",
-    "d3-array": "^2.12.1",
-    "d3-axis": "^1.0.12",
-    "d3-scale": "^3.2.4",
-    "d3-selection": "^1.4.1",
-    "d3-shape": "^1.3.7",
-    "d3-zoom": "^1.8.3"
+    "d3-array": "^3.1.1",
+    "d3-axis": "^3.0.0",
+    "d3-scale": "^4.0.2",
+    "d3-selection": "^3.0.0",
+    "d3-shape": "^3.1.0",
+    "d3-zoom": "^3.0.0"
   }
 }
