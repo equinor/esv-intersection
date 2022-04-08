@@ -2,6 +2,11 @@
 
 ## New changes not yet released
 
+## v1.7.0
+
+- Let Pixi Application options be configurable
+- Update dependencies
+
 ## v1.6.0
 
 - Update major version of d3 to v3
