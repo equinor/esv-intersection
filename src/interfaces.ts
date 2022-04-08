@@ -1,5 +1,5 @@
 import { ZoomTransform } from 'd3-zoom';
-import { Graphics } from 'pixi.js';
+import { Application, Graphics } from 'pixi.js';
 import { Layer } from './layers/base/Layer';
 import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
 import Vector2 from '@equinor/videx-vector2';
@@ -65,7 +65,7 @@ export interface WellborepathLayerOptions extends LayerOptions {
 
 export interface GeomodelLayerOptions extends LayerOptions {}
 
-export interface CompletionLayerOptions extends LayerOptions {}
+export interface CompletionLayerOptions extends PixiLayerOptions {}
 
 export interface GeomodelLayerLabelsOptions extends LayerOptions {
   margins?: number;
@@ -91,7 +91,11 @@ export interface CementLayerOptions extends WellComponentBaseOptions {
   secondColor?: string;
 }
 
-export interface WellComponentBaseOptions extends LayerOptions {
+export interface PixiLayerOptions extends LayerOptions {
+  pixiApplicationOptions?: PixiApplicationOptions;
+}
+
+export interface WellComponentBaseOptions extends PixiLayerOptions {
   exaggerationFactor?: number;
 }
 
@@ -202,3 +206,6 @@ export interface CalloutOptions extends LayerOptions {
   offsetMax?: number;
   offsetFactor?: number;
 }
+
+type PixiApplicationConstructorParameters = ConstructorParameters<typeof Application>;
+type PixiApplicationOptions = PixiApplicationConstructorParameters[0];

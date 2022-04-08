@@ -1,12 +1,16 @@
 import { Application, RENDERER_TYPE } from 'pixi.js';
 import { Layer } from './Layer';
-import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
+import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent, PixiLayerOptions } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class PixiLayer extends Layer {
   elm: HTMLElement;
 
   ctx: Application;
+
+  constructor(id?: string, options?: PixiLayerOptions) {
+    super(id, options);
+  }
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
@@ -19,6 +23,7 @@ export abstract class PixiLayer extends Layer {
       this.updateStyle();
 
       const { elm, height, width } = event;
+      const { pixiApplicationOptions } = this.options as PixiLayerOptions;
 
       const pixiOptions = {
         width: width || parseInt(this.elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH,
@@ -28,6 +33,7 @@ export abstract class PixiLayer extends Layer {
         clearBeforeRender: true,
         autoResize: true,
         preserveDrawingBuffer: true,
+        ...pixiApplicationOptions,
       };
 
       this.ctx = new Application(pixiOptions);
