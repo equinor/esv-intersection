@@ -43,9 +43,9 @@
     "@babel/core": "^7.16.7",
     "@babel/preset-env": "^7.16.8",
     "@babel/preset-typescript": "^7.16.7",
-    "@storybook/addon-docs": "^6.4.19",
-    "@storybook/addon-storysource": "^6.4.19",
-    "@storybook/html": "^6.4.19",
+    "@storybook/addon-docs": "^6.4.22",
+    "@storybook/addon-storysource": "^6.4.22",
+    "@storybook/html": "^6.4.22",
     "@types/d3": "^7.1.0",
     "@types/jest": "^27.4.0",
     "@types/mock-raf": "^1.0.2",
@@ -56,7 +56,7 @@
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-storybook": "^0.5.7",
+    "eslint-plugin-storybook": "^0.5.10",
     "jest": "^27.4.7",
     "jest-canvas-mock": "^2.3.1",
     "mock-raf": "^1.0.1",
@@ -89,13 +89,13 @@
     ]
   },
   "peerDependencies": {
-    "pixi.js": "^5.2.1"
+    "pixi.js": "^5.3.12"
   },
   "dependencies": {
     "@equinor/videx-math": "^1.0.12",
     "@equinor/videx-vector2": "^1.0.44",
     "curve-interpolator": "2.0.8",
-    "d3-array": "^3.1.1",
+    "d3-array": "^3.1.6",
     "d3-axis": "^3.0.0",
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
