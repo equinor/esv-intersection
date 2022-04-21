@@ -2,6 +2,11 @@
 
 ## New changes not yet released
 
+## v1.8.0
+
+- Update dependencies
+- Pixi.js peer dependency bumped to ^5.3.12
+
 ## v1.7.0
 
 - Let Pixi Application options be configurable
