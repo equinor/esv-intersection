@@ -1,5 +1,5 @@
 import { ZoomTransform } from 'd3-zoom';
-import { Application, Graphics } from 'pixi.js';
+import { Graphics, IApplicationOptions } from 'pixi.js';
 import { Layer } from './layers/base/Layer';
 import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
 import Vector2 from '@equinor/videx-vector2';
@@ -92,7 +92,7 @@ export interface CementLayerOptions extends WellComponentBaseOptions {
 }
 
 export interface PixiLayerOptions extends LayerOptions {
-  pixiApplicationOptions?: PixiApplicationOptions;
+  pixiApplicationOptions?: IApplicationOptions;
 }
 
 export interface WellComponentBaseOptions extends PixiLayerOptions {
@@ -206,6 +206,3 @@ export interface CalloutOptions extends LayerOptions {
   offsetMax?: number;
   offsetFactor?: number;
 }
-
-type PixiApplicationConstructorParameters = ConstructorParameters<typeof Application>;
-type PixiApplicationOptions = PixiApplicationConstructorParameters[0];
