@@ -26,7 +26,7 @@ export class CementLayer extends WellboreBaseComponentLayer {
     };
   }
 
-  render(): void {
+  preRender(): void {
     if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
       return;
     }

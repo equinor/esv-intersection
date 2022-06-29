@@ -17,6 +17,8 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
     this.render = this.render.bind(this);
   }
 
+  abstract preRender(): void;
+
   onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
     this._textureCache = null;
@@ -25,12 +27,13 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
-    this.clear();
+    this.clearStage();
+    this.preRender();
     this.render();
   }
 
   onRescale(event: OnRescaleEvent): void {
-    const shouldRender = this.rescaleEvent?.zFactor !== event.zFactor;
+    const shouldRecalculate = this.rescaleEvent?.zFactor !== event.zFactor;
 
     this.rescaleEvent = event;
     super.optionsRescale(event);
@@ -45,20 +48,20 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
     this.ctx.stage.position.set(event.xScale(0), event.yScale(0));
     this.ctx.stage.scale.set(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
 
-    if (shouldRender) {
-      this.clear();
-      this.render();
+    if (shouldRecalculate) {
+      this.clearStage();
+      this.preRender();
     }
+
+    this.render();
   }
 
-  clear(): void {
+  clearStage(): void {
     const children = this.ctx.stage.removeChildren();
     children.forEach((child) => {
       child.destroy();
     });
   }
-
-  abstract render(): void;
 
   /**
    * Calculate yRatio without zFactor
@@ -154,9 +157,7 @@ export abstract class WellboreBaseComponentLayer extends PixiLayer {
   drawOutline(leftPath: Point[], rightPath: Point[], lineColor: number, lineWidth = 1, close: boolean = false): void {
     const DRAW_ALIGNMENT_INSIDE = 1;
 
-    const leftPathReverse = leftPath
-      .map<Point>((d) => d.clone())
-      .reverse();
+    const leftPathReverse = leftPath.map<Point>((d) => d.clone()).reverse();
 
     const startPointRight = rightPath[0];
     const startPointLeft = leftPathReverse[0];
