@@ -20,7 +20,6 @@ class PixiRenderApplication {
       baseTexture: true,
     });
     this.stage = null;
-
     this.renderer.destroy(true);
     this.renderer = null;
   }
