@@ -1,4 +1,4 @@
-import { Application, RENDERER_TYPE } from 'pixi.js';
+import { Application, Renderer, RENDERER_TYPE } from 'pixi.js';
 import { Layer } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent, PixiLayerOptions } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
@@ -47,7 +47,11 @@ export abstract class PixiLayer extends Layer {
 
     // Get renderType and clContext before we destroy the renderer
     const renderType = this.renderType();
-    const glContext = this.ctx.renderer?.gl;
+
+    let glContext;
+    if (this.ctx.renderer instanceof Renderer) {
+      glContext = this.ctx.renderer?.gl;
+    }
 
     this.ctx.stop();
     this.ctx.destroy(true, { children: true, texture: true, baseTexture: true });
@@ -58,7 +62,7 @@ export abstract class PixiLayer extends Layer {
      *
      * Cleaning up our self since it still seems to work and fix issue with lingering contexts
      */
-    if (renderType === RENDERER_TYPE.WEBGL) {
+    if (renderType === RENDERER_TYPE.WEBGL && glContext) {
       glContext?.getExtension('WEBGL_lose_context')?.loseContext();
     }
 
