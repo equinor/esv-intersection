@@ -5,30 +5,34 @@ import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
 
 export class GeomodelLayerV2 extends PixiLayer {
-  private isRendered: boolean = false;
+  private isPreRendered: boolean = false;
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
 
-    if (!this.isRendered) {
-      this.render();
+    if (!this.isPreRendered) {
+      this.clearStage();
+      this.preRender();
     }
+
+    this.render();
   }
 
   onUpdate(event: OnUpdateEvent): void {
     super.onUpdate(event);
 
-    this.isRendered = false;
-    this.cleanUpStage();
+    this.isPreRendered = false;
+    this.clearStage();
+    this.preRender();
     this.render();
   }
 
-  cleanUpStage(): void {
+  clearStage(): void {
     this.ctx.stage.children.forEach((g: Graphics) => g.destroy());
     this.ctx.stage.removeChildren();
   }
 
-  render(): void {
+  preRender(): void {
     const { data }: { data: SurfaceData } = this;
 
     if (!data) {
@@ -38,7 +42,7 @@ export class GeomodelLayerV2 extends PixiLayer {
     data.areas.forEach((a: SurfaceArea) => this.generateAreaPolygon(a));
     data.lines.forEach((l: SurfaceLine) => this.generateSurfaceLine(l));
 
-    this.isRendered = true;
+    this.isPreRendered = true;
   }
 
   createPolygons = (data: any): number[][] => {

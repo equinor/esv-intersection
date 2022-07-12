@@ -2,7 +2,7 @@ import Vector2 from '@equinor/videx-vector2';
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
 import { OnUpdateEvent } from '..';
-import { CompletionLayerOptions } from '../interfaces';
+import { CompletionLayerOptions, OnRescaleEvent } from '../interfaces';
 
 interface CompletionItem {}
 
@@ -16,12 +16,21 @@ export class CompletionLayer extends PixiLayer {
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
-    super.onUpdate(event);
+  onRescale(event: OnRescaleEvent): void {
+    super.onRescale(event);
+    this.clearStage();
+    this.preRender();
     this.render();
   }
 
-  render(): void {
+  onUpdate(event: OnUpdateEvent): void {
+    super.onUpdate(event);
+    this.clearStage();
+    this.preRender();
+    this.render();
+  }
+
+  preRender(): void {
     const wellborePath = this.referenceSystem ? (this.referenceSystem.projectedPath as [number, number][]) : [];
 
     if (wellborePath == null) {
@@ -31,6 +40,13 @@ export class CompletionLayer extends PixiLayer {
     // TODO: clear old completion items when there is no data to display
     const items: CompletionItem[] = this.data?.length > 0 ? this.data.map((d: unknown) => this.generateCompletionItem(wellborePath, d)) : [];
     items.map((s: unknown) => this.drawCompletionItem(s));
+  }
+
+  clearStage(): void {
+    const children = this.ctx.stage.removeChildren();
+    children.forEach((child) => {
+      child.destroy();
+    });
   }
 
   getShape(type: string): Graphics {

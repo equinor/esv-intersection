@@ -1,12 +1,42 @@
-import { Application, Renderer, RENDERER_TYPE } from 'pixi.js';
+import { AbstractRenderer, autoDetectRenderer, Container, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
 import { Layer } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent, PixiLayerOptions } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
+class PixiRenderApplication {
+  stage: Container;
+
+  renderer: AbstractRenderer;
+
+  constructor(pixiRenderOptions: IRendererOptionsAuto) {
+    this.renderer = autoDetectRenderer(pixiRenderOptions);
+    this.stage = new Container();
+  }
+
+  destroy() {
+    this.stage.destroy({
+      children: true,
+      texture: true,
+      baseTexture: true,
+    });
+    this.stage = null;
+    this.renderer.destroy(true);
+    this.renderer = null;
+  }
+
+  get view() {
+    return this.renderer.view;
+  }
+
+  render() {
+    this.renderer.render(this.stage);
+  }
+}
+
 export abstract class PixiLayer extends Layer {
   elm: HTMLElement;
 
-  ctx: Application;
+  ctx: PixiRenderApplication;
 
   constructor(id?: string, options?: PixiLayerOptions) {
     super(id, options);
@@ -36,10 +66,14 @@ export abstract class PixiLayer extends Layer {
         ...pixiApplicationOptions,
       };
 
-      this.ctx = new Application(pixiOptions);
+      this.ctx = new PixiRenderApplication(pixiOptions);
       container.appendChild(this.ctx.view);
       elm.appendChild(container);
     }
+  }
+
+  render(): void {
+    this.ctx.render();
   }
 
   onUnmount(event?: OnUnmountEvent): void {
@@ -47,14 +81,10 @@ export abstract class PixiLayer extends Layer {
 
     // Get renderType and clContext before we destroy the renderer
     const renderType = this.renderType();
+    const glContext = this.ctx.renderer instanceof Renderer ? this.ctx.renderer?.gl : undefined;
 
-    let glContext;
-    if (this.ctx.renderer instanceof Renderer) {
-      glContext = this.ctx.renderer?.gl;
-    }
-
-    this.ctx.stop();
-    this.ctx.destroy(true, { children: true, texture: true, baseTexture: true });
+    this.ctx.destroy();
+    this.ctx = undefined;
 
     /**
      * WebGL v2 does supposedly not have WEBGL_lose_context
@@ -67,8 +97,7 @@ export abstract class PixiLayer extends Layer {
     }
 
     this.elm.remove();
-    this.elm = null;
-    this.ctx = null;
+    this.elm = undefined;
   }
 
   onResize(event: OnResizeEvent): void {
