@@ -2,6 +2,11 @@
 
 ## New changes not yet released
 
+## v2.0.0
+
+- Update major version of Pixi.js peer dependency to ^6.4.2
+- Only render Pixi layers on input changes and user interactions. Should reduce idle CPU load
+
 ## v1.8.0
 
 - Update dependencies
