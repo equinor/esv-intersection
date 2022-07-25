@@ -59,7 +59,7 @@ export abstract class PixiLayer extends Layer {
         width: width || parseInt(this.elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH,
         height: height || parseInt(this.elm.getAttribute('height'), 10) || DEFAULT_LAYER_HEIGHT,
         antialias: true,
-        transparent: true,
+        backgroundAlpha: 0,
         clearBeforeRender: true,
         autoResize: true,
         preserveDrawingBuffer: true,
