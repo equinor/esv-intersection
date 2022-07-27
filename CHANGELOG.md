@@ -1,6 +1,10 @@
 # Changelog
 
-## New changes not yet released
+## v2.0.1
+
+- Change deprecated `transparent` property to `backgroundAlpha` in Pixi `RendererOptions`
+- Bump `terser` from 4.8.0 to 4.8.1
+- Upgrade `d3-array` from 3.1.6 to 3.2.0
 
 ## v2.0.0
 
