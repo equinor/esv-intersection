@@ -81,9 +81,15 @@ export interface HoleSizeLayerOptions extends WellComponentBaseOptions {
   lineColor?: number;
 }
 
+export interface CasingShoeSize {
+  width: number;
+  length: number;
+}
+
 export interface CasingLayerOptions extends WellComponentBaseOptions {
   solidColor?: number;
   lineColor?: number;
+  casingShoeSize?: CasingShoeSize;
 }
 
 export interface CementLayerOptions extends WellComponentBaseOptions {

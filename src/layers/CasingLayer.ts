@@ -1,7 +1,7 @@
 import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
 import { zip } from 'd3-array';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CasingLayerOptions, Casing } from '..';
+import { CasingLayerOptions, Casing, CasingShoeSize } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { SHOE_LENGTH, SHOE_WIDTH } from '../constants';
@@ -16,6 +16,11 @@ export interface CasingRenderObject {
   casingWallWidth: number;
 }
 
+const defaultCasingShoeSize: CasingShoeSize = {
+  width: SHOE_WIDTH,
+  length: SHOE_LENGTH,
+};
+
 export class CasingLayer extends WellboreBaseComponentLayer {
   constructor(id?: string, options?: CasingLayerOptions) {
     super(id, options);
@@ -23,6 +28,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
       ...this.options,
       solidColor: 0xdcdcdc,
       lineColor: 0x575757,
+      casingShoeSize: defaultCasingShoeSize,
       ...options,
     };
   }
@@ -100,10 +106,9 @@ export class CasingLayer extends WellboreBaseComponentLayer {
   };
 
   drawShoe(casingEnd: number, casingRadius: number): void {
-    const { exaggerationFactor } = this.options as CasingLayerOptions;
-
-    const shoeWidth = SHOE_WIDTH * exaggerationFactor;
-    const shoeLength = SHOE_LENGTH * exaggerationFactor;
+    const { exaggerationFactor, casingShoeSize } = this.options as CasingLayerOptions;
+    const shoeWidth = casingShoeSize.width * exaggerationFactor;
+    const shoeLength = casingShoeSize.length * exaggerationFactor;
     const shoeCoords = this.generateShoe(casingEnd, casingRadius, shoeLength, shoeWidth);
     const shoeCoords2 = this.generateShoe(casingEnd, casingRadius, shoeLength, -shoeWidth);
     this.drawBigPolygon(shoeCoords2);
