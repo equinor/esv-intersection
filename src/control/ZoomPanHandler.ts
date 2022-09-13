@@ -7,7 +7,7 @@ import { ZoomAndPanOptions, OnRescaleEvent } from '../interfaces';
 const DEFAULT_MIN_ZOOM_LEVEL = 0.1;
 const DEFAULT_MAX_ZOOM_LEVEL = 256;
 
-type RescaleFunction = (event: OnRescaleEvent) => void;
+export type RescaleFunction = (event: OnRescaleEvent) => void;
 /**
  * Handle zoom and pan for intersection layers
  */

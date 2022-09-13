@@ -3,7 +3,7 @@ import { Layer } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent, PixiLayerOptions } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
-class PixiRenderApplication {
+export class PixiRenderApplication {
   stage: Container;
 
   renderer: AbstractRenderer;
