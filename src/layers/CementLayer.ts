@@ -9,7 +9,7 @@ import {
 } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 
-interface CementShape {
+export interface CementShape {
   rightPolygon: Point[];
   leftPolygon: Point[];
   path: Point[];
