@@ -65,7 +65,9 @@ export class GeomodelLayerV2 extends PixiLayer {
         if (polygon) {
           // Generate bottom of polygon
           for (let j: number = !topIsValid ? i - 1 : i; j >= 0; j--) {
-            if (!data[j][1]) break;
+            if (!data[j][1]) {
+              break;
+            }
             polygon.push(data[j][0], data[j][2] || 10000);
           }
           polygons.push(polygon);

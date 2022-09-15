@@ -129,10 +129,14 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
     res.add(temp);
 
     len = res.magnitude;
-    if (len > threshold) break;
+    if (len > threshold) {
+      break;
+    }
   }
 
-  if (len === 0) return new Vector2([0, 0]);
+  if (len === 0) {
+    return new Vector2([0, 0]);
+  }
   return res.scale(1 / len);
 }
 
@@ -150,7 +154,9 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
  * @return {Number[]}    Simplified array
  */
 function simplify(inputArr: number[][], maxOffset = 0.001, maxDistance = 10): number[][] {
-  if (inputArr.length <= 4) return inputArr;
+  if (inputArr.length <= 4) {
+    return inputArr;
+  }
   const [o0, o1] = inputArr[0];
   const arr = inputArr.map((d) => [d[0] - o0, d[1] - o1]);
   let [a0, a1] = arr[0];
