@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.0
+
+- Allow setting `CasingShoeSize` for the `CasingLayer`
+
 ## v2.0.1
 
 - Change deprecated `transparent` property to `backgroundAlpha` in Pixi `RendererOptions`
