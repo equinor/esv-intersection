@@ -4,7 +4,7 @@ import { OnMountEvent, OnResizeEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class SVGLayer<T> extends Layer<T> {
-  elm: Selection<SVGElement, any, null, undefined>;
+  elm: Selection<SVGElement, unknown, null, undefined>;
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);

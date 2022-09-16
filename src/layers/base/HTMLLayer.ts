@@ -4,7 +4,7 @@ import { OnMountEvent, OnResizeEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class HTMLLayer<T> extends Layer<T> {
-  elm: Selection<HTMLElement, any, null, undefined>;
+  elm: Selection<HTMLElement, unknown, null, undefined>;
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);

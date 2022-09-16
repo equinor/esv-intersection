@@ -79,7 +79,14 @@ export class CompletionLayer extends PixiLayer<CompletionData[]> {
     }
   }
 
-  generateCompletionItem(_wbp: any, data: CompletionData): CompletionItem {
+  /**
+   * @‌deprecated use generateCompletionGraphics
+   */
+  generateCompletionItem(_wbp: unknown, data: CompletionData): CompletionItem {
+    return this.generateCompletionGraphics(data);
+  }
+
+  generateCompletionGraphics(data: CompletionData): CompletionItem {
     if (!this.referenceSystem) {
       return;
     }

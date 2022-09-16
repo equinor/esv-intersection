@@ -5,13 +5,18 @@ import { CanvasLayer } from './base/CanvasLayer';
 
 const DEFAULT_MAX_DEPTH = 10000;
 
+type SurfacePaths = {
+  color: string;
+  path: Path2D;
+};
+
 export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
   rescaleEvent: OnRescaleEvent;
 
   // TODO add types for surfaceAreasPaths and surfaceLinesPaths
-  surfaceAreasPaths: any[] = [];
+  surfaceAreasPaths: SurfacePaths[] = [];
 
-  surfaceLinesPaths: any[] = [];
+  surfaceLinesPaths: SurfacePaths[] = [];
 
   maxDepth: number = DEFAULT_MAX_DEPTH;
 
@@ -74,8 +79,8 @@ export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
 
     requestAnimationFrame(() => {
       this.clearCanvas();
-      this.surfaceAreasPaths.forEach((p: any) => this.drawPolygonPath(p.color, p.path));
-      this.surfaceLinesPaths.forEach((l: any) => this.drawLinePath(l.color, l.path));
+      this.surfaceAreasPaths.forEach((p: SurfacePaths) => this.drawPolygonPath(p.color, p.path));
+      this.surfaceLinesPaths.forEach((l: SurfacePaths) => this.drawLinePath(l.color, l.path));
     });
   }
 
@@ -84,9 +89,9 @@ export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
   }
 
   generateSurfaceAreasPaths(): void {
-    this.surfaceAreasPaths = this.data.areas.reduce((acc: any, s: SurfaceArea) => {
+    this.surfaceAreasPaths = this.data.areas.reduce((acc: SurfacePaths[], s: SurfaceArea) => {
       const polygons = this.createPolygons(s.data);
-      const mapped = polygons.map((polygon: any) => ({
+      const mapped: SurfacePaths[] = polygons.map((polygon: number[]) => ({
         color: this.colorToCSSColor(s.color),
         path: this.generatePolygonPath(polygon),
       }));
@@ -96,9 +101,9 @@ export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
   }
 
   generateSurfaceLinesPaths(): void {
-    this.surfaceLinesPaths = this.data.lines.reduce((acc: any, l: SurfaceLine) => {
+    this.surfaceLinesPaths = this.data.lines.reduce((acc: SurfacePaths[], l: SurfaceLine) => {
       const lines = this.generateLinePaths(l);
-      const mapped = lines.map((path: Path2D) => ({ color: this.colorToCSSColor(l.color), path }));
+      const mapped: SurfacePaths[] = lines.map((path: Path2D) => ({ color: this.colorToCSSColor(l.color), path }));
       acc.push(...mapped);
       return acc;
     }, []);
@@ -162,7 +167,7 @@ export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
     return path;
   };
 
-  generateLinePaths = (s: any): Path2D[] => {
+  generateLinePaths = (s: SurfaceLine): Path2D[] => {
     const paths: Path2D[] = [];
     const { data: d } = s;
 
