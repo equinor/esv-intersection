@@ -20,12 +20,12 @@ const Location = {
   bottomright: 'bottomright',
 };
 
-type Point = {
+export type Point = {
   x: number;
   y: number;
 };
 
-type Callout = {
+export type Callout = {
   title: string;
   label: string;
   color: string;

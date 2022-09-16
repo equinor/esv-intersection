@@ -1,7 +1,7 @@
 import { select, Selection, pointer, ContainerElement } from 'd3-selection';
 import { OverlayCallbacks } from './interfaces';
 
-class Overlay {
+export class Overlay {
   elm: Selection<Element, unknown, null, undefined>;
   source: Element;
   elements: { [propName: string]: Element } = {};
@@ -115,6 +115,4 @@ class Overlay {
   }
 }
 
-const overlay = (caller: any, container: HTMLElement): Overlay => new Overlay(caller, container);
-
-export { overlay, Overlay };
+export const overlay = (caller: any, container: HTMLElement): Overlay => new Overlay(caller, container);

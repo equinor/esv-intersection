@@ -4,7 +4,7 @@ import { PixiLayer } from './base/PixiLayer';
 import { OnUpdateEvent } from '..';
 import { CompletionLayerOptions, OnRescaleEvent } from '../interfaces';
 
-interface CompletionItem {}
+export interface CompletionItem {}
 
 export class CompletionLayer extends PixiLayer {
   constructor(id: string, options: CompletionLayerOptions) {

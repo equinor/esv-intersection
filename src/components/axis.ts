@@ -3,7 +3,7 @@ import { BaseType, Selection } from 'd3-selection';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
 import { OnResizeEvent, OnRescaleEvent } from '../interfaces';
 
-type Options = {
+export type Options = {
   offsetX: number;
   offsetY: number;
   visible: boolean;
