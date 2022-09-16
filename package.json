@@ -61,7 +61,7 @@
     "jest-canvas-mock": "^2.4.0",
     "jest-environment-jsdom": "^29.0.3",
     "mock-raf": "^1.0.1",
-    "pixi.js": "^6.4.2",
+    "pixi.js": "^6.5.3",
     "prettier": "^2.6.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.79.0",
