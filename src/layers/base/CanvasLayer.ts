@@ -3,7 +3,7 @@ import { Layer } from './Layer';
 import { OnMountEvent, OnUpdateEvent, OnResizeEvent, OnRescaleEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
-export abstract class CanvasLayer extends Layer {
+export abstract class CanvasLayer<T> extends Layer<T> {
   ctx: CanvasRenderingContext2D;
   elm: HTMLElement;
   canvas: HTMLCanvasElement;

@@ -14,11 +14,11 @@ const defaultOptions = {
   majorWidth: MAJORWIDTH,
 };
 
-export class GridLayer extends CanvasLayer {
+export class GridLayer<T> extends CanvasLayer<T> {
   private _offsetX: number = 0;
   private _offsetY: number = 0;
 
-  constructor(id?: string, options?: GridLayerOptions) {
+  constructor(id?: string, options?: GridLayerOptions<T>) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -39,7 +39,7 @@ export class GridLayer extends CanvasLayer {
 
   render(event: OnRescaleEvent | OnUpdateEvent): void {
     const { ctx } = this;
-    const { minorWidth, minorColor, majorWidth, majorColor } = this.options as GridLayerOptions;
+    const { minorWidth, minorColor, majorWidth, majorColor } = this.options as GridLayerOptions<T>;
 
     if (!ctx) {
       return;

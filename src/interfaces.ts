@@ -3,6 +3,7 @@ import { Graphics, IApplicationOptions } from 'pixi.js';
 import { Layer } from './layers/base/Layer';
 import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
 import Vector2 from '@equinor/videx-vector2';
+import { SurfaceData } from './datautils';
 
 interface LayerEvent {
   [propType: string]: any;
@@ -34,21 +35,21 @@ export interface OnRescaleEvent extends LayerEvent {
 
 export interface OnUpdateEvent extends LayerEvent {}
 
-export interface LayerOptions {
+export interface LayerOptions<T> {
   order?: number;
   layerOpacity?: number;
   referenceSystem?: IntersectionReferenceSystem;
-  data?: any;
+  data?: T;
   interactive?: boolean;
 
-  onMount?(event: OnMountEvent, layer: Layer): void;
-  onUnmount?(event: OnUnmountEvent, layer: Layer): void;
-  onUpdate?(event: OnUpdateEvent, layer: Layer): void;
-  onRescale?(event: OnRescaleEvent, layer: Layer): void;
-  onResize?(event: OnResizeEvent, layer: Layer): void;
+  onMount?(event: OnMountEvent, layer: Layer<T>): void;
+  onUnmount?(event: OnUnmountEvent, layer: Layer<T>): void;
+  onUpdate?(event: OnUpdateEvent, layer: Layer<T>): void;
+  onRescale?(event: OnRescaleEvent, layer: Layer<T>): void;
+  onResize?(event: OnResizeEvent, layer: Layer<T>): void;
 }
 
-export interface GridLayerOptions extends LayerOptions {
+export interface GridLayerOptions<T> extends LayerOptions<T> {
   majorWidth?: number;
   majorColor?: string;
 
@@ -56,18 +57,18 @@ export interface GridLayerOptions extends LayerOptions {
   minorColor?: string;
 }
 
-export interface WellborepathLayerOptions extends LayerOptions {
+export interface WellborepathLayerOptions extends LayerOptions<[number, number][]> {
   stroke: string;
   strokeWidth: string;
   curveType?: string;
   tension?: number;
 }
 
-export interface GeomodelLayerOptions extends LayerOptions {}
+export interface GeomodelLayerOptions<T> extends LayerOptions<T> {}
 
-export interface CompletionLayerOptions extends PixiLayerOptions {}
+export interface CompletionLayerOptions<T> extends PixiLayerOptions<T> {}
 
-export interface GeomodelLayerLabelsOptions extends LayerOptions {
+export interface GeomodelLayerLabelsOptions extends LayerOptions<SurfaceData> {
   margins?: number;
   minFontSize?: number;
   maxFontSize?: number;
@@ -75,7 +76,7 @@ export interface GeomodelLayerLabelsOptions extends LayerOptions {
   font?: string;
 }
 
-export interface HoleSizeLayerOptions extends WellComponentBaseOptions {
+export interface HoleSizeLayerOptions extends WellComponentBaseOptions<HoleSize[]> {
   firstColor?: string;
   secondColor?: string;
   lineColor?: number;
@@ -86,22 +87,22 @@ export interface CasingShoeSize {
   length: number;
 }
 
-export interface CasingLayerOptions extends WellComponentBaseOptions {
+export interface CasingLayerOptions extends WellComponentBaseOptions<Casing[]> {
   solidColor?: number;
   lineColor?: number;
   casingShoeSize?: CasingShoeSize;
 }
 
-export interface CementLayerOptions extends WellComponentBaseOptions {
+export interface CementLayerOptions<T> extends WellComponentBaseOptions<T> {
   firstColor?: string;
   secondColor?: string;
 }
 
-export interface PixiLayerOptions extends LayerOptions {
+export interface PixiLayerOptions<T> extends LayerOptions<T> {
   pixiApplicationOptions?: IApplicationOptions;
 }
 
-export interface WellComponentBaseOptions extends PixiLayerOptions {
+export interface WellComponentBaseOptions<T> extends PixiLayerOptions<T> {
   exaggerationFactor?: number;
 }
 
@@ -204,7 +205,7 @@ export type BoundingBox = {
   offsetY?: number;
 };
 
-export interface CalloutOptions extends LayerOptions {
+export interface CalloutOptions extends LayerOptions<Annotation[]> {
   minFontSize?: number;
   maxFontSize?: number;
   fontSizeFactor?: number;

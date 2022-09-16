@@ -183,7 +183,7 @@ export class ZoomPanHandler {
    * Update translate extent (pan limits)
    */
   updateTranslateExtent(): void {
-    const { width, xSpan, ySpan, zFactor, enableTranslateExtent, translateBoundsX, translateBoundsY } = this;
+    const { width, xSpan, zFactor, enableTranslateExtent, translateBoundsX, translateBoundsY } = this;
 
     let x1: number = -Infinity;
     let y1: number = -Infinity;
@@ -192,7 +192,6 @@ export class ZoomPanHandler {
 
     if (enableTranslateExtent) {
       const ppu: number = width / xSpan;
-      const h: number = ySpan * ppu * zFactor;
 
       x1 = translateBoundsX[0] * ppu;
       x2 = translateBoundsX[1] * ppu;
@@ -262,7 +261,7 @@ export class ZoomPanHandler {
    * Update scale
    */
   applyTransform(transform: ZoomTransform): void {
-    const { width, scaleX, scaleY, xSpan, ySpan, xBounds, yBounds, zFactor } = this;
+    const { width, scaleX, scaleY, xSpan, xBounds, yBounds, zFactor } = this;
 
     const { viewportRatio: ratio, isXInverted, isYInverted } = this;
 
@@ -293,7 +292,7 @@ export class ZoomPanHandler {
    * @returns  a merge of filter and payload
    */
   setViewport(cx: number = null, cy: number = null, displ: number = null, duration: number = null): void {
-    const { zoom, container, calculateTransform, viewportRatio: ratio, scaleX, scaleY, isXInverted } = this;
+    const { zoom, container, calculateTransform, scaleX, scaleY, isXInverted } = this;
 
     if (cx === null || displ === null) {
       const xd: number[] = scaleX.domain();

@@ -21,7 +21,7 @@ const defaultCasingShoeSize: CasingShoeSize = {
   length: SHOE_LENGTH,
 };
 
-export class CasingLayer extends WellboreBaseComponentLayer {
+export class CasingLayer extends WellboreBaseComponentLayer<Casing[]> {
   constructor(id?: string, options?: CasingLayerOptions) {
     super(id, options);
     this.options = {

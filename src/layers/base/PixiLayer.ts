@@ -33,12 +33,12 @@ export class PixiRenderApplication {
   }
 }
 
-export abstract class PixiLayer extends Layer {
+export abstract class PixiLayer<T> extends Layer<T> {
   elm: HTMLElement;
 
   ctx: PixiRenderApplication;
 
-  constructor(id?: string, options?: PixiLayerOptions) {
+  constructor(id?: string, options?: PixiLayerOptions<T>) {
     super(id, options);
   }
 
@@ -53,7 +53,7 @@ export abstract class PixiLayer extends Layer {
       this.updateStyle();
 
       const { elm, height, width } = event;
-      const { pixiApplicationOptions } = this.options as PixiLayerOptions;
+      const { pixiApplicationOptions } = this.options as PixiLayerOptions<T>;
 
       const pixiOptions = {
         width: width || parseInt(this.elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH,
@@ -134,19 +134,19 @@ export abstract class PixiLayer extends Layer {
     }
   }
 
-  onOpacityChanged(opacity: number): void {
+  onOpacityChanged(_opacity: number): void {
     if (this.elm) {
       this.updateStyle();
     }
   }
 
-  onOrderChanged(order: number): void {
+  onOrderChanged(_order: number): void {
     if (this.elm) {
       this.updateStyle();
     }
   }
 
-  onInteractivityChanged(interactive: boolean): void {
+  onInteractivityChanged(_interactive: boolean): void {
     if (this.elm) {
       this.updateStyle();
     }

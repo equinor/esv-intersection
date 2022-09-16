@@ -14,7 +14,7 @@ const DEFAULT_MAX_FONT_SIZE = 13;
 const DEFAULT_TEXT_COLOR = 'black';
 const DEFAULT_FONT = 'Arial';
 
-export class GeomodelLabelsLayer extends CanvasLayer {
+export class GeomodelLabelsLayer extends CanvasLayer<SurfaceData> {
   defaultMargins: number = DEFAULT_MARGINS;
   defaultMinFontSize: number = DEFAULT_MIN_FONT_SIZE;
   defaultMaxFontSize: number = DEFAULT_MAX_FONT_SIZE;

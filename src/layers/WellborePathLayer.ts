@@ -17,7 +17,7 @@ import {
 import { SVGLayer } from './base/SVGLayer';
 import { WellborepathLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 
-export class WellborepathLayer extends SVGLayer {
+export class WellborepathLayer extends SVGLayer<[number, number][]> {
   rescaleEvent: OnRescaleEvent;
 
   constructor(id?: string, options?: WellborepathLayerOptions) {
@@ -60,7 +60,7 @@ export class WellborepathLayer extends SVGLayer {
       .append('g')
       .attr('class', 'well-path')
       .append('path')
-      .attr('d', this.renderWellborePath(data))
+      .attr('d', this.renderWellborePath(data)) // TODO: Data might be an [number, number][]
       .attr('stroke-width', strokeWidth || '2px')
       .attr('stroke', stroke || 'red')
       .attr('fill', 'none');

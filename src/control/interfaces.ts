@@ -8,12 +8,12 @@ export interface AxisOptions {
   unitOfMeasure: string;
 }
 
-export interface ControllerOptions {
+export interface ControllerOptions<T> {
   container: HTMLElement;
   axisOptions?: AxisOptions;
   scaleOptions?: ScaleOptions;
   referenceSystem?: IntersectionReferenceSystem;
-  layers?: Layer[];
+  layers?: Layer<T>[];
   path?: number[][];
 }
 

@@ -37,7 +37,7 @@ export type Callout = {
   dy: number;
 };
 
-export class CalloutCanvasLayer extends CanvasLayer {
+export class CalloutCanvasLayer extends CanvasLayer<Annotation[]> {
   rescaleEvent: OnRescaleEvent;
   xRatio: number;
   callouts: Callout[];
@@ -217,7 +217,7 @@ export class CalloutCanvasLayer extends CanvasLayer {
     isLeftToRight: boolean,
     xScale: ScaleLinear<number, number>,
     yScale: ScaleLinear<number, number>,
-    scale: number,
+    _scale: number,
     fontSize: number,
     offset: number = 20,
   ): Callout[] {

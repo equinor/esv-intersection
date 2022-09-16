@@ -23,7 +23,9 @@ const createGradientFill = (
   return gradient;
 };
 
-export class HoleSizeLayer extends WellboreBaseComponentLayer {
+const EXAGGERATED_DIAMETER = 100;
+
+export class HoleSizeLayer extends WellboreBaseComponentLayer<HoleSize[]> {
   maxDiameter: number;
 
   constructor(id?: string, options?: HoleSizeLayerOptions) {
@@ -45,7 +47,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
     }
 
     data.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
-    this.maxDiameter = data.length > 0 ? data[0].diameter : 100;
+    this.maxDiameter = data.length > 0 ? data[0].diameter : EXAGGERATED_DIAMETER;
     data.forEach((hole: HoleSize) => this.drawHoleSize(hole));
   }
 

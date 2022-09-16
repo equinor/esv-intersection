@@ -5,7 +5,7 @@ import { CanvasLayer } from './base/CanvasLayer';
 
 const DEFAULT_MAX_DEPTH = 10000;
 
-export class GeomodelCanvasLayer extends CanvasLayer {
+export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
   rescaleEvent: OnRescaleEvent;
 
   // TODO add types for surfaceAreasPaths and surfaceLinesPaths
@@ -15,7 +15,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
 
   maxDepth: number = DEFAULT_MAX_DEPTH;
 
-  constructor(id?: string, options?: GeomodelLayerOptions) {
+  constructor(id?: string, options?: GeomodelLayerOptions<SurfaceData>) {
     super(id, options);
     this.render = this.render.bind(this);
     this.generateSurfaceAreasPaths = this.generateSurfaceAreasPaths.bind(this);

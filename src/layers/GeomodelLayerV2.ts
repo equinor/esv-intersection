@@ -4,7 +4,9 @@ import { OnRescaleEvent, OnUpdateEvent } from '../interfaces';
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
 
-export class GeomodelLayerV2 extends PixiLayer {
+const DEFAULT_Y_BOTTOM = 10000;
+
+export class GeomodelLayerV2 extends PixiLayer<SurfaceData> {
   private isPreRendered: boolean = false;
 
   onRescale(event: OnRescaleEvent): void {
@@ -45,7 +47,7 @@ export class GeomodelLayerV2 extends PixiLayer {
     this.isPreRendered = true;
   }
 
-  createPolygons = (data: any): number[][] => {
+  createPolygons = (data: number[][]): number[][] => {
     const polygons: number[][] = [];
     let polygon: number[] = null;
 
@@ -68,7 +70,7 @@ export class GeomodelLayerV2 extends PixiLayer {
             if (!data[j][1]) {
               break;
             }
-            polygon.push(data[j][0], data[j][2] || 10000);
+            polygon.push(data[j][0], data[j][2] || DEFAULT_Y_BOTTOM);
           }
           polygons.push(polygon);
           polygon = null;
@@ -83,7 +85,7 @@ export class GeomodelLayerV2 extends PixiLayer {
     g.lineStyle(1, s.color as number, 1);
     g.beginFill(s.color as number);
     const polygons = this.createPolygons(s.data);
-    polygons.forEach((polygon: any) => g.drawPolygon(polygon));
+    polygons.forEach((polygon: number[]) => g.drawPolygon(polygon));
     g.endFill();
     this.ctx.stage.addChild(g);
   };
