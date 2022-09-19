@@ -6,6 +6,7 @@ import Vector2 from '@equinor/videx-vector2';
 import { SurfaceData } from './datautils';
 import { ScaleLinear } from 'd3-scale';
 import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
+import { CurveInterpolator } from 'curve-interpolator';
 
 interface LayerEvent {
   [propType: string]: any;
@@ -174,13 +175,10 @@ export interface ScaleOptions {
 }
 
 export interface Interpolators {
-  trajectory: any;
-  curtain: any;
-  position?: any;
-  curve?: any;
+  trajectory: CurveInterpolator;
+  curtain: ExtendedCurveInterpolator;
+  curve?: ExtendedCurveInterpolator;
 }
-
-export interface Interpolator {}
 
 export interface Trajectory {
   points: number[][];

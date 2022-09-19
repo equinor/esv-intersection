@@ -526,13 +526,13 @@ export class GeomodelLabelsLayer extends CanvasLayer<SurfaceData> {
     const [dx1, dx2] = xScale.domain();
     const [dy1, dy2] = yScale.domain();
 
-    let top = referenceSystem.interpolators.curtain.lookup(dy1, 1, 0);
+    let top = referenceSystem.interpolators.curtain.lookup(dy1, 1, 0) as number[][];
     if (top.length === 0) {
-      top = [referenceSystem.interpolators.curtain.getPointAt(0.0)];
+      top = [referenceSystem.interpolators.curtain.getPointAt(0.0) as number[]];
     }
-    let bottom = referenceSystem.interpolators.curtain.lookup(dy2, 1, 0);
+    let bottom = referenceSystem.interpolators.curtain.lookup(dy2, 1, 0) as number[][];
     if (bottom.length === 0) {
-      bottom = [referenceSystem.interpolators.curtain.getPointAt(1.0)];
+      bottom = [referenceSystem.interpolators.curtain.getPointAt(1.0) as number[]];
     }
 
     const maxX = Math.max(top[0][0], bottom[0][0]);
@@ -557,12 +557,11 @@ export class GeomodelLabelsLayer extends CanvasLayer<SurfaceData> {
 
     const spaceOnLeftSideInScreenCoordinates = spaceOnLeftSide * xRatio;
     const spaceOnRightSideInScreenCoordinates = spaceOnRightSide * xRatio;
-
     const isLabelsOnLeftSide =
       spaceOnLeftSide > spaceOnRightSide ||
       spaceOnLeftSideInScreenCoordinates > t ||
       (spaceOnLeftSideInScreenCoordinates < t && spaceOnRightSideInScreenCoordinates < t && isXFlipped) ||
-      bottom[1] < dy1;
+      bottom[0][1] < dy1;
 
     return isLabelsOnLeftSide;
   }
