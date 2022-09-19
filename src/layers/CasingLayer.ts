@@ -1,5 +1,4 @@
 import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
-import { zip } from 'd3-array';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
 import { CasingLayerOptions, Casing, CasingShoeSize } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
@@ -42,9 +41,10 @@ export class CasingLayer extends WellboreBaseComponentLayer<Casing[]> {
 
     // draw smaller casings and holes on top of bigger ones if overlapping
     const sortedCasings = data.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
-    const casingRenderObjects = sortedCasings.map((casing: Casing) => this.prepareCasingRenderObject(casing));
-    // @ts-ignore
-    const zippedRenderObjects: [Casing, CasingRenderObject][] = zip(sortedCasings, casingRenderObjects);
+    const zippedRenderObjects: [Casing, CasingRenderObject][] = sortedCasings.map((casing: Casing) => [
+      casing,
+      this.prepareCasingRenderObject(casing),
+    ]);
     zippedRenderObjects.forEach((zippedRenderObject) => this.drawCasing(zippedRenderObject));
   }
 
