@@ -5,7 +5,6 @@ import { normalize } from 'curve-interpolator';
 
 import { Interpolators, Trajectory, ReferenceSystemOptions, MDPoint } from '../interfaces';
 import { ExtendedCurveInterpolator } from './ExtendedCurveInterpolator';
-import { Vector } from 'curve-interpolator/dist/src/interfaces';
 
 // determines how curvy the curve is
 const TENSION = 0.75;

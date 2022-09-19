@@ -5,7 +5,7 @@ export class Overlay<T> {
   elm: Selection<Element, unknown, null, undefined>;
   source: Element;
   elements: { [propName: string]: Element } = {};
-  listeners: { [propName: string]: OverlayCallbacks } = {};
+  listeners: { [propName: string]: OverlayCallbacks<T> } = {};
   enabled = true;
 
   constructor(caller: T, container: HTMLElement) {
@@ -84,7 +84,7 @@ export class Overlay<T> {
     });
   }
 
-  create(key: string, callbacks?: OverlayCallbacks): HTMLElement {
+  create(key: string, callbacks?: OverlayCallbacks<T>): HTMLElement {
     const newElm = this.elm.append('div').style('position', 'relative').style('pointer-events', 'none').node();
     this.elements[key] = newElm;
     if (callbacks) {
@@ -93,7 +93,7 @@ export class Overlay<T> {
     return newElm;
   }
 
-  register(key: string, callbacks: OverlayCallbacks): void {
+  register(key: string, callbacks: OverlayCallbacks<T>): void {
     this.listeners[key] = callbacks;
   }
 

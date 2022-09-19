@@ -6,7 +6,6 @@ import Vector2 from '@equinor/videx-vector2';
 import { SurfaceData } from './datautils';
 import { ScaleLinear } from 'd3-scale';
 import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
-import { Vector } from 'curve-interpolator/dist/src/interfaces';
 
 interface LayerEvent {
   [propType: string]: any;
