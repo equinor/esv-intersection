@@ -5,6 +5,7 @@ import { normalize } from 'curve-interpolator';
 
 import { Interpolators, Trajectory, ReferenceSystemOptions, MDPoint } from '../interfaces';
 import { ExtendedCurveInterpolator } from './ExtendedCurveInterpolator';
+import { Vector } from 'curve-interpolator/dist/src/interfaces';
 
 // determines how curvy the curve is
 const TENSION = 0.75;
@@ -141,7 +142,7 @@ export class IntersectionReferenceSystem {
    * @param start in MD
    * @param end in MD
    */
-  getCurtainPath(start: number, end: number): MDPoint[] {
+  getCurtainPath(start: number, end: number): { point: number[]; md: number }[] {
     if (!this._curtainPathCache) {
       const points = [];
       let prevAngle = Math.PI * 2; // Always add first point

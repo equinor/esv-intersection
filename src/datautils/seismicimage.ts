@@ -1,8 +1,38 @@
 /* eslint-disable no-magic-numbers */
 import { clamp } from '@equinor/videx-math';
+import { SeismicCanvasDataOptions } from '../layers/SeismicCanvasLayer';
 
 import { createColorTable } from './colortable';
 import { findIndexOfSample } from './findsample';
+
+export type SeismicInfo = {
+  minX: number;
+  maxX: number;
+  minTvdMsl: number;
+  maxTvdMsl: number;
+  domain: {
+    min: number;
+    max: number;
+    difference: number;
+  };
+};
+
+export const getSeismicOptions = (info: SeismicInfo | null): SeismicCanvasDataOptions => {
+  if (!info) {
+    return {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+    };
+  }
+  return {
+    x: info.minX,
+    y: info.minTvdMsl,
+    width: info.maxX - info.minX,
+    height: info.maxTvdMsl - info.minTvdMsl,
+  };
+};
 
 /**
  * Get key information about the seismic data
@@ -11,9 +41,9 @@ import { findIndexOfSample } from './findsample';
  * @param trajectory Wellbore or freehand trajectory
  * @return  Key domain and depth information for seismic data
  */
-export function getSeismicInfo(data: { datapoints: number[][]; yAxisValues: number[] }, trajectory: number[][]): any {
+export function getSeismicInfo(data: { datapoints: number[][]; yAxisValues: number[] }, trajectory: number[][]): SeismicInfo | null {
   if (!(data && data.datapoints)) {
-    return;
+    return null;
   }
   const minX = trajectory.reduce((acc: number, val: number[]) => Math.min(acc, val[0]), 0);
   const maxX = trajectory.reduce((acc: number, val: number[]) => Math.max(acc, val[0]), 0);

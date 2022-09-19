@@ -15,7 +15,7 @@ export class Controller<T> {
   private _referenceSystem: IntersectionReferenceSystem;
 
   private layerManager: LayerManager<T>;
-  private _overlay: Overlay;
+  private _overlay: Overlay<Controller<T>>;
 
   /**
    * Interface to control layers, reference system, axis and overlay. overlay is created on instantiation, does not currently support opt-out.
@@ -274,7 +274,7 @@ export class Controller<T> {
     this.overlay.setZIndex(highestZIndex + 2);
   }
 
-  get overlay(): Overlay {
+  get overlay(): Overlay<Controller<T>> {
     return this._overlay;
   }
 

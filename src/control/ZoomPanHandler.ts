@@ -14,7 +14,7 @@ export type RescaleFunction = (event: OnRescaleEvent) => void;
 export class ZoomPanHandler {
   zoom: ZoomBehavior<Element, unknown> = null;
   elm: HTMLElement = null;
-  container: Selection<any, unknown, null, undefined> = null;
+  container: Selection<HTMLElement, unknown, null, undefined> = null;
   onRescale: RescaleFunction = null;
   options: ZoomAndPanOptions = null;
   xBounds: [number, number] = [0, 1];
@@ -37,8 +37,6 @@ export class ZoomPanHandler {
     onRescale: RescaleFunction,
     options: ZoomAndPanOptions = { maxZoomLevel: DEFAULT_MAX_ZOOM_LEVEL, minZoomLevel: DEFAULT_MIN_ZOOM_LEVEL },
   ) {
-    this.onZoom = this.onZoom.bind(this);
-
     this.container = select(elm);
     this.options = options;
 
@@ -247,7 +245,7 @@ export class ZoomPanHandler {
   /**
    * Handle zoom
    */
-  onZoom(event: any): void {
+  onZoom(event: { transform: ZoomTransform }): void {
     const { transform } = event;
     if (!transform) {
       return;
@@ -355,7 +353,7 @@ export class ZoomPanHandler {
     let h = 0;
 
     if (typeof width === 'undefined' || typeof width === 'boolean') {
-      const { containerWidth, containerHeight } = this.container.node().getBoundingClientRect();
+      const { width: containerWidth, height: containerHeight } = this.container.node().getBoundingClientRect();
       w = containerWidth;
       h = containerHeight;
     } else {

@@ -22,6 +22,7 @@ import {
   generateSeismicSliceImage,
   transformFormationData,
   getPicksData,
+  getSeismicOptions,
 } from '../../../src/datautils';
 
 //Data
@@ -46,6 +47,8 @@ export const intersectionFlipX = () => {
 
   return renderIntersection(scaleOptions);
 };
+
+
 
 const renderIntersection = (scaleOptions: any) => {
   const axisOptions = {
@@ -85,12 +88,7 @@ const renderIntersection = (scaleOptions: any) => {
     const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
     const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
-    const seismicInfo = getSeismicInfo(seismic, trajectory) || {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-    };
+    const seismicInfo = getSeismicInfo(seismic, trajectory)
 
     const transformedPicksData = transformFormationData(picks, stratColumns);
     const picksData = getPicksData(transformedPicksData);
@@ -131,12 +129,7 @@ const renderIntersection = (scaleOptions: any) => {
 
     addMDOverlay(controller);
 
-    const seismicOptions = {
-      x: seismicInfo.minX,
-      y: seismicInfo.minTvdMsl,
-      width: seismicInfo.maxX - seismicInfo.minX,
-      height: seismicInfo.maxTvdMsl - seismicInfo.minTvdMsl,
-    };
+    const seismicOptions = getSeismicOptions(seismicInfo)
 
     generateSeismicSliceImage(seismic as any, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
       seismicLayer.setData({ image: seismicImage, options: seismicOptions });

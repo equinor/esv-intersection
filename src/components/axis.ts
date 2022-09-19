@@ -10,7 +10,7 @@ export type Options = {
 };
 
 export class Axis {
-  private mainGroup: Selection<SVGElement, any, null, undefined>;
+  private mainGroup: Selection<SVGElement, unknown, null, undefined>;
   private _scaleX: ScaleLinear<number, number>;
   private _scaleY: ScaleLinear<number, number>;
   private _showLabels = true;
@@ -24,7 +24,7 @@ export class Axis {
   private visible: boolean = true;
 
   constructor(
-    mainGroup: Selection<SVGElement, any, null, undefined>,
+    mainGroup: Selection<SVGElement, unknown, null, undefined>,
     showLabels = true,
     labelXDesc: string,
     labelYDesc: string,
@@ -51,7 +51,7 @@ export class Axis {
     this._scaleY = scaleLinear().domain([0, 1]).range([0, 1]);
   }
 
-  private renderLabelx(): Selection<BaseType, any, null, undefined> {
+  private renderLabelx(): Selection<BaseType, unknown, null, undefined> {
     const { _labelXDesc: labelXDesc, _unitOfMeasure: unitOfMeasure, _showLabels, _scaleX: scaleX } = this;
     const [, width] = scaleX.range();
     const gx = this.renderGx();
@@ -75,7 +75,7 @@ export class Axis {
     return labelx;
   }
 
-  private renderLabely(): Selection<BaseType, any, null, undefined> {
+  private renderLabely(): Selection<BaseType, unknown, null, undefined> {
     const { _labelYDesc: labelYDesc, _unitOfMeasure: unitOfMeasure, _showLabels, _scaleY } = this;
     const [, height] = _scaleY.range();
     const gy = this.renderGy();
@@ -99,9 +99,9 @@ export class Axis {
     return labely;
   }
 
-  private renderGy(): Selection<BaseType, any, null, undefined> {
+  private renderGy(): Selection<BaseType, unknown, null, undefined> {
     const { _scaleX, _scaleY } = this;
-    const yAxis = axisRight(_scaleY) as (selection: Selection<SVGSVGElement, any, any, any>) => void;
+    const yAxis = axisRight(_scaleY) as (selection: Selection<SVGSVGElement, unknown, null, undefined>) => void;
     const [, width] = _scaleX.range();
     const gy = this.createOrGet('y-axis');
     gy.call(yAxis);
@@ -110,9 +110,9 @@ export class Axis {
     return gy;
   }
 
-  private renderGx(): Selection<BaseType, any, null, undefined> {
+  private renderGx(): Selection<BaseType, unknown, null, undefined> {
     const { _scaleX, _scaleY } = this;
-    const xAxis = axisBottom(_scaleX) as (selection: Selection<SVGSVGElement, any, any, any>) => void;
+    const xAxis = axisBottom(_scaleX) as (selection: Selection<SVGSVGElement, unknown, null, undefined>) => void;
     const [, height] = _scaleY.range();
 
     const gx = this.createOrGet('x-axis');
@@ -121,7 +121,7 @@ export class Axis {
     return gx;
   }
 
-  private createOrGet = (name: string): Selection<BaseType, any, null, undefined> => {
+  private createOrGet = (name: string): Selection<BaseType, unknown, null, undefined> => {
     const { mainGroup } = this;
     let res = mainGroup.select(`g.${name}`);
     if (res.empty()) {

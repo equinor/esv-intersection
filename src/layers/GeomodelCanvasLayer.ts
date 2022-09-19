@@ -121,7 +121,7 @@ export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
     ctx.stroke(path);
   };
 
-  createPolygons = (data: any): number[][] => {
+  createPolygons = (data: number[][]): number[][] => {
     const polygons: number[][] = [];
     let polygon: number[] = null;
 

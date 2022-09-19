@@ -1,5 +1,6 @@
 import { CanvasLayer } from './base/CanvasLayer';
 import { GridLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
+import { ScaleLinear } from 'd3-scale';
 
 // constants
 const MINORCOLOR: string = 'lightgray';
@@ -84,8 +85,8 @@ export class GridLayer<T> extends CanvasLayer<T> {
     ctx.restore();
   }
 
-  private renderTicksX(xscale: any, xticks: any, ry1: any, ry2: any): void {
-    xticks.forEach((tx: any) => {
+  private renderTicksX(xscale: ScaleLinear<number, number, never>, xticks: number[], ry1: number, ry2: number): void {
+    xticks.forEach((tx: number) => {
       const x = xscale(tx);
       this.ctx.beginPath();
       this.ctx.moveTo(x, ry1);
@@ -94,8 +95,8 @@ export class GridLayer<T> extends CanvasLayer<T> {
     });
   }
 
-  private renderTicksY(yscale: any, yticks: any, rx1: any, rx2: any): void {
-    yticks.forEach((ty: any) => {
+  private renderTicksY(yscale: ScaleLinear<number, number, never>, yticks: number[], rx1: number, rx2: number): void {
+    yticks.forEach((ty: number) => {
       const y = yscale(ty);
       this.ctx.beginPath();
       this.ctx.moveTo(rx1, y);
@@ -104,10 +105,10 @@ export class GridLayer<T> extends CanvasLayer<T> {
     });
   }
 
-  private mapMinorTicks(ticks: any): void {
-    let xminticks = [];
+  private mapMinorTicks(ticks: number[]): number[] {
+    let xminticks: number[] = [];
     if (ticks.length >= 2) {
-      xminticks = ticks.map((v: any) => v + (ticks[1] - ticks[0]) / 2);
+      xminticks = ticks.map((v: number) => v + (ticks[1] - ticks[0]) / 2);
       xminticks.pop();
     }
     return xminticks;

@@ -1,9 +1,18 @@
 import { Layer, OnUpdateEvent } from '../src';
 
-class TestLayer extends Layer {
+class TestLayer extends Layer<string> {
+  onOpacityChanged(opacity: number): void {
+    throw new Error('Method not implemented.');
+  }
+  onOrderChanged(order: number): void {
+    throw new Error('Method not implemented.');
+  }
+  onInteractivityChanged(interactive: boolean): void {
+    throw new Error('Method not implemented.');
+  }
   testString: string = '';
   updateWasCalled: boolean = false;
-  setData(data: any) {
+  setData(data: string) {
     super.setData(data);
     this.testString = data;
   }

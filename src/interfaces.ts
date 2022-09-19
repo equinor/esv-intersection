@@ -4,6 +4,9 @@ import { Layer } from './layers/base/Layer';
 import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
 import Vector2 from '@equinor/videx-vector2';
 import { SurfaceData } from './datautils';
+import { ScaleLinear } from 'd3-scale';
+import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
+import { Vector } from 'curve-interpolator/dist/src/interfaces';
 
 interface LayerEvent {
   [propType: string]: any;
@@ -22,6 +25,8 @@ export interface OnResizeEvent extends LayerEvent {
 }
 
 export interface OnRescaleEvent extends LayerEvent {
+  xScale: ScaleLinear<number, number, never>;
+  yScale: ScaleLinear<number, number, never>;
   xBounds?: [number, number];
   yBounds?: [number, number];
   zFactor?: number;
@@ -189,9 +194,9 @@ export interface ReferenceSystemOptions {
   tension?: number;
   trajectoryAngle?: number;
   calculateDisplacementFromBottom?: boolean;
-  curveInterpolator?: Interpolator;
-  trajectoryInterpolator?: Interpolator;
-  curtainInterpolator?: Interpolator;
+  curveInterpolator?: ExtendedCurveInterpolator;
+  trajectoryInterpolator?: ExtendedCurveInterpolator;
+  curtainInterpolator?: ExtendedCurveInterpolator;
   approxT?: boolean;
   quickT?: boolean;
 }
