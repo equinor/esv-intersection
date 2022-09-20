@@ -167,7 +167,7 @@ export abstract class Layer<T> {
     }
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     if (event.data) {
       this._data = event.data;
     }

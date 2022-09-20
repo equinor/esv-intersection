@@ -1,6 +1,6 @@
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { OnRescaleEvent, OnUpdateEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
 
@@ -20,7 +20,7 @@ export class GeomodelLayerV2 extends PixiLayer<SurfaceData> {
     this.render();
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<SurfaceData>): void {
     super.onUpdate(event);
 
     this.isPreRendered = false;

@@ -1,6 +1,6 @@
 import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { OnUpdateEvent, OnRescaleEvent, WellComponentBaseOptions, MDPoint, OnUnmountEvent } from '../interfaces';
+import { OnUpdateEvent, WellComponentBaseOptions, MDPoint, OnUnmountEvent, OnRescaleEvent } from '../interfaces';
 
 export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
   _textureCache: Texture;
@@ -25,7 +25,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     this.rescaleEvent = null;
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.clearStage();
     this.preRender();

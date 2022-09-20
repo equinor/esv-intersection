@@ -9,12 +9,13 @@ import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
 import { CurveInterpolator } from 'curve-interpolator';
 
 interface LayerEvent {
-  [propType: string]: any;
   elm?: HTMLElement;
 }
 
 export interface OnMountEvent extends LayerEvent {
   elm: HTMLElement;
+  width?: number;
+  height?: number;
 }
 
 export interface OnUnmountEvent extends LayerEvent {}
@@ -27,18 +28,20 @@ export interface OnResizeEvent extends LayerEvent {
 export interface OnRescaleEvent extends LayerEvent {
   xScale: ScaleLinear<number, number, never>;
   yScale: ScaleLinear<number, number, never>;
-  xBounds?: [number, number];
-  yBounds?: [number, number];
-  zFactor?: number;
-  viewportRatio?: number;
-  width?: number;
-  height?: number;
-  xRatio?: number;
-  yRatio?: number;
-  transform?: ZoomTransform;
+  xBounds: [number, number];
+  yBounds: [number, number];
+  zFactor: number;
+  viewportRatio: number;
+  xRatio: number;
+  yRatio: number;
+  width: number;
+  height: number;
+  transform: ZoomTransform;
 }
 
-export interface OnUpdateEvent extends LayerEvent {}
+export interface OnUpdateEvent<T> extends LayerEvent {
+  data?: T;
+}
 
 export interface LayerOptions<T> {
   order?: number;
@@ -49,7 +52,7 @@ export interface LayerOptions<T> {
 
   onMount?(event: OnMountEvent, layer: Layer<T>): void;
   onUnmount?(event: OnUnmountEvent, layer: Layer<T>): void;
-  onUpdate?(event: OnUpdateEvent, layer: Layer<T>): void;
+  onUpdate?(event: OnUpdateEvent<T>, layer: Layer<T>): void;
   onRescale?(event: OnRescaleEvent, layer: Layer<T>): void;
   onResize?(event: OnResizeEvent, layer: Layer<T>): void;
 }
@@ -57,7 +60,6 @@ export interface LayerOptions<T> {
 export interface GridLayerOptions<T> extends LayerOptions<T> {
   majorWidth?: number;
   majorColor?: string;
-
   minorWidth?: number;
   minorColor?: string;
 }
@@ -69,9 +71,16 @@ export interface WellborepathLayerOptions extends LayerOptions<[number, number][
   tension?: number;
 }
 
-export interface GeomodelLayerOptions<T> extends LayerOptions<T> {}
+export interface GeomodelLayerOptions extends LayerOptions<SurfaceData> {}
 
-export interface CompletionLayerOptions<T> extends PixiLayerOptions<T> {}
+export type CompletionData = {
+  shape: string;
+  start: number;
+  end: number;
+  diameter: number;
+};
+
+export interface CompletionLayerOptions extends PixiLayerOptions<CompletionData[]> {}
 
 export interface GeomodelLayerLabelsOptions extends LayerOptions<SurfaceData> {
   margins?: number;

@@ -20,7 +20,7 @@ export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
 
   maxDepth: number = DEFAULT_MAX_DEPTH;
 
-  constructor(id?: string, options?: GeomodelLayerOptions<SurfaceData>) {
+  constructor(id?: string, options?: GeomodelLayerOptions) {
     super(id, options);
     this.render = this.render.bind(this);
     this.generateSurfaceAreasPaths = this.generateSurfaceAreasPaths.bind(this);
@@ -50,7 +50,7 @@ export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
     super.onMount(event);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<SurfaceData>): void {
     super.onUpdate(event);
     this.updatePaths();
     this.render();

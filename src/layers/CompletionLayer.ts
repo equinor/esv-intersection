@@ -2,21 +2,14 @@ import Vector2 from '@equinor/videx-vector2';
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
 import { OnUpdateEvent } from '..';
-import { CompletionLayerOptions, OnRescaleEvent } from '../interfaces';
+import { CompletionLayerOptions, CompletionData, OnRescaleEvent } from '../interfaces';
 
 export interface CompletionItem {
   graphics: Graphics;
 }
 
-type CompletionData = {
-  shape: string;
-  start: number;
-  end: number;
-  diameter: number;
-};
-
 export class CompletionLayer extends PixiLayer<CompletionData[]> {
-  constructor(id: string, options: CompletionLayerOptions<CompletionData[]>) {
+  constructor(id: string, options: CompletionLayerOptions) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -32,7 +25,7 @@ export class CompletionLayer extends PixiLayer<CompletionData[]> {
     this.render();
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<CompletionData[]>): void {
     super.onUpdate(event);
     this.clearStage();
     this.preRender();

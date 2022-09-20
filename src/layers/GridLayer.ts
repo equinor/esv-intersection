@@ -15,6 +15,11 @@ const defaultOptions = {
   majorWidth: MAJORWIDTH,
 };
 
+export interface OnGridLayerUpdateEvent<T> extends OnUpdateEvent<T> {
+  xScale?: ScaleLinear<number, number, never>;
+  yScale?: ScaleLinear<number, number, never>;
+}
+
 export class GridLayer<T> extends CanvasLayer<T> {
   private _offsetX: number = 0;
   private _offsetY: number = 0;
@@ -28,7 +33,7 @@ export class GridLayer<T> extends CanvasLayer<T> {
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnGridLayerUpdateEvent<T>): void {
     super.onUpdate(event);
     this.render(event);
   }
@@ -38,7 +43,7 @@ export class GridLayer<T> extends CanvasLayer<T> {
     this.render(event);
   }
 
-  render(event: OnRescaleEvent | OnUpdateEvent): void {
+  render(event: OnRescaleEvent | OnGridLayerUpdateEvent<T>): void {
     const { ctx } = this;
     const { minorWidth, minorColor, majorWidth, majorColor } = this.options as GridLayerOptions<T>;
 

@@ -29,7 +29,7 @@ export class WellborepathLayer extends SVGLayer<[number, number][]> {
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<[number, number][]>): void {
     super.onUpdate(event);
     this.render();
   }

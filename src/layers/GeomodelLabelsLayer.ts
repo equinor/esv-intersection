@@ -82,7 +82,7 @@ export class GeomodelLabelsLayer extends CanvasLayer<SurfaceData> {
     super.onMount(event);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<SurfaceData>): void {
     super.onUpdate(event);
     this.render();
   }

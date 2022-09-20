@@ -65,7 +65,7 @@ export class CalloutCanvasLayer extends CanvasLayer<Annotation[]> {
     this.render();
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<Annotation[]>): void {
     super.onUpdate(event);
 
     this.callouts = undefined;

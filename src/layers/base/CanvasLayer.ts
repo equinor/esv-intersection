@@ -77,7 +77,7 @@ export abstract class CanvasLayer<T> extends Layer<T> {
     ctx.canvas.setAttribute('height', `${height}px`);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
   }
 

@@ -18,7 +18,7 @@ export class SeismicCanvasLayer extends CanvasLayer<SeismicCanvasData> {
     super.onMount(event);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<SeismicCanvasData>): void {
     super.onUpdate(event);
 
     this.clearCanvas();
