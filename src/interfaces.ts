@@ -7,6 +7,7 @@ import { SurfaceData } from './datautils';
 import { ScaleLinear } from 'd3-scale';
 import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
 import { CurveInterpolator } from 'curve-interpolator';
+import { CementData } from './layers/CementLayer';
 
 interface LayerEvent {
   elm?: HTMLElement;
@@ -107,7 +108,7 @@ export interface CasingLayerOptions extends WellComponentBaseOptions<Casing[]> {
   casingShoeSize?: CasingShoeSize;
 }
 
-export interface CementLayerOptions<T> extends WellComponentBaseOptions<T> {
+export interface CementLayerOptions extends WellComponentBaseOptions<CementData> {
   firstColor?: string;
   secondColor?: string;
 }

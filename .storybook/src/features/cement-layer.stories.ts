@@ -1,4 +1,4 @@
-import { CementLayer, OnRescaleEvent, CementLayerOptions, ZoomPanHandler, IntersectionReferenceSystem, Controller } from '../../../src';
+import { CementLayer, OnRescaleEvent, CementLayerOptions, ZoomPanHandler, IntersectionReferenceSystem, Controller, CementData } from '../../../src';
 import { getWellborePath, getCasings, getCement, getHolesize } from '../data';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';

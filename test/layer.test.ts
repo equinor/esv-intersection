@@ -17,7 +17,7 @@ class TestLayer extends Layer<string> {
     this.testString = data;
   }
 
-  onUpdate(event: OnUpdateEvent) {
+  onUpdate(event: OnUpdateEvent<string>) {
     this.updateWasCalled = true;
   }
 }

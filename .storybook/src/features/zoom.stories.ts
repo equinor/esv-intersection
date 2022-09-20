@@ -1,4 +1,4 @@
-import { select } from 'd3-selection';
+import { select, Selection } from 'd3-selection';
 import { CanvasLayer } from '../../../src/layers';
 import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../../../src/interfaces';
 import { GridLayer } from '../../../src/layers';
@@ -17,8 +17,8 @@ function createButton(label: string, cb: any) {
   return btn;
 }
 
-class TestLayer extends CanvasLayer {
-  constructor(id: String, options: LayerOptions) {
+class TestLayer extends CanvasLayer<unknown> {
+  constructor(id: string, options: LayerOptions<unknown>) {
     super(id, options);
 
     this.render = this.render.bind(this);
@@ -30,19 +30,22 @@ class TestLayer extends CanvasLayer {
     this.render(event);
   }
 
-  onUpdate(event: OnUpdateEvent) {
+  onUpdate(event: OnUpdateEvent<unknown>) {
     super.onUpdate(event);
 
-    this.render(event);
+    this.render(null);
   }
 
-  render(event: OnRescaleEvent | OnUpdateEvent) {
+  render(event: OnRescaleEvent | null) {
     const { ctx } = this;
 
     if (!ctx) {
       return;
     }
 
+    if (!event) {
+      return;
+    }
     // Get the bounds area
     const [xb1, xb2] = event.xBounds;
     const [yb1, yb2] = event.yBounds;
@@ -229,7 +232,7 @@ export const ZoomWithTestLayer = () => {
   );
   root.appendChild(
     createButton('center', () => {
-      zoomHandler.setViewport(500, 500, null, 500);
+      zoomHandler.setViewport(500, 500, undefined, 500);
     }),
   );
   root.appendChild(
@@ -280,9 +283,8 @@ export const ZoomWithGridAndAxis = () => {
   const marginXAxis = 40;
   const marginYAxis = 30;
 
-  const svg = select(container).append('svg').attr('height', `${height}px`).attr('width', `${width}px`).style('position', 'absolute');
+  const mainGroup = (select(container).append('svg').attr('height', `${height}px`).attr('width', `${width}px`).style('position', 'absolute') as unknown) as Selection<SVGElement, unknown, null, undefined>;
 
-  const mainGroup = svg;
   const showLabels = true;
 
   const axis = new Axis(mainGroup, showLabels, 'Displacement', 'TVD MSL', 'm');

@@ -166,9 +166,9 @@ const transformStratColumn = (units: Unit[]): UnitDto[] => units.map(unitDto);
  * @param {Pick[]} picks picks
  * @param {Unit[]} stratColumn strat column
  */
-function joinPicksAndStratColumn(picks: Pick[], stratColumn: Unit[]): { joined: PickAndUnit[]; nonUnitPicks: Pick[] } {
+function joinPicksAndStratColumn(picks: Pick[], stratColumn: Unit[]): { joined: PickAndUnit[]; nonUnitPicks: PickWithId[] } {
   const transformed = transformStratColumn(stratColumn);
-  const nonUnitPicks: Pick[] = [];
+  const nonUnitPicks: PickWithId[] = [];
   const joined: PickAndUnit[] = [];
   picks.forEach((p: Pick) => {
     const matches = transformed.filter((u: UnitDto) => p.pickIdentifier.search(new RegExp(`(${u.topSurface}|${u.baseSurface})`, 'i')) !== -1);
@@ -185,7 +185,7 @@ function joinPicksAndStratColumn(picks: Pick[], stratColumn: Unit[]): { joined: 
         }),
       );
     } else {
-      nonUnitPicks.push(p);
+      nonUnitPicks.push({ identifier: p.pickIdentifier, ...p });
     }
   });
 
@@ -290,7 +290,7 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
  * @param {Pick[]} picks picks
  * @param {Unit[]} stratColumn strat column
  */
-export function transformFormationData(picks: Pick[], stratColumn: Unit[]): { unitPicks: PairedPickAndUnit[]; nonUnitPicks: Pick[] } {
+export function transformFormationData(picks: Pick[], stratColumn: Unit[]): { unitPicks: PairedPickAndUnit[]; nonUnitPicks: PickWithId[] } {
   const { joined, nonUnitPicks } = joinPicksAndStratColumn(picks, stratColumn);
   const pairs = pairJoinedPicks(joined);
 

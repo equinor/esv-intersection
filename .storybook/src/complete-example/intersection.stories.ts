@@ -275,7 +275,7 @@ function addMDOverlay(instance: any) {
  * @param title
  * @param additionalEventParams
  */
-const createButton = (manager: Controller, layer: Layer, title: string) => {
+const createButton = <T>(manager: Controller<T>, layer: Layer<T>, title: string) => {
   const btn = document.createElement('button');
   btn.innerHTML = `${title}`;
   btn.setAttribute('style', 'width: 170px;height:32px;margin-top:12px;background: lightblue;');

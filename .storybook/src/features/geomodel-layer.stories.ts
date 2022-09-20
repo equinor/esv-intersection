@@ -8,6 +8,7 @@ import {
   OnRescaleEvent,
   IntersectionReferenceSystem,
   Controller,
+  GeomodelLayerLabelsOptions,
 } from '../../../src';
 import { generateSurfaceData, SurfaceData } from '../../../src/datautils';
 import { getSurfaces, getStratColumns, getPositionLog, getWellborePath } from '../data';
@@ -65,7 +66,7 @@ export const GeoModelWithLabelsUsingLowLevelInterface = () => {
   const geoModelLayer = new GeomodelLayerV2('geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
-  const options2: LayerOptions = { order: 1 };
+  const options2: GeomodelLayerLabelsOptions = { order: 1 };
   const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
   geoModelLabelsLayer.onMount({ elm: container });
 
@@ -156,7 +157,7 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
   const geoModelLayer = new GeomodelLayerV2('geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
-  const options2: LayerOptions = { order: 1 };
+  const options2: GeomodelLayerLabelsOptions = { order: 1 };
   const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
   geoModelLabelsLayer.onMount({ elm: container });
 

@@ -289,21 +289,21 @@ export class ZoomPanHandler {
    * @param  duration - duration of transition
    * @returns  a merge of filter and payload
    */
-  setViewport(cx: number = null, cy: number = null, displ: number = null, duration: number = null): void {
+  setViewport(cx?: number, cy?: number, displ?: number, duration?: number): void {
     const { zoom, container, calculateTransform, scaleX, scaleY, isXInverted } = this;
 
-    if (cx === null || displ === null) {
+    if (isNaN(cx) || isNaN(displ)) {
       const xd: number[] = scaleX.domain();
       const dspan: number = xd[1] - xd[0];
-      if (cx === null) {
+      if (isNaN(cx)) {
         cx = xd[0] + dspan / 2 || 0;
       }
-      if (displ === null) {
+      if (isNaN(displ)) {
         displ = Math.abs(dspan) || 1;
       }
     }
 
-    if (cy === null) {
+    if (isNaN(cy)) {
       const yd: number[] = scaleY.domain();
       cy = yd[0] + (yd[1] - yd[0]) / 2 || 0;
     }

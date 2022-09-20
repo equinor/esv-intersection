@@ -15,10 +15,10 @@ export interface CementShape {
   path: Point[];
 }
 
-type CementData = { cement: Cement[]; casings: Casing[]; holes: HoleSize[] };
+export type CementData = { cement: Cement[]; casings: Casing[]; holes: HoleSize[] };
 
 export class CementLayer extends WellboreBaseComponentLayer<CementData> {
-  constructor(id?: string, options?: CementLayerOptions<CementData>) {
+  constructor(id?: string, options?: CementLayerOptions) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -50,7 +50,7 @@ export class CementLayer extends WellboreBaseComponentLayer<CementData> {
   }
 
   createCementShape = (cement: Cement, casings: Casing[], holes: HoleSize[]): CementShape => {
-    const { exaggerationFactor } = this.options as CementLayerOptions<CementData>;
+    const { exaggerationFactor } = this.options as CementLayerOptions;
 
     // Merge deprecated casingId and casingIds array
     const casingIds = [cement.casingId, ...(cement.casingIds || [])].filter((id) => id);
@@ -127,7 +127,7 @@ export class CementLayer extends WellboreBaseComponentLayer<CementData> {
       return this._textureCache;
     }
 
-    const { firstColor, secondColor } = this.options as CementLayerOptions<CementData>;
+    const { firstColor, secondColor } = this.options as CementLayerOptions;
 
     const canvas = document.createElement('canvas');
     canvas.width = 150;
