@@ -7,8 +7,6 @@ const defaultOptions = {
   interactive: false,
 };
 
-const ONE_THOUSAND = 1000;
-
 export abstract class Layer<T> {
   private _id: string;
   private _order: number;
@@ -22,7 +20,7 @@ export abstract class Layer<T> {
   private _interactive: boolean = false;
 
   constructor(id?: string, options?: LayerOptions<T>) {
-    this._id = id || `layer-${Math.floor(Math.random() * ONE_THOUSAND)}`;
+    this._id = id || `layer-${Math.floor(Math.random() * 1000)}`;
     const opts = options || defaultOptions;
     this._order = opts.order || 1;
     this._options = {

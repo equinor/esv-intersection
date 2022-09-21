@@ -81,7 +81,7 @@ export class LayerManager<T> {
    * @param layer Layer
    * @param params extra params to pass to the onUpdate method
    */
-  addLayer(layer: Layer<T>, params?: unknown): LayerManager<T> {
+  addLayer(layer: Layer<T>, params?: LayerOptions<T>): LayerManager<T> {
     this.layers.push(layer);
     this.initLayer(layer, params);
 
@@ -113,7 +113,7 @@ export class LayerManager<T> {
     return this;
   }
 
-  getLayer(layerId: string): Layer<unknown> {
+  getLayer(layerId: string): Layer<T> {
     return this.layers.find((l) => l.id === layerId);
   }
 
