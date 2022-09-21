@@ -1,16 +1,18 @@
 import { select, Selection } from 'd3-selection';
 import { ZoomPanHandler } from './ZoomPanHandler';
-import { Layer, GridLayer, LayerOptions } from '../layers';
+import { Layer, GridLayer, PixiRenderApplication, LayerOptions } from '../layers';
 import { ScaleOptions, OnMountEvent, OnRescaleEvent } from '../interfaces';
 import { Axis } from '../components';
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
-import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH, HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';
 import { AxisOptions } from './interfaces';
 
 export class LayerManager<T> {
   private container: HTMLElement;
 
   private layerContainer: HTMLElement;
+
+  private ctx: PixiRenderApplication;
 
   private _zoomPanHandler: ZoomPanHandler;
 
@@ -47,6 +49,27 @@ export class LayerManager<T> {
     if (axisOptions) {
       this._axis = this.createAxis(axisOptions);
     }
+
+    const pixiOptions = {
+      width: parseInt(this.layerContainer.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH,
+      height: parseInt(this.layerContainer.getAttribute('height'), 10) || DEFAULT_LAYER_HEIGHT,
+      antialias: true,
+      backgroundAlpha: 0,
+      clearBeforeRender: true,
+      autoResize: true,
+      preserveDrawingBuffer: true,
+      ...{},
+    };
+
+    this.ctx = new PixiRenderApplication(pixiOptions);
+
+    const pixiHtmlContainer = document.createElement('div');
+    pixiHtmlContainer.setAttribute('id', 'pixi-layer');
+    pixiHtmlContainer.setAttribute('class', 'webgl-layer');
+
+    pixiHtmlContainer.appendChild(this.ctx.view);
+
+    this.layerContainer.appendChild(pixiHtmlContainer);
 
     this.rescale = this.rescale.bind(this);
   }

@@ -49,6 +49,10 @@ export abstract class PixiLayer<T> extends Layer<T> {
   onMount(event: OnMountEvent): void {
     super.onMount(event);
 
+    this.elm = event.ctx.view.parentElement;
+    this.ctx = event.ctx;
+    this.updateStyle();
+
     if (!this.elm) {
       const container = document.createElement('div');
       container.setAttribute('id', `${this.id}`);
@@ -122,9 +126,11 @@ export abstract class PixiLayer<T> extends Layer<T> {
   }
 
   updateStyle(visible?: boolean): void {
+    console.log('updateStyle', { visible });
     const isVisible = visible || this.isVisible;
     const visibility = isVisible ? 'visible' : 'hidden';
     const interactive = this.interactive ? 'auto' : 'none';
+    console.log({ elm: this.elm });
     this.elm.setAttribute(
       'style',
       `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`,
