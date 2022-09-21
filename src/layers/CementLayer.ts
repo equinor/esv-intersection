@@ -1,6 +1,6 @@
 import { Point, Texture, RENDERER_TYPE } from 'pixi.js';
-import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { Cement, Casing, HoleSize, MDPoint, WellComponentBaseOptions } from '../interfaces';
+import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
+import { Cement, Casing, HoleSize, MDPoint } from '../interfaces';
 import {
   calculateCementDiameter,
   cementDiameterChangeDepths,

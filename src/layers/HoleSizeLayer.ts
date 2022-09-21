@@ -1,6 +1,6 @@
 import { Point, RENDERER_TYPE, Rectangle, Texture } from 'pixi.js';
-import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { HoleSize, WellComponentBaseOptions } from '..';
+import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
+import { HoleSize } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { convertColor } from '../utils/color';

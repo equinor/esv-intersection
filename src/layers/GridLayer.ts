@@ -1,6 +1,7 @@
 import { CanvasLayer } from './base/CanvasLayer';
-import { GridLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { ScaleLinear } from 'd3-scale';
+import { LayerOptions } from './base/Layer';
 
 // constants
 const MINORCOLOR: string = 'lightgray';
@@ -14,6 +15,13 @@ const defaultOptions = {
   minorWidth: MINORWIDTH,
   majorWidth: MAJORWIDTH,
 };
+
+export interface GridLayerOptions<T> extends LayerOptions<T> {
+  majorWidth?: number;
+  majorColor?: string;
+  minorWidth?: number;
+  minorColor?: string;
+}
 
 export interface OnGridLayerUpdateEvent<T> extends OnUpdateEvent<T> {
   xScale?: ScaleLinear<number, number, never>;

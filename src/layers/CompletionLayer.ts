@@ -1,8 +1,8 @@
 import Vector2 from '@equinor/videx-vector2';
 import { Graphics } from 'pixi.js';
-import { PixiLayer } from './base/PixiLayer';
+import { PixiLayer, PixiLayerOptions } from './base/PixiLayer';
 import { OnUpdateEvent } from '..';
-import { CompletionData, OnRescaleEvent, PixiLayerOptions } from '../interfaces';
+import { CompletionData, OnRescaleEvent } from '../interfaces';
 
 export interface CompletionItem {
   graphics: Graphics;

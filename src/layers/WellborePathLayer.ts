@@ -15,7 +15,8 @@ import {
   curveStepBefore,
 } from 'd3-shape';
 import { SVGLayer } from './base/SVGLayer';
-import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
+import { LayerOptions } from '..';
 
 export interface WellborepathLayerOptions<T extends [number, number][]> extends LayerOptions<T> {
   stroke: string;

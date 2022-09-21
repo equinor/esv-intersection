@@ -1,6 +1,6 @@
 import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
-import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CasingLayerOptions, Casing, CasingShoeSize } from '..';
+import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
+import { Casing } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { SHOE_LENGTH, SHOE_WIDTH } from '../constants';
@@ -19,6 +19,17 @@ const defaultCasingShoeSize: CasingShoeSize = {
   width: SHOE_WIDTH,
   length: SHOE_LENGTH,
 };
+
+export interface CasingShoeSize {
+  width: number;
+  length: number;
+}
+
+export interface CasingLayerOptions<T extends Casing[]> extends WellComponentBaseOptions<T> {
+  solidColor?: number;
+  lineColor?: number;
+  casingShoeSize?: CasingShoeSize;
+}
 
 export class CasingLayer<T extends Casing[]> extends WellboreBaseComponentLayer<T> {
   constructor(id?: string, options?: CasingLayerOptions<T>) {

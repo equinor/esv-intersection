@@ -1,6 +1,6 @@
-import { AbstractRenderer, autoDetectRenderer, Container, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
-import { Layer } from './Layer';
-import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent, PixiLayerOptions } from '../../interfaces';
+import { AbstractRenderer, autoDetectRenderer, Container, IApplicationOptions, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
+import { Layer, LayerOptions } from './Layer';
+import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export class PixiRenderApplication {
@@ -31,6 +31,10 @@ export class PixiRenderApplication {
   render() {
     this.renderer.render(this.stage);
   }
+}
+
+export interface PixiLayerOptions<T> extends LayerOptions<T> {
+  pixiApplicationOptions?: IApplicationOptions;
 }
 
 export abstract class PixiLayer<T> extends Layer<T> {

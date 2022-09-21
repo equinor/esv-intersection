@@ -2,8 +2,9 @@
 import { ScaleLinear } from 'd3-scale';
 
 import { CanvasLayer } from './base/CanvasLayer';
-import { OnUpdateEvent, Annotation, OnRescaleEvent, BoundingBox, LayerOptions } from '../interfaces';
+import { OnUpdateEvent, Annotation, OnRescaleEvent, BoundingBox } from '../interfaces';
 import { calcSize, isOverlapping, getOverlapOffset } from '../utils';
+import { LayerOptions } from './base/Layer';
 
 const DEFAULT_MIN_FONT_SIZE = 7;
 const DEFAULT_MAX_FONT_SIZE = 11;

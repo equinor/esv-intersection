@@ -50,7 +50,7 @@ export const CompletionLayerUsingHighLevelInterface = () => {
     const [path, completion] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
 
-    const options: CompletionLayerOptions = {
+    const options: CompletionLayerOptions<CompletionData[]> = {
       order: 1,
       referenceSystem,
       data: completion,

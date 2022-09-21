@@ -1,9 +1,5 @@
 import { select, Selection } from 'd3-selection';
-import { CanvasLayer } from '../../../src/layers';
-import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../../../src/interfaces';
-import { GridLayer } from '../../../src/layers';
-import { ZoomPanHandler } from '../../../src/control';
-import { Axis } from '../../../src/components';
+import { ZoomPanHandler, GridLayer, Axis, OnRescaleEvent, OnUpdateEvent, CanvasLayer, LayerOptions } from '../../../src';
 import { createFPSLabel, createRootContainer, createLayerContainer } from '../utils';
 
 const width = 600;

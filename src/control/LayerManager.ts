@@ -1,7 +1,7 @@
 import { select, Selection } from 'd3-selection';
 import { ZoomPanHandler } from './ZoomPanHandler';
-import { Layer, GridLayer } from '../layers';
-import { ScaleOptions, OnMountEvent, OnRescaleEvent, LayerOptions } from '../interfaces';
+import { Layer, GridLayer, LayerOptions } from '../layers';
+import { ScaleOptions, OnMountEvent, OnRescaleEvent } from '../interfaces';
 import { Axis } from '../components';
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
 import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';

@@ -4,15 +4,24 @@ import Vector2 from '@equinor/videx-vector2';
 import { clamp } from '@equinor/videx-math';
 
 import { CanvasLayer } from './base/CanvasLayer';
-import { GeomodelLayerLabelsOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 import { SurfaceArea, SurfaceLine, findSampleAtPos, SurfaceData } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
+import { LayerOptions } from './base/Layer';
 
 const DEFAULT_MARGINS = 18;
 const DEFAULT_MIN_FONT_SIZE = 8;
 const DEFAULT_MAX_FONT_SIZE = 13;
 const DEFAULT_TEXT_COLOR = 'black';
 const DEFAULT_FONT = 'Arial';
+
+export interface GeomodelLayerLabelsOptions<T extends SurfaceData> extends LayerOptions<T> {
+  margins?: number;
+  minFontSize?: number;
+  maxFontSize?: number;
+  textColor?: string;
+  font?: string;
+}
 
 export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   defaultMargins: number = DEFAULT_MARGINS;

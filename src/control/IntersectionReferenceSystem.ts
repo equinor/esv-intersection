@@ -3,7 +3,7 @@ import Vector2 from '@equinor/videx-vector2';
 import { clamp, radians } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
 
-import { Interpolators, Trajectory, ReferenceSystemOptions, MDPoint } from '../interfaces';
+import { Interpolators, Trajectory, MDPoint } from '../interfaces';
 import { ExtendedCurveInterpolator } from './ExtendedCurveInterpolator';
 
 // determines how curvy the curve is
@@ -22,6 +22,19 @@ const CURTAIN_SAMPLING_INTERVAL = 0.1;
 const defaultOptions = {
   approxT: true,
 };
+
+export interface ReferenceSystemOptions {
+  normalizedLength?: number;
+  arcDivisions?: number;
+  tension?: number;
+  trajectoryAngle?: number;
+  calculateDisplacementFromBottom?: boolean;
+  curveInterpolator?: ExtendedCurveInterpolator;
+  trajectoryInterpolator?: ExtendedCurveInterpolator;
+  curtainInterpolator?: ExtendedCurveInterpolator;
+  approxT?: boolean;
+  quickT?: boolean;
+}
 
 export class IntersectionReferenceSystem {
   options: ReferenceSystemOptions;

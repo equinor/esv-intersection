@@ -1,9 +1,6 @@
 import { ZoomTransform } from 'd3-zoom';
-import { Graphics, IApplicationOptions } from 'pixi.js';
-import { Layer } from './layers/base/Layer';
-import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
+import { Graphics } from 'pixi.js';
 import Vector2 from '@equinor/videx-vector2';
-import { SurfaceData } from './datautils';
 import { ScaleLinear } from 'd3-scale';
 import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
 import { CurveInterpolator } from 'curve-interpolator';
@@ -43,60 +40,12 @@ export interface OnUpdateEvent<T> extends LayerEvent {
   data?: T;
 }
 
-export interface LayerOptions<T> {
-  order?: number;
-  layerOpacity?: number;
-  referenceSystem?: IntersectionReferenceSystem;
-  data?: T;
-  interactive?: boolean;
-
-  onMount?(event: OnMountEvent, layer: Layer<T>): void;
-  onUnmount?(event: OnUnmountEvent, layer: Layer<T>): void;
-  onUpdate?(event: OnUpdateEvent<T>, layer: Layer<T>): void;
-  onRescale?(event: OnRescaleEvent, layer: Layer<T>): void;
-  onResize?(event: OnResizeEvent, layer: Layer<T>): void;
-}
-
-export interface GridLayerOptions<T> extends LayerOptions<T> {
-  majorWidth?: number;
-  majorColor?: string;
-  minorWidth?: number;
-  minorColor?: string;
-}
-
 export type CompletionData = {
   shape: string;
   start: number;
   end: number;
   diameter: number;
 };
-
-export interface GeomodelLayerLabelsOptions<T extends SurfaceData> extends LayerOptions<T> {
-  margins?: number;
-  minFontSize?: number;
-  maxFontSize?: number;
-  textColor?: string;
-  font?: string;
-}
-
-export interface CasingShoeSize {
-  width: number;
-  length: number;
-}
-
-export interface CasingLayerOptions<T extends Casing[]> extends WellComponentBaseOptions<T> {
-  solidColor?: number;
-  lineColor?: number;
-  casingShoeSize?: CasingShoeSize;
-}
-
-export interface PixiLayerOptions<T> extends LayerOptions<T> {
-  pixiApplicationOptions?: IApplicationOptions;
-}
-
-export interface WellComponentBaseOptions<T> extends PixiLayerOptions<T> {
-  exaggerationFactor?: number;
-}
 
 export interface ZoomAndPanOptions {
   maxZoomLevel: number;
@@ -170,19 +119,6 @@ export interface Interpolators {
 export interface Trajectory {
   points: number[][];
   offset: number;
-}
-
-export interface ReferenceSystemOptions {
-  normalizedLength?: number;
-  arcDivisions?: number;
-  tension?: number;
-  trajectoryAngle?: number;
-  calculateDisplacementFromBottom?: boolean;
-  curveInterpolator?: ExtendedCurveInterpolator;
-  trajectoryInterpolator?: ExtendedCurveInterpolator;
-  curtainInterpolator?: ExtendedCurveInterpolator;
-  approxT?: boolean;
-  quickT?: boolean;
 }
 
 export type BoundingBox = {

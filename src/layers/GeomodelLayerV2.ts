@@ -1,8 +1,9 @@
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
+import { LayerOptions } from './base/Layer';
 
 const DEFAULT_Y_BOTTOM = 10000;
 

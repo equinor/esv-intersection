@@ -1,4 +1,4 @@
-import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import { OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
 import { IntersectionReferenceSystem } from '../../control';
 
 const defaultOptions = {
@@ -6,6 +6,20 @@ const defaultOptions = {
   layerOpacity: 1,
   interactive: false,
 };
+
+export interface LayerOptions<T> {
+  order?: number;
+  layerOpacity?: number;
+  referenceSystem?: IntersectionReferenceSystem;
+  data?: T;
+  interactive?: boolean;
+
+  onMount?(event: OnMountEvent, layer: Layer<T>): void;
+  onUnmount?(event: OnUnmountEvent, layer: Layer<T>): void;
+  onUpdate?(event: OnUpdateEvent<T>, layer: Layer<T>): void;
+  onRescale?(event: OnRescaleEvent, layer: Layer<T>): void;
+  onResize?(event: OnResizeEvent, layer: Layer<T>): void;
+}
 
 export abstract class Layer<T> {
   private _id: string;
