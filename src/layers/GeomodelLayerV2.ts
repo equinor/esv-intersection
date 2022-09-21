@@ -1,12 +1,14 @@
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../interfaces';
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
 
 const DEFAULT_Y_BOTTOM = 10000;
 
-export class GeomodelLayerV2 extends PixiLayer<SurfaceData> {
+export interface GeomodelLayerOptions<T extends SurfaceData> extends LayerOptions<T> {}
+
+export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
   private isPreRendered: boolean = false;
 
   onRescale(event: OnRescaleEvent): void {
@@ -20,7 +22,7 @@ export class GeomodelLayerV2 extends PixiLayer<SurfaceData> {
     this.render();
   }
 
-  onUpdate(event: OnUpdateEvent<SurfaceData>): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
 
     this.isPreRendered = false;

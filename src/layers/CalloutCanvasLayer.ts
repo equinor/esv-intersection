@@ -2,7 +2,7 @@
 import { ScaleLinear } from 'd3-scale';
 
 import { CanvasLayer } from './base/CanvasLayer';
-import { OnUpdateEvent, Annotation, OnRescaleEvent, BoundingBox, CalloutOptions } from '../interfaces';
+import { OnUpdateEvent, Annotation, OnRescaleEvent, BoundingBox, LayerOptions } from '../interfaces';
 import { calcSize, isOverlapping, getOverlapOffset } from '../utils';
 
 const DEFAULT_MIN_FONT_SIZE = 7;
@@ -37,7 +37,16 @@ export type Callout = {
   dy: number;
 };
 
-export class CalloutCanvasLayer extends CanvasLayer<Annotation[]> {
+export interface CalloutOptions<T extends Annotation[]> extends LayerOptions<T> {
+  minFontSize?: number;
+  maxFontSize?: number;
+  fontSizeFactor?: number;
+  offsetMin?: number;
+  offsetMax?: number;
+  offsetFactor?: number;
+}
+
+export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
   rescaleEvent: OnRescaleEvent;
   xRatio: number;
   callouts: Callout[];
@@ -49,7 +58,7 @@ export class CalloutCanvasLayer extends CanvasLayer<Annotation[]> {
   offsetMax: number;
   offsetFactor: number;
 
-  constructor(id?: string, options?: CalloutOptions) {
+  constructor(id?: string, options?: CalloutOptions<T>) {
     super(id, options);
     this.minFontSize = options.minFontSize || DEFAULT_MIN_FONT_SIZE;
     this.maxFontSize = options.maxFontSize || DEFAULT_MAX_FONT_SIZE;
@@ -65,7 +74,7 @@ export class CalloutCanvasLayer extends CanvasLayer<Annotation[]> {
     this.render();
   }
 
-  onUpdate(event: OnUpdateEvent<Annotation[]>): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
 
     this.callouts = undefined;

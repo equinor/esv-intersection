@@ -2,7 +2,7 @@ import { CanvasLayer } from './base/CanvasLayer';
 import { OnUpdateEvent, OnMountEvent, OnRescaleEvent } from '../interfaces';
 import { ScaleLinear } from 'd3-scale';
 
-export interface OnImageLayerUpdateEvent extends OnUpdateEvent<unknown> {
+export interface OnImageLayerUpdateEvent<T> extends OnUpdateEvent<T> {
   url: string;
   xScale: ScaleLinear<number, number, never>;
   yScale: ScaleLinear<number, number, never>;
@@ -12,9 +12,9 @@ export interface OnImageLayerUpdateEvent extends OnUpdateEvent<unknown> {
   y?: number;
 }
 
-export type OnImageLayerRescaleEvent = OnImageLayerUpdateEvent & OnRescaleEvent;
+export type OnImageLayerRescaleEvent<T> = OnImageLayerUpdateEvent<T> & OnRescaleEvent;
 
-export class ImageLayer extends CanvasLayer<unknown> {
+export class ImageLayer<T> extends CanvasLayer<T> {
   img: HTMLImageElement;
 
   onMount(event: OnMountEvent): void {
@@ -24,19 +24,19 @@ export class ImageLayer extends CanvasLayer<unknown> {
     this.isLoading = true;
   }
 
-  onUpdate(event: OnImageLayerUpdateEvent): void {
+  onUpdate(event: OnImageLayerUpdateEvent<T>): void {
     super.onUpdate(event);
     this.img.src = event.url;
     this.render(event);
   }
 
-  onRescale(event: OnImageLayerRescaleEvent): void {
+  onRescale(event: OnImageLayerRescaleEvent<T>): void {
     super.onRescale(event);
     this.setTransform(event);
     this.render(event);
   }
 
-  render(event: OnImageLayerUpdateEvent): void {
+  render(event: OnImageLayerUpdateEvent<T>): void {
     const width = parseInt(this.elm.getAttribute('width'), 10);
     const height = parseInt(this.elm.getAttribute('height'), 10);
     const { xScale, yScale, xRatio, yRatio, x, y } = event;

@@ -1,6 +1,6 @@
 import { Point, Texture, RENDERER_TYPE } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CementLayerOptions, Cement, Casing, HoleSize, MDPoint } from '../interfaces';
+import { Cement, Casing, HoleSize, MDPoint, WellComponentBaseOptions } from '../interfaces';
 import {
   calculateCementDiameter,
   cementDiameterChangeDepths,
@@ -17,8 +17,13 @@ export interface CementShape {
 
 export type CementData = { cement: Cement[]; casings: Casing[]; holes: HoleSize[] };
 
-export class CementLayer extends WellboreBaseComponentLayer<CementData> {
-  constructor(id?: string, options?: CementLayerOptions) {
+export interface CementLayerOptions<T extends CementData> extends WellComponentBaseOptions<T> {
+  firstColor?: string;
+  secondColor?: string;
+}
+
+export class CementLayer<T extends CementData> extends WellboreBaseComponentLayer<T> {
+  constructor(id?: string, options?: CementLayerOptions<T>) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -50,7 +55,7 @@ export class CementLayer extends WellboreBaseComponentLayer<CementData> {
   }
 
   createCementShape = (cement: Cement, casings: Casing[], holes: HoleSize[]): CementShape => {
-    const { exaggerationFactor } = this.options as CementLayerOptions;
+    const { exaggerationFactor } = this.options as CementLayerOptions<T>;
 
     // Merge deprecated casingId and casingIds array
     const casingIds = [cement.casingId, ...(cement.casingIds || [])].filter((id) => id);
@@ -127,7 +132,7 @@ export class CementLayer extends WellboreBaseComponentLayer<CementData> {
       return this._textureCache;
     }
 
-    const { firstColor, secondColor } = this.options as CementLayerOptions;
+    const { firstColor, secondColor } = this.options as CementLayerOptions<T>;
 
     const canvas = document.createElement('canvas');
     canvas.width = 150;

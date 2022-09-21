@@ -118,7 +118,7 @@ export const HighlightWellborepathWithController = () => {
   return root;
 };
 
-class HighlightLayer extends HTMLLayer {
+class HighlightLayer<T> extends HTMLLayer<T> {
   elements: Selection<HTMLDivElement, unknown, null, undefined>[] = [];
   elementCurveLength: number = 0;
 
@@ -142,7 +142,7 @@ class HighlightLayer extends HTMLLayer {
     }
   }
 
-  addHighlightElement(id: string): HighlightLayer {
+  addHighlightElement(id: string): HighlightLayer<T> {
     const elm = this.elm.append('div').attr('id', `${id}-highlight`);
     elm.style('visibility', 'visible');
     elm.style('height', `${POINTHEIGHT}px`);

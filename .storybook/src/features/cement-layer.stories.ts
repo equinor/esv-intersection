@@ -14,7 +14,7 @@ export const CementLayerUsingLowLevelInterface = () => {
   Promise.all([getWellborePath(), getCement(), getCasings(), getHolesize()]).then(([wbp, cement, casings, holes]) => {
     const referenceSystem = new IntersectionReferenceSystem(wbp);
 
-    const options: CementLayerOptions = {
+    const options: CementLayerOptions<CementData> = {
       order: 1,
       referenceSystem,
       data: { cement, casings, holes },
@@ -50,7 +50,7 @@ export const CementLayerUsingHighLevelInterface = () => {
   Promise.all([getWellborePath(), getCement(), getCasings(), getHolesize()]).then(([wbp, cement, casings, holes]) => {
     const referenceSystem = new IntersectionReferenceSystem(wbp);
 
-    const options: CementLayerOptions = {
+    const options: CementLayerOptions<CementData> = {
       order: 1,
       referenceSystem,
       data: { cement, casings, holes },

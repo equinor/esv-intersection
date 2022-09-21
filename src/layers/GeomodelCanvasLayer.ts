@@ -1,7 +1,8 @@
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
-import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { colorToCSSColor } from '../utils/color';
 import { CanvasLayer } from './base/CanvasLayer';
+import { GeomodelLayerOptions } from './GeomodelLayerV2';
 
 const DEFAULT_MAX_DEPTH = 10000;
 
@@ -10,17 +11,16 @@ type SurfacePaths = {
   path: Path2D;
 };
 
-export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
+export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
   rescaleEvent: OnRescaleEvent;
 
-  // TODO add types for surfaceAreasPaths and surfaceLinesPaths
   surfaceAreasPaths: SurfacePaths[] = [];
 
   surfaceLinesPaths: SurfacePaths[] = [];
 
   maxDepth: number = DEFAULT_MAX_DEPTH;
 
-  constructor(id?: string, options?: GeomodelLayerOptions) {
+  constructor(id?: string, options?: GeomodelLayerOptions<T>) {
     super(id, options);
     this.render = this.render.bind(this);
     this.generateSurfaceAreasPaths = this.generateSurfaceAreasPaths.bind(this);
@@ -30,27 +30,7 @@ export class GeomodelCanvasLayer extends CanvasLayer<SurfaceData> {
     this.updatePaths = this.updatePaths.bind(this);
   }
 
-  get data(): SurfaceData {
-    return super.getData();
-  }
-
-  set data(data: SurfaceData) {
-    this.setData(data);
-  }
-
-  getData(): SurfaceData {
-    return super.getData();
-  }
-
-  setData(data: SurfaceData): void {
-    super.setData(data);
-  }
-
-  onMount(event: OnMountEvent): void {
-    super.onMount(event);
-  }
-
-  onUpdate(event: OnUpdateEvent<SurfaceData>): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.updatePaths();
     this.render();

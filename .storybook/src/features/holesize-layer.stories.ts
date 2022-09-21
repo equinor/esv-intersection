@@ -1,4 +1,4 @@
-import { HoleSizeLayer, HoleSizeLayerOptions, OnRescaleEvent, ZoomPanHandler, IntersectionReferenceSystem, Controller } from '../../../src';
+import { HoleSizeLayer, HoleSizeLayerOptions, OnRescaleEvent, ZoomPanHandler, IntersectionReferenceSystem, Controller, HoleSize } from '../../../src';
 import { getWellborePath, getHolesize } from '../data';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
@@ -14,7 +14,7 @@ export const HoleSizeLayerUsingLowLevelInterface = () => {
     const [path, holesize] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
 
-    const options: HoleSizeLayerOptions = {
+    const options: HoleSizeLayerOptions<HoleSize[]> = {
       order: 1,
       referenceSystem,
     };
@@ -50,7 +50,7 @@ export const HoleSizeLayerUsingHighLevelInterface = () => {
     const [path, holesize] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
 
-    const options: HoleSizeLayerOptions = {
+    const options: HoleSizeLayerOptions<HoleSize[]> = {
       order: 1,
       referenceSystem,
       data: holesize

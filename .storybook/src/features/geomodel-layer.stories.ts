@@ -23,7 +23,7 @@ export const GeoModelUsingLowLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions<SurfaceData> = { order: 1 };
   const geoModelLayer = new GeomodelLayerV2('webgl', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
@@ -62,11 +62,11 @@ export const GeoModelWithLabelsUsingLowLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions<SurfaceData>  = { order: 1 };
   const geoModelLayer = new GeomodelLayerV2('geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
-  const options2: GeomodelLayerLabelsOptions = { order: 1 };
+  const options2: GeomodelLayerLabelsOptions<SurfaceData> = { order: 1 };
   const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
   geoModelLabelsLayer.onMount({ elm: container });
 
@@ -115,7 +115,7 @@ export const GeoModelUsingHighLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions<SurfaceData>  = { order: 1 };
   const geoModelLayer = new GeomodelLayerV2('webgl', options);
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
@@ -153,11 +153,11 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions<SurfaceData> = { order: 1 };
   const geoModelLayer = new GeomodelLayerV2('geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
-  const options2: GeomodelLayerLabelsOptions = { order: 1 };
+  const options2: GeomodelLayerLabelsOptions<SurfaceData> = { order: 1 };
   const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
   geoModelLabelsLayer.onMount({ elm: container });
 
@@ -203,7 +203,7 @@ export const GeoModelCanvasUsingHighLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: GeomodelLayerOptions = { order: 1 };
+  const options: GeomodelLayerOptions<SurfaceData> = { order: 1 };
   const geoModelLayer = new GeomodelCanvasLayer('canvas', options);
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {

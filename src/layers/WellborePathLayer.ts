@@ -15,12 +15,19 @@ import {
   curveStepBefore,
 } from 'd3-shape';
 import { SVGLayer } from './base/SVGLayer';
-import { WellborepathLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent, LayerOptions } from '../interfaces';
 
-export class WellborepathLayer extends SVGLayer<[number, number][]> {
+export interface WellborepathLayerOptions<T extends [number, number][]> extends LayerOptions<T> {
+  stroke: string;
+  strokeWidth: string;
+  curveType?: string;
+  tension?: number;
+}
+
+export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T> {
   rescaleEvent: OnRescaleEvent;
 
-  constructor(id?: string, options?: WellborepathLayerOptions) {
+  constructor(id?: string, options?: WellborepathLayerOptions<T>) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -29,7 +36,7 @@ export class WellborepathLayer extends SVGLayer<[number, number][]> {
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent<[number, number][]>): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.render();
   }
@@ -44,7 +51,7 @@ export class WellborepathLayer extends SVGLayer<[number, number][]> {
   }
 
   render(): void {
-    const { strokeWidth, stroke } = this.options as WellborepathLayerOptions;
+    const { strokeWidth, stroke } = this.options as WellborepathLayerOptions<T>;
 
     if (!this.elm) {
       return;
@@ -60,7 +67,7 @@ export class WellborepathLayer extends SVGLayer<[number, number][]> {
       .append('g')
       .attr('class', 'well-path')
       .append('path')
-      .attr('d', this.renderWellborePath(data)) // TODO: Data might be an [number, number][]
+      .attr('d', this.renderWellborePath(data))
       .attr('stroke-width', strokeWidth || '2px')
       .attr('stroke', stroke || 'red')
       .attr('fill', 'none');
@@ -72,7 +79,7 @@ export class WellborepathLayer extends SVGLayer<[number, number][]> {
 
     // TODO: Might be a good idea to move something like this to a shared function in a base class
     let curveFactory;
-    const { curveType, tension } = this.options as WellborepathLayerOptions;
+    const { curveType, tension } = this.options as WellborepathLayerOptions<T>;
     switch (curveType) {
       default:
       case 'curveCatmullRom':

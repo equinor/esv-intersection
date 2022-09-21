@@ -1,6 +1,6 @@
 import { Point, RENDERER_TYPE, Rectangle, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { HoleSizeLayerOptions, HoleSize } from '..';
+import { HoleSize, WellComponentBaseOptions } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { convertColor } from '../utils/color';
@@ -25,10 +25,16 @@ const createGradientFill = (
 
 const EXAGGERATED_DIAMETER = 100;
 
-export class HoleSizeLayer extends WellboreBaseComponentLayer<HoleSize[]> {
+export interface HoleSizeLayerOptions<T extends HoleSize[]> extends WellComponentBaseOptions<T> {
+  firstColor?: string;
+  secondColor?: string;
+  lineColor?: number;
+}
+
+export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLayer<T> {
   maxDiameter: number;
 
-  constructor(id?: string, options?: HoleSizeLayerOptions) {
+  constructor(id?: string, options?: HoleSizeLayerOptions<T>) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -56,7 +62,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer<HoleSize[]> {
       return;
     }
 
-    const { exaggerationFactor, firstColor, lineColor } = this.options as HoleSizeLayerOptions;
+    const { exaggerationFactor, firstColor, lineColor } = this.options as HoleSizeLayerOptions<T>;
 
     const diameter = holeObject.diameter * exaggerationFactor;
     const radius = diameter / 2;
@@ -87,7 +93,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer<HoleSize[]> {
   };
 
   createTexture(diameter: number): Texture {
-    const { exaggerationFactor } = this.options as HoleSizeLayerOptions;
+    const { exaggerationFactor } = this.options as HoleSizeLayerOptions<T>;
 
     const textureDiameter = this.maxDiameter * exaggerationFactor;
     const height = textureDiameter;
@@ -106,7 +112,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer<HoleSize[]> {
   }
 
   createBaseTexture(width: number, height: number): Texture {
-    const { firstColor, secondColor } = this.options as HoleSizeLayerOptions;
+    const { firstColor, secondColor } = this.options as HoleSizeLayerOptions<T>;
 
     const canvas = document.createElement('canvas');
     canvas.width = width;

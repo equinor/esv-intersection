@@ -1,6 +1,6 @@
 import { HTMLLayer } from '../src';
 
-class htmlLayer extends HTMLLayer {}
+class htmlLayer<T> extends HTMLLayer<T> {}
 const data = { key: 'value' };
 describe('HTML', () => {
   let elm: HTMLElement;

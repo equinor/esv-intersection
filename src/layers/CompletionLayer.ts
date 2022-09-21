@@ -2,14 +2,16 @@ import Vector2 from '@equinor/videx-vector2';
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
 import { OnUpdateEvent } from '..';
-import { CompletionLayerOptions, CompletionData, OnRescaleEvent } from '../interfaces';
+import { CompletionData, OnRescaleEvent, PixiLayerOptions } from '../interfaces';
 
 export interface CompletionItem {
   graphics: Graphics;
 }
 
-export class CompletionLayer extends PixiLayer<CompletionData[]> {
-  constructor(id: string, options: CompletionLayerOptions) {
+export interface CompletionLayerOptions<T extends CompletionData[]> extends PixiLayerOptions<T> {}
+
+export class CompletionLayer<T extends CompletionData[]> extends PixiLayer<T> {
+  constructor(id: string, options: CompletionLayerOptions<T>) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -25,7 +27,7 @@ export class CompletionLayer extends PixiLayer<CompletionData[]> {
     this.render();
   }
 
-  onUpdate(event: OnUpdateEvent<CompletionData[]>): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.clearStage();
     this.preRender();
@@ -33,7 +35,7 @@ export class CompletionLayer extends PixiLayer<CompletionData[]> {
   }
 
   preRender(): void {
-    const wellborePath = this.referenceSystem ? (this.referenceSystem.projectedPath as [number, number][]) : [];
+    const wellborePath = this.referenceSystem ? this.referenceSystem.projectedPath : [];
 
     if (wellborePath == null) {
       return;

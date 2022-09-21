@@ -15,7 +15,7 @@ export const CasingUsingLowLevelInterface = () => {
     const [path, casings] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
 
-    const options: CasingLayerOptions = {
+    const options: CasingLayerOptions<Casing[]> = {
       order: 1,
       referenceSystem,
     };
@@ -52,7 +52,7 @@ export const CasingUsingHighLevelInterface = () => {
     const [path, casings] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
 
-    const options: CasingLayerOptions = {
+    const options: CasingLayerOptions<Casing[]> = {
       order: 1,
       referenceSystem,
     };

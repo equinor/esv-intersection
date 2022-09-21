@@ -14,7 +14,7 @@ const DEFAULT_MAX_FONT_SIZE = 13;
 const DEFAULT_TEXT_COLOR = 'black';
 const DEFAULT_FONT = 'Arial';
 
-export class GeomodelLabelsLayer extends CanvasLayer<SurfaceData> {
+export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   defaultMargins: number = DEFAULT_MARGINS;
   defaultMinFontSize: number = DEFAULT_MIN_FONT_SIZE;
   defaultMaxFontSize: number = DEFAULT_MAX_FONT_SIZE;
@@ -27,7 +27,7 @@ export class GeomodelLabelsLayer extends CanvasLayer<SurfaceData> {
   isXFlipped: boolean = false;
   areasWithAvgTopDepth: any[] = null;
 
-  constructor(id?: string, options?: GeomodelLayerLabelsOptions) {
+  constructor(id?: string, options?: GeomodelLayerLabelsOptions<T>) {
     super(id, options);
     this.render = this.render.bind(this);
     this.getMarginsInWorldCoordinates = this.getMarginsInWorldCoordinates.bind(this);
@@ -36,11 +36,11 @@ export class GeomodelLabelsLayer extends CanvasLayer<SurfaceData> {
     this.generateSurfacesWithAvgDepth = this.generateSurfacesWithAvgDepth.bind(this);
   }
 
-  get options(): GeomodelLayerLabelsOptions {
+  get options(): GeomodelLayerLabelsOptions<T> {
     return this._options;
   }
 
-  setData(data: SurfaceData): void {
+  setData(data: T): void {
     super.setData(data);
     this.areasWithAvgTopDepth = null;
   }
@@ -82,7 +82,7 @@ export class GeomodelLabelsLayer extends CanvasLayer<SurfaceData> {
     super.onMount(event);
   }
 
-  onUpdate(event: OnUpdateEvent<SurfaceData>): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.render();
   }

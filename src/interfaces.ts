@@ -7,7 +7,6 @@ import { SurfaceData } from './datautils';
 import { ScaleLinear } from 'd3-scale';
 import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
 import { CurveInterpolator } from 'curve-interpolator';
-import { CementData } from './layers/CementLayer';
 
 interface LayerEvent {
   elm?: HTMLElement;
@@ -65,15 +64,6 @@ export interface GridLayerOptions<T> extends LayerOptions<T> {
   minorColor?: string;
 }
 
-export interface WellborepathLayerOptions extends LayerOptions<[number, number][]> {
-  stroke: string;
-  strokeWidth: string;
-  curveType?: string;
-  tension?: number;
-}
-
-export interface GeomodelLayerOptions extends LayerOptions<SurfaceData> {}
-
 export type CompletionData = {
   shape: string;
   start: number;
@@ -81,9 +71,7 @@ export type CompletionData = {
   diameter: number;
 };
 
-export interface CompletionLayerOptions extends PixiLayerOptions<CompletionData[]> {}
-
-export interface GeomodelLayerLabelsOptions extends LayerOptions<SurfaceData> {
+export interface GeomodelLayerLabelsOptions<T extends SurfaceData> extends LayerOptions<T> {
   margins?: number;
   minFontSize?: number;
   maxFontSize?: number;
@@ -91,26 +79,15 @@ export interface GeomodelLayerLabelsOptions extends LayerOptions<SurfaceData> {
   font?: string;
 }
 
-export interface HoleSizeLayerOptions extends WellComponentBaseOptions<HoleSize[]> {
-  firstColor?: string;
-  secondColor?: string;
-  lineColor?: number;
-}
-
 export interface CasingShoeSize {
   width: number;
   length: number;
 }
 
-export interface CasingLayerOptions extends WellComponentBaseOptions<Casing[]> {
+export interface CasingLayerOptions<T extends Casing[]> extends WellComponentBaseOptions<T> {
   solidColor?: number;
   lineColor?: number;
   casingShoeSize?: CasingShoeSize;
-}
-
-export interface CementLayerOptions extends WellComponentBaseOptions<CementData> {
-  firstColor?: string;
-  secondColor?: string;
 }
 
 export interface PixiLayerOptions<T> extends LayerOptions<T> {
@@ -216,12 +193,3 @@ export type BoundingBox = {
   offsetX?: number;
   offsetY?: number;
 };
-
-export interface CalloutOptions extends LayerOptions<Annotation[]> {
-  minFontSize?: number;
-  maxFontSize?: number;
-  fontSizeFactor?: number;
-  offsetMin?: number;
-  offsetMax?: number;
-  offsetFactor?: number;
-}
