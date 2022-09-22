@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import { ScaleLinear } from 'd3-scale';
 
 import { CanvasLayer } from './base/CanvasLayer';

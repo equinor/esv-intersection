@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 export function findIndexOfSample(data: number[][], pos: number): number {
   let a = 0;
   let b = data.length - 1;

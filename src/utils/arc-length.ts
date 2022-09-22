@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { Vector } from 'curve-interpolator/dist/src/interfaces';
 

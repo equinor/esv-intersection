@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { clamp } from '@equinor/videx-math';
 
@@ -13,6 +12,7 @@ const DEFAULT_MIN_FONT_SIZE = 8;
 const DEFAULT_MAX_FONT_SIZE = 13;
 const DEFAULT_TEXT_COLOR = 'black';
 const DEFAULT_FONT = 'Arial';
+const MAX_FONT_SIZE_IN_WORLD_COORDINATES = 70;
 
 export interface GeomodelLayerLabelsOptions<T extends SurfaceData> extends LayerOptions<T> {
   margins?: number;
@@ -35,7 +35,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
   rescaleEvent: OnRescaleEvent;
   isLabelsOnLeftSide: boolean = true;
-  maxFontSizeInWorldCoordinates: number = 70;
+  maxFontSizeInWorldCoordinates: number = MAX_FONT_SIZE_IN_WORLD_COORDINATES;
   isXFlipped: boolean = false;
   areasWithAvgTopDepth: SurfaceAreaWithAvgTopDepth[] = null;
 
@@ -346,6 +346,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     }
 
     let hexString = color.toString(16);
+    // eslint-disable-next-line no-magic-numbers
     hexString = '000000'.substr(0, 6 - hexString.length) + hexString;
     return `#${hexString}`;
   }

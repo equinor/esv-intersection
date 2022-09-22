@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import { clamp } from '@equinor/videx-math';
 import { SeismicCanvasDataOptions } from '../layers/SeismicCanvasLayer';
 
@@ -119,6 +118,7 @@ export async function generateSeismicSliceImage(
   };
 
   const length = trajectory[0][0] - trajectory[trajectory.length - 1][0];
+  // eslint-disable-next-line no-magic-numbers
   const width = Math.abs(Math.floor(length / 5));
   const height = data.yAxisValues.length;
 

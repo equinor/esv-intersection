@@ -1,8 +1,9 @@
-/* eslint-disable no-magic-numbers */
 import { Point } from 'pixi.js';
 import { merge } from 'd3-array';
 import { Cement, Casing, HoleSize } from '..';
 import { HOLE_OUTLINE } from '../constants';
+
+const EPSILON = 0;
 
 export const getEndLines = (
   rightPath: Point[],
@@ -58,10 +59,10 @@ export const cementDiameterChangeDepths = (
 
   const diameterChangeDepths = merge(
     diameterIntervals.map((d) => [
-      d.start - 0.0001, // +- 0.0001 to find diameter right beforeobject
+      d.start - EPSILON, // +- 0.0001 to find diameter right before object
       d.start,
       d.end,
-      d.end + 0.0001, // +- 0.0001 to find diameter right after object
+      d.end + EPSILON, // +- 0.0001 to find diameter right after object
     ]),
   ).filter((d) => d >= topOfCement && d <= bottomOfCement) as number[]; // trim
 

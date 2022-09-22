@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { clamp } from '@equinor/videx-math';
 import { CurveInterpolator } from 'curve-interpolator';
@@ -106,7 +105,8 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
     if (from === 0 && to === 1) {
       return this.length;
     }
-    return ArcLength.bisect((t: number) => this.getPointAt(t), from, to, 0.002);
+    const tolerance = 0.002;
+    return ArcLength.bisect((t: number) => this.getPointAt(t), from, to, tolerance);
   }
 
   /**

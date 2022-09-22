@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { clamp, radians } from '@equinor/videx-math';
 import { CurveInterpolator, normalize } from 'curve-interpolator';
