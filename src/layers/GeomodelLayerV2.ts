@@ -33,8 +33,8 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
   }
 
   clearStage(): void {
-    this.ctx.stage.children.forEach((g: Graphics) => g.destroy());
-    this.ctx.stage.removeChildren();
+    this.container.children.forEach((g: Graphics) => g.destroy());
+    this.container.removeChildren();
   }
 
   preRender(): void {

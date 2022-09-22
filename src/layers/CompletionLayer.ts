@@ -46,13 +46,6 @@ export class CompletionLayer extends PixiLayer {
     items.map((s: CompletionItem) => this.drawCompletionItem(s));
   }
 
-  clearStage(): void {
-    const children = this.ctx.stage.removeChildren();
-    children.forEach((child) => {
-      child.destroy();
-    });
-  }
-
   getShape(type: string): Graphics {
     const graphics = new Graphics();
     switch (type) {
