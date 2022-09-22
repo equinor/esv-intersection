@@ -53,8 +53,6 @@ export abstract class PixiLayer<T> extends Layer<T> {
     this.ctx.stage.addChild(this.container);
 
     this.destroyContextOnUnmount = options?.destroyContextOnUnmount || false;
-
-    console.log('PixiLayer constructor called');
   }
 
   render(): void {
@@ -63,7 +61,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
 
   onMount(event: OnMountEvent) {
     const { elm: parentElement } = event;
-    console.log('on mount');
+
     if (!this.elm) {
       const container = document.createElement('div');
       container.setAttribute('id', `${this.id}`);

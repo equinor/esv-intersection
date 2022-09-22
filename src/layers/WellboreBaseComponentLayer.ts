@@ -38,8 +38,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
   }
 
   onRescale(event: OnRescaleEvent): void {
-    const shouldRecalculate = true;
-    this.rescaleEvent?.zFactor !== event.zFactor;
+    const shouldRecalculate = this.rescaleEvent?.zFactor !== event.zFactor;
 
     this.rescaleEvent = event;
     super.optionsRescale(event);
@@ -53,7 +52,6 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     const flippedY = event.yBounds[0] > event.yBounds[1];
     this.container.position.set(event.xScale(0), event.yScale(0));
     this.container.scale.set(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
-    // console.log({ shouldRecalculate });
     if (shouldRecalculate) {
       this.clearStage();
       this.preRender();
@@ -63,9 +61,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
   }
 
   clearStage(): void {
-    console.log(this.ctx.stage.children.length);
     const children = this.container.removeChildren();
-    console.log(this.container);
     children.forEach((child) => {
       child.destroy();
     });
