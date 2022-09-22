@@ -12,8 +12,8 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
 
   rescaleEvent: OnRescaleEvent;
 
-  constructor(id?: string, options?: WellComponentBaseOptions<T>, pixiRenderApplication?: PixiRenderApplication) {
-    super(id, options, pixiRenderApplication);
+  constructor(pixiRenderApplication?: PixiRenderApplication, id?: string, options?: WellComponentBaseOptions) {
+    super(pixiRenderApplication, id, options);
     this.options = {
       ...this.options,
       exaggerationFactor: 2,
@@ -62,7 +62,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
   }
 
   clearStage(): void {
-    const children = this.ctx.stage.removeChildren();
+    const children = this.container.removeChildren();
     children.forEach((child) => {
       child.destroy();
     });

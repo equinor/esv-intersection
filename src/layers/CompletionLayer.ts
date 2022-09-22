@@ -10,9 +10,9 @@ export interface CompletionItem {
 
 export interface CompletionLayerOptions<T extends CompletionData[]> extends LayerOptions<T> {}
 
-export class CompletionLayer<T extends CompletionData[]> extends PixiLayer<T> {
-  constructor(id: string, options: CompletionLayerOptions<T>, pixiRenderApplication?: PixiRenderApplication) {
-    super(id, options, pixiRenderApplication);
+export class CompletionLayer extends PixiLayer {
+  constructor(ctx: PixiRenderApplication, id: string, options: CompletionLayerOptions) {
+    super(ctx, id, options);
     this.options = {
       ...this.options,
       ...options,

@@ -34,8 +34,8 @@ export interface HoleSizeLayerOptions<T extends HoleSize[]> extends WellComponen
 export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLayer<T> {
   maxDiameter: number;
 
-  constructor(id?: string, options?: HoleSizeLayerOptions<T>, pixiRenderApplication?: PixiRenderApplication) {
-    super(id, options, pixiRenderApplication);
+  constructor(ctx: PixiRenderApplication, id?: string, options?: HoleSizeLayerOptions) {
+    super(ctx, id, options);
     this.options = {
       ...this.options,
       firstColor: 'rgb(140, 84, 29)',

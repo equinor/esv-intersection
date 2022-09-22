@@ -12,8 +12,6 @@ export class LayerManager<T> {
 
   private layerContainer: HTMLElement;
 
-  private ctx: PixiRenderApplication;
-
   private _zoomPanHandler: ZoomPanHandler;
 
   private layers: Layer<T>[] = [];
@@ -49,27 +47,6 @@ export class LayerManager<T> {
     if (axisOptions) {
       this._axis = this.createAxis(axisOptions);
     }
-
-    const pixiOptions = {
-      width: parseInt(this.layerContainer.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH,
-      height: parseInt(this.layerContainer.getAttribute('height'), 10) || DEFAULT_LAYER_HEIGHT,
-      antialias: true,
-      backgroundAlpha: 0,
-      clearBeforeRender: true,
-      autoResize: true,
-      preserveDrawingBuffer: true,
-      ...{},
-    };
-
-    this.ctx = new PixiRenderApplication(pixiOptions);
-
-    const pixiHtmlContainer = document.createElement('div');
-    pixiHtmlContainer.setAttribute('id', 'pixi-layer');
-    pixiHtmlContainer.setAttribute('class', 'webgl-layer');
-
-    pixiHtmlContainer.appendChild(this.ctx.view);
-
-    this.layerContainer.appendChild(pixiHtmlContainer);
 
     this.rescale = this.rescale.bind(this);
   }

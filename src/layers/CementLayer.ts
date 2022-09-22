@@ -24,8 +24,8 @@ export interface CementLayerOptions<T extends CementData> extends WellComponentB
 }
 
 export class CementLayer<T extends CementData> extends WellboreBaseComponentLayer<T> {
-  constructor(id?: string, options?: CementLayerOptions<T>, pixiRenderApplication?: PixiRenderApplication) {
-    super(id, options, pixiRenderApplication);
+  constructor(ctx: PixiRenderApplication, id?: string, options?: CementLayerOptions<T>) {
+    super(ctx, id, options);
     this.options = {
       ...this.options,
       firstColor: '#c7b9ab',

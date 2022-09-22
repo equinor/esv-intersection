@@ -32,9 +32,8 @@ export interface CasingLayerOptions<T extends Casing[]> extends WellComponentBas
 }
 
 export class CasingLayer<T extends Casing[]> extends WellboreBaseComponentLayer<T> {
-  constructor(id?: string, options?: CasingLayerOptions<T>, pixiRenderApplication?: PixiRenderApplication) {
-    super(id, options, pixiRenderApplication);
-    super(id, options);
+  constructor(ctx: PixiRenderApplication, id?: string, options?: CasingLayerOptions<T>) {
+    super(ctx, id, options);
     this.options = {
       ...this.options,
       solidColor: 0xdcdcdc,

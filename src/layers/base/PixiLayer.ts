@@ -39,80 +39,66 @@ export interface PixiLayerOptions<T> extends LayerOptions<T> {
 
 export abstract class PixiLayer<T> extends Layer<T> {
   elm: HTMLElement;
-
   ctx: PixiRenderApplication;
+  container: Container;
+  destroyContextOnUnmount: boolean = false;
 
-  constructor(id?: string, options?: PixiLayerOptions, pixiRenderApplication?: PixiRenderApplication) {
+  constructor(ctx: PixiRenderApplication, id?: string, options?: PixiLayerOptions) {
     super(id, options);
 
-    if (pixiRenderApplication) {
-      this.ctx = pixiRenderApplication;
-      this.elm = pixiRenderApplication.view.parentElement;
-    }
-  }
+    this.ctx = ctx;
+    // this.elm = ctx.view.parentElement;
 
-  onMount(event: OnMountEvent): void {
-    super.onMount(event);
+    this.container = new Container();
+    this.ctx.stage.addChild(this.container);
 
-    if (event.ctx) {
-      this.elm = event.ctx.view.parentElement;
-      this.ctx = event.ctx;
-      this.updateStyle();
-    }
-
-    if (!this.elm && !this.ctx) {
-      const container = document.createElement('div');
-      container.setAttribute('id', `${this.id}`);
-      container.setAttribute('class', 'webgl-layer');
-      this.elm = container;
-      this.updateStyle();
-
-      const { elm, height, width } = event;
-      const { pixiApplicationOptions } = this.options as PixiLayerOptions<T>;
-
-      const pixiOptions = {
-        width: width || parseInt(this.elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH,
-        height: height || parseInt(this.elm.getAttribute('height'), 10) || DEFAULT_LAYER_HEIGHT,
-        antialias: true,
-        backgroundAlpha: 0,
-        clearBeforeRender: true,
-        autoResize: true,
-        preserveDrawingBuffer: true,
-        ...pixiApplicationOptions,
-      };
-
-      this.ctx = new PixiRenderApplication(pixiOptions);
-      container.appendChild(this.ctx.view);
-      elm.appendChild(container);
-    }
+    this.destroyContextOnUnmount = options?.destroyContextOnUnmount || false;
   }
 
   render(): void {
     this.ctx.render();
   }
 
+  onMount(event: OnMountEvent) {
+    const { elm: parentElement } = event;
+    if (!this.elm) {
+      const container = document.createElement('div');
+      container.setAttribute('id', `${this.id}`);
+      container.setAttribute('class', 'webgl-layer');
+
+      this.elm = container;
+      this.elm.appendChild(this.ctx.view);
+
+      parentElement.appendChild(container);
+
+      this.updateStyle();
+    }
+  }
+
   onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
 
-    // Get renderType and clContext before we destroy the renderer
-    const renderType = this.renderType();
-    const glContext = this.ctx.renderer instanceof Renderer ? this.ctx.renderer?.gl : undefined;
+    if (this.destroyContextOnUnmount) {
+      // Get renderType and clContext before we destroy the renderer
+      const renderType = this.renderType();
+      const glContext = this.ctx.renderer instanceof Renderer ? this.ctx.renderer?.gl : undefined;
 
-    this.ctx.destroy();
-    this.ctx = undefined;
+      this.ctx.destroy();
+      this.ctx = undefined;
 
-    /**
-     * WebGL v2 does supposedly not have WEBGL_lose_context
-     * so Pixi.js does not use it to "clean up" on v2.
-     *
-     * Cleaning up our self since it still seems to work and fix issue with lingering contexts
-     */
-    if (renderType === RENDERER_TYPE.WEBGL && glContext) {
-      glContext?.getExtension('WEBGL_lose_context')?.loseContext();
+      /**
+       * WebGL v2 does supposedly not have WEBGL_lose_context
+       * so Pixi.js does not use it to "clean up" on v2.
+       *
+       * Cleaning up our self since it still seems to work and fix issue with lingering contexts
+       */
+      if (renderType === RENDERER_TYPE.WEBGL && glContext) {
+        glContext?.getExtension('WEBGL_lose_context')?.loseContext();
+      }
+
+      this.elm.remove();
+      this.elm = undefined;
     }
-
-    this.elm.remove();
-    this.elm = undefined;
   }
 
   onResize(event: OnResizeEvent): void {
