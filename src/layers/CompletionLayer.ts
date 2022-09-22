@@ -98,7 +98,7 @@ export class CompletionLayer extends PixiLayer {
     return { graphics };
   }
 
-  drawCompletionItem(item: CompletionItem): void {
-    this.ctx.stage.addChild(item.graphics);
+  drawCompletionItem(item: any): void {
+    this.container.addChild(item.graphics);
   }
 }

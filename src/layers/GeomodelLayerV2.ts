@@ -90,7 +90,7 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     const polygons = this.createPolygons(s.data);
     polygons.forEach((polygon: number[]) => g.drawPolygon(polygon));
     g.endFill();
-    this.ctx.stage.addChild(g);
+    this.container.addChild(g);
   };
 
   generateSurfaceLine = (s: SurfaceLine): void => {
@@ -113,6 +113,6 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
         penDown = false;
       }
     }
-    this.ctx.stage.addChild(g);
+    this.container.addChild(g);
   };
 }
