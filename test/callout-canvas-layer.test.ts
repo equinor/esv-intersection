@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import createMockRaf from 'mock-raf';
 import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
 import { CalloutCanvasLayer, IntersectionReferenceSystem } from '../src/index';
@@ -14,7 +15,7 @@ describe('CalloutCanvasLayer', () => {
 
   const mockRaf = createMockRaf();
 
-  let mockRequestAnimationFrame: any;
+  let mockRequestAnimationFrame: jest.SpyInstance<number, [callback: FrameRequestCallback]>;
 
   beforeEach(() => {
     elm = document.createElement('div');
@@ -42,8 +43,8 @@ describe('CalloutCanvasLayer', () => {
       const referenceSystem = new IntersectionReferenceSystem(wp);
       const layer = new CalloutCanvasLayer('calloutcanvaslayer', { referenceSystem });
       layer.onMount({ elm });
-      layer.onUpdate({});
-      layer.onRescale(rescaleEventStub(data));
+      layer.onUpdate({ data });
+      layer.onRescale(rescaleEventStub());
 
       layer.ctx.__clearEvents();
 
@@ -53,7 +54,7 @@ describe('CalloutCanvasLayer', () => {
 
       // Assert
       const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
-      const fillTextCalls = events.filter((call: any) => call.type === 'fillText');
+      const fillTextCalls = events.filter((call: CanvasRenderingContext2DEvent) => call.type === 'fillText');
       expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -63,8 +64,8 @@ describe('CalloutCanvasLayer', () => {
       const referenceSystem = new IntersectionReferenceSystem(wp);
       layer.referenceSystem = referenceSystem;
       layer.onMount({ elm });
-      layer.onUpdate({});
-      layer.onRescale(rescaleEventStub(data));
+      layer.onUpdate({ data });
+      layer.onRescale(rescaleEventStub());
 
       layer.ctx.__clearEvents();
 
@@ -74,7 +75,7 @@ describe('CalloutCanvasLayer', () => {
 
       // Assert
       const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
-      const fillTextCalls = events.filter((call: any) => call.type === 'fillText');
+      const fillTextCalls = events.filter((call: CanvasRenderingContext2DEvent) => call.type === 'fillText');
       expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -82,8 +83,8 @@ describe('CalloutCanvasLayer', () => {
       // Arrange
       const layer = new CalloutCanvasLayer('calloutcanvaslayer', {});
       layer.onMount({ elm });
-      layer.onUpdate({});
-      layer.onRescale(rescaleEventStub(data));
+      layer.onUpdate({ data });
+      layer.onRescale(rescaleEventStub());
 
       layer.ctx.__clearEvents();
 

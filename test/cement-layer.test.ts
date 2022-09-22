@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import { CementLayer, IntersectionReferenceSystem } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
 
@@ -28,8 +29,8 @@ describe('CementLayer', () => {
       const referenceSystem = new IntersectionReferenceSystem(wp);
       const layer = new CementLayer('casing-layer', { referenceSystem });
       layer.onMount({ elm });
-      layer.onUpdate({});
-      layer.onRescale(rescaleEventStub(data));
+      layer.onUpdate({ data });
+      layer.onRescale(rescaleEventStub());
 
       // Act
       layer.data = data;
@@ -44,8 +45,8 @@ describe('CementLayer', () => {
       const referenceSystem = new IntersectionReferenceSystem(wp);
       layer.referenceSystem = referenceSystem;
       layer.onMount({ elm });
-      layer.onUpdate({});
-      layer.onRescale(rescaleEventStub(data));
+      layer.onUpdate({ data });
+      layer.onRescale(rescaleEventStub());
 
       // Act
       layer.data = data;
@@ -58,8 +59,8 @@ describe('CementLayer', () => {
       // Arrange
       const layer = new CementLayer('casing-layer', {});
       layer.onMount({ elm });
-      layer.onUpdate({});
-      layer.onRescale(rescaleEventStub(data));
+      layer.onUpdate({ data });
+      layer.onRescale(rescaleEventStub());
 
       // Act
       // Assert

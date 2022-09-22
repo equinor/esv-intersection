@@ -14,7 +14,7 @@
     "build": "rollup -c",
     "prepub": "npm run build",
     "pub": "npm publish --access=public",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src test",
     "test": "tsc --project tsconfig.test.json && jest",
     "test:watch": "jest --watchAll",
     "predocs": "rimraf docs_out",
