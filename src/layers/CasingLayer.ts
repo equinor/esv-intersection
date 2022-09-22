@@ -1,7 +1,6 @@
 import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
-import { zip } from 'd3-array';
-import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { CasingLayerOptions, Casing, CasingShoeSize } from '..';
+import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
+import { Casing } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { SHOE_LENGTH, SHOE_WIDTH } from '../constants';
@@ -21,8 +20,19 @@ const defaultCasingShoeSize: CasingShoeSize = {
   length: SHOE_LENGTH,
 };
 
-export class CasingLayer extends WellboreBaseComponentLayer {
-  constructor(id?: string, options?: CasingLayerOptions) {
+export interface CasingShoeSize {
+  width: number;
+  length: number;
+}
+
+export interface CasingLayerOptions<T extends Casing[]> extends WellComponentBaseOptions<T> {
+  solidColor?: number;
+  lineColor?: number;
+  casingShoeSize?: CasingShoeSize;
+}
+
+export class CasingLayer<T extends Casing[]> extends WellboreBaseComponentLayer<T> {
+  constructor(id?: string, options?: CasingLayerOptions<T>) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -42,9 +52,10 @@ export class CasingLayer extends WellboreBaseComponentLayer {
 
     // draw smaller casings and holes on top of bigger ones if overlapping
     const sortedCasings = data.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
-    const casingRenderObjects = sortedCasings.map((casing: Casing) => this.prepareCasingRenderObject(casing));
-    // @ts-ignore
-    const zippedRenderObjects: [Casing, CasingRenderObject][] = zip(sortedCasings, casingRenderObjects);
+    const zippedRenderObjects: [Casing, CasingRenderObject][] = sortedCasings.map((casing: Casing) => [
+      casing,
+      this.prepareCasingRenderObject(casing),
+    ]);
     zippedRenderObjects.forEach((zippedRenderObject) => this.drawCasing(zippedRenderObject));
   }
 
@@ -52,7 +63,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
     if (casing == null) {
       return;
     }
-    const { exaggerationFactor } = this.options as CasingLayerOptions;
+    const { exaggerationFactor } = this.options as CasingLayerOptions<T>;
 
     const diameter = casing.diameter * exaggerationFactor;
     const innerDiameter = casing.innerDiameter * exaggerationFactor;
@@ -83,7 +94,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
   };
 
   drawCasing = (zippedRenderObject: [Casing, CasingRenderObject]): void => {
-    const { lineColor, solidColor } = this.options as CasingLayerOptions;
+    const { lineColor, solidColor } = this.options as CasingLayerOptions<T>;
     const [casing, { pathPoints, polygon, leftPath, rightPath, radius, diameter, casingWallWidth }] = zippedRenderObject;
 
     // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
@@ -106,7 +117,7 @@ export class CasingLayer extends WellboreBaseComponentLayer {
   };
 
   drawShoe(casingEnd: number, casingRadius: number): void {
-    const { exaggerationFactor, casingShoeSize } = this.options as CasingLayerOptions;
+    const { exaggerationFactor, casingShoeSize } = this.options as CasingLayerOptions<T>;
     const shoeWidth = casingShoeSize.width * exaggerationFactor;
     const shoeLength = casingShoeSize.length * exaggerationFactor;
     const shoeCoords = this.generateShoe(casingEnd, casingRadius, shoeLength, shoeWidth);

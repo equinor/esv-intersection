@@ -34,7 +34,7 @@ export const createNormals = (points: number[][]): Vector2[] => {
 
   let n: Vector2;
 
-  return points.map((coord, i, list) => {
+  return points.map((_coord, i, list) => {
     if (i < list.length - 1) {
       const p = arrayToVector(list[i]);
       const q = arrayToVector(list[i + 1]);

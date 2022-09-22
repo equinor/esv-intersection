@@ -1,6 +1,6 @@
-import { AbstractRenderer, autoDetectRenderer, Container, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
-import { Layer } from './Layer';
-import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent, PixiLayerOptions } from '../../interfaces';
+import { AbstractRenderer, autoDetectRenderer, Container, IApplicationOptions, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
+import { Layer, LayerOptions } from './Layer';
+import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export class PixiRenderApplication {
@@ -33,12 +33,16 @@ export class PixiRenderApplication {
   }
 }
 
-export abstract class PixiLayer extends Layer {
+export interface PixiLayerOptions<T> extends LayerOptions<T> {
+  pixiApplicationOptions?: IApplicationOptions;
+}
+
+export abstract class PixiLayer<T> extends Layer<T> {
   elm: HTMLElement;
 
   ctx: PixiRenderApplication;
 
-  constructor(id?: string, options?: PixiLayerOptions) {
+  constructor(id?: string, options?: PixiLayerOptions<T>) {
     super(id, options);
   }
 
@@ -53,7 +57,7 @@ export abstract class PixiLayer extends Layer {
       this.updateStyle();
 
       const { elm, height, width } = event;
-      const { pixiApplicationOptions } = this.options as PixiLayerOptions;
+      const { pixiApplicationOptions } = this.options as PixiLayerOptions<T>;
 
       const pixiOptions = {
         width: width || parseInt(this.elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH,
@@ -134,19 +138,19 @@ export abstract class PixiLayer extends Layer {
     }
   }
 
-  onOpacityChanged(opacity: number): void {
+  onOpacityChanged(_opacity: number): void {
     if (this.elm) {
       this.updateStyle();
     }
   }
 
-  onOrderChanged(order: number): void {
+  onOrderChanged(_order: number): void {
     if (this.elm) {
       this.updateStyle();
     }
   }
 
-  onInteractivityChanged(interactive: boolean): void {
+  onInteractivityChanged(_interactive: boolean): void {
     if (this.elm) {
       this.updateStyle();
     }

@@ -1,4 +1,4 @@
-import { LayerOptions, OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import { OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
 import { IntersectionReferenceSystem } from '../../control';
 
 const defaultOptions = {
@@ -7,19 +7,33 @@ const defaultOptions = {
   interactive: false,
 };
 
-export abstract class Layer {
+export interface LayerOptions<T> {
+  order?: number;
+  layerOpacity?: number;
+  referenceSystem?: IntersectionReferenceSystem;
+  data?: T;
+  interactive?: boolean;
+
+  onMount?(event: OnMountEvent, layer: Layer<T>): void;
+  onUnmount?(event: OnUnmountEvent, layer: Layer<T>): void;
+  onUpdate?(event: OnUpdateEvent<T>, layer: Layer<T>): void;
+  onRescale?(event: OnRescaleEvent, layer: Layer<T>): void;
+  onResize?(event: OnResizeEvent, layer: Layer<T>): void;
+}
+
+export abstract class Layer<T> {
   private _id: string;
   private _order: number;
-  protected _options: LayerOptions;
+  protected _options: LayerOptions<T>;
   private loading: boolean;
   private _element?: HTMLElement;
   private _opacity: number;
   private _referenceSystem?: IntersectionReferenceSystem = null;
-  private _data?: any;
+  private _data?: T;
   private _visible: boolean;
   private _interactive: boolean = false;
 
-  constructor(id?: string, options?: LayerOptions) {
+  constructor(id?: string, options?: LayerOptions<T>) {
     this._id = id || `layer-${Math.floor(Math.random() * 1000)}`;
     const opts = options || defaultOptions;
     this._order = opts.order || 1;
@@ -55,11 +69,11 @@ export abstract class Layer {
     return this._element;
   }
 
-  get options(): LayerOptions {
+  get options(): LayerOptions<T> {
     return this._options;
   }
 
-  set options(options: LayerOptions) {
+  set options(options: LayerOptions<T>) {
     this._options = options;
   }
 
@@ -106,11 +120,11 @@ export abstract class Layer {
     this._referenceSystem = referenceSystem;
   }
 
-  get data(): any {
+  get data(): T {
     return this.getData();
   }
 
-  set data(data: any) {
+  set data(data: T) {
     this.setData(data);
   }
 
@@ -118,11 +132,11 @@ export abstract class Layer {
     return this._visible;
   }
 
-  getData(): any {
+  getData(): T {
     return this._data;
   }
 
-  setData(data: any): void {
+  setData(data: T): void {
     this._data = data;
     // should not be called when there is no visual element to work with
     if (this.element) {
@@ -165,7 +179,7 @@ export abstract class Layer {
     }
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     if (event.data) {
       this._data = event.data;
     }
@@ -184,9 +198,9 @@ export abstract class Layer {
     }
   }
 
-  onOpacityChanged(opacity: number): void {}
+  abstract onOpacityChanged(opacity: number): void;
 
-  onOrderChanged(order: number): void {}
+  abstract onOrderChanged(order: number): void;
 
-  onInteractivityChanged(interactive: boolean): void {}
+  abstract onInteractivityChanged(interactive: boolean): void;
 }

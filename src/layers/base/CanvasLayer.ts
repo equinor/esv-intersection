@@ -1,26 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Layer } from './Layer';
 import { OnMountEvent, OnUpdateEvent, OnResizeEvent, OnRescaleEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
-export abstract class CanvasLayer extends Layer {
+export abstract class CanvasLayer<T> extends Layer<T> {
   ctx: CanvasRenderingContext2D;
   elm: HTMLElement;
   canvas: HTMLCanvasElement;
 
-  onOpacityChanged(opacity: number): void {
+  onOpacityChanged(_opacity: number): void {
     if (this.canvas) {
       this.updateStyle();
     }
   }
 
-  onOrderChanged(order: number): void {
+  onOrderChanged(_order: number): void {
     if (this.canvas) {
       this.updateStyle();
     }
   }
 
-  onInteractivityChanged(interactive: boolean): void {
+  onInteractivityChanged(_interactive: boolean): void {
     if (this.canvas) {
       this.updateStyle();
     }
@@ -77,7 +76,7 @@ export abstract class CanvasLayer extends Layer {
     ctx.canvas.setAttribute('height', `${height}px`);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
   }
 

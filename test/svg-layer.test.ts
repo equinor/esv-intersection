@@ -1,6 +1,14 @@
+/* eslint-disable no-magic-numbers */
 import { WellborepathLayer } from '../src/index';
 
-const wellborePath = [0, 0, 0, 12, 4, 12];
+const wellborePath: [number, number][] = [
+  [0, 0],
+  [0, 0],
+  [0, 0],
+  [12, 12],
+  [4, 4],
+  [12, 12],
+];
 
 describe('SVG', () => {
   let elm: HTMLElement;

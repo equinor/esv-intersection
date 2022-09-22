@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import { Point } from 'pixi.js';
 import Vector2 from '@equinor/videx-vector2';
 import { createNormals, offsetPoints } from '../src/utils/vectorUtils';

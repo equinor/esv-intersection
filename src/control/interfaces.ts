@@ -8,35 +8,35 @@ export interface AxisOptions {
   unitOfMeasure: string;
 }
 
-export interface ControllerOptions {
+export interface ControllerOptions<T> {
   container: HTMLElement;
   axisOptions?: AxisOptions;
   scaleOptions?: ScaleOptions;
   referenceSystem?: IntersectionReferenceSystem;
-  layers?: Layer[];
+  layers?: Layer<T>[];
   path?: number[][];
 }
 
-interface OverlayEvent {
+interface OverlayEvent<T> {
   target?: Element;
   source: Element;
-  caller: any;
+  caller: T;
 }
 
-export interface OverlayResizeEvent extends OverlayEvent {
+export interface OverlayResizeEvent<T> extends OverlayEvent<T> {
   width: number;
   height: number;
 }
 
-export interface OverlayMouseMoveEvent extends OverlayEvent {
+export interface OverlayMouseMoveEvent<T> extends OverlayEvent<T> {
   x: number;
   y: number;
 }
 
-export interface OverlayMouseExitEvent extends OverlayEvent {}
+export interface OverlayMouseExitEvent<T> extends OverlayEvent<T> {}
 
-export interface OverlayCallbacks {
-  onMouseMove?(event: OverlayMouseMoveEvent): void;
-  onMouseExit?(event: OverlayMouseExitEvent): void;
-  onResize?(event: OverlayResizeEvent): void;
+export interface OverlayCallbacks<T> {
+  onMouseMove?(event: OverlayMouseMoveEvent<T>): void;
+  onMouseExit?(event: OverlayMouseExitEvent<T>): void;
+  onResize?(event: OverlayResizeEvent<T>): void;
 }

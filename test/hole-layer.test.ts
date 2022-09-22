@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import { HoleSizeLayer, IntersectionReferenceSystem } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
 
@@ -24,8 +25,8 @@ describe('HoleSizeLayer', () => {
       const referenceSystem = new IntersectionReferenceSystem(wp);
       const layer = new HoleSizeLayer('casing-layer', { referenceSystem });
       layer.onMount({ elm });
-      layer.onUpdate({});
-      layer.onRescale(rescaleEventStub(data));
+      layer.onUpdate({ data });
+      layer.onRescale(rescaleEventStub());
 
       // Act
       layer.data = data;
@@ -40,8 +41,8 @@ describe('HoleSizeLayer', () => {
       const referenceSystem = new IntersectionReferenceSystem(wp);
       layer.referenceSystem = referenceSystem;
       layer.onMount({ elm });
-      layer.onUpdate({});
-      layer.onRescale(rescaleEventStub(data));
+      layer.onUpdate({ data });
+      layer.onRescale(rescaleEventStub());
 
       // Act
       layer.data = data;
@@ -54,8 +55,8 @@ describe('HoleSizeLayer', () => {
       // Arrange
       const layer = new HoleSizeLayer('casing-layer', {});
       layer.onMount({ elm });
-      layer.onUpdate({});
-      layer.onRescale(rescaleEventStub(data));
+      layer.onUpdate({ data });
+      layer.onRescale(rescaleEventStub());
 
       // Act
       // Assert

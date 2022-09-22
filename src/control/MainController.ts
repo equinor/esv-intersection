@@ -3,7 +3,7 @@ import { LayerManager } from './LayerManager';
 import { Layer } from '../layers';
 import { ControllerOptions } from './interfaces';
 import { ZoomPanHandler } from './ZoomPanHandler';
-import { ReferenceSystemOptions } from '..';
+import { LayerOptions, OnRescaleEvent, ReferenceSystemOptions } from '..';
 import { Axis } from '../components';
 import { overlay, Overlay } from './overlay';
 import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';
@@ -11,11 +11,11 @@ import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';
 /**
  * API for controlling data and layers
  */
-export class Controller {
+export class Controller<T> {
   private _referenceSystem: IntersectionReferenceSystem;
 
-  private layerManager: LayerManager;
-  private _overlay: Overlay;
+  private layerManager: LayerManager<T>;
+  private _overlay: Overlay<Controller<T>>;
 
   /**
    * Interface to control layers, reference system, axis and overlay. overlay is created on instantiation, does not currently support opt-out.
@@ -29,7 +29,7 @@ export class Controller {
    * @param options.path (optional) creates a reference system based on an array of 3d coordinates
    * @param options.referenceSystem (optional) sets reference system, takes priority over path if both are supplied
    */
-  constructor(options: ControllerOptions) {
+  constructor(options: ControllerOptions<T>) {
     const { container, axisOptions, scaleOptions, referenceSystem, layers, path } = options;
 
     this._referenceSystem = referenceSystem || (path && new IntersectionReferenceSystem(path));
@@ -47,7 +47,7 @@ export class Controller {
    * Sets reference system, overrides any existing reference systems in place
    * @param referenceSystem IntersectionReferenceSystem
    */
-  setReferenceSystem(referenceSystem: IntersectionReferenceSystem): Controller {
+  setReferenceSystem(referenceSystem: IntersectionReferenceSystem): Controller<T> {
     this._referenceSystem = referenceSystem;
     this.layerManager.setReferenceSystem(referenceSystem);
     return this;
@@ -59,7 +59,7 @@ export class Controller {
    * @param options optional
    * @param options.trajectoryAngle (optional) angle in degrees
    */
-  updatePath(path: number[][], options?: ReferenceSystemOptions): Controller {
+  updatePath(path: number[][], options?: ReferenceSystemOptions): Controller<T> {
     this.setReferenceSystem(new IntersectionReferenceSystem(path, options));
 
     return this;
@@ -69,7 +69,7 @@ export class Controller {
    * Clears data from all mounted layers
    * @param includeReferenceSystem - (optional) if true also removes reference system, default is true
    */
-  clearAllData(includeReferenceSystem: boolean = true): Controller {
+  clearAllData(includeReferenceSystem: boolean = true): Controller<T> {
     this.layerManager.clearAllData(includeReferenceSystem);
     return this;
   }
@@ -79,7 +79,7 @@ export class Controller {
    * @param layer layer object
    * @param params (optional) adds additional parameters to the onUpdateEvent
    */
-  addLayer(layer: Layer, params?: any): Controller {
+  addLayer(layer: Layer<T>, params?: LayerOptions<T>): Controller<T> {
     this.layerManager.addLayer(layer, params);
     this.setOverlayZIndex(this.layerManager.getLayers());
     return this;
@@ -89,7 +89,7 @@ export class Controller {
    * Remove and unmount layer from list
    * @param layerId string id
    */
-  removeLayer(layerId: string): Controller {
+  removeLayer(layerId: string): Controller<T> {
     this.layerManager.removeLayer(layerId);
     return this;
   }
@@ -97,7 +97,7 @@ export class Controller {
   /**
    * Remove and unmount all layers from list
    */
-  removeAllLayers(): Controller {
+  removeAllLayers(): Controller<T> {
     this.layerManager.removeAllLayers();
     return this;
   }
@@ -106,7 +106,7 @@ export class Controller {
    * Find first layer with given id, returns undefined if none are found
    * @param layerId string id
    */
-  getLayer(layerId: string): Layer {
+  getLayer(layerId: string): Layer<unknown> {
     return this.layerManager.getLayer(layerId);
   }
 
@@ -114,7 +114,7 @@ export class Controller {
    * Sets visibility to true and rescales the layer
    * @param layerId string id
    */
-  showLayer(layerId: string): Controller {
+  showLayer(layerId: string): Controller<T> {
     this.layerManager.showLayer(layerId);
     return this;
   }
@@ -123,7 +123,7 @@ export class Controller {
    * Sets visibility to false
    * @param layerId string id
    */
-  hideLayer(layerId: string): Controller {
+  hideLayer(layerId: string): Controller<T> {
     this.layerManager.hideLayer(layerId);
     return this;
   }
@@ -133,7 +133,7 @@ export class Controller {
    * @param width (required)
    * @param height (required)
    */
-  adjustToSize(width: number, height: number): Controller {
+  adjustToSize(width: number, height: number): Controller<T> {
     this.layerManager.adjustToSize(width, height);
 
     const dimensions = { width: Math.max(width - HORIZONTAL_AXIS_MARGIN, 0), height: Math.max(height - VERTICAL_AXIS_MARGIN, 0) };
@@ -149,7 +149,7 @@ export class Controller {
    * @param  displ - displacement
    * @param  duration - duration of transition
    */
-  setViewport(cx?: number, cy?: number, displacement?: number, duration?: number): Controller {
+  setViewport(cx?: number, cy?: number, displacement?: number, duration?: number): Controller<T> {
     this.zoomPanHandler.setViewport(cx, cy, displacement, duration);
     return this;
   }
@@ -159,7 +159,7 @@ export class Controller {
    * @param xBounds - domain in x-direction
    * @param yBounds - domain in y-direction
    */
-  setBounds(xBounds: [number, number], yBounds: [number, number]): Controller {
+  setBounds(xBounds: [number, number], yBounds: [number, number]): Controller<T> {
     this.zoomPanHandler.setBounds(xBounds, yBounds);
     return this;
   }
@@ -167,7 +167,7 @@ export class Controller {
   /**
    * Display both axes
    */
-  showAxis(): Controller {
+  showAxis(): Controller<T> {
     this.layerManager.showAxis();
     return this;
   }
@@ -175,7 +175,7 @@ export class Controller {
   /**
    * Hide both axes
    */
-  hideAxis(): Controller {
+  hideAxis(): Controller<T> {
     this.layerManager.hideAxis();
     return this;
   }
@@ -183,7 +183,7 @@ export class Controller {
   /**
    * Shows labels in x and y
    */
-  showAxisLabels(): Controller {
+  showAxisLabels(): Controller<T> {
     this.layerManager.showAxisLabels();
     return this;
   }
@@ -191,7 +191,7 @@ export class Controller {
   /**
    * Hide labels in x and y
    */
-  hideAxisLabels(): Controller {
+  hideAxisLabels(): Controller<T> {
     this.layerManager.hideAxisLabels();
     return this;
   }
@@ -201,7 +201,7 @@ export class Controller {
    * @param x
    * @param y
    */
-  setAxisOffset(x: number, y: number): Controller {
+  setAxisOffset(x: number, y: number): Controller<T> {
     this.layerManager.setAxisOffset(x, y);
     return this;
   }
@@ -210,7 +210,7 @@ export class Controller {
    * Sets domain offset in x-direction, offset is subtracted from domain
    * @param x
    */
-  setXAxisOffset(x: number): Controller {
+  setXAxisOffset(x: number): Controller<T> {
     this.layerManager.setXAxisOffset(x);
     return this;
   }
@@ -219,7 +219,7 @@ export class Controller {
    * Sets domain offset in y-direction, offset is subtracted from domain
    * @param y
    */
-  setYAxisOffset(y: number): Controller {
+  setYAxisOffset(y: number): Controller<T> {
     this.layerManager.setYAxisOffset(y);
     return this;
   }
@@ -228,7 +228,7 @@ export class Controller {
    * Defines min and max of how much one can zoom
    * @param zoomlevels
    */
-  setZoomLevelBoundary(zoomlevels: [number, number]): Controller {
+  setZoomLevelBoundary(zoomlevels: [number, number]): Controller<T> {
     this.zoomPanHandler.setZoomLevelBoundary(zoomlevels);
     return this;
   }
@@ -237,7 +237,7 @@ export class Controller {
    * Defines how far in one can zoom
    * @param zoomlevel
    */
-  setMaxZoomLevel(zoomlevel: number): Controller {
+  setMaxZoomLevel(zoomlevel: number): Controller<T> {
     this.zoomPanHandler.setMaxZoomLevel(zoomlevel);
     return this;
   }
@@ -246,7 +246,7 @@ export class Controller {
    * Defines how far out one can zoom
    * @param zoomlevel
    */
-  setMinZoomLevel(zoomlevel: number): Controller {
+  setMinZoomLevel(zoomlevel: number): Controller<T> {
     this.zoomPanHandler.setMinZoomLevel(zoomlevel);
     return this;
   }
@@ -255,7 +255,7 @@ export class Controller {
    * Destroy Controller
    * Convenience method for removing from DOM and clearing references
    */
-  destroy(): Controller {
+  destroy(): Controller<T> {
     this.layerManager.destroy();
     this._overlay.destroy();
     this._referenceSystem = undefined;
@@ -264,17 +264,17 @@ export class Controller {
     return this;
   }
 
-  private getHighestZIndex(layers: Layer[]): number {
+  private getHighestZIndex(layers: Layer<T>[]): number {
     const highestZIndex = layers.length > 0 ? layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 1;
     return highestZIndex;
   }
 
-  private setOverlayZIndex(layers: Layer[]): void {
+  private setOverlayZIndex(layers: Layer<T>[]): void {
     const highestZIndex = this.getHighestZIndex(layers);
     this.overlay.setZIndex(highestZIndex + 2);
   }
 
-  get overlay(): Overlay {
+  get overlay(): Overlay<Controller<T>> {
     return this._overlay;
   }
 
@@ -290,7 +290,7 @@ export class Controller {
     return this.layerManager.axis;
   }
 
-  get currentStateAsEvent(): any {
+  get currentStateAsEvent(): OnRescaleEvent {
     return this.zoomPanHandler.currentStateAsEvent();
   }
 }

@@ -1,21 +1,26 @@
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
-import { GeomodelLayerOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { colorToCSSColor } from '../utils/color';
 import { CanvasLayer } from './base/CanvasLayer';
+import { GeomodelLayerOptions } from './GeomodelLayerV2';
 
 const DEFAULT_MAX_DEPTH = 10000;
 
-export class GeomodelCanvasLayer extends CanvasLayer {
+type SurfacePaths = {
+  color: string;
+  path: Path2D;
+};
+
+export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
   rescaleEvent: OnRescaleEvent;
 
-  // TODO add types for surfaceAreasPaths and surfaceLinesPaths
-  surfaceAreasPaths: any[] = [];
+  surfaceAreasPaths: SurfacePaths[] = [];
 
-  surfaceLinesPaths: any[] = [];
+  surfaceLinesPaths: SurfacePaths[] = [];
 
   maxDepth: number = DEFAULT_MAX_DEPTH;
 
-  constructor(id?: string, options?: GeomodelLayerOptions) {
+  constructor(id?: string, options?: GeomodelLayerOptions<T>) {
     super(id, options);
     this.render = this.render.bind(this);
     this.generateSurfaceAreasPaths = this.generateSurfaceAreasPaths.bind(this);
@@ -25,27 +30,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
     this.updatePaths = this.updatePaths.bind(this);
   }
 
-  get data(): SurfaceData {
-    return super.getData();
-  }
-
-  set data(data: SurfaceData) {
-    this.setData(data);
-  }
-
-  getData(): SurfaceData {
-    return super.getData();
-  }
-
-  setData(data: SurfaceData): void {
-    super.setData(data);
-  }
-
-  onMount(event: OnMountEvent): void {
-    super.onMount(event);
-  }
-
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.updatePaths();
     this.render();
@@ -74,8 +59,8 @@ export class GeomodelCanvasLayer extends CanvasLayer {
 
     requestAnimationFrame(() => {
       this.clearCanvas();
-      this.surfaceAreasPaths.forEach((p: any) => this.drawPolygonPath(p.color, p.path));
-      this.surfaceLinesPaths.forEach((l: any) => this.drawLinePath(l.color, l.path));
+      this.surfaceAreasPaths.forEach((p: SurfacePaths) => this.drawPolygonPath(p.color, p.path));
+      this.surfaceLinesPaths.forEach((l: SurfacePaths) => this.drawLinePath(l.color, l.path));
     });
   }
 
@@ -84,9 +69,9 @@ export class GeomodelCanvasLayer extends CanvasLayer {
   }
 
   generateSurfaceAreasPaths(): void {
-    this.surfaceAreasPaths = this.data.areas.reduce((acc: any, s: SurfaceArea) => {
+    this.surfaceAreasPaths = this.data.areas.reduce((acc: SurfacePaths[], s: SurfaceArea) => {
       const polygons = this.createPolygons(s.data);
-      const mapped = polygons.map((polygon: any) => ({
+      const mapped: SurfacePaths[] = polygons.map((polygon: number[]) => ({
         color: this.colorToCSSColor(s.color),
         path: this.generatePolygonPath(polygon),
       }));
@@ -96,9 +81,9 @@ export class GeomodelCanvasLayer extends CanvasLayer {
   }
 
   generateSurfaceLinesPaths(): void {
-    this.surfaceLinesPaths = this.data.lines.reduce((acc: any, l: SurfaceLine) => {
+    this.surfaceLinesPaths = this.data.lines.reduce((acc: SurfacePaths[], l: SurfaceLine) => {
       const lines = this.generateLinePaths(l);
-      const mapped = lines.map((path: Path2D) => ({ color: this.colorToCSSColor(l.color), path }));
+      const mapped: SurfacePaths[] = lines.map((path: Path2D) => ({ color: this.colorToCSSColor(l.color), path }));
       acc.push(...mapped);
       return acc;
     }, []);
@@ -116,7 +101,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
     ctx.stroke(path);
   };
 
-  createPolygons = (data: any): number[][] => {
+  createPolygons = (data: number[][]): number[][] => {
     const polygons: number[][] = [];
     let polygon: number[] = null;
 
@@ -162,7 +147,7 @@ export class GeomodelCanvasLayer extends CanvasLayer {
     return path;
   };
 
-  generateLinePaths = (s: any): Path2D[] => {
+  generateLinePaths = (s: SurfaceLine): Path2D[] => {
     const paths: Path2D[] = [];
     const { data: d } = s;
 

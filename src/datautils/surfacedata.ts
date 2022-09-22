@@ -1,9 +1,44 @@
-/* eslint-disable no-magic-numbers */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { interpolateRgb, quantize } from 'd3-interpolate';
 import { scaleOrdinal } from 'd3-scale';
 import { convertColor } from '../utils/color';
 import { StratUnit, SurfaceMetaAndValues, SurfaceLine, SurfaceArea, SurfaceData } from './interfaces';
+
+const TRANSLUCENT_RED = 0x80000000;
+const WHITE = 0xffffffff;
+
+type MappedSurfaces = {
+  name: string;
+  isBase: boolean;
+  values: number[];
+  color: string;
+  visualization: string;
+};
+
+type StratGroup = {
+  age: number;
+  name: string;
+};
+
+type Stratigraphy = {
+  unit: StratUnit;
+  group: string;
+  name: string;
+  isBase: boolean;
+  values: number[];
+  color: string;
+  visualization: string;
+};
+
+type MappedGroup = {
+  id: string;
+  label: string;
+  color: string;
+  top: number[];
+};
+
+interface SurfaceAreaGrouping {
+  [propType: string]: SurfaceArea[];
+}
 
 /**
  * Generate surface data from trajectory, stratcolum and surface data
@@ -18,16 +53,16 @@ export function generateSurfaceData(trajectory: number[][], stratColumn: StratUn
     return;
   }
   const filteredSurfaces: SurfaceMetaAndValues[] = surfaceData.filter((s) => s.data.values);
-  const mappedSurfaces: any = mapSurfaceData(filteredSurfaces);
+  const mappedSurfaces = mapSurfaceData(filteredSurfaces);
 
-  const stratGroups = new Map();
+  const stratGroups = new Map<string, StratGroup>();
   const stratigraphies = combineSurfacesAndStratColumn(mappedSurfaces, stratColumn, stratGroups);
   sortStratigraphies(stratigraphies);
 
   const lines: SurfaceLine[] = getSurfaceLines(mappedSurfaces, trajectory);
-  const surfaceAreas: SurfaceArea[][] = generateSurfaceAreas(trajectory, stratigraphies, stratColumn);
+  const surfaceAreas: SurfaceAreaGrouping = generateSurfaceAreas(trajectory, stratigraphies, stratColumn);
 
-  const groups: any = mapGroups(stratGroups, surfaceAreas);
+  const groups: MappedGroup[] = mapGroups(stratGroups, surfaceAreas);
   const groupAreas: SurfaceArea[] = generateGroupAreas(groups, trajectory);
 
   //Combine group areas with surface areas
@@ -35,7 +70,7 @@ export function generateSurfaceData(trajectory: number[][], stratColumn: StratUn
     ...groupAreas,
     ...Object.values(surfaceAreas)
       .flat()
-      .filter((d: any) => !d.exclude),
+      .filter((d) => !d.exclude),
   ];
 
   const data = {
@@ -51,10 +86,10 @@ export function generateSurfaceData(trajectory: number[][], stratColumn: StratUn
  * @param  mappedSurfaces
  * @param  trajectory
  */
-function getSurfaceLines(mappedSurfaces: any, trajectory: number[][]): SurfaceLine[] {
+function getSurfaceLines(mappedSurfaces: MappedSurfaces[], trajectory: number[][]): SurfaceLine[] {
   const lines: SurfaceLine[] = mappedSurfaces
-    .filter((d: any) => d.visualization === 'line')
-    .map((l: any) => ({
+    .filter((d: MappedSurfaces) => d.visualization === 'line')
+    .map((l: MappedSurfaces) => ({
       id: l.name,
       label: l.name,
       width: 2,
@@ -65,22 +100,23 @@ function getSurfaceLines(mappedSurfaces: any, trajectory: number[][]): SurfaceLi
   return lines;
 }
 
-function generateGroupAreas(groups: any, trajectory: number[][]): any {
-  const groupAreas: any = groups.map((g: any, i: number) => {
-    const next: any = i + 1 < groups.length ? groups[i + 1] : null;
+function generateGroupAreas(groups: MappedGroup[], trajectory: number[][]): SurfaceArea[] {
+  const groupAreas = groups.map((g: MappedGroup, i: number) => {
+    const next: MappedGroup | null = i + 1 < groups.length ? groups[i + 1] : null;
     return {
       id: g.id,
+      label: g.label,
       color: convertColor(g.color),
-      data: trajectory.map((p: any, j: any) => [p[0], g.top[j], next ? next.top[j] : null]),
+      data: trajectory.map((p: number[], j: number) => [p[0], g.top[j], next ? next.top[j] : null]),
     };
   });
   return groupAreas;
 }
 
-function mapGroups(stratGroups: any, surfaceAreas: SurfaceArea[][]): any {
-  const groups: any = Array.from(stratGroups.values())
-    .sort((a: any, b: any) => a.age - b.age)
-    .filter((g: any) => {
+function mapGroups(stratGroups: Map<string, StratGroup>, surfaceAreas: SurfaceAreaGrouping): MappedGroup[] {
+  const groups = Array.from(stratGroups.values())
+    .sort((a: StratGroup, b: StratGroup) => a.age - b.age)
+    .filter((g: StratGroup) => {
       const surfaces: SurfaceArea[] = surfaceAreas[g.name];
       const isValid = surfaces && surfaces.length > 0;
       if (!isValid) {
@@ -88,8 +124,8 @@ function mapGroups(stratGroups: any, surfaceAreas: SurfaceArea[][]): any {
       }
       return isValid;
     })
-    .map((g: any, i: number) => {
-      const surface = surfaceAreas[g.name];
+    .map((g: StratGroup, i: number) => {
+      const surface: SurfaceArea[] = surfaceAreas[g.name];
       const top = surface[0];
       return {
         id: g.name,
@@ -101,12 +137,16 @@ function mapGroups(stratGroups: any, surfaceAreas: SurfaceArea[][]): any {
   return groups;
 }
 
-function combineSurfacesAndStratColumn(mappedSurfaces: any, stratColumn: StratUnit[], stratGroups: Map<string, any>): any {
-  const firstUnit = stratColumn && stratColumn.find((d: any) => d.stratUnitLevel === 1);
+function combineSurfacesAndStratColumn(
+  mappedSurfaces: MappedSurfaces[],
+  stratColumn: StratUnit[],
+  stratGroups: Map<string, StratGroup>,
+): Stratigraphy[] {
+  const firstUnit = stratColumn && stratColumn.find((d: StratUnit) => d.stratUnitLevel === 1);
   const defaultGroupName: string = firstUnit ? firstUnit.identifier : 'SEABED';
   const stratigrafies = mappedSurfaces
-    .filter((d: any) => d.visualization === 'interval' || d.visualization === 'none')
-    .map((s: any) => {
+    .filter((d: MappedSurfaces) => d.visualization === 'interval' || d.visualization === 'none')
+    .map((s: MappedSurfaces) => {
       const path: StratUnit[] = [];
       const stratUnit: StratUnit = findStratcolumnUnit(stratColumn, s.name, path);
       if (!stratUnit) {
@@ -133,8 +173,8 @@ function combineSurfacesAndStratColumn(mappedSurfaces: any, stratColumn: StratUn
  * Sort stratigrafies on unit and age, base after top and higher level after lower
  * @param  stratigrafies
  */
-function sortStratigraphies(stratigrafies: any): void {
-  stratigrafies.sort((a: any, b: any) => {
+function sortStratigraphies(stratigrafies: Stratigraphy[]): void {
+  stratigrafies.sort((a: Stratigraphy, b: Stratigraphy) => {
     if (!a.unit && !b.unit) {
       return 0;
     }
@@ -164,8 +204,8 @@ function sortStratigraphies(stratigrafies: any): void {
  * @param {string} unitname
  * @param {[]} path
  */
-function findStratcolumnUnit(units: StratUnit[], unitname: string, path: StratUnit[] = []): any {
-  const unit: StratUnit = units.find((u: any) => u.identifier.toLowerCase() === unitname.toLowerCase());
+function findStratcolumnUnit(units: StratUnit[], unitname: string, path: StratUnit[] = []): StratUnit | null {
+  const unit: StratUnit = units.find((u: StratUnit) => u.identifier.toLowerCase() === unitname.toLowerCase());
   if (unit) {
     // Build path
     let temp: StratUnit = unit;
@@ -179,11 +219,12 @@ function findStratcolumnUnit(units: StratUnit[], unitname: string, path: StratUn
   return null;
 }
 
-function mapSurfaceData(surfaces: SurfaceMetaAndValues[]): any {
+function mapSurfaceData(surfaces: SurfaceMetaAndValues[]): MappedSurfaces[] {
   return surfaces.map((s: SurfaceMetaAndValues) => {
     const displayName: string = s.visualSettings.displayName;
     const name: string = displayName.replace(/\s(Base|Top)/gi, '');
     const isBase: boolean = displayName.toLowerCase().endsWith('base');
+
     return {
       name,
       isBase,
@@ -194,9 +235,9 @@ function mapSurfaceData(surfaces: SurfaceMetaAndValues[]): any {
   });
 }
 
-function getColorFromUnit(unit: any): number {
+function getColorFromUnit(unit: StratUnit): number {
   if (unit.colorR === null || unit.colorG === null || unit.colorB === null) {
-    return 0x80000000;
+    return TRANSLUCENT_RED;
   }
   const res: number = (unit.colorR << 16) | (unit.colorG << 8) | unit.colorB;
   return res;
@@ -204,12 +245,13 @@ function getColorFromUnit(unit: any): number {
 
 const unassignedColorScale = scaleOrdinal<number, string>()
   .domain([0, 100])
+  // eslint-disable-next-line no-magic-numbers
   .range(quantize(interpolateRgb('#e6f1cf', '#85906d'), 10));
 
 /**
  * Find the best matching base index based on name or by values
  */
-function findBestMatchingBaseIndex(top: any, index: number, surfaces: any, stratColumn: StratUnit[]): number {
+function findBestMatchingBaseIndex(top: Stratigraphy, index: number, surfaces: Stratigraphy[], stratColumn: StratUnit[]): number {
   const nextIndex: number = index + 1;
 
   if (!surfaces || nextIndex >= surfaces.length) {
@@ -217,7 +259,7 @@ function findBestMatchingBaseIndex(top: any, index: number, surfaces: any, strat
   }
 
   // If there is a matching base by name, use that. More robust, does not rely on sorting
-  const baseSurfaceIndex = surfaces.findIndex((candidate: any) => candidate.isBase && candidate.name === top.name);
+  const baseSurfaceIndex = surfaces.findIndex((candidate: Stratigraphy) => candidate.isBase && candidate.name === top.name);
   if (baseSurfaceIndex !== -1) {
     return baseSurfaceIndex;
   }
@@ -234,14 +276,14 @@ function findBestMatchingBaseIndex(top: any, index: number, surfaces: any, strat
   return null;
 }
 
-function isAnchestor(descendant: any, candidate: any, stratColumn: StratUnit[]): boolean {
+function isAnchestor(descendant: Stratigraphy, candidate: Stratigraphy, stratColumn: StratUnit[]): boolean {
   const path: StratUnit[] = [];
   findStratcolumnUnit(stratColumn, descendant.name, path);
   return path.some((p: StratUnit) => candidate.name === p.identifier);
 }
 
-function generateSurfaceAreas(projection: number[][], surfaces: any, stratColumn: StratUnit[]): SurfaceArea[][] {
-  const areas: SurfaceArea[][] = surfaces.reduce((acc: any, surface: any, i: number) => {
+function generateSurfaceAreas(projection: number[][], surfaces: Stratigraphy[], stratColumn: StratUnit[]): SurfaceAreaGrouping {
+  const areas: SurfaceAreaGrouping = surfaces.reduce((acc: SurfaceAreaGrouping, surface: Stratigraphy, i: number) => {
     if (!surface.isBase) {
       if (!acc[surface.group]) {
         acc[surface.group] = [];
@@ -250,7 +292,7 @@ function generateSurfaceAreas(projection: number[][], surfaces: any, stratColumn
       acc[surface.group].push({
         id: surface.name,
         label: surface.name,
-        color: (surface.unit && getColorFromUnit(surface.unit)) || 0xffffffff,
+        color: (surface.unit && getColorFromUnit(surface.unit)) || WHITE,
         exclude: surface.visualization === 'none' || !surface.unit,
         data: projection.map((p, j) => {
           const baseValue: number = surface.values[j] !== null ? getBaseValue(baseIndex, surfaces, j) : null;
@@ -265,7 +307,7 @@ function generateSurfaceAreas(projection: number[][], surfaces: any, stratColumn
 
 // get the value from the surface with the supplied index,
 // iterate to next surface if value is null
-function getBaseValue(index: number, surfaces: any[], datapoint: number): number {
+function getBaseValue(index: number, surfaces: Stratigraphy[], datapoint: number): number {
   if (!surfaces || !index || index >= surfaces.length) {
     return null;
   }

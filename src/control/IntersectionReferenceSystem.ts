@@ -1,9 +1,8 @@
-/* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { clamp, radians } from '@equinor/videx-math';
-import { normalize } from 'curve-interpolator';
+import { CurveInterpolator, normalize } from 'curve-interpolator';
 
-import { Interpolators, Trajectory, ReferenceSystemOptions, MDPoint } from '../interfaces';
+import { Interpolators, Trajectory, MDPoint } from '../interfaces';
 import { ExtendedCurveInterpolator } from './ExtendedCurveInterpolator';
 
 // determines how curvy the curve is
@@ -22,6 +21,19 @@ const CURTAIN_SAMPLING_INTERVAL = 0.1;
 const defaultOptions = {
   approxT: true,
 };
+
+export interface ReferenceSystemOptions {
+  normalizedLength?: number;
+  arcDivisions?: number;
+  tension?: number;
+  trajectoryAngle?: number;
+  calculateDisplacementFromBottom?: boolean;
+  curveInterpolator?: ExtendedCurveInterpolator;
+  trajectoryInterpolator?: ExtendedCurveInterpolator;
+  curtainInterpolator?: ExtendedCurveInterpolator;
+  approxT?: boolean;
+  quickT?: boolean;
+}
 
 export class IntersectionReferenceSystem {
   options: ReferenceSystemOptions;
@@ -120,7 +132,7 @@ export class IntersectionReferenceSystem {
     const { calculateDisplacementFromBottom } = this.options;
     const cl = clamp(calculateDisplacementFromBottom ? this.length - (length - this._offset) : length - this._offset, 0, this.length);
     const p = curtain.getPointAtArcLength(cl, this.options);
-    return p;
+    return p as number[];
   }
 
   curtainTangent(length: number): number[] {
@@ -128,7 +140,7 @@ export class IntersectionReferenceSystem {
     const l = length - this._offset;
     const t = curtain.findTForArcLength(l, this.options);
     const tangent = t && curtain.getTangentAt(t);
-    return tangent;
+    return tangent as number[];
   }
 
   /**
@@ -141,7 +153,7 @@ export class IntersectionReferenceSystem {
    * @param start in MD
    * @param end in MD
    */
-  getCurtainPath(start: number, end: number): MDPoint[] {
+  getCurtainPath(start: number, end: number): { point: number[]; md: number }[] {
     if (!this._curtainPathCache) {
       const points = [];
       let prevAngle = Math.PI * 2; // Always add first point
@@ -199,7 +211,7 @@ export class IntersectionReferenceSystem {
   getPosition(length: number): number[] {
     const { trajectory } = this.interpolators;
     const t = this.getProjectedLength(length);
-    const p = trajectory.getPointAt(t);
+    const p = trajectory.getPointAt(t) as number[];
     return p;
   }
 
@@ -210,16 +222,16 @@ export class IntersectionReferenceSystem {
     const extensionStart = from < 0 ? -from : 0;
     const extensionEnd = to > 1 ? to - 1 : 0;
 
-    const refStart = this.interpolators.trajectory.getPointAt(0);
-    const refEnd = this.interpolators.trajectory.getPointAt(1);
+    const refStart = this.interpolators.trajectory.getPointAt(0) as number[];
+    const refEnd = this.interpolators.trajectory.getPointAt(1) as number[];
 
     let p0;
     let p3;
     let offset = 0;
     const t0 = Math.max(0, from);
     const t1 = Math.min(1, to);
-    const p1 = this.interpolators.trajectory.getPointAt(t0);
-    const p2 = this.interpolators.trajectory.getPointAt(t1);
+    const p1 = this.interpolators.trajectory.getPointAt(t0) as number[];
+    const p2 = this.interpolators.trajectory.getPointAt(t1) as number[];
 
     if (extensionStart) {
       p0 = [
@@ -247,7 +259,7 @@ export class IntersectionReferenceSystem {
         points.push([p0[0] - this.startVector[0] * f, p0[1] - this.startVector[1] * f]);
       }
     }
-    const curvePoints = this.interpolators.trajectory.getPoints(curveSteps - 1, null, t0, t1); // returns steps + 1 points
+    const curvePoints = this.interpolators.trajectory.getPoints(curveSteps - 1, null, t0, t1) as number[][]; // returns steps + 1 points
     points.push(...curvePoints);
     if (p3) {
       for (let i = 1; i < postSteps - 1; i++) {
@@ -281,7 +293,7 @@ export class IntersectionReferenceSystem {
 
     const points = [];
 
-    const refStart = new Vector2(this.interpolators.trajectory.getPointAt(0.0));
+    const refStart = new Vector2(this.interpolators.trajectory.getPointAt(0.0) as number[]);
     const startVec = new Vector2(this.startVector);
     const startExtensionStepLength = startExtensionLength / startExtensionNumPoints;
     for (let i = startExtensionNumPoints; i > 0; i--) {
@@ -290,9 +302,10 @@ export class IntersectionReferenceSystem {
       points.push(point.toArray());
     }
 
-    points.push(...this.interpolators.trajectory.getPoints(curveSteps, null, 0.0, 1.0));
+    const curveStepPoints = this.interpolators.trajectory.getPoints(curveSteps, null, 0.0, 1.0) as number[][];
+    points.push(...curveStepPoints);
 
-    const refEnd = new Vector2(this.interpolators.trajectory.getPointAt(1.0));
+    const refEnd = new Vector2(this.interpolators.trajectory.getPointAt(1.0) as number[]);
     const endVec = new Vector2(this.endVector);
     const endExtensionStepLength = endExtensionLength / (endExtensionNumPoints - 1); // -1 so last point is at end of extension
     for (let i = 1; i < endExtensionNumPoints; i++) {
@@ -349,7 +362,7 @@ export class IntersectionReferenceSystem {
    * @param from number between 0 and 1
    * @param to number between 0 and 1
    */
-  static getDirectionVector(interpolator: any, from: number, to: number): number[] {
+  static getDirectionVector(interpolator: CurveInterpolator, from: number, to: number): number[] {
     const p1 = interpolator.getPointAt(to);
     const p2 = interpolator.getPointAt(from);
 

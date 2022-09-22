@@ -1,5 +1,5 @@
 import { SeismicCanvasLayer, ZoomPanHandler, OnRescaleEvent } from '../../../src';
-import { generateProjectedTrajectory, getSeismicInfo, generateSeismicSliceImage } from '../../../src/datautils';
+import { generateProjectedTrajectory, getSeismicInfo, generateSeismicSliceImage, getSeismicOptions } from '../../../src/datautils';
 import { getSeismic, getPositionLog } from '../data';
 import { seismicColorMap } from '../exampledata';
 
@@ -22,16 +22,11 @@ export const SeismicUsingLowLevelInterface = () => {
 
     seismicLayer.onMount({ ...ev });
     const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
-    const seismicInfo = getSeismicInfo(seismic, trajectory) || { x: 0, y: 0, width: 0, height: 0 };
+    const seismicInfo = getSeismicInfo(seismic, trajectory)
     generateSeismicSliceImage(seismic, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
       seismicLayer.data = {
         image: seismicImage,
-        options: {
-          x: seismicInfo.minX,
-          y: seismicInfo.minTvdMsl,
-          width: seismicInfo.maxX - seismicInfo.minX,
-          height: seismicInfo.maxTvdMsl - seismicInfo.minTvdMsl,
-        },
+        options: getSeismicOptions(seismicInfo)
       };
     });
 

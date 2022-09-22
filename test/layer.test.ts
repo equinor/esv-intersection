@@ -1,14 +1,23 @@
 import { Layer, OnUpdateEvent } from '../src';
 
-class TestLayer extends Layer {
+class TestLayer extends Layer<string> {
+  onOpacityChanged(_opacity: number): void {
+    throw new Error('Method not implemented.');
+  }
+  onOrderChanged(_order: number): void {
+    throw new Error('Method not implemented.');
+  }
+  onInteractivityChanged(_interactive: boolean): void {
+    throw new Error('Method not implemented.');
+  }
   testString: string = '';
   updateWasCalled: boolean = false;
-  setData(data: any) {
+  setData(data: string) {
     super.setData(data);
     this.testString = data;
   }
 
-  onUpdate(event: OnUpdateEvent) {
+  onUpdate(_event: OnUpdateEvent<string>) {
     this.updateWasCalled = true;
   }
 }
@@ -50,5 +59,4 @@ describe('Layer', () => {
     expect(layer.data).toEqual('test');
     expect(layer.updateWasCalled).toEqual(true);
   });
-
 });

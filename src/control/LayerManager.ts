@@ -1,20 +1,20 @@
 import { select, Selection } from 'd3-selection';
 import { ZoomPanHandler } from './ZoomPanHandler';
-import { Layer, GridLayer } from '../layers';
+import { Layer, GridLayer, LayerOptions } from '../layers';
 import { ScaleOptions, OnMountEvent, OnRescaleEvent } from '../interfaces';
 import { Axis } from '../components';
 import { IntersectionReferenceSystem } from './IntersectionReferenceSystem';
 import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';
 import { AxisOptions } from './interfaces';
 
-export class LayerManager {
+export class LayerManager<T> {
   private container: HTMLElement;
 
   private layerContainer: HTMLElement;
 
   private _zoomPanHandler: ZoomPanHandler;
 
-  private layers: Layer[] = [];
+  private layers: Layer<T>[] = [];
 
   private _axis: Axis;
   private _svgContainer: Selection<HTMLElement, unknown, null, undefined>;
@@ -55,7 +55,7 @@ export class LayerManager {
    * Adds and mounts an array of layers
    * @param layers array of layers
    */
-  addLayers(layers: Layer[]): LayerManager {
+  addLayers(layers: Layer<T>[]): LayerManager<T> {
     layers.forEach((layer) => this.addLayer(layer));
     return this;
   }
@@ -63,7 +63,7 @@ export class LayerManager {
   /**
    * Gets all layers currently mounted
    */
-  getLayers(): Layer[] {
+  getLayers(): Layer<T>[] {
     return this.layers;
   }
 
@@ -71,7 +71,7 @@ export class LayerManager {
    * Clears data from all mounted layers
    * @param includeReferenceSystem - (optional) if true also removes reference system, default is true
    */
-  clearAllData(includeReferenceSystem: boolean = true): LayerManager {
+  clearAllData(includeReferenceSystem: boolean = true): LayerManager<T> {
     this.layers.forEach((l) => l.clearData(includeReferenceSystem));
     return this;
   }
@@ -81,7 +81,7 @@ export class LayerManager {
    * @param layer Layer
    * @param params extra params to pass to the onUpdate method
    */
-  addLayer(layer: Layer, params?: any): LayerManager {
+  addLayer(layer: Layer<T>, params?: LayerOptions<T>): LayerManager<T> {
     this.layers.push(layer);
     this.initLayer(layer, params);
 
@@ -92,7 +92,7 @@ export class LayerManager {
    * Remove and unmount layer from manager
    * @param layerId name of layer
    */
-  removeLayer(layerId: string): LayerManager {
+  removeLayer(layerId: string): LayerManager<T> {
     const layer = this.layers.find((l) => l.id === layerId);
     if (layer) {
       layer.onUnmount();
@@ -105,7 +105,7 @@ export class LayerManager {
   /**
    * Remove and unmount all layers from manager
    */
-  removeAllLayers(): LayerManager {
+  removeAllLayers(): LayerManager<T> {
     const { layers } = this;
     layers.forEach((layer) => {
       this.removeLayer(layer.id);
@@ -113,11 +113,11 @@ export class LayerManager {
     return this;
   }
 
-  getLayer(layerId: string): Layer {
+  getLayer(layerId: string): Layer<T> {
     return this.layers.find((l) => l.id === layerId);
   }
 
-  initLayer(layer: Layer, params?: any): LayerManager {
+  initLayer(layer: Layer<T>, params?: LayerOptions<T>): LayerManager<T> {
     const event: OnMountEvent = {
       elm: this.layerContainer,
     };
@@ -134,14 +134,14 @@ export class LayerManager {
     return this;
   }
 
-  showLayer(layerId: string): LayerManager {
+  showLayer(layerId: string): LayerManager<T> {
     const layer = this.getLayer(layerId);
     layer.setVisibility(true);
     layer.onRescale(this.zoomPanHandler.currentStateAsEvent());
     return this;
   }
 
-  hideLayer(layerId: string): LayerManager {
+  hideLayer(layerId: string): LayerManager<T> {
     this.getLayer(layerId).setVisibility(false);
     return this;
   }
@@ -172,71 +172,71 @@ export class LayerManager {
     this.layers.forEach((layer) => (layer.referenceSystem = irs));
   }
 
-  showAxis(): LayerManager {
+  showAxis(): LayerManager<T> {
     this._axis.show();
     return this;
   }
 
-  hideAxis(): LayerManager {
+  hideAxis(): LayerManager<T> {
     this._axis.hide();
     return this;
   }
 
-  showAxisLabels(): LayerManager {
+  showAxisLabels(): LayerManager<T> {
     this._axis.showLabels();
     return this;
   }
 
-  hideAxisLabels(): LayerManager {
+  hideAxisLabels(): LayerManager<T> {
     this._axis.hideLabels();
     return this;
   }
 
-  setAxisOffset(x: number, y: number): LayerManager {
+  setAxisOffset(x: number, y: number): LayerManager<T> {
     this._axis.offsetX = x;
     this._axis.offsetY = y;
-    const gridLayers = this.layers.filter((l: Layer) => l instanceof GridLayer);
-    gridLayers.forEach((l: GridLayer) => {
+    const gridLayers = this.layers.filter((l: Layer<T>) => l instanceof GridLayer<T>);
+    gridLayers.forEach((l: GridLayer<T>) => {
       l.offsetX = x;
       l.offsetY = y;
     });
     return this;
   }
 
-  setXAxisOffset(x: number): LayerManager {
+  setXAxisOffset(x: number): LayerManager<T> {
     this._axis.offsetX = x;
-    const gridLayers = this.layers.filter((l: Layer) => l instanceof GridLayer);
-    gridLayers.forEach((l: GridLayer) => {
+    const gridLayers = this.layers.filter((l: Layer<T>) => l instanceof GridLayer<T>);
+    gridLayers.forEach((l: GridLayer<T>) => {
       l.offsetX = x;
     });
     return this;
   }
 
-  setYAxisOffset(y: number): LayerManager {
+  setYAxisOffset(y: number): LayerManager<T> {
     this._axis.offsetY = y;
-    const gridLayers = this.layers.filter((l: Layer) => l instanceof GridLayer);
-    gridLayers.forEach((l: GridLayer) => {
+    const gridLayers = this.layers.filter((l: Layer<T>) => l instanceof GridLayer<T>);
+    gridLayers.forEach((l: GridLayer<T>) => {
       l.offsetY = y;
     });
     return this;
   }
 
-  setZoomLevelBoundary(zoomlevels: [number, number]): LayerManager {
+  setZoomLevelBoundary(zoomlevels: [number, number]): LayerManager<T> {
     this._zoomPanHandler.setZoomLevelBoundary(zoomlevels);
     return this;
   }
 
-  setMaxZoomLevel(zoomlevel: number): LayerManager {
+  setMaxZoomLevel(zoomlevel: number): LayerManager<T> {
     this._zoomPanHandler.setMaxZoomLevel(zoomlevel);
     return this;
   }
 
-  setMinZoomLevel(zoomlevel: number): LayerManager {
+  setMinZoomLevel(zoomlevel: number): LayerManager<T> {
     this._zoomPanHandler.setMinZoomLevel(zoomlevel);
     return this;
   }
 
-  destroy(): LayerManager {
+  destroy(): LayerManager<T> {
     this.removeAllLayers();
     this.layerContainer.remove();
     this.layerContainer = undefined;

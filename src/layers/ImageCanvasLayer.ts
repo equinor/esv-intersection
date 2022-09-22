@@ -1,7 +1,20 @@
 import { CanvasLayer } from './base/CanvasLayer';
 import { OnUpdateEvent, OnMountEvent, OnRescaleEvent } from '../interfaces';
+import { ScaleLinear } from 'd3-scale';
 
-export class ImageLayer extends CanvasLayer {
+export interface OnImageLayerUpdateEvent<T> extends OnUpdateEvent<T> {
+  url: string;
+  xScale: ScaleLinear<number, number, never>;
+  yScale: ScaleLinear<number, number, never>;
+  xRatio?: number;
+  yRatio?: number;
+  x?: number;
+  y?: number;
+}
+
+export type OnImageLayerRescaleEvent<T> = OnImageLayerUpdateEvent<T> & OnRescaleEvent;
+
+export class ImageLayer<T> extends CanvasLayer<T> {
   img: HTMLImageElement;
 
   onMount(event: OnMountEvent): void {
@@ -11,19 +24,19 @@ export class ImageLayer extends CanvasLayer {
     this.isLoading = true;
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnImageLayerUpdateEvent<T>): void {
     super.onUpdate(event);
     this.img.src = event.url;
     this.render(event);
   }
 
-  onRescale(event: OnRescaleEvent): void {
+  onRescale(event: OnImageLayerRescaleEvent<T>): void {
     super.onRescale(event);
     this.setTransform(event);
     this.render(event);
   }
 
-  render(event: OnUpdateEvent): void {
+  render(event: OnImageLayerUpdateEvent<T>): void {
     const width = parseInt(this.elm.getAttribute('width'), 10);
     const height = parseInt(this.elm.getAttribute('height'), 10);
     const { xScale, yScale, xRatio, yRatio, x, y } = event;

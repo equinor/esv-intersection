@@ -1,16 +1,18 @@
 import { ZoomTransform } from 'd3-zoom';
-import { Graphics, IApplicationOptions } from 'pixi.js';
-import { Layer } from './layers/base/Layer';
-import { IntersectionReferenceSystem } from './control/IntersectionReferenceSystem';
+import { Graphics } from 'pixi.js';
 import Vector2 from '@equinor/videx-vector2';
+import { ScaleLinear } from 'd3-scale';
+import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
+import { CurveInterpolator } from 'curve-interpolator';
 
 interface LayerEvent {
-  [propType: string]: any;
   elm?: HTMLElement;
 }
 
 export interface OnMountEvent extends LayerEvent {
   elm: HTMLElement;
+  width?: number;
+  height?: number;
 }
 
 export interface OnUnmountEvent extends LayerEvent {}
@@ -21,89 +23,29 @@ export interface OnResizeEvent extends LayerEvent {
 }
 
 export interface OnRescaleEvent extends LayerEvent {
-  xBounds?: [number, number];
-  yBounds?: [number, number];
-  zFactor?: number;
-  viewportRatio?: number;
-  width?: number;
-  height?: number;
-  xRatio?: number;
-  yRatio?: number;
-  transform?: ZoomTransform;
-}
-
-export interface OnUpdateEvent extends LayerEvent {}
-
-export interface LayerOptions {
-  order?: number;
-  layerOpacity?: number;
-  referenceSystem?: IntersectionReferenceSystem;
-  data?: any;
-  interactive?: boolean;
-
-  onMount?(event: OnMountEvent, layer: Layer): void;
-  onUnmount?(event: OnUnmountEvent, layer: Layer): void;
-  onUpdate?(event: OnUpdateEvent, layer: Layer): void;
-  onRescale?(event: OnRescaleEvent, layer: Layer): void;
-  onResize?(event: OnResizeEvent, layer: Layer): void;
-}
-
-export interface GridLayerOptions extends LayerOptions {
-  majorWidth?: number;
-  majorColor?: string;
-
-  minorWidth?: number;
-  minorColor?: string;
-}
-
-export interface WellborepathLayerOptions extends LayerOptions {
-  stroke: string;
-  strokeWidth: string;
-  curveType?: string;
-  tension?: number;
-}
-
-export interface GeomodelLayerOptions extends LayerOptions {}
-
-export interface CompletionLayerOptions extends PixiLayerOptions {}
-
-export interface GeomodelLayerLabelsOptions extends LayerOptions {
-  margins?: number;
-  minFontSize?: number;
-  maxFontSize?: number;
-  textColor?: string;
-  font?: string;
-}
-
-export interface HoleSizeLayerOptions extends WellComponentBaseOptions {
-  firstColor?: string;
-  secondColor?: string;
-  lineColor?: number;
-}
-
-export interface CasingShoeSize {
+  xScale: ScaleLinear<number, number, never>;
+  yScale: ScaleLinear<number, number, never>;
+  xBounds: [number, number];
+  yBounds: [number, number];
+  zFactor: number;
+  viewportRatio: number;
+  xRatio: number;
+  yRatio: number;
   width: number;
-  length: number;
+  height: number;
+  transform: ZoomTransform;
 }
 
-export interface CasingLayerOptions extends WellComponentBaseOptions {
-  solidColor?: number;
-  lineColor?: number;
-  casingShoeSize?: CasingShoeSize;
+export interface OnUpdateEvent<T> extends LayerEvent {
+  data?: T;
 }
 
-export interface CementLayerOptions extends WellComponentBaseOptions {
-  firstColor?: string;
-  secondColor?: string;
-}
-
-export interface PixiLayerOptions extends LayerOptions {
-  pixiApplicationOptions?: IApplicationOptions;
-}
-
-export interface WellComponentBaseOptions extends PixiLayerOptions {
-  exaggerationFactor?: number;
-}
+export type CompletionData = {
+  shape: string;
+  start: number;
+  end: number;
+  diameter: number;
+};
 
 export interface ZoomAndPanOptions {
   maxZoomLevel: number;
@@ -169,30 +111,14 @@ export interface ScaleOptions {
 }
 
 export interface Interpolators {
-  trajectory: any;
-  curtain: any;
-  position?: any;
-  curve?: any;
+  trajectory: CurveInterpolator;
+  curtain: ExtendedCurveInterpolator;
+  curve?: ExtendedCurveInterpolator;
 }
-
-export interface Interpolator {}
 
 export interface Trajectory {
   points: number[][];
   offset: number;
-}
-
-export interface ReferenceSystemOptions {
-  normalizedLength?: number;
-  arcDivisions?: number;
-  tension?: number;
-  trajectoryAngle?: number;
-  calculateDisplacementFromBottom?: boolean;
-  curveInterpolator?: Interpolator;
-  trajectoryInterpolator?: Interpolator;
-  curtainInterpolator?: Interpolator;
-  approxT?: boolean;
-  quickT?: boolean;
 }
 
 export type BoundingBox = {
@@ -203,12 +129,3 @@ export type BoundingBox = {
   offsetX?: number;
   offsetY?: number;
 };
-
-export interface CalloutOptions extends LayerOptions {
-  minFontSize?: number;
-  maxFontSize?: number;
-  fontSizeFactor?: number;
-  offsetMin?: number;
-  offsetMax?: number;
-  offsetFactor?: number;
-}

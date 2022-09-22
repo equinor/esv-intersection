@@ -1,20 +1,32 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { clamp } from '@equinor/videx-math';
 
 import { CanvasLayer } from './base/CanvasLayer';
-import { GeomodelLayerLabelsOptions, OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 import { SurfaceArea, SurfaceLine, findSampleAtPos, SurfaceData } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
+import { LayerOptions } from './base/Layer';
 
 const DEFAULT_MARGINS = 18;
 const DEFAULT_MIN_FONT_SIZE = 8;
 const DEFAULT_MAX_FONT_SIZE = 13;
 const DEFAULT_TEXT_COLOR = 'black';
 const DEFAULT_FONT = 'Arial';
+const MAX_FONT_SIZE_IN_WORLD_COORDINATES = 70;
 
-export class GeomodelLabelsLayer extends CanvasLayer {
+export interface GeomodelLayerLabelsOptions<T extends SurfaceData> extends LayerOptions<T> {
+  margins?: number;
+  minFontSize?: number;
+  maxFontSize?: number;
+  textColor?: string;
+  font?: string;
+}
+
+interface SurfaceAreaWithAvgTopDepth extends SurfaceArea {
+  avgTopDepth: number;
+}
+
+export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   defaultMargins: number = DEFAULT_MARGINS;
   defaultMinFontSize: number = DEFAULT_MIN_FONT_SIZE;
   defaultMaxFontSize: number = DEFAULT_MAX_FONT_SIZE;
@@ -23,11 +35,11 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
   rescaleEvent: OnRescaleEvent;
   isLabelsOnLeftSide: boolean = true;
-  maxFontSizeInWorldCoordinates: number = 70;
+  maxFontSizeInWorldCoordinates: number = MAX_FONT_SIZE_IN_WORLD_COORDINATES;
   isXFlipped: boolean = false;
-  areasWithAvgTopDepth: any[] = null;
+  areasWithAvgTopDepth: SurfaceAreaWithAvgTopDepth[] = null;
 
-  constructor(id?: string, options?: GeomodelLayerLabelsOptions) {
+  constructor(id?: string, options?: GeomodelLayerLabelsOptions<T>) {
     super(id, options);
     this.render = this.render.bind(this);
     this.getMarginsInWorldCoordinates = this.getMarginsInWorldCoordinates.bind(this);
@@ -36,24 +48,24 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     this.generateSurfacesWithAvgDepth = this.generateSurfacesWithAvgDepth.bind(this);
   }
 
-  get options(): GeomodelLayerLabelsOptions {
+  get options(): GeomodelLayerLabelsOptions<T> {
     return this._options;
   }
 
-  setData(data: SurfaceData): void {
+  setData(data: T): void {
     super.setData(data);
     this.areasWithAvgTopDepth = null;
   }
 
-  generateSurfacesWithAvgDepth(): any {
+  generateSurfacesWithAvgDepth(): void {
     const { areas } = this.data;
-    this.areasWithAvgTopDepth = areas.reduce((acc: any, area: any) => {
+    this.areasWithAvgTopDepth = areas.reduce((acc: SurfaceAreaWithAvgTopDepth[], area: SurfaceArea) => {
       // Filter surfaces without label
       if (!area.label) {
         return acc;
       }
       const sumAndCount = area.data.reduce(
-        (a: any, d: any) => {
+        (a: { sum: number; count: number }, d: number[]) => {
           if (d[1] != null) {
             a.sum += d[1];
             a.count++;
@@ -82,7 +94,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     super.onMount(event);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.render();
   }
@@ -116,8 +128,8 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   drawAreaLabels(): void {
-    this.areasWithAvgTopDepth.forEach((s: any, i: number, array: any[]) => {
-      const topmostSurfaceNotDrawnYet = array.reduce((acc, v, index) => {
+    this.areasWithAvgTopDepth.forEach((s: SurfaceAreaWithAvgTopDepth, i: number, array: SurfaceAreaWithAvgTopDepth[]) => {
+      const topmostSurfaceNotDrawnYet = array.reduce((acc: SurfaceAreaWithAvgTopDepth | null, v, index): SurfaceAreaWithAvgTopDepth | null => {
         if (index > i) {
           if (acc == null) {
             acc = v;
@@ -129,6 +141,11 @@ export class GeomodelLabelsLayer extends CanvasLayer {
         }
         return acc;
       }, null);
+
+      if (!topmostSurfaceNotDrawnYet) {
+        return;
+      }
+
       this.drawAreaLabel(s, topmostSurfaceNotDrawnYet, array, i);
     });
   }
@@ -137,7 +154,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     this.data.lines.filter((surfaceLine: SurfaceLine) => surfaceLine.label).forEach((surfaceLine: SurfaceLine) => this.drawLineLabel(surfaceLine));
   }
 
-  drawAreaLabel = (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea, surfaces: any[], i: number): void => {
+  drawAreaLabel = (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea, surfaces: SurfaceArea[], i: number): void => {
     const { data } = surfaceArea;
     const { ctx, maxFontSizeInWorldCoordinates, isXFlipped } = this;
     const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
@@ -329,6 +346,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     }
 
     let hexString = color.toString(16);
+    // eslint-disable-next-line no-magic-numbers
     hexString = '000000'.substr(0, 6 - hexString.length) + hexString;
     return `#${hexString}`;
   }
@@ -341,7 +359,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     topLimit: number = null,
     bottomLimit: number = null,
     alternativeSurfaceData: number[][] = null,
-    surfaces: any[] = null,
+    surfaces: SurfaceArea[] | null = null,
     currentSurfaceIndex: number = null,
   ): Vector2 {
     const pos = Vector2.zero.mutable;
@@ -370,7 +388,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     topLimit: number,
     bottomLimit: number,
     alternativeSurfaceData: number[][],
-    surfaces: any[],
+    surfaces: SurfaceArea[] | null,
     currentSurfaceIndex: number,
   ): number {
     if (!alternativeSurfaceData) {
@@ -384,7 +402,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       while (altY == null && si < surfaces.length) {
         const altSurface = surfaces[si++];
         altY = findSampleAtPos(
-          altSurface.data.map((d: any) => [d[0], d[1]]),
+          altSurface.data.map((d: number[]) => [d[0], d[1]]),
           x,
           topLimit,
           bottomLimit,
@@ -439,7 +457,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     maxReductionAngle: number = Math.PI / 4,
     angleReductionExponent: number = 4,
     alternativeSurfaceBottomData: number[][] = null,
-    surfaces: any[] = null,
+    surfaces: SurfaceArea[] | null = null,
     currentSurfaceIndex: number = null,
   ): number {
     const angles: number[] = [];
@@ -526,13 +544,13 @@ export class GeomodelLabelsLayer extends CanvasLayer {
     const [dx1, dx2] = xScale.domain();
     const [dy1, dy2] = yScale.domain();
 
-    let top = referenceSystem.interpolators.curtain.lookup(dy1, 1, 0);
+    let top = referenceSystem.interpolators.curtain.lookup(dy1, 1, 0) as number[][];
     if (top.length === 0) {
-      top = [referenceSystem.interpolators.curtain.getPointAt(0.0)];
+      top = [referenceSystem.interpolators.curtain.getPointAt(0.0) as number[]];
     }
-    let bottom = referenceSystem.interpolators.curtain.lookup(dy2, 1, 0);
+    let bottom = referenceSystem.interpolators.curtain.lookup(dy2, 1, 0) as number[][];
     if (bottom.length === 0) {
-      bottom = [referenceSystem.interpolators.curtain.getPointAt(1.0)];
+      bottom = [referenceSystem.interpolators.curtain.getPointAt(1.0) as number[]];
     }
 
     const maxX = Math.max(top[0][0], bottom[0][0]);
@@ -557,12 +575,11 @@ export class GeomodelLabelsLayer extends CanvasLayer {
 
     const spaceOnLeftSideInScreenCoordinates = spaceOnLeftSide * xRatio;
     const spaceOnRightSideInScreenCoordinates = spaceOnRightSide * xRatio;
-
     const isLabelsOnLeftSide =
       spaceOnLeftSide > spaceOnRightSide ||
       spaceOnLeftSideInScreenCoordinates > t ||
       (spaceOnLeftSideInScreenCoordinates < t && spaceOnRightSideInScreenCoordinates < t && isXFlipped) ||
-      bottom[1] < dy1;
+      bottom[0][1] < dy1;
 
     return isLabelsOnLeftSide;
   }

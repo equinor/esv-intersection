@@ -14,7 +14,7 @@ export type RescaleFunction = (event: OnRescaleEvent) => void;
 export class ZoomPanHandler {
   zoom: ZoomBehavior<Element, unknown> = null;
   elm: HTMLElement = null;
-  container: Selection<any, unknown, null, undefined> = null;
+  container: Selection<HTMLElement, unknown, null, undefined> = null;
   onRescale: RescaleFunction = null;
   options: ZoomAndPanOptions = null;
   xBounds: [number, number] = [0, 1];
@@ -37,8 +37,6 @@ export class ZoomPanHandler {
     onRescale: RescaleFunction,
     options: ZoomAndPanOptions = { maxZoomLevel: DEFAULT_MAX_ZOOM_LEVEL, minZoomLevel: DEFAULT_MIN_ZOOM_LEVEL },
   ) {
-    this.onZoom = this.onZoom.bind(this);
-
     this.container = select(elm);
     this.options = options;
 
@@ -183,7 +181,7 @@ export class ZoomPanHandler {
    * Update translate extent (pan limits)
    */
   updateTranslateExtent(): void {
-    const { width, xSpan, ySpan, zFactor, enableTranslateExtent, translateBoundsX, translateBoundsY } = this;
+    const { width, xSpan, zFactor, enableTranslateExtent, translateBoundsX, translateBoundsY } = this;
 
     let x1: number = -Infinity;
     let y1: number = -Infinity;
@@ -192,7 +190,6 @@ export class ZoomPanHandler {
 
     if (enableTranslateExtent) {
       const ppu: number = width / xSpan;
-      const h: number = ySpan * ppu * zFactor;
 
       x1 = translateBoundsX[0] * ppu;
       x2 = translateBoundsX[1] * ppu;
@@ -248,7 +245,7 @@ export class ZoomPanHandler {
   /**
    * Handle zoom
    */
-  onZoom(event: any): void {
+  onZoom(event: { transform: ZoomTransform }): void {
     const { transform } = event;
     if (!transform) {
       return;
@@ -262,7 +259,7 @@ export class ZoomPanHandler {
    * Update scale
    */
   applyTransform(transform: ZoomTransform): void {
-    const { width, scaleX, scaleY, xSpan, ySpan, xBounds, yBounds, zFactor } = this;
+    const { width, scaleX, scaleY, xSpan, xBounds, yBounds, zFactor } = this;
 
     const { viewportRatio: ratio, isXInverted, isYInverted } = this;
 
@@ -292,21 +289,21 @@ export class ZoomPanHandler {
    * @param  duration - duration of transition
    * @returns  a merge of filter and payload
    */
-  setViewport(cx: number = null, cy: number = null, displ: number = null, duration: number = null): void {
-    const { zoom, container, calculateTransform, viewportRatio: ratio, scaleX, scaleY, isXInverted } = this;
+  setViewport(cx?: number, cy?: number, displ?: number, duration?: number): void {
+    const { zoom, container, calculateTransform, scaleX, scaleY, isXInverted } = this;
 
-    if (cx === null || displ === null) {
+    if (isNaN(cx) || isNaN(displ)) {
       const xd: number[] = scaleX.domain();
       const dspan: number = xd[1] - xd[0];
-      if (cx === null) {
+      if (isNaN(cx)) {
         cx = xd[0] + dspan / 2 || 0;
       }
-      if (displ === null) {
+      if (isNaN(displ)) {
         displ = Math.abs(dspan) || 1;
       }
     }
 
-    if (cy === null) {
+    if (isNaN(cy)) {
       const yd: number[] = scaleY.domain();
       cy = yd[0] + (yd[1] - yd[0]) / 2 || 0;
     }
@@ -356,7 +353,7 @@ export class ZoomPanHandler {
     let h = 0;
 
     if (typeof width === 'undefined' || typeof width === 'boolean') {
-      const { containerWidth, containerHeight } = this.container.node().getBoundingClientRect();
+      const { width: containerWidth, height: containerHeight } = this.container.node().getBoundingClientRect();
       w = containerWidth;
       h = containerHeight;
     } else {

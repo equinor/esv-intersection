@@ -1,5 +1,5 @@
 import { Axis } from '../../../src/components';
-import { select } from 'd3-selection';
+import { select, Selection } from 'd3-selection';
 import { ZoomPanHandler, OnRescaleEvent, Controller } from '../../../src';
 import { createFPSLabel, createRootContainer, createLayerContainer, createHelpText } from '../utils';
 import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../../../src/constants';
@@ -11,9 +11,7 @@ export const AxisUsingLowLevelInterface = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  const svg = select(container).append('svg').attr('height', `${height}px`).attr('width', `${width}px`).style('background-color', '#eee');
-
-  const mainGroup = svg;
+  const mainGroup = (select(container).append('svg').attr('height', `${height}px`).attr('width', `${width}px`).style('background-color', '#eee') as unknown) as Selection<SVGElement, unknown, null, undefined>;
   const showLabels = true;
 
   const xLabel = 'x';

@@ -1,10 +1,15 @@
 import { Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
-import { OnRescaleEvent, OnUpdateEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
+import { LayerOptions } from './base/Layer';
 
-export class GeomodelLayerV2 extends PixiLayer {
+const DEFAULT_Y_BOTTOM = 10000;
+
+export interface GeomodelLayerOptions<T extends SurfaceData> extends LayerOptions<T> {}
+
+export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
   private isPreRendered: boolean = false;
 
   onRescale(event: OnRescaleEvent): void {
@@ -18,7 +23,7 @@ export class GeomodelLayerV2 extends PixiLayer {
     this.render();
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
 
     this.isPreRendered = false;
@@ -45,7 +50,7 @@ export class GeomodelLayerV2 extends PixiLayer {
     this.isPreRendered = true;
   }
 
-  createPolygons = (data: any): number[][] => {
+  createPolygons = (data: number[][]): number[][] => {
     const polygons: number[][] = [];
     let polygon: number[] = null;
 
@@ -65,8 +70,10 @@ export class GeomodelLayerV2 extends PixiLayer {
         if (polygon) {
           // Generate bottom of polygon
           for (let j: number = !topIsValid ? i - 1 : i; j >= 0; j--) {
-            if (!data[j][1]) break;
-            polygon.push(data[j][0], data[j][2] || 10000);
+            if (!data[j][1]) {
+              break;
+            }
+            polygon.push(data[j][0], data[j][2] || DEFAULT_Y_BOTTOM);
           }
           polygons.push(polygon);
           polygon = null;
@@ -81,7 +88,7 @@ export class GeomodelLayerV2 extends PixiLayer {
     g.lineStyle(1, s.color as number, 1);
     g.beginFill(s.color as number);
     const polygons = this.createPolygons(s.data);
-    polygons.forEach((polygon: any) => g.drawPolygon(polygon));
+    polygons.forEach((polygon: number[]) => g.drawPolygon(polygon));
     g.endFill();
     this.ctx.stage.addChild(g);
   };

@@ -1,6 +1,5 @@
 import { clamp } from '@equinor/videx-math';
 
-/* eslint-disable no-magic-numbers */
 type fx = (n: number) => number;
 
 /*

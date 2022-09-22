@@ -1,8 +1,9 @@
-/* eslint-disable no-magic-numbers */
 import { Point } from 'pixi.js';
 import { merge } from 'd3-array';
 import { Cement, Casing, HoleSize } from '..';
 import { HOLE_OUTLINE } from '../constants';
+
+const EPSILON = 0;
 
 export const getEndLines = (
   rightPath: Point[],
@@ -18,12 +19,7 @@ export const getEndLines = (
 };
 
 export const makeTubularPolygon = (rightPath: Point[], leftPath: Point[]): Point[] => {
-  return [
-    ...leftPath,
-    ...rightPath
-      .map<Point>((d) => d.clone())
-      .reverse(),
-  ];
+  return [...leftPath, ...rightPath.map<Point>((d) => d.clone()).reverse()];
 };
 
 export const overlaps = (top1: number, bottom1: number, top2: number, bottom2: number): boolean => top1 <= bottom2 && top2 <= bottom1;
@@ -61,15 +57,14 @@ export const cementDiameterChangeDepths = (
 ): number[] => {
   const topOfCement = cement.toc;
 
-  const diameterChangeDepths =
-    merge(
-      diameterIntervals.map((d) => [
-        d.start - 0.0001, // +- 0.0001 to find diameter right beforeobject
-        d.start,
-        d.end,
-        d.end + 0.0001, // +- 0.0001 to find diameter right after object
-      ]),
-    ).filter((d) => d >= topOfCement && d <= bottomOfCement) as number[]; // trim
+  const diameterChangeDepths = merge(
+    diameterIntervals.map((d) => [
+      d.start - EPSILON, // +- 0.0001 to find diameter right before object
+      d.start,
+      d.end,
+      d.end + EPSILON, // +- 0.0001 to find diameter right after object
+    ]),
+  ).filter((d) => d >= topOfCement && d <= bottomOfCement) as number[]; // trim
 
   diameterChangeDepths.push(topOfCement);
   diameterChangeDepths.push(bottomOfCement);
@@ -79,37 +74,39 @@ export const cementDiameterChangeDepths = (
   return uniqDepths.sort((a: number, b: number) => a - b);
 };
 
-export const calculateCementDiameter = (innerCasing: Casing[], nonAttachedCasings: Casing[], holes: HoleSize[]) => (
-  depth: number,
-): {
-  md: number;
-  innerDiameter: number;
-  outerDiameter: number;
-} => {
-  const defaultCementWidth = 100; // Default to flow cement outside to show error in data
+export const calculateCementDiameter =
+  (innerCasing: Casing[], nonAttachedCasings: Casing[], holes: HoleSize[]) =>
+  (
+    depth: number,
+  ): {
+    md: number;
+    innerDiameter: number;
+    outerDiameter: number;
+  } => {
+    const defaultCementWidth = 100; // Default to flow cement outside to show error in data
 
-  const innerCasingAtDepth = innerCasing.find((casing) => casing.start <= depth && casing.end >= depth);
-  const innerDiameter = innerCasingAtDepth ? innerCasingAtDepth.diameter : 0;
+    const innerCasingAtDepth = innerCasing.find((casing) => casing.start <= depth && casing.end >= depth);
+    const innerDiameter = innerCasingAtDepth ? innerCasingAtDepth.diameter : 0;
 
-  const outerCasings = nonAttachedCasings.filter((casing) => casing.innerDiameter > innerDiameter);
-  const holeAtDepth = holes.find((hole) => hole.start <= depth && hole.end >= depth && hole.diameter > innerDiameter);
-  const outerCasingAtDepth = outerCasings
-    .filter((d) => d)
-    .sort((a, b) => a.innerDiameter - b.innerDiameter) // ascending
-    .find((casing) => casing.start <= depth && casing.end >= depth && casing.diameter > innerDiameter);
+    const outerCasings = nonAttachedCasings.filter((casing) => casing.innerDiameter > innerDiameter);
+    const holeAtDepth = holes.find((hole) => hole.start <= depth && hole.end >= depth && hole.diameter > innerDiameter);
+    const outerCasingAtDepth = outerCasings
+      .filter((d) => d)
+      .sort((a, b) => a.innerDiameter - b.innerDiameter) // ascending
+      .find((casing) => casing.start <= depth && casing.end >= depth && casing.diameter > innerDiameter);
 
-  let outerDiameter;
-  if (outerCasingAtDepth) {
-    outerDiameter = outerCasingAtDepth.innerDiameter;
-  } else if (holeAtDepth) {
-    outerDiameter = holeAtDepth.diameter - HOLE_OUTLINE;
-  } else {
-    outerDiameter = defaultCementWidth;
-  }
+    let outerDiameter;
+    if (outerCasingAtDepth) {
+      outerDiameter = outerCasingAtDepth.innerDiameter;
+    } else if (holeAtDepth) {
+      outerDiameter = holeAtDepth.diameter - HOLE_OUTLINE;
+    } else {
+      outerDiameter = defaultCementWidth;
+    }
 
-  return {
-    md: depth,
-    innerDiameter,
-    outerDiameter,
+    return {
+      md: depth,
+      innerDiameter,
+      outerDiameter,
+    };
   };
-};

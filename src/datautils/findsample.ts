@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 export function findIndexOfSample(data: number[][], pos: number): number {
   let a = 0;
   let b = data.length - 1;
@@ -47,7 +46,6 @@ export function findSampleAtPos(data: number[][], pos: number, topLimit: number 
     const v1 = data[index][1];
     const v2 = data[index + 1][1];
     if (v2 && v2) {
-      const x: number = pos;
       const x1 = data[index][0];
       const x2 = data[index + 1][0];
       const span = x2 - x1;

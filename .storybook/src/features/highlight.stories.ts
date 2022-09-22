@@ -118,8 +118,8 @@ export const HighlightWellborepathWithController = () => {
   return root;
 };
 
-class HighlightLayer extends HTMLLayer {
-  elements: Selection<HTMLElement, any, null, undefined>[] = [];
+class HighlightLayer<T> extends HTMLLayer<T> {
+  elements: Selection<HTMLDivElement, unknown, null, undefined>[] = [];
   elementCurveLength: number = 0;
 
   onMount(event: OnMountEvent): void {
@@ -142,7 +142,7 @@ class HighlightLayer extends HTMLLayer {
     }
   }
 
-  addHighlightElement(id: string): HighlightLayer {
+  addHighlightElement(id: string): HighlightLayer<T> {
     const elm = this.elm.append('div').attr('id', `${id}-highlight`);
     elm.style('visibility', 'visible');
     elm.style('height', `${POINTHEIGHT}px`);
@@ -166,7 +166,7 @@ class HighlightLayer extends HTMLLayer {
 }
 
 const onUpdate = (event: InputEvent, obj: any) => {
-  obj.layer.onUpdateCurveLength(event.target.valueAsNumber);
+  obj.layer.onUpdateCurveLength(Number(event.target!['value']));
   obj.layer.onRescale(obj.rescaleEvent);
 };
 

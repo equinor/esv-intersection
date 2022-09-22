@@ -4,7 +4,6 @@ export * from './GridLayer';
 export * from './base/SVGLayer';
 export * from './base/HTMLLayer';
 export * from './WellborePathLayer';
-export * from './GeomodelLayer';
 export * from './GeomodelCanvasLayer';
 export * from './GeomodelLayerV2';
 export * from './GeomodelLabelsLayer';

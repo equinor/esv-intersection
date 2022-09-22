@@ -1,6 +1,5 @@
 import Vector2 from '@equinor/videx-vector2';
 import { seqI } from '@equinor/videx-math';
-// @ts-ignore
 import { CurveInterpolator } from 'curve-interpolator';
 import { SurveySample } from './interfaces';
 
@@ -46,13 +45,15 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
 
   const points: number[][] = poslog ? poslog.map((p) => [p.easting, p.northing, p.tvd, p.md]) : [];
 
-  const interpolator: any = new CurveInterpolator(points, { tension: 0.75, arcDivisions: 5000 });
+  const interpolator: CurveInterpolator = new CurveInterpolator(points, { tension: 0.75, arcDivisions: 5000 });
   const displacement: number = interpolator.length;
 
   const nPoints: number = Math.round(displacement * pathSteps);
   let path: number[][] = null;
   if (nPoints > 0) {
-    path = simplify(interpolator.getPoints(nPoints), 0.0005, 10);
+    const maxOffset = 0.0005;
+    const maxDistance = 10;
+    path = simplify(interpolator.getPoints(nPoints), maxOffset, maxDistance);
   } else {
     path = [[points[0][0], points[0][1]]];
   }
@@ -63,7 +64,8 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
   let v: Vector2 = null;
 
   if (relativeDist < thresholdRelativeDist) {
-    const radCurtainDirection = (defaultIntersectionAngle / 180) * Math.PI;
+    const oneEighty = 180;
+    const radCurtainDirection = (defaultIntersectionAngle / oneEighty) * Math.PI;
     v = new Vector2(Math.cos(radCurtainDirection), Math.sin(radCurtainDirection)).mutable;
   } else {
     v = getDirectionVector(path, thresholdDirectionDist);
@@ -102,9 +104,6 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
     .splice(1);
 
   trajectory.push(...endPoints);
-  const a1: number = Vector2.angleRight(initial);
-
-  const angle: number = ((a1 > 0 ? a1 : 2 * Math.PI + a1) * 360) / (2 * Math.PI);
 
   const projectedTrajectory: number[][] = projectCurtain(trajectory, null, offset);
 
@@ -129,10 +128,14 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
     res.add(temp);
 
     len = res.magnitude;
-    if (len > threshold) break;
+    if (len > threshold) {
+      break;
+    }
   }
 
-  if (len === 0) return new Vector2([0, 0]);
+  if (len === 0) {
+    return new Vector2([0, 0]);
+  }
   return res.scale(1 / len);
 }
 
@@ -150,7 +153,9 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
  * @return {Number[]}    Simplified array
  */
 function simplify(inputArr: number[][], maxOffset = 0.001, maxDistance = 10): number[][] {
-  if (inputArr.length <= 4) return inputArr;
+  if (inputArr.length <= 4) {
+    return inputArr;
+  }
   const [o0, o1] = inputArr[0];
   const arr = inputArr.map((d) => [d[0] - o0, d[1] - o1]);
   let [a0, a1] = arr[0];

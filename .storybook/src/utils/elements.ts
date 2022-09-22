@@ -27,7 +27,7 @@ export const createButtonContainer = (width: number) => {
   return container;
 };
 
-export const createButton = (layer: Layer, zoomHandler: ZoomPanHandler, title: string, additionalEventParams: any, onMount: any) => {
+export const createButton = <T>(layer: Layer<T>, zoomHandler: ZoomPanHandler, title: string, additionalEventParams: any, onMount: any) => {
   const btn = document.createElement('button');
   btn.innerHTML = `Toggle ${title}`;
   btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
@@ -83,7 +83,7 @@ export const createHelpText = (description: string) => {
   return text;
 };
 
-export const createSlider = (layer: Layer, event: OnUpdateEvent, width: number) => {
+export const createSlider = <T>(layer: Layer<T>, event: OnUpdateEvent<T>, width: number) => {
   const slider = document.createElement('input');
   slider.type = 'range';
   slider.value = `${layer.opacity.valueOf() * 10}`;

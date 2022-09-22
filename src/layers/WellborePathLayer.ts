@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import {
   line,
   curveCatmullRom,
@@ -15,12 +14,24 @@ import {
   curveStepBefore,
 } from 'd3-shape';
 import { SVGLayer } from './base/SVGLayer';
-import { WellborepathLayerOptions, OnUpdateEvent, OnRescaleEvent } from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
+import { LayerOptions } from '..';
 
-export class WellborepathLayer extends SVGLayer {
+const CURVE_CATMULL_ROM_ALPHA = 0.7;
+const CURVE_CARDINAL_TENSION = 0.9;
+const CURVE_BUNDLE_BETA = 1.0;
+
+export interface WellborepathLayerOptions<T extends [number, number][]> extends LayerOptions<T> {
+  stroke: string;
+  strokeWidth: string;
+  curveType?: string;
+  tension?: number;
+}
+
+export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T> {
   rescaleEvent: OnRescaleEvent;
 
-  constructor(id?: string, options?: WellborepathLayerOptions) {
+  constructor(id?: string, options?: WellborepathLayerOptions<T>) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -29,7 +40,7 @@ export class WellborepathLayer extends SVGLayer {
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.render();
   }
@@ -44,7 +55,7 @@ export class WellborepathLayer extends SVGLayer {
   }
 
   render(): void {
-    const { strokeWidth, stroke } = this.options as WellborepathLayerOptions;
+    const { strokeWidth, stroke } = this.options as WellborepathLayerOptions<T>;
 
     if (!this.elm) {
       return;
@@ -72,11 +83,11 @@ export class WellborepathLayer extends SVGLayer {
 
     // TODO: Might be a good idea to move something like this to a shared function in a base class
     let curveFactory;
-    const { curveType, tension } = this.options as WellborepathLayerOptions;
+    const { curveType, tension } = this.options as WellborepathLayerOptions<T>;
     switch (curveType) {
       default:
       case 'curveCatmullRom':
-        curveFactory = curveCatmullRom.alpha(tension || 0.7);
+        curveFactory = curveCatmullRom.alpha(tension || CURVE_CATMULL_ROM_ALPHA);
         break;
       case 'curveLinear':
         curveFactory = curveLinear;
@@ -88,10 +99,10 @@ export class WellborepathLayer extends SVGLayer {
         curveFactory = curveBasisClosed;
         break;
       case 'curveBundle':
-        curveFactory = curveBundle.beta(tension || 1.0);
+        curveFactory = curveBundle.beta(tension || CURVE_BUNDLE_BETA);
         break;
       case 'curveCardinal':
-        curveFactory = curveCardinal.tension(tension || 0.9);
+        curveFactory = curveCardinal.tension(tension || CURVE_CARDINAL_TENSION);
         break;
       case 'curveMonotoneX':
         curveFactory = curveMonotoneX;

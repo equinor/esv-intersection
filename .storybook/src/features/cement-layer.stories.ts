@@ -1,4 +1,4 @@
-import { CementLayer, OnRescaleEvent, CementLayerOptions, ZoomPanHandler, IntersectionReferenceSystem, Controller } from '../../../src';
+import { CementLayer, OnRescaleEvent, CementLayerOptions, ZoomPanHandler, IntersectionReferenceSystem, Controller, CementData } from '../../../src';
 import { getWellborePath, getCasings, getCement, getHolesize } from '../data';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
@@ -14,7 +14,7 @@ export const CementLayerUsingLowLevelInterface = () => {
   Promise.all([getWellborePath(), getCement(), getCasings(), getHolesize()]).then(([wbp, cement, casings, holes]) => {
     const referenceSystem = new IntersectionReferenceSystem(wbp);
 
-    const options: CementLayerOptions = {
+    const options: CementLayerOptions<CementData> = {
       order: 1,
       referenceSystem,
       data: { cement, casings, holes },
@@ -50,7 +50,7 @@ export const CementLayerUsingHighLevelInterface = () => {
   Promise.all([getWellborePath(), getCement(), getCasings(), getHolesize()]).then(([wbp, cement, casings, holes]) => {
     const referenceSystem = new IntersectionReferenceSystem(wbp);
 
-    const options: CementLayerOptions = {
+    const options: CementLayerOptions<CementData> = {
       order: 1,
       referenceSystem,
       data: { cement, casings, holes },

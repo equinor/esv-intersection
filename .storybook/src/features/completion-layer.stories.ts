@@ -1,4 +1,4 @@
-import { CompletionLayer, ZoomPanHandler, CompletionLayerOptions, OnRescaleEvent, IntersectionReferenceSystem, Controller } from '../../../src';
+import { CompletionLayer, ZoomPanHandler, CompletionLayerOptions, OnRescaleEvent, IntersectionReferenceSystem, Controller, CompletionData } from '../../../src';
 import { getWellborePath, getCompletion } from '../data';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
@@ -15,7 +15,7 @@ export const CompletionLayerUsingLowLevelInterface = () => {
     const [path, completion] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
 
-    const options: CompletionLayerOptions = {
+    const options: CompletionLayerOptions<CompletionData[]> = {
       order: 1,
       referenceSystem,
     };
@@ -50,7 +50,7 @@ export const CompletionLayerUsingHighLevelInterface = () => {
     const [path, completion] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
 
-    const options: CompletionLayerOptions = {
+    const options: CompletionLayerOptions<CompletionData[]> = {
       order: 1,
       referenceSystem,
       data: completion,

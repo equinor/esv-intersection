@@ -1,6 +1,6 @@
 import { Point, RENDERER_TYPE, Rectangle, Texture } from 'pixi.js';
-import { WellboreBaseComponentLayer } from './WellboreBaseComponentLayer';
-import { HoleSizeLayerOptions, HoleSize } from '..';
+import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
+import { HoleSize } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { convertColor } from '../utils/color';
@@ -23,10 +23,18 @@ const createGradientFill = (
   return gradient;
 };
 
-export class HoleSizeLayer extends WellboreBaseComponentLayer {
+const EXAGGERATED_DIAMETER = 100;
+
+export interface HoleSizeLayerOptions<T extends HoleSize[]> extends WellComponentBaseOptions<T> {
+  firstColor?: string;
+  secondColor?: string;
+  lineColor?: number;
+}
+
+export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLayer<T> {
   maxDiameter: number;
 
-  constructor(id?: string, options?: HoleSizeLayerOptions) {
+  constructor(id?: string, options?: HoleSizeLayerOptions<T>) {
     super(id, options);
     this.options = {
       ...this.options,
@@ -45,7 +53,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
     }
 
     data.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
-    this.maxDiameter = data.length > 0 ? data[0].diameter : 100;
+    this.maxDiameter = data.length > 0 ? data[0].diameter : EXAGGERATED_DIAMETER;
     data.forEach((hole: HoleSize) => this.drawHoleSize(hole));
   }
 
@@ -54,7 +62,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
       return;
     }
 
-    const { exaggerationFactor, firstColor, lineColor } = this.options as HoleSizeLayerOptions;
+    const { exaggerationFactor, firstColor, lineColor } = this.options as HoleSizeLayerOptions<T>;
 
     const diameter = holeObject.diameter * exaggerationFactor;
     const radius = diameter / 2;
@@ -85,7 +93,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
   };
 
   createTexture(diameter: number): Texture {
-    const { exaggerationFactor } = this.options as HoleSizeLayerOptions;
+    const { exaggerationFactor } = this.options as HoleSizeLayerOptions<T>;
 
     const textureDiameter = this.maxDiameter * exaggerationFactor;
     const height = textureDiameter;
@@ -104,7 +112,7 @@ export class HoleSizeLayer extends WellboreBaseComponentLayer {
   }
 
   createBaseTexture(width: number, height: number): Texture {
-    const { firstColor, secondColor } = this.options as HoleSizeLayerOptions;
+    const { firstColor, secondColor } = this.options as HoleSizeLayerOptions<T>;
 
     const canvas = document.createElement('canvas');
     canvas.width = width;

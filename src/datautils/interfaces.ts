@@ -12,14 +12,20 @@ export interface SurveySample {
  * Strat unit element as retrieved from SDMA
  */
 export interface StratUnit {
-  [propType: string]: any;
+  identifier: string;
+  stratUnitParent: string;
+  colorR: null | number;
+  colorG: null | number;
+  colorB: null | number;
+  topAge: number;
+  baseAge: number;
+  stratUnitLevel: number;
 }
 
 /**
  * Surfaces meta data as received from surface API with surface values injected
  */
 export interface SurfaceMetaAndValues {
-  [propType: string]: any;
   data: {
     values: number[];
   };

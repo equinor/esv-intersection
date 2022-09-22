@@ -1,4 +1,15 @@
-const checkForOverlap = (r1: any, r2: any) => {
+type GraphicObject = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+type GraphicObjectWithId = GraphicObject & {
+  id: number;
+};
+
+const checkForOverlap = (r1: GraphicObject, r2: GraphicObject) => {
   const r1x2 = r1.x + r1.width;
   const r2x2 = r2.x + r2.width;
   const r1y2 = r1.y + r1.height;
@@ -83,7 +94,7 @@ describe('callout', () => {
       expect(actual2).toEqual(null);
     });
     it('should highlight two overlapping texts', () => {
-      const arr = [
+      const arr: GraphicObject[] = [
         {
           x: 0,
           y: 0,
@@ -104,7 +115,7 @@ describe('callout', () => {
         },
       ];
 
-      let overlap = [];
+      const overlap: GraphicObject[] = [];
 
       for (let i = 0; i < arr.length; i++) {
         const eli = arr[i];
@@ -135,7 +146,7 @@ describe('callout', () => {
       expect(overlap).toEqual(expectation);
     });
     it('should highlight three overlapping texts', () => {
-      const arr = [
+      const arr: GraphicObjectWithId[] = [
         {
           id: 0,
           x: 0,
@@ -166,7 +177,7 @@ describe('callout', () => {
         },
       ];
 
-      let overlap = [];
+      const overlap: GraphicObjectWithId[] = [];
 
       for (let i = 0; i < arr.length; i++) {
         const eli = arr[i];

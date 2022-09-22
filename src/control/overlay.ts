@@ -1,14 +1,14 @@
 import { select, Selection, pointer, ContainerElement } from 'd3-selection';
 import { OverlayCallbacks } from './interfaces';
 
-export class Overlay {
+export class Overlay<T> {
   elm: Selection<Element, unknown, null, undefined>;
   source: Element;
   elements: { [propName: string]: Element } = {};
-  listeners: { [propName: string]: OverlayCallbacks } = {};
+  listeners: { [propName: string]: OverlayCallbacks<T> } = {};
   enabled = true;
 
-  constructor(caller: any, container: HTMLElement) {
+  constructor(caller: T, container: HTMLElement) {
     const con = select(container);
     this.elm = con.append('div').attr('id', 'overlay').style('z-index', '11').style('position', 'absolute');
 
@@ -84,7 +84,7 @@ export class Overlay {
     });
   }
 
-  create(key: string, callbacks?: OverlayCallbacks): HTMLElement {
+  create(key: string, callbacks?: OverlayCallbacks<T>): HTMLElement {
     const newElm = this.elm.append('div').style('position', 'relative').style('pointer-events', 'none').node();
     this.elements[key] = newElm;
     if (callbacks) {
@@ -93,7 +93,7 @@ export class Overlay {
     return newElm;
   }
 
-  register(key: string, callbacks: OverlayCallbacks): void {
+  register(key: string, callbacks: OverlayCallbacks<T>): void {
     this.listeners[key] = callbacks;
   }
 
@@ -115,4 +115,4 @@ export class Overlay {
   }
 }
 
-export const overlay = (caller: any, container: HTMLElement): Overlay => new Overlay(caller, container);
+export const overlay = <T>(caller: T, container: HTMLElement): Overlay<T> => new Overlay<T>(caller, container);

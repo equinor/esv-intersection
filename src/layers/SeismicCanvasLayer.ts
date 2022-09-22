@@ -1,12 +1,24 @@
 import { CanvasLayer } from './base/CanvasLayer';
 import { OnUpdateEvent, OnMountEvent, OnRescaleEvent } from '../interfaces';
 
-export class SeismicCanvasLayer extends CanvasLayer {
+export type SeismicCanvasDataOptions = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type SeismicCanvasData = {
+  image: CanvasImageSource | OffscreenCanvas;
+  options: SeismicCanvasDataOptions;
+};
+
+export class SeismicCanvasLayer extends CanvasLayer<SeismicCanvasData> {
   onMount(event: OnMountEvent): void {
     super.onMount(event);
   }
 
-  onUpdate(event: OnUpdateEvent): void {
+  onUpdate(event: OnUpdateEvent<SeismicCanvasData>): void {
     super.onUpdate(event);
 
     this.clearCanvas();

@@ -22,6 +22,7 @@ import {
   generateSeismicSliceImage,
   transformFormationData,
   getPicksData,
+  getSeismicOptions,
 } from '../../../src/datautils';
 
 //Data
@@ -85,12 +86,7 @@ const renderIntersection = (scaleOptions: any) => {
     const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
     const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
-    const seismicInfo = getSeismicInfo(seismic, trajectory) || {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-    };
+    const seismicInfo = getSeismicInfo(seismic, trajectory)
 
     const transformedPicksData = transformFormationData(picks, stratColumns);
     const picksData = getPicksData(transformedPicksData);
@@ -131,12 +127,7 @@ const renderIntersection = (scaleOptions: any) => {
 
     addMDOverlay(controller);
 
-    const seismicOptions = {
-      x: seismicInfo.minX,
-      y: seismicInfo.minTvdMsl,
-      width: seismicInfo.maxX - seismicInfo.minX,
-      height: seismicInfo.maxTvdMsl - seismicInfo.minTvdMsl,
-    };
+    const seismicOptions = getSeismicOptions(seismicInfo)
 
     generateSeismicSliceImage(seismic as any, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
       seismicLayer.setData({ image: seismicImage, options: seismicOptions });
@@ -282,7 +273,7 @@ function addMDOverlay(instance: any) {
  * @param title
  * @param additionalEventParams
  */
-const createButton = (manager: Controller, layer: Layer, title: string) => {
+const createButton = <T>(manager: Controller<T>, layer: Layer<T>, title: string) => {
   const btn = document.createElement('button');
   btn.innerHTML = `${title}`;
   btn.setAttribute('style', 'width: 170px;height:32px;margin-top:12px;background: lightblue;');

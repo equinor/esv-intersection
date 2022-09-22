@@ -14,7 +14,7 @@ export const WellborepathUsingLowLevelInterface = () => {
   getWellborePath().then((data) => {
     const referenceSystem = new IntersectionReferenceSystem(data);
 
-    const options: WellborepathLayerOptions = {
+    const options: WellborepathLayerOptions<[number,number][]> = {
       order: 1,
       strokeWidth: '2px',
       stroke: 'black',
@@ -45,7 +45,7 @@ export const WellborepathUsingHighLevelInterface = () => {
   getWellborePath().then((data) => {
     const referenceSystem = new IntersectionReferenceSystem(data);
 
-    const options: WellborepathLayerOptions = {
+    const options: WellborepathLayerOptions<[number,number][]> = {
       order: 1,
       strokeWidth: '2px',
       stroke: 'black',
