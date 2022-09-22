@@ -1,5 +1,4 @@
 /* eslint-disable no-magic-numbers */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { interpolateRgb, quantize } from 'd3-interpolate';
 import { scaleOrdinal } from 'd3-scale';
 import { convertColor } from '../utils/color';

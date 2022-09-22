@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-magic-numbers */
 import Vector2 from '@equinor/videx-vector2';
 import { clamp } from '@equinor/videx-math';
@@ -23,6 +22,10 @@ export interface GeomodelLayerLabelsOptions<T extends SurfaceData> extends Layer
   font?: string;
 }
 
+interface SurfaceAreaWithAvgTopDepth extends SurfaceArea {
+  avgTopDepth: number;
+}
+
 export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   defaultMargins: number = DEFAULT_MARGINS;
   defaultMinFontSize: number = DEFAULT_MIN_FONT_SIZE;
@@ -34,7 +37,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   isLabelsOnLeftSide: boolean = true;
   maxFontSizeInWorldCoordinates: number = 70;
   isXFlipped: boolean = false;
-  areasWithAvgTopDepth: any[] = null;
+  areasWithAvgTopDepth: SurfaceAreaWithAvgTopDepth[] = null;
 
   constructor(id?: string, options?: GeomodelLayerLabelsOptions<T>) {
     super(id, options);
@@ -54,15 +57,15 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     this.areasWithAvgTopDepth = null;
   }
 
-  generateSurfacesWithAvgDepth(): any {
+  generateSurfacesWithAvgDepth(): void {
     const { areas } = this.data;
-    this.areasWithAvgTopDepth = areas.reduce((acc: any, area: any) => {
+    this.areasWithAvgTopDepth = areas.reduce((acc: SurfaceAreaWithAvgTopDepth[], area: SurfaceArea) => {
       // Filter surfaces without label
       if (!area.label) {
         return acc;
       }
       const sumAndCount = area.data.reduce(
-        (a: any, d: any) => {
+        (a: { sum: number; count: number }, d: number[]) => {
           if (d[1] != null) {
             a.sum += d[1];
             a.count++;
@@ -125,8 +128,8 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   }
 
   drawAreaLabels(): void {
-    this.areasWithAvgTopDepth.forEach((s: any, i: number, array: any[]) => {
-      const topmostSurfaceNotDrawnYet = array.reduce((acc, v, index) => {
+    this.areasWithAvgTopDepth.forEach((s: SurfaceAreaWithAvgTopDepth, i: number, array: SurfaceAreaWithAvgTopDepth[]) => {
+      const topmostSurfaceNotDrawnYet = array.reduce((acc: SurfaceAreaWithAvgTopDepth | null, v, index): SurfaceAreaWithAvgTopDepth | null => {
         if (index > i) {
           if (acc == null) {
             acc = v;
@@ -138,6 +141,11 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
         }
         return acc;
       }, null);
+
+      if (!topmostSurfaceNotDrawnYet) {
+        return;
+      }
+
       this.drawAreaLabel(s, topmostSurfaceNotDrawnYet, array, i);
     });
   }
@@ -146,7 +154,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     this.data.lines.filter((surfaceLine: SurfaceLine) => surfaceLine.label).forEach((surfaceLine: SurfaceLine) => this.drawLineLabel(surfaceLine));
   }
 
-  drawAreaLabel = (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea, surfaces: any[], i: number): void => {
+  drawAreaLabel = (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea, surfaces: SurfaceArea[], i: number): void => {
     const { data } = surfaceArea;
     const { ctx, maxFontSizeInWorldCoordinates, isXFlipped } = this;
     const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
@@ -350,7 +358,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     topLimit: number = null,
     bottomLimit: number = null,
     alternativeSurfaceData: number[][] = null,
-    surfaces: any[] = null,
+    surfaces: SurfaceArea[] | null = null,
     currentSurfaceIndex: number = null,
   ): Vector2 {
     const pos = Vector2.zero.mutable;
@@ -379,7 +387,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     topLimit: number,
     bottomLimit: number,
     alternativeSurfaceData: number[][],
-    surfaces: any[],
+    surfaces: SurfaceArea[] | null,
     currentSurfaceIndex: number,
   ): number {
     if (!alternativeSurfaceData) {
@@ -393,7 +401,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       while (altY == null && si < surfaces.length) {
         const altSurface = surfaces[si++];
         altY = findSampleAtPos(
-          altSurface.data.map((d: any) => [d[0], d[1]]),
+          altSurface.data.map((d: number[]) => [d[0], d[1]]),
           x,
           topLimit,
           bottomLimit,
@@ -448,7 +456,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     maxReductionAngle: number = Math.PI / 4,
     angleReductionExponent: number = 4,
     alternativeSurfaceBottomData: number[][] = null,
-    surfaces: any[] = null,
+    surfaces: SurfaceArea[] | null = null,
     currentSurfaceIndex: number = null,
   ): number {
     const angles: number[] = [];
