@@ -12,7 +12,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
 
   rescaleEvent: OnRescaleEvent;
 
-  constructor(pixiRenderApplication?: PixiRenderApplication, id?: string, options?: WellComponentBaseOptions) {
+  constructor(pixiRenderApplication?: PixiRenderApplication, id?: string, options?: WellComponentBaseOptions<T>) {
     super(pixiRenderApplication, id, options);
     this.options = {
       ...this.options,

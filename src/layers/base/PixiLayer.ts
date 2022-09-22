@@ -1,4 +1,13 @@
-import { AbstractRenderer, autoDetectRenderer, Container, IApplicationOptions, IRendererOptionsAuto, RENDERER_TYPE } from 'pixi.js';
+import {
+  AbstractRenderer,
+  Application,
+  autoDetectRenderer,
+  Container,
+  DisplayObject,
+  IApplicationOptions,
+  IRendererOptionsAuto,
+  RENDERER_TYPE,
+} from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 
@@ -48,7 +57,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
     return this._container;
   }
 
-  constructor(ctx: Application | PixiRenderApplication, id?: string, options?: LayerOptions) {
+  constructor(ctx: Application | PixiRenderApplication, id?: string, options?: LayerOptions<T>) {
     super(id, options);
 
     this._ctx = ctx;
