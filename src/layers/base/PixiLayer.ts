@@ -1,7 +1,6 @@
 import { AbstractRenderer, autoDetectRenderer, Container, IApplicationOptions, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
-import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export class PixiRenderApplication {
   stage: Container;
@@ -60,6 +59,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
   }
 
   onMount(event: OnMountEvent) {
+    super.onMount(event);
     const { elm: parentElement } = event;
 
     if (!this.elm) {
