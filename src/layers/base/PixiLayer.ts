@@ -1,7 +1,10 @@
-import { AbstractRenderer, autoDetectRenderer, Container, IApplicationOptions, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
+import { AbstractRenderer, autoDetectRenderer, Container, IApplicationOptions, IRendererOptionsAuto, RENDERER_TYPE } from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 
+// PixiRenderApplication does not inherit from PIXI.Application to avoid registering the gameloop plugin
+// The gameloop plugin tries to re-render at 60fps
+// We only want to re-render on data changes
 export class PixiRenderApplication {
   stage: Container;
 
@@ -45,7 +48,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
     return this._container;
   }
 
-  constructor(ctx: PixiRenderApplication, id?: string, options?: PixiLayerOptions) {
+  constructor(ctx: Application | PixiRenderApplication, id?: string, options?: LayerOptions) {
     super(id, options);
 
     this._ctx = ctx;
