@@ -1,5 +1,5 @@
 /* eslint-disable no-magic-numbers */
-import { CementLayer, IntersectionReferenceSystem } from '../src/index';
+import { CementLayer, IntersectionReferenceSystem, PixiRenderApplication } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
 
 describe('CementLayer', () => {
@@ -26,38 +26,43 @@ describe('CementLayer', () => {
 
     it('should render when reference system is set in constructor', () => {
       // Arrange
+      const pixiRenderApplication = new PixiRenderApplication();
       const referenceSystem = new IntersectionReferenceSystem(wp);
-      const layer = new CementLayer('casing-layer', { referenceSystem });
+      const layer = new CementLayer(pixiRenderApplication, 'casing-layer', { referenceSystem });
       layer.onMount({ elm });
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
+      jest.spyOn(layer, 'addChild');
 
       // Act
       layer.data = data;
 
       // Assert
-      expect(layer.ctx.stage.addChild).toHaveBeenCalled();
+      expect(layer.addChild).toHaveBeenCalled();
     });
 
     it('should render when reference system is set after constructor', () => {
       // Arrange
-      const layer = new CementLayer('casing-layer', {});
+      const pixiRenderApplication = new PixiRenderApplication();
+      const layer = new CementLayer(pixiRenderApplication, 'casing-layer', {});
       const referenceSystem = new IntersectionReferenceSystem(wp);
       layer.referenceSystem = referenceSystem;
       layer.onMount({ elm });
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
+      jest.spyOn(layer, 'addChild');
 
       // Act
       layer.data = data;
 
       // Assert
-      expect(layer.ctx.stage.addChild).toHaveBeenCalled();
+      expect(layer.addChild).toHaveBeenCalled();
     });
 
     it('should not throw exception when setting data without reference system', () => {
       // Arrange
-      const layer = new CementLayer('casing-layer', {});
+      const pixiRenderApplication = new PixiRenderApplication();
+      const layer = new CementLayer(pixiRenderApplication, 'casing-layer', {});
       layer.onMount({ elm });
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());

@@ -3,11 +3,8 @@ import { PixiLayer } from './base/PixiLayer';
 import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
-import { LayerOptions } from './base/Layer';
 
 const DEFAULT_Y_BOTTOM = 10000;
-
-export interface GeomodelLayerOptions<T extends SurfaceData> extends LayerOptions<T> {}
 
 export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
   private isPreRendered: boolean = false;

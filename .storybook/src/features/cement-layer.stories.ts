@@ -1,4 +1,4 @@
-import { CementLayer, OnRescaleEvent, CementLayerOptions, ZoomPanHandler, IntersectionReferenceSystem, Controller, CementData } from '../../../src';
+import { CementLayer, OnRescaleEvent, CementLayerOptions, ZoomPanHandler, IntersectionReferenceSystem, Controller, CementData, PixiRenderApplication } from '../../../src';
 import { getWellborePath, getCasings, getCement, getHolesize } from '../data';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
@@ -19,7 +19,9 @@ export const CementLayerUsingLowLevelInterface = () => {
       referenceSystem,
       data: { cement, casings, holes },
     };
-    const cementLayer = new CementLayer('webgl', options);
+
+    const renderer = new PixiRenderApplication();
+    const cementLayer = new CementLayer(renderer, 'webgl', options);
 
     cementLayer.onMount({ elm: container, height, width });
     cementLayer.onUpdate({});

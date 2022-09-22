@@ -11,6 +11,8 @@ import {
   CompletionLayer,
   CementLayer,
   CalloutCanvasLayer,
+  PixiRenderApplication,
+  CementData,
 } from '../../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
@@ -29,6 +31,7 @@ import {
 import { seismicColorMap } from '../exampledata';
 
 import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks } from '../data';
+import { Annotation, Casing, CompletionData, HoleSize } from '../../../src';
 
 export const intersection = () => {
   const xBounds: [number, number] = [0, 1000];
@@ -86,22 +89,31 @@ const renderIntersection = (scaleOptions: any) => {
     const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
     const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
     const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
-    const seismicInfo = getSeismicInfo(seismic, trajectory)
+    const seismicInfo = getSeismicInfo(seismic, trajectory);
 
     const transformedPicksData = transformFormationData(picks, stratColumns);
     const picksData = getPicksData(transformedPicksData);
 
+    const renderer = new PixiRenderApplication({ width, height: height / 2 });
+
     // Instantiate layers
-    const gridLayer = new GridLayer('grid', { majorColor: 'black', minorColor: 'gray', majorWidth: 0.5, minorWidth: 0.5, order: 1, referenceSystem });
-    const geomodelLayer = new GeomodelLayerV2('geomodel', { order: 2, layerOpacity: 0.6, data: geolayerdata });
+    const gridLayer = new GridLayer('grid', {
+      majorColor: 'black',
+      minorColor: 'gray',
+      majorWidth: 0.5,
+      minorWidth: 0.5,
+      order: 1,
+      referenceSystem,
+    });
+    const geomodelLayer = new GeomodelLayerV2<SurfaceData>(renderer, 'geomodel', { order: 2, layerOpacity: 0.6, data: geolayerdata });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-    const holeSizeLayer = new HoleSizeLayer('holesize', { order: 4, data: holesizes, referenceSystem });
-    const casingLayer = new CasingLayer('casing', { order: 5, data: casings, referenceSystem });
-    const geomodelLabelsLayer = new GeomodelLabelsLayer('geomodellabels', { order: 3, data: geolayerdata });
+    const holeSizeLayer = new HoleSizeLayer<HoleSize[]>(renderer, 'holesize', { order: 4, data: holesizes, referenceSystem });
+    const casingLayer = new CasingLayer<Casing[]>(renderer, 'casing', { order: 5, data: casings, referenceSystem });
+    const geomodelLabelsLayer = new GeomodelLabelsLayer<SurfaceData>('geomodellabels', { order: 3, data: geolayerdata });
     const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
-    const completionLayer = new CompletionLayer('completion', { order: 4, data: completion, referenceSystem });
-    const cementLayer = new CementLayer('cement', { order: 99, data: { cement, casings, holes: holesizes }, referenceSystem });
-    const calloutLayer = new CalloutCanvasLayer('callout', { order: 100, data: picksData, referenceSystem });
+    const completionLayer = new CompletionLayer<CompletionData[]>(renderer, 'completion', { order: 4, data: completion, referenceSystem });
+    const cementLayer = new CementLayer<CementData>(renderer, 'cement', { order: 99, data: { cement, casings, holes: holesizes }, referenceSystem });
+    const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
     const layers = [
       gridLayer,
@@ -127,7 +139,7 @@ const renderIntersection = (scaleOptions: any) => {
 
     addMDOverlay(controller);
 
-    const seismicOptions = getSeismicOptions(seismicInfo)
+    const seismicOptions = getSeismicOptions(seismicInfo);
 
     generateSeismicSliceImage(seismic as any, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
       seismicLayer.setData({ image: seismicImage, options: seismicOptions });
@@ -299,7 +311,7 @@ const createSetLayerButton = (cementLayer: any, casingLayer: any, cement: any, c
   btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
   btn.onclick = () => {
     const alterWBI = (c: any): any => {
-      return { ...c, end: c.end += 15 };
+      return { ...c, end: (c.end += 15) };
     };
     casings[0] = alterWBI(casings[0]);
     holes[0] = alterWBI(holes[0]);

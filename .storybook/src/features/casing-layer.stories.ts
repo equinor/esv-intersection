@@ -1,4 +1,4 @@
-import { CasingLayer, Casing, OnRescaleEvent, CasingLayerOptions, ZoomPanHandler, IntersectionReferenceSystem, Controller } from '../../../src/';
+import { CasingLayer, Casing, OnRescaleEvent, CasingLayerOptions, ZoomPanHandler, IntersectionReferenceSystem, Controller, PixiRenderApplication } from '../../../src/';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
 
@@ -19,7 +19,8 @@ export const CasingUsingLowLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const casingLayer = new CasingLayer('webgl', options);
+    const renderer = new PixiRenderApplication();
+    const casingLayer = new CasingLayer(renderer, 'webgl', options);
 
     casingLayer.onMount({ elm: container, height, width });
     casingLayer.onUpdate({
@@ -56,7 +57,8 @@ export const CasingUsingHighLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const casingLayer = new CasingLayer('webgl', options);
+    const renderer = new PixiRenderApplication();
+    const casingLayer = new CasingLayer(renderer, 'webgl', options);
 
 
     const controller = new Controller({ container, layers: [casingLayer] });

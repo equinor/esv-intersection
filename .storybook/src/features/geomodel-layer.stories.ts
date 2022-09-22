@@ -9,6 +9,7 @@ import {
   IntersectionReferenceSystem,
   Controller,
   GeomodelLayerLabelsOptions,
+  PixiRenderApplication,
 } from '../../../src';
 import { generateSurfaceData, SurfaceData } from '../../../src/datautils';
 import { getSurfaces, getStratColumns, getPositionLog, getWellborePath } from '../data';
@@ -116,7 +117,8 @@ export const GeoModelUsingHighLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: GeomodelLayerOptions<SurfaceData>  = { order: 1 };
-  const geoModelLayer = new GeomodelLayerV2('webgl', options);
+  const renderer = new PixiRenderApplication();
+  const geoModelLayer = new GeomodelLayerV2(renderer, 'webgl', options);
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
     const [path, surfaces, stratColumns] = values;
@@ -154,7 +156,8 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: GeomodelLayerOptions<SurfaceData> = { order: 1 };
-  const geoModelLayer = new GeomodelLayerV2('geomodels', options);
+  const renderer = new PixiRenderApplication();
+  const geoModelLayer = new GeomodelLayerV2(renderer, 'geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
   const options2: GeomodelLayerLabelsOptions<SurfaceData> = { order: 1 };

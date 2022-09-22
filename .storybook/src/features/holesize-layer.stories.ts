@@ -1,4 +1,4 @@
-import { HoleSizeLayer, HoleSizeLayerOptions, OnRescaleEvent, ZoomPanHandler, IntersectionReferenceSystem, Controller, HoleSize } from '../../../src';
+import { HoleSizeLayer, HoleSizeLayerOptions, OnRescaleEvent, ZoomPanHandler, IntersectionReferenceSystem, Controller, HoleSize, PixiRenderApplication } from '../../../src';
 import { getWellborePath, getHolesize } from '../data';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
@@ -18,7 +18,8 @@ export const HoleSizeLayerUsingLowLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const holeSizeLayer = new HoleSizeLayer('webgl', options);
+    const renderer = new PixiRenderApplication();
+    const holeSizeLayer = new HoleSizeLayer(renderer, 'webgl', options);
 
     holeSizeLayer.onMount({ elm: container, height, width });
 
@@ -55,7 +56,9 @@ export const HoleSizeLayerUsingHighLevelInterface = () => {
       referenceSystem,
       data: holesize
     };
-    const holeSizeLayer = new HoleSizeLayer('webgl', options);
+
+    const renderer = new PixiRenderApplication();
+    const holeSizeLayer = new HoleSizeLayer(renderer, 'webgl', options);
 
     const controller = new Controller({ container, layers: [holeSizeLayer] });
 

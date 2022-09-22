@@ -1,15 +1,7 @@
-import {
-  AbstractRenderer,
-  Application,
-  autoDetectRenderer,
-  Container,
-  DisplayObject,
-  IApplicationOptions,
-  IRendererOptionsAuto,
-  RENDERER_TYPE,
-} from 'pixi.js';
+import { AbstractRenderer, Application, autoDetectRenderer, Container, DisplayObject, IRendererOptionsAuto, RENDERER_TYPE } from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
-import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
+import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 // PixiRenderApplication does not inherit from PIXI.Application to avoid registering the gameloop plugin
 // The gameloop plugin tries to re-render at 60fps
@@ -19,8 +11,17 @@ export class PixiRenderApplication {
 
   renderer: AbstractRenderer;
 
-  constructor(pixiRenderOptions: IRendererOptionsAuto) {
-    this.renderer = autoDetectRenderer(pixiRenderOptions);
+  constructor(pixiRenderOptions?: IRendererOptionsAuto) {
+    this.renderer = autoDetectRenderer({
+      width: DEFAULT_LAYER_WIDTH,
+      height: DEFAULT_LAYER_HEIGHT,
+      antialias: true,
+      backgroundAlpha: 0,
+      clearBeforeRender: true,
+      // autoResize: true,
+      preserveDrawingBuffer: true,
+      ...pixiRenderOptions,
+    });
     this.stage = new Container();
   }
 
@@ -42,10 +43,6 @@ export class PixiRenderApplication {
   render() {
     this.renderer.render(this.stage);
   }
-}
-
-export interface PixiLayerOptions<T> extends LayerOptions<T> {
-  pixiApplicationOptions?: IApplicationOptions;
 }
 
 export abstract class PixiLayer<T> extends Layer<T> {
@@ -96,10 +93,6 @@ export abstract class PixiLayer<T> extends Layer<T> {
 
       this.updateStyle();
     }
-  }
-
-  onUnmount(event?: OnUnmountEvent): void {
-    super.onUnmount(event);
   }
 
   onResize(event: OnResizeEvent): void {

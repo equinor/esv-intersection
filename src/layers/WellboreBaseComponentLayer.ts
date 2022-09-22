@@ -1,4 +1,4 @@
-import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
+import { Graphics, Texture, Point, SimpleRope, Application } from 'pixi.js';
 import { PixiLayer, PixiRenderApplication } from './base/PixiLayer';
 import { OnUpdateEvent, OnRescaleEvent, MDPoint, OnUnmountEvent } from '../interfaces';
 import { LayerOptions } from './base';
@@ -12,8 +12,8 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
 
   rescaleEvent: OnRescaleEvent;
 
-  constructor(pixiRenderApplication?: PixiRenderApplication, id?: string, options?: WellComponentBaseOptions<T>) {
-    super(pixiRenderApplication, id, options);
+  constructor(ctx: Application | PixiRenderApplication, id?: string, options?: WellComponentBaseOptions<T>) {
+    super(ctx, id, options);
     this.options = {
       ...this.options,
       exaggerationFactor: 2,
