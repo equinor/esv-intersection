@@ -42,18 +42,25 @@ export abstract class PixiLayer<T> extends Layer<T> {
 
   ctx: PixiRenderApplication;
 
-  constructor(id?: string, options?: PixiLayerOptions<T>) {
+  constructor(id?: string, options?: PixiLayerOptions, pixiRenderApplication?: PixiRenderApplication) {
     super(id, options);
+
+    if (pixiRenderApplication) {
+      this.ctx = pixiRenderApplication;
+      this.elm = pixiRenderApplication.view.parentElement;
+    }
   }
 
   onMount(event: OnMountEvent): void {
     super.onMount(event);
 
-    this.elm = event.ctx.view.parentElement;
-    this.ctx = event.ctx;
-    this.updateStyle();
+    if (event.ctx) {
+      this.elm = event.ctx.view.parentElement;
+      this.ctx = event.ctx;
+      this.updateStyle();
+    }
 
-    if (!this.elm) {
+    if (!this.elm && !this.ctx) {
       const container = document.createElement('div');
       container.setAttribute('id', `${this.id}`);
       container.setAttribute('class', 'webgl-layer');

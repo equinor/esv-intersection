@@ -1,18 +1,18 @@
 import Vector2 from '@equinor/videx-vector2';
 import { Graphics } from 'pixi.js';
-import { PixiLayer, PixiLayerOptions } from './base/PixiLayer';
-import { OnUpdateEvent } from '..';
+import { PixiLayer } from './base/PixiLayer';
+import { LayerOptions, OnUpdateEvent, PixiRenderApplication } from '..';
 import { CompletionData, OnRescaleEvent } from '../interfaces';
 
 export interface CompletionItem {
   graphics: Graphics;
 }
 
-export interface CompletionLayerOptions<T extends CompletionData[]> extends PixiLayerOptions<T> {}
+export interface CompletionLayerOptions<T extends CompletionData[]> extends LayerOptions<T> {}
 
 export class CompletionLayer<T extends CompletionData[]> extends PixiLayer<T> {
-  constructor(id: string, options: CompletionLayerOptions<T>) {
-    super(id, options);
+  constructor(id: string, options: CompletionLayerOptions<T>, pixiRenderApplication?: PixiRenderApplication) {
+    super(id, options, pixiRenderApplication);
     this.options = {
       ...this.options,
       ...options,

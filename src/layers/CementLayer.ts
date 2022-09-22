@@ -8,6 +8,7 @@ import {
   makeTubularPolygon,
 } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
+import { PixiRenderApplication } from './base';
 
 export interface CementShape {
   rightPolygon: Point[];
@@ -23,8 +24,8 @@ export interface CementLayerOptions<T extends CementData> extends WellComponentB
 }
 
 export class CementLayer<T extends CementData> extends WellboreBaseComponentLayer<T> {
-  constructor(id?: string, options?: CementLayerOptions<T>) {
-    super(id, options);
+  constructor(id?: string, options?: CementLayerOptions<T>, pixiRenderApplication?: PixiRenderApplication) {
+    super(id, options, pixiRenderApplication);
     this.options = {
       ...this.options,
       firstColor: '#c7b9ab',
