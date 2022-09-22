@@ -34,6 +34,13 @@ export class CompletionLayer extends PixiLayer {
     this.render();
   }
 
+  clearStage(): void {
+    const children = this.container.removeChildren();
+    children.forEach((child) => {
+      child.destroy();
+    });
+  }
+
   preRender(): void {
     const wellborePath = this.referenceSystem ? this.referenceSystem.projectedPath : [];
 
