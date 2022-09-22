@@ -14,12 +14,12 @@
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",
-    "project": "./tsconfig.json"
+    "project": "./tsconfig.test.json"
   },
   "rules": {
     "prettier/prettier": "error",
 
-    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-unused-vars": ["error", { "args": "all", "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
@@ -36,7 +36,7 @@
     "max-len": ["error", { "code": 150 }],
     "comma-dangle": ["error", "always-multiline"],
     "eqeqeq": ["error", "always", { "null": "ignore" }],
-    "no-magic-numbers": ["error", { "ignore": [-1, 0, 0.5, 1, 2, 3, 4, 255, 1000], "ignoreDefaultValues": true }],
+    "no-magic-numbers": ["error", { "ignore": [-1, 0, 0.5, 1, 2, 3, 4, 8, 16, 100, 255, 1000], "ignoreDefaultValues": true }],
     "newline-per-chained-call": ["off", { "ignoreChainWithDepth": 1 }],
     "no-warning-comments": [0, { "terms": ["todo", "fixme"], "location": "start" }]
   }

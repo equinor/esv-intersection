@@ -2,11 +2,10 @@ import { scaleLinear } from 'd3-scale';
 import { zoomIdentity } from 'd3-zoom';
 import { OnRescaleEvent } from '../src';
 
-export function rescaleEventStub(data: any): OnRescaleEvent {
+export function rescaleEventStub(): OnRescaleEvent {
   const xBounds = [0, 1000] as [number, number];
   const yBounds = [0, 1000] as [number, number];
   const event = {
-    data,
     xBounds,
     yBounds,
     zFactor: 1,

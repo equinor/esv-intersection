@@ -1,5 +1,3 @@
-/* eslint-disable no-magic-numbers */
-
 /**
  * Find index where value[index] =< searchValue and value[index+1] >= searchValue using binary search
  * @param {Number} values Array of sorted values

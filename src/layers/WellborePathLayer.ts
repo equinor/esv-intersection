@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import {
   line,
   curveCatmullRom,
@@ -17,6 +16,10 @@ import {
 import { SVGLayer } from './base/SVGLayer';
 import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { LayerOptions } from '..';
+
+const CURVE_CATMULL_ROM_ALPHA = 0.7;
+const CURVE_CARDINAL_TENSION = 0.9;
+const CURVE_BUNDLE_BETA = 1.0;
 
 export interface WellborepathLayerOptions<T extends [number, number][]> extends LayerOptions<T> {
   stroke: string;
@@ -84,7 +87,7 @@ export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T>
     switch (curveType) {
       default:
       case 'curveCatmullRom':
-        curveFactory = curveCatmullRom.alpha(tension || 0.7);
+        curveFactory = curveCatmullRom.alpha(tension || CURVE_CATMULL_ROM_ALPHA);
         break;
       case 'curveLinear':
         curveFactory = curveLinear;
@@ -96,10 +99,10 @@ export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T>
         curveFactory = curveBasisClosed;
         break;
       case 'curveBundle':
-        curveFactory = curveBundle.beta(tension || 1.0);
+        curveFactory = curveBundle.beta(tension || CURVE_BUNDLE_BETA);
         break;
       case 'curveCardinal':
-        curveFactory = curveCardinal.tension(tension || 0.9);
+        curveFactory = curveCardinal.tension(tension || CURVE_CARDINAL_TENSION);
         break;
       case 'curveMonotoneX':
         curveFactory = curveMonotoneX;

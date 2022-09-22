@@ -1,9 +1,10 @@
-/* eslint-disable no-magic-numbers */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { interpolateRgb, quantize } from 'd3-interpolate';
 import { scaleOrdinal } from 'd3-scale';
 import { convertColor } from '../utils/color';
 import { StratUnit, SurfaceMetaAndValues, SurfaceLine, SurfaceArea, SurfaceData } from './interfaces';
+
+const TRANSLUCENT_RED = 0x80000000;
+const WHITE = 0xffffffff;
 
 type MappedSurfaces = {
   name: string;
@@ -236,7 +237,7 @@ function mapSurfaceData(surfaces: SurfaceMetaAndValues[]): MappedSurfaces[] {
 
 function getColorFromUnit(unit: StratUnit): number {
   if (unit.colorR === null || unit.colorG === null || unit.colorB === null) {
-    return 0x80000000;
+    return TRANSLUCENT_RED;
   }
   const res: number = (unit.colorR << 16) | (unit.colorG << 8) | unit.colorB;
   return res;
@@ -244,6 +245,7 @@ function getColorFromUnit(unit: StratUnit): number {
 
 const unassignedColorScale = scaleOrdinal<number, string>()
   .domain([0, 100])
+  // eslint-disable-next-line no-magic-numbers
   .range(quantize(interpolateRgb('#e6f1cf', '#85906d'), 10));
 
 /**
@@ -290,7 +292,7 @@ function generateSurfaceAreas(projection: number[][], surfaces: Stratigraphy[], 
       acc[surface.group].push({
         id: surface.name,
         label: surface.name,
-        color: (surface.unit && getColorFromUnit(surface.unit)) || 0xffffffff,
+        color: (surface.unit && getColorFromUnit(surface.unit)) || WHITE,
         exclude: surface.visualization === 'none' || !surface.unit,
         data: projection.map((p, j) => {
           const baseValue: number = surface.values[j] !== null ? getBaseValue(baseIndex, surfaces, j) : null;
