@@ -22,23 +22,16 @@ export class CompletionLayer extends PixiLayer {
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
-    this.clearStage();
+    this.clearLayer();
     this.preRender();
     this.render();
   }
 
   onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
-    this.clearStage();
+    this.clearLayer();
     this.preRender();
     this.render();
-  }
-
-  clearStage(): void {
-    const children = this.container.removeChildren();
-    children.forEach((child) => {
-      child.destroy();
-    });
   }
 
   preRender(): void {
@@ -99,6 +92,6 @@ export class CompletionLayer extends PixiLayer {
   }
 
   drawCompletionItem(item: any): void {
-    this.container.addChild(item.graphics);
+    this.addChild(item.graphics);
   }
 }

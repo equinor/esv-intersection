@@ -16,7 +16,7 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     super.onRescale(event);
 
     if (!this.isPreRendered) {
-      this.clearStage();
+      this.clearLayer();
       this.preRender();
     }
 
@@ -27,14 +27,9 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     super.onUpdate(event);
 
     this.isPreRendered = false;
-    this.clearStage();
+    this.clearLayer();
     this.preRender();
     this.render();
-  }
-
-  clearStage(): void {
-    this.container.children.forEach((g: Graphics) => g.destroy());
-    this.container.removeChildren();
   }
 
   preRender(): void {
@@ -90,7 +85,7 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     const polygons = this.createPolygons(s.data);
     polygons.forEach((polygon: number[]) => g.drawPolygon(polygon));
     g.endFill();
-    this.container.addChild(g);
+    this.addChild(g);
   };
 
   generateSurfaceLine = (s: SurfaceLine): void => {
@@ -113,6 +108,6 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
         penDown = false;
       }
     }
-    this.container.addChild(g);
+    this.addChild(g);
   };
 }

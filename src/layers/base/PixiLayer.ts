@@ -37,40 +37,50 @@ export interface PixiLayerOptions<T> extends LayerOptions<T> {
 }
 
 export abstract class PixiLayer<T> extends Layer<T> {
-  elm: HTMLElement;
-  ctx: PixiRenderApplication;
-  container: Container;
-  destroyContextOnUnmount: boolean = false;
+  private _pixiViewContainer: HTMLElement;
+  private _ctx: PixiRenderApplication;
+  private _container: Container;
+
+  get container() {
+    return this._container;
+  }
 
   constructor(ctx: PixiRenderApplication, id?: string, options?: PixiLayerOptions) {
     super(id, options);
 
-    this.ctx = ctx;
-    // this.elm = ctx.view.parentElement;
+    this._ctx = ctx;
 
-    this.container = new Container();
-    this.ctx.stage.addChild(this.container);
-
-    this.destroyContextOnUnmount = options?.destroyContextOnUnmount || false;
+    this._container = new Container();
+    this._ctx.stage.addChild(this._container);
   }
 
   render(): void {
-    this.ctx.render();
+    this._ctx.render();
+  }
+
+  addChild(child: DisplayObject) {
+    this._container.addChild(child);
+  }
+
+  clearLayer() {
+    const children = this._container.removeChildren();
+    children.forEach((child) => {
+      child.destroy();
+    });
   }
 
   onMount(event: OnMountEvent) {
     super.onMount(event);
-    const { elm: parentElement } = event;
 
-    if (!this.elm) {
+    if (!this._pixiViewContainer) {
       const container = document.createElement('div');
       container.setAttribute('id', `${this.id}`);
       container.setAttribute('class', 'webgl-layer');
 
-      this.elm = container;
-      this.elm.appendChild(this.ctx.view);
+      this._pixiViewContainer = container;
+      this._pixiViewContainer.appendChild(this._ctx.view);
 
-      parentElement.appendChild(container);
+      this.element.appendChild(container);
 
       this.updateStyle();
     }
@@ -78,52 +88,27 @@ export abstract class PixiLayer<T> extends Layer<T> {
 
   onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
-
-    if (this.destroyContextOnUnmount) {
-      // Get renderType and clContext before we destroy the renderer
-      const renderType = this.renderType();
-      const glContext = this.ctx.renderer instanceof Renderer ? this.ctx.renderer?.gl : undefined;
-
-      this.ctx.destroy();
-      this.ctx = undefined;
-
-      /**
-       * WebGL v2 does supposedly not have WEBGL_lose_context
-       * so Pixi.js does not use it to "clean up" on v2.
-       *
-       * Cleaning up our self since it still seems to work and fix issue with lingering contexts
-       */
-      if (renderType === RENDERER_TYPE.WEBGL && glContext) {
-        glContext?.getExtension('WEBGL_lose_context')?.loseContext();
-      }
-
-      this.elm.remove();
-      this.elm = undefined;
-    }
   }
 
   onResize(event: OnResizeEvent): void {
     super.onResize(event);
-    this.ctx.renderer.resize(event.width, event.height);
+    this._ctx.renderer.resize(event.width, event.height);
   }
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
-    if (!this.ctx) {
-      return;
-    }
 
     const flippedX = event.xBounds[0] > event.xBounds[1];
     const flippedY = event.yBounds[0] > event.yBounds[1];
-    this.ctx.stage.position.set(event.xScale(0), event.yScale(0));
-    this.ctx.stage.scale.set(event.xRatio * (flippedX ? -1 : 1), event.yRatio * (flippedY ? -1 : 1));
+    this.container.position.set(event.xScale(0), event.yScale(0));
+    this.container.scale.set(event.xRatio * (flippedX ? -1 : 1), event.yRatio * (flippedY ? -1 : 1));
   }
 
   updateStyle(visible?: boolean): void {
     const isVisible = visible || this.isVisible;
     const visibility = isVisible ? 'visible' : 'hidden';
     const interactive = this.interactive ? 'auto' : 'none';
-    this.elm.setAttribute(
+    this._pixiViewContainer.setAttribute(
       'style',
       `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`,
     );
@@ -131,30 +116,30 @@ export abstract class PixiLayer<T> extends Layer<T> {
 
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
-    if (this.elm) {
+    if (this._pixiViewContainer) {
       this.updateStyle(visible);
     }
   }
 
   onOpacityChanged(_opacity: number): void {
-    if (this.elm) {
+    if (this._pixiViewContainer) {
       this.updateStyle();
     }
   }
 
   onOrderChanged(_order: number): void {
-    if (this.elm) {
+    if (this._pixiViewContainer) {
       this.updateStyle();
     }
   }
 
   onInteractivityChanged(_interactive: boolean): void {
-    if (this.elm) {
+    if (this._pixiViewContainer) {
       this.updateStyle();
     }
   }
 
   renderType(): RENDERER_TYPE {
-    return this.ctx.renderer.type;
+    return this._ctx.renderer.type;
   }
 }
