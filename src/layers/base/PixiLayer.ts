@@ -3,9 +3,11 @@ import { Layer, LayerOptions } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
-// PixiRenderApplication does not inherit from PIXI.Application to avoid registering the gameloop plugin
-// The gameloop plugin tries to re-render at 60fps
+// PixiRenderApplication has many similarities with PIXI.Application,
+// but an important distinction is that it does not run the TickerPlugin.
 // We only want to re-render on data changes
+// The plugin we are trying to avoid:
+// https://github.com/pixijs/pixijs/blob/dev/packages/ticker/src/TickerPlugin.ts
 export class PixiRenderApplication {
   stage: Container;
 
