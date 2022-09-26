@@ -50,19 +50,15 @@ export class PixiRenderApplication {
 export abstract class PixiLayer<T> extends Layer<T> {
   private pixiViewContainer: HTMLElement;
   private ctx: PixiRenderApplication;
-  private _container: Container;
-
-  get container() {
-    return this._container;
-  }
+  private container: Container;
 
   constructor(ctx: Application | PixiRenderApplication, id?: string, options?: LayerOptions<T>) {
     super(id, options);
 
     this.ctx = ctx;
 
-    this._container = new Container();
-    this.ctx.stage.addChild(this._container);
+    this.container = new Container();
+    this.ctx.stage.addChild(this.container);
   }
 
   render(): void {
@@ -70,11 +66,11 @@ export abstract class PixiLayer<T> extends Layer<T> {
   }
 
   addChild(child: DisplayObject) {
-    this._container.addChild(child);
+    this.container.addChild(child);
   }
 
   clearLayer() {
-    const children = this._container.removeChildren();
+    const children = this.container.removeChildren();
     children.forEach((child) => {
       child.destroy();
     });
@@ -102,8 +98,8 @@ export abstract class PixiLayer<T> extends Layer<T> {
     super.onUnmount(event);
 
     this.clearLayer();
-    this.ctx.stage.removeChild(this._container);
-    this._container.destroy();
+    this.ctx.stage.removeChild(this.container);
+    this.container.destroy();
     this.pixiViewContainer.remove();
     this.pixiViewContainer = undefined;
   }
@@ -118,14 +114,22 @@ export abstract class PixiLayer<T> extends Layer<T> {
 
     const flippedX = event.xBounds[0] > event.xBounds[1];
     const flippedY = event.yBounds[0] > event.yBounds[1];
-    this.container.position.set(event.xScale(0), event.yScale(0));
-    this.container.scale.set(event.xRatio * (flippedX ? -1 : 1), event.yRatio * (flippedY ? -1 : 1));
+    this.setContainerPosition(event.xScale(0), event.yScale(0));
+    this.setContainerScale(event.xRatio * (flippedX ? -1 : 1), event.yRatio * (flippedY ? -1 : 1));
+  }
+
+  protected setContainerPosition(x?: number, y?: number) {
+    this.container.position.set(x, y);
+  }
+
+  protected setContainerScale(x?: number, y?: number) {
+    this.container.scale.set(x, y);
   }
 
   updateStyle(visible?: boolean): void {
     const isVisible = visible || this.isVisible;
     const interactive = this.interactive ? 'auto' : 'none';
-    this._container.visible = isVisible;
+    this.container.visible = isVisible;
     this.pixiViewContainer.setAttribute('style', `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};`);
   }
 

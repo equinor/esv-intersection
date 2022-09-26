@@ -45,8 +45,8 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     const yRatio = this.yRatio();
     const flippedX = event.xBounds[0] > event.xBounds[1];
     const flippedY = event.yBounds[0] > event.yBounds[1];
-    this.container.position.set(event.xScale(0), event.yScale(0));
-    this.container.scale.set(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
+    this.setContainerPosition(event.xScale(0), event.yScale(0));
+    this.setContainerScale(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
     if (shouldRecalculate) {
       this.clearLayer();
       this.preRender();
