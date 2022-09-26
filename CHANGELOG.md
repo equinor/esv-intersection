@@ -1,5 +1,11 @@
 # Changelog
 
+## TO BE RELEASED
+
+- Removed `any` from type definitions in the library
+- Removed deprecated layer `GeomodelLayer`, in favor of `GeomodelLayerV2`
+- Upgraded peer dependency `pixi.js@6.5.3`
+
 ## v2.1.0
 
 - Allow setting `CasingShoeSize` for the `CasingLayer`
