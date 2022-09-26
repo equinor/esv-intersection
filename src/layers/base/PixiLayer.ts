@@ -111,12 +111,9 @@ export abstract class PixiLayer<T> extends Layer<T> {
 
   updateStyle(visible?: boolean): void {
     const isVisible = visible || this.isVisible;
-    const visibility = isVisible ? 'visible' : 'hidden';
     const interactive = this.interactive ? 'auto' : 'none';
-    this._pixiViewContainer.setAttribute(
-      'style',
-      `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};visibility:${visibility}`,
-    );
+    this._container.visible = isVisible;
+    this._pixiViewContainer.setAttribute('style', `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};`);
   }
 
   setVisibility(visible: boolean): void {
