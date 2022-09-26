@@ -62,17 +62,27 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
 
     const { holeSizes, casings, cements } = this.data;
 
-    this.renderCement(holeSizes, casings, cements);
-    this.renderCasing(casings);
-  }
+    const cementShapes = cements.map((cement: Cement) => this.createCementShape(cement, casings, holeSizes));
 
-  private renderCasing(casings: Casing[]): void {
     const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
     const zippedRenderObjects: [Casing, CasingRenderObject][] = sortedCasings.map((casing: Casing) => [
       casing,
       this.prepareCasingRenderObject(casing),
     ]);
-    zippedRenderObjects.forEach((zippedRenderObject) => this.drawCasing(zippedRenderObject));
+
+    const zipped = cementShapes.map((cementShape, i) => {
+      const zippedRenderObject = zippedRenderObjects[i];
+      return { cementShape, zippedRenderObject };
+    });
+
+    zipped.forEach(({ cementShape, zippedRenderObject }) => {
+      this.renderCement(cementShape);
+      this.renderCasing(zippedRenderObject);
+    });
+  }
+
+  private renderCasing(zippedRenderObject: [Casing, CasingRenderObject]): void {
+    this.drawCasing(zippedRenderObject);
   }
 
   private prepareCasingRenderObject = (casing: Casing): CasingRenderObject => {
@@ -109,20 +119,16 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     };
   };
 
-  private renderCement(holeSizes: HoleSize[], casings: Casing[], cementings: Cement[]): void {
-    const cementShapes = cementings.map((cement: Cement) => this.createCementShape(cement, casings, holeSizes));
-
+  private renderCement(cementShape: CementShape): void {
     const texture: Texture = this.createCementTexture();
 
-    cementShapes.forEach((cementShape: CementShape) => {
-      if (this.renderType() === RENDERER_TYPE.CANVAS) {
-        this.drawBigTexturedPolygon(cementShape.leftPolygon, texture);
-        this.drawBigTexturedPolygon(cementShape.rightPolygon, texture);
-      } else {
-        this.drawRopeWithMask(cementShape.path, cementShape.leftPolygon, texture);
-        this.drawRopeWithMask(cementShape.path, cementShape.rightPolygon, texture);
-      }
-    });
+    if (this.renderType() === RENDERER_TYPE.CANVAS) {
+      this.drawBigTexturedPolygon(cementShape.leftPolygon, texture);
+      this.drawBigTexturedPolygon(cementShape.rightPolygon, texture);
+    } else {
+      this.drawRopeWithMask(cementShape.path, cementShape.leftPolygon, texture);
+      this.drawRopeWithMask(cementShape.path, cementShape.rightPolygon, texture);
+    }
   }
 
   private drawCasing = (zippedRenderObject: [Casing, CasingRenderObject]): void => {
