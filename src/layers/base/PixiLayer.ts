@@ -1,6 +1,6 @@
 import { AbstractRenderer, Application, autoDetectRenderer, Container, DisplayObject, IRendererOptionsAuto, RENDERER_TYPE } from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
-import { OnMountEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 // PixiRenderApplication does not inherit from PIXI.Application to avoid registering the gameloop plugin
@@ -81,18 +81,29 @@ export abstract class PixiLayer<T> extends Layer<T> {
   onMount(event: OnMountEvent) {
     super.onMount(event);
 
-    if (!this.pixiViewContainer) {
-      const container = document.createElement('div');
-      container.setAttribute('id', `${this.id}`);
-      container.setAttribute('class', 'webgl-layer');
+    this.pixiViewContainer = this.element.querySelector('#webgl-layer');
 
-      this.pixiViewContainer = container;
+    if (!this.pixiViewContainer) {
+      this.pixiViewContainer = document.createElement('div');
+      this.pixiViewContainer.setAttribute('id', `${this.id}`);
+      this.pixiViewContainer.setAttribute('class', 'webgl-layer');
+
       this.pixiViewContainer.appendChild(this.ctx.view);
 
-      this.element.appendChild(container);
+      this.element.appendChild(this.pixiViewContainer);
 
       this.updateStyle();
     }
+  }
+
+  onUnmount(event?: OnUnmountEvent) {
+    super.onUnmount(event);
+
+    this.clearLayer();
+    this.ctx.stage.removeChild(this._container);
+    this._container.destroy();
+    this.pixiViewContainer.remove();
+    this.pixiViewContainer = undefined;
   }
 
   onResize(event: OnResizeEvent): void {
