@@ -46,8 +46,8 @@ export class PixiRenderApplication {
 }
 
 export abstract class PixiLayer<T> extends Layer<T> {
-  private _pixiViewContainer: HTMLElement;
-  private _ctx: PixiRenderApplication;
+  private pixiViewContainer: HTMLElement;
+  private ctx: PixiRenderApplication;
   private _container: Container;
 
   get container() {
@@ -57,14 +57,14 @@ export abstract class PixiLayer<T> extends Layer<T> {
   constructor(ctx: Application | PixiRenderApplication, id?: string, options?: LayerOptions<T>) {
     super(id, options);
 
-    this._ctx = ctx;
+    this.ctx = ctx;
 
     this._container = new Container();
-    this._ctx.stage.addChild(this._container);
+    this.ctx.stage.addChild(this._container);
   }
 
   render(): void {
-    this._ctx.render();
+    this.ctx.render();
   }
 
   addChild(child: DisplayObject) {
@@ -81,13 +81,13 @@ export abstract class PixiLayer<T> extends Layer<T> {
   onMount(event: OnMountEvent) {
     super.onMount(event);
 
-    if (!this._pixiViewContainer) {
+    if (!this.pixiViewContainer) {
       const container = document.createElement('div');
       container.setAttribute('id', `${this.id}`);
       container.setAttribute('class', 'webgl-layer');
 
-      this._pixiViewContainer = container;
-      this._pixiViewContainer.appendChild(this._ctx.view);
+      this.pixiViewContainer = container;
+      this.pixiViewContainer.appendChild(this.ctx.view);
 
       this.element.appendChild(container);
 
@@ -97,7 +97,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
 
   onResize(event: OnResizeEvent): void {
     super.onResize(event);
-    this._ctx.renderer.resize(event.width, event.height);
+    this.ctx.renderer.resize(event.width, event.height);
   }
 
   onRescale(event: OnRescaleEvent): void {
@@ -113,35 +113,35 @@ export abstract class PixiLayer<T> extends Layer<T> {
     const isVisible = visible || this.isVisible;
     const interactive = this.interactive ? 'auto' : 'none';
     this._container.visible = isVisible;
-    this._pixiViewContainer.setAttribute('style', `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};`);
+    this.pixiViewContainer.setAttribute('style', `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};`);
   }
 
   setVisibility(visible: boolean): void {
     super.setVisibility(visible);
-    if (this._pixiViewContainer) {
+    if (this.pixiViewContainer) {
       this.updateStyle(visible);
     }
   }
 
   onOpacityChanged(_opacity: number): void {
-    if (this._pixiViewContainer) {
+    if (this.pixiViewContainer) {
       this.updateStyle();
     }
   }
 
   onOrderChanged(_order: number): void {
-    if (this._pixiViewContainer) {
+    if (this.pixiViewContainer) {
       this.updateStyle();
     }
   }
 
   onInteractivityChanged(_interactive: boolean): void {
-    if (this._pixiViewContainer) {
+    if (this.pixiViewContainer) {
       this.updateStyle();
     }
   }
 
   renderType(): RENDERER_TYPE {
-    return this._ctx.renderer.type;
+    return this.ctx.renderer.type;
   }
 }
