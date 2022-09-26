@@ -1,4 +1,4 @@
-import { AbstractRenderer, Application, autoDetectRenderer, Container, DisplayObject, IRendererOptionsAuto, RENDERER_TYPE } from 'pixi.js';
+import { AbstractRenderer, Application, autoDetectRenderer, Container, DisplayObject, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
@@ -34,6 +34,21 @@ export class PixiRenderApplication {
       baseTexture: true,
     });
     this.stage = null;
+
+    // Get renderType and clContext before we destroy the renderer
+    const renderType = this.renderer.type;
+    const glContext = this.renderer instanceof Renderer ? this.renderer?.gl : undefined;
+
+    /**
+     * WebGL v2 does supposedly not have WEBGL_lose_context
+     * so Pixi.js does not use it to "clean up" on v2.
+     *
+     * Cleaning up our self since it still seems to work and fix issue with lingering context
+     */
+    if (renderType === RENDERER_TYPE.WEBGL && glContext) {
+      glContext?.getExtension('WEBGL_lose_context')?.loseContext();
+    }
+
     this.renderer.destroy(true);
     this.renderer = null;
   }
