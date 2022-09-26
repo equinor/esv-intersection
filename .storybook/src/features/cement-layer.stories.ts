@@ -57,7 +57,9 @@ export const CementLayerUsingHighLevelInterface = () => {
       referenceSystem,
       data: { cement, casings, holes },
     };
-    const cementLayer = new CementLayer('webgl', options);
+
+    const renderer = new PixiRenderApplication();
+    const cementLayer = new CementLayer(renderer,'webgl', options);
 
     const controller = new Controller({ container, layers: [cementLayer] });
 

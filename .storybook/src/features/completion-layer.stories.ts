@@ -19,7 +19,8 @@ export const CompletionLayerUsingLowLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const completionLayer = new CompletionLayer('webgl', options);
+    const renderer = new PixiRenderApplication();
+    const completionLayer = new CompletionLayer(renderer, 'webgl', options);
     completionLayer.onMount({ elm: container, height, width });
 
     completionLayer.onUpdate({ data: completion });
