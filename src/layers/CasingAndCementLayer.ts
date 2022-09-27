@@ -12,6 +12,7 @@ import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
 
 interface CasingRenderObject {
+  casingId: string;
   pathPoints: number[][];
   polygon: Point[];
   leftPath: Point[];
@@ -19,6 +20,8 @@ interface CasingRenderObject {
   radius: number;
   diameter: number;
   casingWallWidth: number;
+  hasShoe: boolean;
+  bottom: number;
 }
 
 const defaultCasingShoeSize: CasingShoeSize = {
@@ -62,17 +65,40 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
 
     const { holeSizes, casings, cements } = this.data;
 
-    this.renderCement(holeSizes, casings, cements);
-    this.renderCasing(casings);
+    const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
+    const casingRenderObjects: CasingRenderObject[] = sortedCasings.map(this.prepareCasingRenderObject);
+    const cementShapes = cements.map((cement: Cement) => this.createCementShape(cement, sortedCasings, holeSizes));
+
+    this.pairCementAndCasingRenderObjects(casingRenderObjects, cementShapes).forEach(
+      ([cementShape, casingRenderObject]: [CementShape | undefined, CasingRenderObject]) => {
+        if (cementShape) {
+          this.drawCementShape(cementShape);
+        }
+
+        this.drawCasing(casingRenderObject);
+
+        if (casingRenderObject.hasShoe) {
+          this.drawShoe(casingRenderObject.bottom, casingRenderObject.radius);
+        }
+      },
+    );
   }
 
-  private renderCasing(casings: Casing[]): void {
-    const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
-    const zippedRenderObjects: [Casing, CasingRenderObject][] = sortedCasings.map((casing: Casing) => [
-      casing,
-      this.prepareCasingRenderObject(casing),
-    ]);
-    zippedRenderObjects.forEach((zippedRenderObject) => this.drawCasing(zippedRenderObject));
+  private pairCementAndCasingRenderObjects(
+    casingRenderObjects: CasingRenderObject[],
+    cementShapes: CementShape[],
+  ): [CementShape | undefined, CasingRenderObject][] {
+    const { tuples } = casingRenderObjects.reduce(
+      (acc, casingRenderObject) => {
+        const foundCementShape = acc.remainingCement.find((cement) => cement.casingIds.includes(casingRenderObject.casingId));
+        return {
+          tuples: [...acc.tuples, [foundCementShape, casingRenderObject]],
+          remainingCement: acc.remainingCement.filter((c) => c !== foundCementShape),
+        };
+      },
+      { tuples: [], remainingCement: cementShapes },
+    );
+    return tuples;
   }
 
   private prepareCasingRenderObject = (casing: Casing): CasingRenderObject => {
@@ -99,6 +125,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     const casingWallWidth = Math.abs(radius - innerRadius);
 
     return {
+      casingId: casing.casingId,
       pathPoints,
       polygon,
       leftPath,
@@ -106,28 +133,26 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
       radius,
       diameter,
       casingWallWidth,
+      hasShoe: casing.hasShoe,
+      bottom: casing.end,
     };
   };
 
-  private renderCement(holeSizes: HoleSize[], casings: Casing[], cementings: Cement[]): void {
-    const cementShapes = cementings.map((cement: Cement) => this.createCementShape(cement, casings, holeSizes));
-
+  private drawCementShape(cementShape: CementShape): void {
     const texture: Texture = this.createCementTexture();
 
-    cementShapes.forEach((cementShape: CementShape) => {
-      if (this.renderType() === RENDERER_TYPE.CANVAS) {
-        this.drawBigTexturedPolygon(cementShape.leftPolygon, texture);
-        this.drawBigTexturedPolygon(cementShape.rightPolygon, texture);
-      } else {
-        this.drawRopeWithMask(cementShape.path, cementShape.leftPolygon, texture);
-        this.drawRopeWithMask(cementShape.path, cementShape.rightPolygon, texture);
-      }
-    });
+    if (this.renderType() === RENDERER_TYPE.CANVAS) {
+      this.drawBigTexturedPolygon(cementShape.leftPolygon, texture);
+      this.drawBigTexturedPolygon(cementShape.rightPolygon, texture);
+    } else {
+      this.drawRopeWithMask(cementShape.path, cementShape.leftPolygon, texture);
+      this.drawRopeWithMask(cementShape.path, cementShape.rightPolygon, texture);
+    }
   }
 
-  private drawCasing = (zippedRenderObject: [Casing, CasingRenderObject]): void => {
+  private drawCasing = (zippedRenderObject: CasingRenderObject): void => {
     const { casingLineColor, casingSolidColor } = this.options as CasingAndCementLayerOptions<T>;
-    const [casing, { pathPoints, polygon, leftPath, rightPath, radius, diameter, casingWallWidth }] = zippedRenderObject;
+    const { pathPoints, polygon, leftPath, rightPath, diameter, casingWallWidth } = zippedRenderObject;
 
     // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
@@ -142,10 +167,6 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     }
 
     this.drawOutline(leftPath, rightPath, casingLineColor, casingWallWidth, true);
-
-    if (casing.hasShoe) {
-      this.drawShoe(casing.end, radius);
-    }
   };
 
   private createCasingTexture(diameter: number): Texture {
@@ -249,7 +270,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     const leftPolygon = makeTubularPolygon(side1Left, side1Right);
     const rightPolygon = makeTubularPolygon(side2Left, side2Right);
 
-    return { leftPolygon, rightPolygon, path: pathPoints };
+    return { leftPolygon, rightPolygon, path: pathPoints, casingIds: attachedCasings.map((c) => c.casingId) };
   }
   private createCementTexture(): Texture {
     if (this._textureCache) {

@@ -5,7 +5,7 @@ import {
   IntersectionReferenceSystem,
   Controller,
   PixiRenderApplication,
-} from '../../../src/';
+} from '../../../src';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
 

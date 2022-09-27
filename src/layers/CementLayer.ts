@@ -14,6 +14,7 @@ export interface CementShape {
   rightPolygon: Point[];
   leftPolygon: Point[];
   path: Point[];
+  casingIds: string[];
 }
 
 export type CementData = { cement: Cement[]; casings: Casing[]; holes: HoleSize[] };
@@ -125,7 +126,7 @@ export class CementLayer<T extends CementData> extends WellboreBaseComponentLaye
     const leftPolygon = makeTubularPolygon(side1Left, side1Right);
     const rightPolygon = makeTubularPolygon(side2Left, side2Right);
 
-    return { leftPolygon, rightPolygon, path: pathPoints };
+    return { casingIds: cement.casingIds, leftPolygon, rightPolygon, path: pathPoints };
   };
 
   createTexture(): Texture {
