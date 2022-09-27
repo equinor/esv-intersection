@@ -24,8 +24,8 @@ export const GeoModelUsingLowLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
-  const renderer = new PixiRenderApplication();
-  const geoModelLayer = new GeomodelLayerV2(renderer, 'webgl', options);
+  const pixiContext = new PixiRenderApplication();
+  const geoModelLayer = new GeomodelLayerV2(pixiContext, 'webgl', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
@@ -63,10 +63,10 @@ export const GeoModelWithLabelsUsingLowLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: LayerOptions<SurfaceData>  = { order: 1 };
+  const options: LayerOptions<SurfaceData> = { order: 1 };
 
-  const renderer = new PixiRenderApplication();
-  const geoModelLayer = new GeomodelLayerV2(renderer, 'geomodels', options);
+  const pixiContext = new PixiRenderApplication();
+  const geoModelLayer = new GeomodelLayerV2(pixiContext, 'geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
   const options2: GeomodelLayerLabelsOptions<SurfaceData> = { order: 1 };
@@ -118,9 +118,9 @@ export const GeoModelUsingHighLevelInterface = () => {
   const container = createLayerContainer(width, height);
   const fpsLabel = createFPSLabel();
 
-  const options: LayerOptions<SurfaceData>  = { order: 1 };
-  const renderer = new PixiRenderApplication();
-  const geoModelLayer = new GeomodelLayerV2(renderer, 'webgl', options);
+  const options: LayerOptions<SurfaceData> = { order: 1 };
+  const pixiContext = new PixiRenderApplication();
+  const geoModelLayer = new GeomodelLayerV2(pixiContext, 'webgl', options);
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
     const [path, surfaces, stratColumns] = values;
@@ -158,8 +158,8 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
-  const renderer = new PixiRenderApplication();
-  const geoModelLayer = new GeomodelLayerV2(renderer, 'geomodels', options);
+  const pixiContext = new PixiRenderApplication();
+  const geoModelLayer = new GeomodelLayerV2(pixiContext, 'geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
   const options2: GeomodelLayerLabelsOptions<SurfaceData> = { order: 1 };

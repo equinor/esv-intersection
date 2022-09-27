@@ -1,4 +1,13 @@
-import { CompletionLayer, ZoomPanHandler, CompletionLayerOptions, OnRescaleEvent, IntersectionReferenceSystem, Controller, CompletionData, PixiRenderApplication } from '../../../src';
+import {
+  CompletionLayer,
+  ZoomPanHandler,
+  CompletionLayerOptions,
+  OnRescaleEvent,
+  IntersectionReferenceSystem,
+  Controller,
+  CompletionData,
+  PixiRenderApplication,
+} from '../../../src';
 import { getWellborePath, getCompletion } from '../data';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
@@ -19,8 +28,8 @@ export const CompletionLayerUsingLowLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const renderer = new PixiRenderApplication();
-    const completionLayer = new CompletionLayer(renderer, 'webgl', options);
+    const pixiContext = new PixiRenderApplication();
+    const completionLayer = new CompletionLayer(pixiContext, 'webgl', options);
     completionLayer.onMount({ elm: container, height, width });
 
     completionLayer.onUpdate({ data: completion });
@@ -57,8 +66,8 @@ export const CompletionLayerUsingHighLevelInterface = () => {
       data: completion,
     };
 
-    const renderer = new PixiRenderApplication();
-    const completionLayer = new CompletionLayer(renderer, 'webgl', options);
+    const pixiContext = new PixiRenderApplication();
+    const completionLayer = new CompletionLayer(pixiContext, 'webgl', options);
 
     const controller = new Controller({ container, layers: [completionLayer] });
 

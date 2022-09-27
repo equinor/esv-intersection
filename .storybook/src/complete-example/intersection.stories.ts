@@ -94,7 +94,7 @@ const renderIntersection = (scaleOptions: any) => {
     const transformedPicksData = transformFormationData(picks, stratColumns);
     const picksData = getPicksData(transformedPicksData);
 
-    const renderer = new PixiRenderApplication({ width, height: height / 2 });
+    const pixiContext = new PixiRenderApplication({ width, height: height / 2 });
 
     // Instantiate layers
     const gridLayer = new GridLayer('grid', {
@@ -105,14 +105,18 @@ const renderIntersection = (scaleOptions: any) => {
       order: 1,
       referenceSystem,
     });
-    const geomodelLayer = new GeomodelLayerV2<SurfaceData>(renderer, 'geomodel', { order: 2, layerOpacity: 0.6, data: geolayerdata });
+    const geomodelLayer = new GeomodelLayerV2<SurfaceData>(pixiContext, 'geomodel', { order: 2, layerOpacity: 0.6, data: geolayerdata });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-    const holeSizeLayer = new HoleSizeLayer<HoleSize[]>(renderer, 'holesize', { order: 4, data: holesizes, referenceSystem });
-    const casingLayer = new CasingLayer<Casing[]>(renderer, 'casing', { order: 5, data: casings, referenceSystem });
+    const holeSizeLayer = new HoleSizeLayer<HoleSize[]>(pixiContext, 'holesize', { order: 4, data: holesizes, referenceSystem });
+    const casingLayer = new CasingLayer<Casing[]>(pixiContext, 'casing', { order: 5, data: casings, referenceSystem });
     const geomodelLabelsLayer = new GeomodelLabelsLayer<SurfaceData>('geomodellabels', { order: 3, data: geolayerdata });
     const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
-    const completionLayer = new CompletionLayer<CompletionData[]>(renderer, 'completion', { order: 4, data: completion, referenceSystem });
-    const cementLayer = new CementLayer<CementData>(renderer, 'cement', { order: 99, data: { cement, casings, holes: holesizes }, referenceSystem });
+    const completionLayer = new CompletionLayer<CompletionData[]>(pixiContext, 'completion', { order: 4, data: completion, referenceSystem });
+    const cementLayer = new CementLayer<CementData>(pixiContext, 'cement', {
+      order: 99,
+      data: { cement, casings, holes: holesizes },
+      referenceSystem,
+    });
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
     const layers = [
