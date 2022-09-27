@@ -1,6 +1,6 @@
 import { Point, RENDERER_TYPE, Rectangle, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
-import { HoleSize } from '..';
+import { HoleSize, PixiRenderApplication } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { convertColor } from '../utils/color';
@@ -34,8 +34,8 @@ export interface HoleSizeLayerOptions<T extends HoleSize[]> extends WellComponen
 export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLayer<T> {
   maxDiameter: number;
 
-  constructor(id?: string, options?: HoleSizeLayerOptions<T>) {
-    super(id, options);
+  constructor(ctx: PixiRenderApplication, id?: string, options?: HoleSizeLayerOptions<T>) {
+    super(ctx, id, options);
     this.options = {
       ...this.options,
       firstColor: 'rgb(140, 84, 29)',

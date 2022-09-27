@@ -1,8 +1,9 @@
-import { Graphics, Texture, Point, SimpleRope } from 'pixi.js';
-import { PixiLayer, PixiLayerOptions } from './base/PixiLayer';
-import { OnUpdateEvent, MDPoint, OnUnmountEvent, OnRescaleEvent } from '../interfaces';
+import { Graphics, Texture, Point, SimpleRope, Application } from 'pixi.js';
+import { PixiLayer, PixiRenderApplication } from './base/PixiLayer';
+import { OnUpdateEvent, OnRescaleEvent, MDPoint, OnUnmountEvent } from '../interfaces';
+import { LayerOptions } from './base';
 
-export interface WellComponentBaseOptions<T> extends PixiLayerOptions<T> {
+export interface WellComponentBaseOptions<T> extends LayerOptions<T> {
   exaggerationFactor?: number;
 }
 
@@ -11,8 +12,8 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
 
   rescaleEvent: OnRescaleEvent;
 
-  constructor(id?: string, options?: WellComponentBaseOptions<T>) {
-    super(id, options);
+  constructor(ctx: Application | PixiRenderApplication, id?: string, options?: WellComponentBaseOptions<T>) {
+    super(ctx, id, options);
     this.options = {
       ...this.options,
       exaggerationFactor: 2,
@@ -31,40 +32,27 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
 
   onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
-    this.clearStage();
+    this.clearLayer();
     this.preRender();
     this.render();
   }
 
-  onRescale(event: OnRescaleEvent): void {
+  override onRescale(event: OnRescaleEvent): void {
     const shouldRecalculate = this.rescaleEvent?.zFactor !== event.zFactor;
 
     this.rescaleEvent = event;
     super.optionsRescale(event);
-
-    if (!this.ctx) {
-      return;
-    }
-
     const yRatio = this.yRatio();
     const flippedX = event.xBounds[0] > event.xBounds[1];
     const flippedY = event.yBounds[0] > event.yBounds[1];
-    this.ctx.stage.position.set(event.xScale(0), event.yScale(0));
-    this.ctx.stage.scale.set(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
-
+    this.setContainerPosition(event.xScale(0), event.yScale(0));
+    this.setContainerScale(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
     if (shouldRecalculate) {
-      this.clearStage();
+      this.clearLayer();
       this.preRender();
     }
 
     this.render();
-  }
-
-  clearStage(): void {
-    const children = this.ctx.stage.removeChildren();
-    children.forEach((child) => {
-      child.destroy();
-    });
   }
 
   /**
@@ -114,7 +102,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     polygon.drawPolygon(coords);
     polygon.endFill();
 
-    this.ctx.stage.addChild(polygon);
+    this.addChild(polygon);
 
     return polygon;
   };
@@ -125,7 +113,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     polygon.drawPolygon(coords);
     polygon.endFill();
 
-    this.ctx.stage.addChild(polygon);
+    this.addChild(polygon);
 
     return polygon;
   };
@@ -140,10 +128,10 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     mask.beginFill(0);
     mask.drawPolygon(maskPolygon);
     mask.endFill();
-    this.ctx.stage.addChild(mask);
+    this.addChild(mask);
     rope.mask = mask;
 
-    this.ctx.stage.addChild(rope);
+    this.addChild(rope);
   }
 
   drawRope(path: Point[], texture: Texture, tint?: number): void {
@@ -155,7 +143,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
 
     rope.tint = tint || rope.tint;
 
-    this.ctx.stage.addChild(rope);
+    this.addChild(rope);
   }
 
   drawOutline(leftPath: Point[], rightPath: Point[], lineColor: number, lineWidth = 1, close: boolean = false): void {
@@ -181,6 +169,6 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
       line.lineTo(startPointRight.x, startPointRight.y);
     }
 
-    this.ctx.stage.addChild(line);
+    this.addChild(line);
   }
 }

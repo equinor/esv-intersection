@@ -1,4 +1,13 @@
-import { CasingLayer, Casing, OnRescaleEvent, CasingLayerOptions, ZoomPanHandler, IntersectionReferenceSystem, Controller } from '../../../src/';
+import {
+  CasingLayer,
+  Casing,
+  OnRescaleEvent,
+  CasingLayerOptions,
+  ZoomPanHandler,
+  IntersectionReferenceSystem,
+  Controller,
+  PixiRenderApplication,
+} from '../../../src/';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
 
@@ -19,7 +28,8 @@ export const CasingUsingLowLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const casingLayer = new CasingLayer('webgl', options);
+    const pixiContext = new PixiRenderApplication();
+    const casingLayer = new CasingLayer(pixiContext, 'webgl', options);
 
     casingLayer.onMount({ elm: container, height, width });
     casingLayer.onUpdate({
@@ -56,8 +66,8 @@ export const CasingUsingHighLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const casingLayer = new CasingLayer('webgl', options);
-
+    const pixiContext = new PixiRenderApplication();
+    const casingLayer = new CasingLayer(pixiContext, 'webgl', options);
 
     const controller = new Controller({ container, layers: [casingLayer] });
     casingLayer.setData(casings);
@@ -69,7 +79,6 @@ export const CasingUsingHighLevelInterface = () => {
     controller.zoomPanHandler.enableTranslateExtent = false;
     controller.setViewport(1000, 1000, 5000);
   });
-
 
   root.appendChild(createHelpText('High level interface for creating and displaying casing. This layer is made using webGL.'));
   root.appendChild(container);

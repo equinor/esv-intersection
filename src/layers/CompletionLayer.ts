@@ -1,18 +1,18 @@
 import Vector2 from '@equinor/videx-vector2';
-import { Graphics } from 'pixi.js';
-import { PixiLayer, PixiLayerOptions } from './base/PixiLayer';
-import { OnUpdateEvent } from '..';
+import { Application, Graphics } from 'pixi.js';
+import { PixiLayer } from './base/PixiLayer';
+import { LayerOptions, OnUpdateEvent, PixiRenderApplication } from '..';
 import { CompletionData, OnRescaleEvent } from '../interfaces';
 
 export interface CompletionItem {
   graphics: Graphics;
 }
 
-export interface CompletionLayerOptions<T extends CompletionData[]> extends PixiLayerOptions<T> {}
+export interface CompletionLayerOptions<T extends CompletionData[]> extends LayerOptions<T> {}
 
 export class CompletionLayer<T extends CompletionData[]> extends PixiLayer<T> {
-  constructor(id: string, options: CompletionLayerOptions<T>) {
-    super(id, options);
+  constructor(ctx: Application | PixiRenderApplication, id: string, options: CompletionLayerOptions<T>) {
+    super(ctx, id, options);
     this.options = {
       ...this.options,
       ...options,
@@ -22,14 +22,14 @@ export class CompletionLayer<T extends CompletionData[]> extends PixiLayer<T> {
 
   onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
-    this.clearStage();
+    this.clearLayer();
     this.preRender();
     this.render();
   }
 
   onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
-    this.clearStage();
+    this.clearLayer();
     this.preRender();
     this.render();
   }
@@ -44,13 +44,6 @@ export class CompletionLayer<T extends CompletionData[]> extends PixiLayer<T> {
     // TODO: clear old completion items when there is no data to display
     const items: CompletionItem[] = this.data?.length > 0 ? this.data.map((d: CompletionData) => this.generateCompletionItem(wellborePath, d)) : [];
     items.map((s: CompletionItem) => this.drawCompletionItem(s));
-  }
-
-  clearStage(): void {
-    const children = this.ctx.stage.removeChildren();
-    children.forEach((child) => {
-      child.destroy();
-    });
   }
 
   getShape(type: string): Graphics {
@@ -99,6 +92,6 @@ export class CompletionLayer<T extends CompletionData[]> extends PixiLayer<T> {
   }
 
   drawCompletionItem(item: CompletionItem): void {
-    this.ctx.stage.addChild(item.graphics);
+    this.addChild(item.graphics);
   }
 }

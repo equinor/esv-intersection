@@ -3,11 +3,8 @@ import { PixiLayer } from './base/PixiLayer';
 import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { SurfaceArea, SurfaceData, SurfaceLine } from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
-import { LayerOptions } from './base/Layer';
 
 const DEFAULT_Y_BOTTOM = 10000;
-
-export interface GeomodelLayerOptions<T extends SurfaceData> extends LayerOptions<T> {}
 
 export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
   private isPreRendered: boolean = false;
@@ -16,7 +13,7 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     super.onRescale(event);
 
     if (!this.isPreRendered) {
-      this.clearStage();
+      this.clearLayer();
       this.preRender();
     }
 
@@ -27,14 +24,9 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     super.onUpdate(event);
 
     this.isPreRendered = false;
-    this.clearStage();
+    this.clearLayer();
     this.preRender();
     this.render();
-  }
-
-  clearStage(): void {
-    this.ctx.stage.children.forEach((g: Graphics) => g.destroy());
-    this.ctx.stage.removeChildren();
   }
 
   preRender(): void {
@@ -90,7 +82,7 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     const polygons = this.createPolygons(s.data);
     polygons.forEach((polygon: number[]) => g.drawPolygon(polygon));
     g.endFill();
-    this.ctx.stage.addChild(g);
+    this.addChild(g);
   };
 
   generateSurfaceLine = (s: SurfaceLine): void => {
@@ -113,6 +105,6 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
         penDown = false;
       }
     }
-    this.ctx.stage.addChild(g);
+    this.addChild(g);
   };
 }
