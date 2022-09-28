@@ -52,4 +52,8 @@ export class ImageLayer<T> extends CanvasLayer<T> {
       this.ctx.drawImage(this.img, xScale(x || 0), yScale(y || 0), calcWidth, calcHeight);
     }
   }
+
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }

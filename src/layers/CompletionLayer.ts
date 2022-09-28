@@ -94,4 +94,8 @@ export class CompletionLayer<T extends CompletionData[]> extends PixiLayer<T> {
   drawCompletionItem(item: CompletionItem): void {
     this.addChild(item.graphics);
   }
+
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }

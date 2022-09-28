@@ -173,4 +173,8 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
     return paths;
   };
+
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }

@@ -42,9 +42,16 @@ export interface CasingAndCementLayerOptions<T extends CasingAndCementData> exte
   secondCementColor?: string;
   casingShoeSize?: CasingShoeSize;
   exaggerationFactor?: number;
+  internalLayers?: {
+    casingId: string;
+    cementId: string;
+  };
 }
 
 export class CasingAndCementLayer<T extends CasingAndCementData> extends WellboreBaseComponentLayer<T> {
+  private casingVisibility = true;
+  private cementVisibility = true;
+
   constructor(ctx: PixiRenderApplication, id?: string, options?: CasingAndCementLayerOptions<T>) {
     super(ctx, id, options);
     this.options = {
@@ -72,13 +79,12 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     this.pairCementAndCasingRenderObjects(casingRenderObjects, cementShapes).forEach(
       ([cementShape, casingRenderObject]: [CementShape | undefined, CasingRenderObject]) => {
         if (cementShape) {
-          this.drawCementShape(cementShape);
+          this.cementVisibility && this.drawCementShape(cementShape);
         }
-
-        this.drawCasing(casingRenderObject);
+        this.casingVisibility && this.drawCasing(casingRenderObject);
 
         if (casingRenderObject.hasShoe) {
-          this.drawShoe(casingRenderObject.bottom, casingRenderObject.radius);
+          this.casingVisibility && this.drawShoe(casingRenderObject.bottom, casingRenderObject.radius);
         }
       },
     );
@@ -213,7 +219,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
 
     attachedCasings.sort((a: Casing, b: Casing) => a.end - b.end); // ascending
     const bottomOfCement = attachedCasings[attachedCasings.length - 1].end;
-
+    // console.log({ attachedCasings });
     const { outerCasings, holes: overlappingHoles } = findIntersectingItems(cement, bottomOfCement, attachedCasings, casings, holes);
 
     const innerDiameterIntervals = attachedCasings;
@@ -272,6 +278,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
 
     return { leftPolygon, rightPolygon, path: pathPoints, casingIds: attachedCasings.map((c) => c.casingId) };
   }
+
   private createCementTexture(): Texture {
     if (this._textureCache) {
       return this._textureCache;
@@ -303,5 +310,36 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     this._textureCache = Texture.from(canvas);
 
     return this._textureCache;
+  }
+
+  getInternalLayerIds(): string[] {
+    const internalLayers = (this.options as CasingAndCementLayerOptions<T>).internalLayers;
+    return [internalLayers.casingId, internalLayers.cementId];
+  }
+
+  override setVisibility(isVisible: boolean, layerId: string) {
+    if (layerId === this.id) {
+      super.setVisibility(isVisible, layerId);
+      return;
+    }
+
+    const isCement = (this.options as CasingAndCementLayerOptions<T>)?.internalLayers?.cementId === layerId;
+    const isCasing = (this.options as CasingAndCementLayerOptions<T>)?.internalLayers?.casingId === layerId;
+
+    if (!isCement && !isCasing) {
+      return;
+    }
+
+    if (isCement) {
+      this.cementVisibility = isVisible;
+    }
+
+    if (isCasing) {
+      this.casingVisibility = isVisible;
+    }
+
+    this.clearLayer();
+    this.preRender();
+    this.render();
   }
 }

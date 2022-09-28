@@ -126,4 +126,8 @@ export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T>
 
     return line().curve(curveFactory)(transformedData);
   }
+
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }

@@ -148,8 +148,8 @@ export abstract class PixiLayer<T> extends Layer<T> {
     this.pixiViewContainer.setAttribute('style', `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};`);
   }
 
-  setVisibility(visible: boolean): void {
-    super.setVisibility(visible);
+  setVisibility(visible: boolean, layerId?: string): void {
+    super.setVisibility(visible, layerId);
     if (this.pixiViewContainer) {
       this.updateStyle(visible);
     }
