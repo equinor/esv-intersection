@@ -7,12 +7,9 @@ import {
   Layer,
   SeismicCanvasLayer,
   HoleSizeLayer,
-  CasingLayer,
   CompletionLayer,
-  CementLayer,
   CalloutCanvasLayer,
   PixiRenderApplication,
-  CementData,
 } from '../../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
@@ -31,7 +28,7 @@ import {
 import { seismicColorMap } from '../exampledata';
 
 import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks } from '../data';
-import { Annotation, Casing, CompletionData, HoleSize } from '../../../src';
+import { Annotation, CasingAndCementData, CasingAndCementLayer, CompletionData, HoleSize } from '../../../src';
 
 export const intersection = () => {
   const xBounds: [number, number] = [0, 1000];
@@ -108,13 +105,16 @@ const renderIntersection = (scaleOptions: any) => {
     const geomodelLayer = new GeomodelLayerV2<SurfaceData>(pixiContext, 'geomodel', { order: 2, layerOpacity: 0.6, data: geolayerdata });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
     const holeSizeLayer = new HoleSizeLayer<HoleSize[]>(pixiContext, 'holesize', { order: 4, data: holesizes, referenceSystem });
-    const casingLayer = new CasingLayer<Casing[]>(pixiContext, 'casing', { order: 5, data: casings, referenceSystem });
     const geomodelLabelsLayer = new GeomodelLabelsLayer<SurfaceData>('geomodellabels', { order: 3, data: geolayerdata });
     const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
     const completionLayer = new CompletionLayer<CompletionData[]>(pixiContext, 'completion', { order: 4, data: completion, referenceSystem });
-    const cementLayer = new CementLayer<CementData>(pixiContext, 'cement', {
+    const casingAndCementLayer = new CasingAndCementLayer<CasingAndCementData>(pixiContext, 'casingAndCement', {
       order: 99,
-      data: { cement, casings, holes: holesizes },
+      data: {
+        holeSizes: holesizes,
+        casings,
+        cements: cement,
+      },
       referenceSystem,
     });
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
@@ -127,8 +127,7 @@ const renderIntersection = (scaleOptions: any) => {
       seismicLayer,
       completionLayer,
       holeSizeLayer,
-      casingLayer,
-      cementLayer,
+      casingAndCementLayer,
       calloutLayer,
     ];
 
@@ -160,13 +159,12 @@ const renderIntersection = (scaleOptions: any) => {
     const btnWellbore = createButton(controller, wellboreLayer, 'Wellbore');
     const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model');
     const btnHoleSize = createButton(controller, holeSizeLayer, 'Hole size');
-    const btnCasing = createButton(controller, casingLayer, 'Casing');
     const btnCompletion = createButton(controller, completionLayer, 'Completion');
-    const btnCement = createButton(controller, cementLayer, 'Cement');
+    const btnCasingAndCement = createButton(controller, casingAndCementLayer, 'Casing & Cement');
     const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
     const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
     const btnPicks = createButton(controller, calloutLayer, 'Picks');
-    const btnSetDataForCompletion = createSetLayerButton(cementLayer, casingLayer, cement, casings, holesizes);
+
     let show = true;
     const toggleAxis = createButtonWithCb(
       'Axis labels',
@@ -221,9 +219,8 @@ const renderIntersection = (scaleOptions: any) => {
     btnToggleContainer.appendChild(btnGeomodelLabels);
     btnToggleContainer.appendChild(btnSeismic);
     btnToggleContainer.appendChild(btnHoleSize);
-    btnToggleContainer.appendChild(btnCasing);
     btnToggleContainer.appendChild(btnCompletion);
-    btnToggleContainer.appendChild(btnCement);
+    btnToggleContainer.appendChild(btnCasingAndCement);
     btnToggleContainer.appendChild(btnPicks);
     btnToggleContainer.appendChild(toggleAxis);
     btnAdjustSizeContainer.appendChild(btnLarger);
@@ -305,22 +302,6 @@ const createButton = <T>(manager: Controller<T>, layer: Layer<T>, title: string)
       btn.style.color = 'white';
     }
     show = !show;
-  };
-  return btn;
-};
-
-const createSetLayerButton = (cementLayer: any, casingLayer: any, cement: any, casings: any, holes: any) => {
-  const btn = document.createElement('button');
-  btn.innerHTML = `Update data for compl`;
-  btn.setAttribute('style', 'width: 130px;height:32px;margin-top:12px;');
-  btn.onclick = () => {
-    const alterWBI = (c: any): any => {
-      return { ...c, end: (c.end += 15) };
-    };
-    casings[0] = alterWBI(casings[0]);
-    holes[0] = alterWBI(holes[0]);
-    cementLayer.setData({ cement, casings, holes });
-    casingLayer.setData(casings);
   };
   return btn;
 };
