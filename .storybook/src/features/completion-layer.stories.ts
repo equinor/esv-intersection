@@ -1,11 +1,11 @@
 import {
-  CompletionLayer,
+  CompletionLayerV2,
   ZoomPanHandler,
-  CompletionLayerOptions,
+  CompletionLayerV2Options,
   OnRescaleEvent,
   IntersectionReferenceSystem,
   Controller,
-  CompletionData,
+  CompletionImage,
   PixiRenderApplication,
 } from '../../../src';
 import { getWellborePath, getCompletion } from '../data';
@@ -24,12 +24,12 @@ export const CompletionLayerUsingLowLevelInterface = () => {
     const [path, completion] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
 
-    const options: CompletionLayerOptions<CompletionData[]> = {
+    const options: CompletionLayerV2Options<CompletionImage[]> = {
       order: 1,
       referenceSystem,
     };
-    const pixiContext = new PixiRenderApplication();
-    const completionLayer = new CompletionLayer(pixiContext, 'webgl', options);
+    const pixiContext = new PixiRenderApplication({ width, height });
+    const completionLayer = new CompletionLayerV2(pixiContext, 'webgl', options);
     completionLayer.onMount({ elm: container, height, width });
 
     completionLayer.onUpdate({ data: completion });
@@ -60,14 +60,14 @@ export const CompletionLayerUsingHighLevelInterface = () => {
     const [path, completion] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
 
-    const options: CompletionLayerOptions<CompletionData[]> = {
+    const options: CompletionLayerV2Options<CompletionImage[]> = {
       order: 1,
       referenceSystem,
       data: completion,
     };
 
-    const pixiContext = new PixiRenderApplication();
-    const completionLayer = new CompletionLayer(pixiContext, 'webgl', options);
+    const pixiContext = new PixiRenderApplication({ width, height });
+    const completionLayer = new CompletionLayerV2(pixiContext, 'webgl', options);
 
     const controller = new Controller({ container, layers: [completionLayer] });
 

@@ -2,7 +2,14 @@ import Vector2 from '@equinor/videx-vector2';
 import { Application, Graphics } from 'pixi.js';
 import { PixiLayer } from './base/PixiLayer';
 import { LayerOptions, OnUpdateEvent, PixiRenderApplication } from '..';
-import { CompletionData, OnRescaleEvent } from '../interfaces';
+import { OnRescaleEvent } from '../interfaces';
+
+export type CompletionData = {
+  shape: string;
+  start: number;
+  end: number;
+  diameter: number;
+};
 
 export interface CompletionItem {
   graphics: Graphics;

@@ -28,7 +28,7 @@ export const CementLayerUsingLowLevelInterface = () => {
       data: { cement, casings, holes },
     };
 
-    const pixiContext = new PixiRenderApplication();
+    const pixiContext = new PixiRenderApplication({ width, height });
     const cementLayer = new CementLayer(pixiContext, 'webgl', options);
 
     cementLayer.onMount({ elm: container, height, width });
@@ -66,7 +66,7 @@ export const CementLayerUsingHighLevelInterface = () => {
       data: { cement, casings, holes },
     };
 
-    const pixiContext = new PixiRenderApplication();
+    const pixiContext = new PixiRenderApplication({ width, height });
     const cementLayer = new CementLayer(pixiContext, 'webgl', options);
 
     const controller = new Controller({ container, layers: [cementLayer] });

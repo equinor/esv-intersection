@@ -24,7 +24,7 @@ export const GeoModelUsingLowLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
-  const pixiContext = new PixiRenderApplication();
+  const pixiContext = new PixiRenderApplication({ width, height });
   const geoModelLayer = new GeomodelLayerV2(pixiContext, 'webgl', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
@@ -65,7 +65,7 @@ export const GeoModelWithLabelsUsingLowLevelInterface = () => {
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
 
-  const pixiContext = new PixiRenderApplication();
+  const pixiContext = new PixiRenderApplication({ width, height });
   const geoModelLayer = new GeomodelLayerV2(pixiContext, 'geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 
@@ -119,7 +119,7 @@ export const GeoModelUsingHighLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
-  const pixiContext = new PixiRenderApplication();
+  const pixiContext = new PixiRenderApplication({ width, height });
   const geoModelLayer = new GeomodelLayerV2(pixiContext, 'webgl', options);
 
   Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
@@ -158,7 +158,7 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
-  const pixiContext = new PixiRenderApplication();
+  const pixiContext = new PixiRenderApplication({ width, height });
   const geoModelLayer = new GeomodelLayerV2(pixiContext, 'geomodels', options);
   geoModelLayer.onMount({ elm: container, height, width });
 

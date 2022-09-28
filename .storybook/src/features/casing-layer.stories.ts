@@ -28,7 +28,7 @@ export const CasingUsingLowLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const pixiContext = new PixiRenderApplication();
+    const pixiContext = new PixiRenderApplication({ width, height });
     const casingLayer = new CasingLayer(pixiContext, 'webgl', options);
 
     casingLayer.onMount({ elm: container, height, width });
@@ -66,7 +66,7 @@ export const CasingUsingHighLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const pixiContext = new PixiRenderApplication();
+    const pixiContext = new PixiRenderApplication({ width, height });
     const casingLayer = new CasingLayer(pixiContext, 'webgl', options);
 
     const controller = new Controller({ container, layers: [casingLayer] });

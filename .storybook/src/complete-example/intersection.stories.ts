@@ -7,9 +7,9 @@ import {
   Layer,
   SeismicCanvasLayer,
   HoleSizeLayer,
-  CompletionLayer,
   CalloutCanvasLayer,
   PixiRenderApplication,
+  CompletionLayerV2,
 } from '../../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
@@ -27,8 +27,8 @@ import {
 //Data
 import { seismicColorMap } from '../exampledata';
 
-import { getCompletion, getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks } from '../data';
-import { Annotation, CasingAndCementData, CasingAndCementLayer, CompletionData, HoleSize } from '../../../src';
+import { getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks, getCompletionV2 } from '../data';
+import { Annotation, CasingAndCementData, CasingAndCementLayer, Completion, HoleSize } from '../../../src';
 
 export const intersection = () => {
   const xBounds: [number, number] = [0, 1000];
@@ -67,7 +67,7 @@ const renderIntersection = (scaleOptions: any) => {
 
   const promises = [
     getWellborePath(),
-    getCompletion(),
+    getCompletionV2(),
     getSeismic(),
     getSurfaces(),
     getStratColumns(),
@@ -77,7 +77,7 @@ const renderIntersection = (scaleOptions: any) => {
     getPicks(),
   ];
   Promise.all(promises).then((values) => {
-    const [path, completion, seismic, surfaces, stratColumns, casings, holesizes, cement, picks] = values;
+    const [path, completion, seismic, surfaces, stratColumns, casings, holeSizes, cement, picks] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
     referenceSystem.offset = path[0][2]; // Offset should be md at start of path
     const displacement = referenceSystem.displacement || 1;
@@ -91,7 +91,7 @@ const renderIntersection = (scaleOptions: any) => {
     const transformedPicksData = transformFormationData(picks, stratColumns);
     const picksData = getPicksData(transformedPicksData);
 
-    const pixiContext = new PixiRenderApplication({ width, height: height / 2 });
+    const pixiContext = new PixiRenderApplication({ width, height });
 
     // Instantiate layers
     const gridLayer = new GridLayer('grid', {
@@ -104,19 +104,19 @@ const renderIntersection = (scaleOptions: any) => {
     });
     const geomodelLayer = new GeomodelLayerV2<SurfaceData>(pixiContext, 'geomodel', { order: 2, layerOpacity: 0.6, data: geolayerdata });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
-    const holeSizeLayer = new HoleSizeLayer<HoleSize[]>(pixiContext, 'holesize', { order: 4, data: holesizes, referenceSystem });
+    const holeSizeLayer = new HoleSizeLayer<HoleSize[]>(pixiContext, 'holesize', { order: 4, data: holeSizes, referenceSystem });
     const geomodelLabelsLayer = new GeomodelLabelsLayer<SurfaceData>('geomodellabels', { order: 3, data: geolayerdata });
     const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
-    const completionLayer = new CompletionLayer<CompletionData[]>(pixiContext, 'completion', { order: 4, data: completion, referenceSystem });
     const casingAndCementLayer = new CasingAndCementLayer<CasingAndCementData>(pixiContext, 'casingAndCement', {
-      order: 99,
+      order: 5,
       data: {
-        holeSizes: holesizes,
+        holeSizes,
         casings,
         cements: cement,
       },
       referenceSystem,
     });
+    const completionLayer = new CompletionLayerV2<Completion[]>(pixiContext, 'completion', { order: 6, data: completion, referenceSystem });
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
     const layers = [
@@ -125,9 +125,9 @@ const renderIntersection = (scaleOptions: any) => {
       wellboreLayer,
       geomodelLabelsLayer,
       seismicLayer,
-      completionLayer,
       holeSizeLayer,
       casingAndCementLayer,
+      completionLayer,
       calloutLayer,
     ];
 

@@ -14,7 +14,7 @@ export class PixiRenderApplication {
   renderer: AbstractRenderer;
 
   constructor(pixiRenderOptions?: IRendererOptionsAuto) {
-    this.renderer = autoDetectRenderer({
+    const options = {
       width: DEFAULT_LAYER_WIDTH,
       height: DEFAULT_LAYER_HEIGHT,
       antialias: true,
@@ -23,7 +23,8 @@ export class PixiRenderApplication {
       // autoResize: true,
       preserveDrawingBuffer: true,
       ...pixiRenderOptions,
-    });
+    };
+    this.renderer = autoDetectRenderer(options);
     this.stage = new Container();
   }
 
@@ -145,7 +146,17 @@ export abstract class PixiLayer<T> extends Layer<T> {
     const isVisible = visible || this.isVisible;
     const interactive = this.interactive ? 'auto' : 'none';
     this.container.visible = isVisible;
-    this.pixiViewContainer.setAttribute('style', `position:absolute;pointer-events:${interactive};z-index:${this.order};opacity:${this.opacity};`);
+
+    const styles = [
+      ['position', 'absolute'],
+      ['pointer-events', `${interactive}`],
+      ['z-index', `${this.order}`],
+      ['opacity', `${this.opacity}`],
+    ]
+      .map((pair) => pair.join(':'))
+      .join(';');
+
+    this.pixiViewContainer.setAttribute('style', styles);
   }
 
   setVisibility(visible: boolean, layerId?: string): void {
