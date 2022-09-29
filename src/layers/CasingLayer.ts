@@ -146,4 +146,8 @@ export class CasingLayer<T extends Casing[]> extends WellboreBaseComponentLayer<
     const textureWidthPO2 = 16;
     return new Texture(Texture.WHITE.baseTexture, null, new Rectangle(0, 0, textureWidthPO2, diameter));
   }
+
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }

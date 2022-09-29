@@ -124,4 +124,8 @@ export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLa
 
     return Texture.from(canvas);
   }
+
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }

@@ -161,4 +161,8 @@ export class CementLayer<T extends CementData> extends WellboreBaseComponentLaye
 
     return this._textureCache;
   }
+
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }

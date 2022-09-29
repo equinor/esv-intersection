@@ -156,7 +156,7 @@ export abstract class Layer<T> {
     this.onUpdate({});
   }
 
-  setVisibility(visible: boolean): void {
+  setVisibility(visible: boolean, _layerId?: string): void {
     this._visible = visible;
   }
 
@@ -203,4 +203,6 @@ export abstract class Layer<T> {
   abstract onOrderChanged(order: number): void;
 
   abstract onInteractivityChanged(interactive: boolean): void;
+
+  abstract getInternalLayerIds(): string[];
 }
