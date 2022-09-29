@@ -67,4 +67,8 @@ export abstract class HTMLLayer<T> extends Layer<T> {
       this.elm.style('pointer-events', interactive);
     }
   }
+
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }

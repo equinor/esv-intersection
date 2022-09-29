@@ -20,6 +20,10 @@ class TestLayer extends Layer<string> {
   onUpdate(_event: OnUpdateEvent<string>) {
     this.updateWasCalled = true;
   }
+
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }
 
 const data = 'test';

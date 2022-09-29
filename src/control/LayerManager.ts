@@ -114,7 +114,7 @@ export class LayerManager<T> {
   }
 
   getLayer(layerId: string): Layer<T> {
-    return this.layers.find((l) => l.id === layerId);
+    return this.layers.find((l) => l.id === layerId || l.getInternalLayerIds().includes(layerId));
   }
 
   initLayer(layer: Layer<T>, params?: LayerOptions<T>): LayerManager<T> {
@@ -136,13 +136,21 @@ export class LayerManager<T> {
 
   showLayer(layerId: string): LayerManager<T> {
     const layer = this.getLayer(layerId);
-    layer.setVisibility(true);
+    if (!layer) {
+      return;
+    }
+    layer.setVisibility(true, layerId);
     layer.onRescale(this.zoomPanHandler.currentStateAsEvent());
     return this;
   }
 
   hideLayer(layerId: string): LayerManager<T> {
-    this.getLayer(layerId).setVisibility(false);
+    const layer = this.getLayer(layerId);
+    if (!layer) {
+      return;
+    }
+    layer.setVisibility(false, layerId);
+    layer.onRescale(this.zoomPanHandler.currentStateAsEvent());
     return this;
   }
 
