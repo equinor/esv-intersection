@@ -219,7 +219,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
 
     attachedCasings.sort((a: Casing, b: Casing) => a.end - b.end); // ascending
     const bottomOfCement = attachedCasings[attachedCasings.length - 1].end;
-    // console.log({ attachedCasings });
+
     const { outerCasings, holes: overlappingHoles } = findIntersectingItems(cement, bottomOfCement, attachedCasings, casings, holes);
 
     const innerDiameterIntervals = attachedCasings;
@@ -313,8 +313,8 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
   }
 
   getInternalLayerIds(): string[] {
-    const internalLayers = (this.options as CasingAndCementLayerOptions<T>).internalLayers;
-    return [internalLayers.casingId, internalLayers.cementId];
+    const { internalLayers } = this.options as CasingAndCementLayerOptions<T>;
+    return internalLayers ? [internalLayers.casingId, internalLayers.cementId] : [];
   }
 
   override setVisibility(isVisible: boolean, layerId: string) {
