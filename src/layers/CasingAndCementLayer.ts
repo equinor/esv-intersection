@@ -128,7 +128,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
 
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
-    const casingWallWidth = Math.abs(radius - innerRadius);
+    const casingWallWidth = radius - innerRadius;
 
     return {
       casingId: casing.casingId,

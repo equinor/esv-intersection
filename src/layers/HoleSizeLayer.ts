@@ -1,4 +1,4 @@
-import { Point, RENDERER_TYPE, Rectangle, Texture } from 'pixi.js';
+import { Point, RENDERER_TYPE, Rectangle, Texture, SimpleRope } from 'pixi.js';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
 import { HoleSize, PixiRenderApplication } from '..';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
@@ -89,14 +89,28 @@ export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLa
       );
     }
 
-    this.drawOutline(leftPath, rightPath, lineColor, HOLE_OUTLINE, false);
+    this.drawOutline(leftPath, rightPath, lineColor, HOLE_OUTLINE * exaggerationFactor, false);
   };
+
+  drawRope(path: Point[], texture: Texture, tint?: number): void {
+    if (path.length === 0) {
+      return null;
+    }
+
+    const { exaggerationFactor } = this.options as HoleSizeLayerOptions<T>;
+
+    const rope: SimpleRope = new SimpleRope(texture, path, exaggerationFactor);
+
+    rope.tint = tint || rope.tint;
+
+    this.addChild(rope);
+  }
 
   createTexture(diameter: number): Texture {
     const { exaggerationFactor } = this.options as HoleSizeLayerOptions<T>;
 
-    const textureDiameter = this.maxDiameter * exaggerationFactor;
-    const height = textureDiameter;
+    const exaggeratedDiameter = diameter / exaggerationFactor;
+    const height = this.maxDiameter;
     const width = 16;
 
     if (!this._textureCache) {
@@ -104,8 +118,8 @@ export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLa
     }
 
     const baseTexture = this._textureCache.baseTexture;
-    const sidePadding = Math.floor((height - diameter) / 2);
-    const frame = new Rectangle(0, sidePadding, width, diameter);
+    const sidePadding = (height - exaggeratedDiameter) / 2;
+    const frame = new Rectangle(0, sidePadding, width, exaggeratedDiameter);
     const texture = new Texture(baseTexture, frame);
 
     return texture;

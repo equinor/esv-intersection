@@ -80,7 +80,7 @@ export class CasingLayer<T extends Casing[]> extends WellboreBaseComponentLayer<
 
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
-    const casingWallWidth = Math.abs(radius - innerRadius);
+    const casingWallWidth = radius - innerRadius;
 
     return {
       pathPoints,
