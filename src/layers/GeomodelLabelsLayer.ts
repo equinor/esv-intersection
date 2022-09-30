@@ -522,9 +522,10 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   }
 
   getSurfacesAreaEdges(): number[] {
-    const data = this.data.areas[0].data;
-    const maxX = Math.max(data[data.length - 1][0], data[0][0]);
-    const minX = Math.min(data[0][0], data[data.length - 1][0]);
+    const data = [...this.data.areas.map((d) => d.data), ...this.data.lines.map((d) => d.data)];
+    const endPoints = data.map((d) => [d[0][0], d[d.length - 1][0]]).flat();
+    const minX = Math.min(...endPoints);
+    const maxX = Math.max(...endPoints);
     const marginsInWorldCoords = this.getMarginsInWorldCoordinates();
     const { isXFlipped } = this;
     const surfaceAreaLeftEdge = isXFlipped ? maxX + marginsInWorldCoords : minX + marginsInWorldCoords;
