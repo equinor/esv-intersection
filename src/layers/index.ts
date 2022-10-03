@@ -15,5 +15,5 @@ export * from './CementLayer';
 export * from './SeismicCanvasLayer';
 export * from './base/PixiLayer';
 export * from './CompletionLayerV2';
-// export * from './CompletionLayer';
+export * from './CompletionLayer';
 export * from './CasingAndCementLayer';

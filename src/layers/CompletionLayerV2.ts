@@ -100,7 +100,6 @@ export class CompletionLayerV2<T extends Completion[]> extends WellboreBaseCompo
     if (completion == null) {
       return;
     }
-    // const { exaggerationFactor } = this.options as CompletionLayerV2Options<T>;
 
     const diameter = completion.diameter;
 
@@ -168,7 +167,6 @@ export class CompletionLayerV2<T extends Completion[]> extends WellboreBaseCompo
         canvasCtx.beginPath();
 
         const distanceBetweenLines = 16 * screenScalingFactor;
-        // eslint-disable-next-line no-plusplus
         for (let i = -canvas.width; i < canvas.width; i++) {
           canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
           canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
