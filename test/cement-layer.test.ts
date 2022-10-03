@@ -1,4 +1,5 @@
 /* eslint-disable no-magic-numbers */
+import { createComplexRopeSegmentsForCement } from '../src/datautils/wellboreItemShapeGenerator';
 import { CementLayer, IntersectionReferenceSystem, PixiRenderApplication } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
 
@@ -72,6 +73,108 @@ describe('CementLayer', () => {
       expect(() => {
         layer.data = data;
       }).not.toThrow();
+    });
+  });
+
+  describe('createComplexRopeSegmentsForCement', () => {
+    const getMockPoints = (start: number, end: number) => [
+      {
+        point: [0, start],
+        md: start,
+      },
+      {
+        point: [0, end],
+        md: end,
+      },
+    ];
+
+    it('Give correct diameter for data set 1', () => {
+      const casings = [{ casingId: '1', diameter: 30, end: 200, hasShoe: true, innerDiameter: 28, start: 100 }];
+      const cement = { casingIds: ['1'], toc: 150 };
+      const holes = [{ start: 50, end: 250, diameter: 36 }];
+
+      const ropeSegments = createComplexRopeSegmentsForCement(cement, casings, holes, 1, getMockPoints);
+
+      expect(ropeSegments).toEqual([
+        {
+          diameter: 35.5,
+          points: [
+            { x: 0, y: 150 },
+            { x: 0, y: 200 },
+          ],
+        },
+      ]);
+    });
+
+    it('Give correct diameter for data set 2', () => {
+      const casings = [
+        { id: 'casing1', casingId: '1', diameter: 30, hasShoe: true, innerDiameter: 30, start: 50, end: 150 },
+        { id: 'casing2', casingId: '2', diameter: 26, hasShoe: true, innerDiameter: 26, start: 50, end: 200 },
+      ];
+      const cement = { casingIds: ['2'], toc: 100 };
+      const holes = [{ start: 50, end: 250, diameter: 36 }];
+
+      const ropeSegments = createComplexRopeSegmentsForCement(cement, casings, holes, 1, getMockPoints);
+
+      expect(ropeSegments).toEqual([
+        {
+          diameter: 30,
+          points: [
+            { x: 0, y: 100 },
+            { x: 0, y: 150 },
+          ],
+        },
+        {
+          diameter: 35.5,
+          points: [
+            { x: 0, y: 150 },
+            { x: 0, y: 200 },
+          ],
+        },
+      ]);
+    });
+
+    it('Give correct diameter for data set 3', () => {
+      const casings = [
+        { id: 'casing1', casingId: '1', diameter: 16, hasShoe: true, innerDiameter: 16, start: 0, end: 200 },
+        { id: 'casing2', casingId: '2', diameter: 30, hasShoe: true, innerDiameter: 30, start: 50, end: 100 },
+        { id: 'casing3', casingId: '2', diameter: 20, hasShoe: true, innerDiameter: 20, start: 100, end: 150 },
+      ];
+      const cement = { casingIds: ['1'], toc: 25 };
+      const holes = [{ start: 0, end: 250, diameter: 36 }];
+
+      const ropeSegments = createComplexRopeSegmentsForCement(cement, casings, holes, 1, getMockPoints);
+
+      expect(ropeSegments).toEqual([
+        {
+          diameter: 30,
+          points: [
+            { x: 0, y: 25 },
+            { x: 0, y: 50 },
+          ],
+        },
+        {
+          diameter: 20,
+          points: [
+            { x: 0, y: 50 },
+            { x: 0, y: 100 },
+          ],
+        },
+        {
+          diameter: 20,
+          points: [
+            { x: 0, y: 100 },
+            { x: 0, y: 150 },
+          ],
+        },
+        {
+          diameter: 35.5,
+          points: [
+            { x: 0, y: 150 },
+            { x: 0, y: 200 },
+          ],
+        },
+      ]);
     });
   });
 });
