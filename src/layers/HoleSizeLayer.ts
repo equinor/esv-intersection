@@ -67,8 +67,7 @@ export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLa
     const diameter = holeObject.diameter * exaggerationFactor;
     const radius = diameter / 2;
 
-    const zFactor = this.rescaleEvent?.zFactor ? this.rescaleEvent?.zFactor : 1;
-    const path = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end, [holeObject.start, holeObject.end], zFactor);
+    const path = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end, [holeObject.start, holeObject.end]);
     const pathPoints = path.map((p) => p.point);
     const normals = createNormals(pathPoints);
 

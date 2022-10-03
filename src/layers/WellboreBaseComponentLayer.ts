@@ -5,6 +5,7 @@ import { LayerOptions } from './base';
 
 export interface WellComponentBaseOptions<T> extends LayerOptions<T> {
   exaggerationFactor?: number;
+  defaultZFactor?: number;
 }
 
 export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
@@ -17,6 +18,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     this.options = {
       ...this.options,
       exaggerationFactor: 2,
+      defaultZFactor: 1,
       ...options,
     };
     this.render = this.render.bind(this);
@@ -86,7 +88,9 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     return points;
   };
 
-  getZFactorScaledPathForPoints = (start: number, end: number, interestPoints: number[], zFactor: number): MDPoint[] => {
+  getZFactorScaledPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
+    const { defaultZFactor } = this.options as WellComponentBaseOptions<T>;
+    const zFactor = this.rescaleEvent?.zFactor ?? defaultZFactor;
     const y = (y: number): number => y * zFactor;
 
     const path = this.getPathForPoints(start, end, interestPoints);

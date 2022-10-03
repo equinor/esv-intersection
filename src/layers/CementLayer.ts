@@ -83,12 +83,10 @@ export class CementLayer<T extends CementData> extends WellboreBaseComponentLaye
 
     const diameterAtChangeDepths = changeDepths.map(calculateCementDiameter(attachedCasings, outerCasings, overlappingHoles));
 
-    const zFactor = this.rescaleEvent?.zFactor ? this.rescaleEvent?.zFactor : 1;
     const path = this.getZFactorScaledPathForPoints(
       cement.toc,
       bottomOfCement,
       diameterAtChangeDepths.map((d) => d.md),
-      zFactor,
     );
     const normals = createNormals(path.map((p) => p.point));
     const pathWithNormals: MDPoint[] = path.map((p, i) => ({

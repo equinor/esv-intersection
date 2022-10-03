@@ -71,8 +71,7 @@ export class CasingLayer<T extends Casing[]> extends WellboreBaseComponentLayer<
     const radius = diameter / 2;
     const innerRadius = innerDiameter / 2;
 
-    const zFactor = this.rescaleEvent?.zFactor ? this.rescaleEvent?.zFactor : 1;
-    const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end], zFactor);
+    const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end]);
 
     const pathPoints = path.map((p) => p.point);
     const normals = createNormals(pathPoints);
@@ -130,8 +129,7 @@ export class CasingLayer<T extends Casing[]> extends WellboreBaseComponentLayer<
   generateShoe = (casingEnd: number, casingRadius: number, length: number, width: number): Point[] => {
     const start = casingEnd - length;
     const end = casingEnd;
-    const zFactor = this.rescaleEvent?.zFactor ? this.rescaleEvent?.zFactor : 1;
-    const path = this.getZFactorScaledPathForPoints(start, end, [start, end], zFactor);
+    const path = this.getZFactorScaledPathForPoints(start, end, [start, end]);
 
     const points = path.map((p) => p.point);
     const normal = createNormals(points);

@@ -85,23 +85,23 @@ interface BaseCompletion {
   end: number;
 }
 
-export interface GenericScreen extends BaseCompletion {
+export interface Screen extends BaseCompletion {
   kind: 'screen';
 }
-export interface GenericTubing extends BaseCompletion {
+export interface Tubing extends BaseCompletion {
   kind: 'tubing';
 }
 
-export type Completion = GenericTubing | GenericScreen;
+export type Completion = Tubing | Screen;
 
 export const foldCompletion =
-  <T>(fGenericScreen: (obj: GenericScreen) => T, fGenericTubing: (obj: GenericTubing) => T) =>
+  <T>(fScreen: (obj: Screen) => T, fTubing: (obj: Tubing) => T) =>
   (completion: Completion): T => {
     switch (completion.kind) {
       case 'screen':
-        return fGenericScreen(completion);
+        return fScreen(completion);
       case 'tubing':
-        return fGenericTubing(completion);
+        return fTubing(completion);
       default:
         return assertNever(completion);
     }

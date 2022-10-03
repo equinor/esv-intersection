@@ -119,8 +119,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     const radius = diameter / 2;
     const innerRadius = innerDiameter / 2;
 
-    const zFactor = this.rescaleEvent?.zFactor ? this.rescaleEvent?.zFactor : 1;
-    const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end], zFactor);
+    const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end]);
 
     const pathPoints = path.map((p) => p.point);
     const normals = createNormals(pathPoints);
@@ -195,8 +194,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     const start = casingEnd - length;
     const end = casingEnd;
 
-    const zFactor = this.rescaleEvent?.zFactor ? this.rescaleEvent?.zFactor : 1;
-    const path = this.getZFactorScaledPathForPoints(start, end, [start, end], zFactor);
+    const path = this.getZFactorScaledPathForPoints(start, end, [start, end]);
 
     const points = path.map((p) => p.point);
     const normal = createNormals(points);
@@ -236,12 +234,10 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
 
     const diameterAtChangeDepths = changeDepths.map(calculateCementDiameter(attachedCasings, outerCasings, overlappingHoles));
 
-    const zFactor = this.rescaleEvent?.zFactor ? this.rescaleEvent?.zFactor : 1;
     const path = this.getZFactorScaledPathForPoints(
       cement.toc,
       bottomOfCement,
       diameterAtChangeDepths.map((d) => d.md),
-      zFactor,
     );
     const normals = createNormals(path.map((p) => p.point));
     const pathWithNormals: MDPoint[] = path.map((p, i) => ({

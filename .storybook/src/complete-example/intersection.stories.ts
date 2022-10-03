@@ -9,7 +9,7 @@ import {
   HoleSizeLayer,
   CalloutCanvasLayer,
   PixiRenderApplication,
-  CompletionLayerV2,
+  CompletionLayer,
 } from '../../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
@@ -27,7 +27,7 @@ import {
 //Data
 import { seismicColorMap } from '../exampledata';
 
-import { getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks, getCompletionV2 } from '../data';
+import { getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks, getCompletion } from '../data';
 import { Annotation, CasingAndCementData, CasingAndCementLayer, Completion, HoleSize } from '../../../src';
 
 export const intersection = () => {
@@ -67,7 +67,7 @@ const renderIntersection = (scaleOptions: any) => {
 
   const promises = [
     getWellborePath(),
-    getCompletionV2(),
+    getCompletion(),
     getSeismic(),
     getSurfaces(),
     getStratColumns(),
@@ -116,7 +116,7 @@ const renderIntersection = (scaleOptions: any) => {
       },
       referenceSystem,
     });
-    const completionLayer = new CompletionLayerV2<Completion[]>(pixiContext, 'completion', { order: 6, data: completion, referenceSystem });
+    const completionLayer = new CompletionLayer<Completion[]>(pixiContext, 'completion', { order: 6, data: completion, referenceSystem });
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
     const layers = [

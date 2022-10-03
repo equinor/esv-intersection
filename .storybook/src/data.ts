@@ -8,7 +8,6 @@ import {
   stratColumns,
   picks,
   seismic,
-  completionV2,
 } from './esv-intersection-data';
 
 export const getWellborePath = (): Promise<any> => {
@@ -23,10 +22,6 @@ export const getPositionLog = (): Promise<any> => {
 export const getCompletion = (): Promise<any[]> => {
   const compl = completion.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax }));
   return Promise.resolve(compl);
-};
-
-export const getCompletionV2 = (): Promise<any[]> => {
-  return Promise.resolve(completionV2);
 };
 
 export const getSurfaces = (): Promise<any[]> => {
