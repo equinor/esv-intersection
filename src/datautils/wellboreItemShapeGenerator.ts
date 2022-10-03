@@ -53,7 +53,7 @@ export const cementDiameterChangeDepths = (
   const topOfCement = cement.toc;
 
   const diameterChangeDepths = diameterIntervals.flatMap((d) => [d.start, d.end]);
-  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfCement && d <= bottomOfCement) as number[]; // trim
+  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfCement && d <= bottomOfCement); // trim
 
   trimmedChangedDepths.push(topOfCement);
   trimmedChangedDepths.push(bottomOfCement);
@@ -72,20 +72,18 @@ export const findCementOuterDiameterAtDepth = (innerCasing: Casing[], nonAttache
   const outerCasings = nonAttachedCasings.filter((casing) => casing.innerDiameter > innerDiameter);
   const holeAtDepth = holes.find((hole) => hole.start <= depth && hole.end >= depth && hole.diameter > innerDiameter);
   const outerCasingAtDepth = outerCasings
-    .filter((d) => d)
     .sort((a, b) => a.innerDiameter - b.innerDiameter) // ascending
     .find((casing) => casing.start <= depth && casing.end >= depth && casing.diameter > innerDiameter);
 
-  let outerDiameter;
   if (outerCasingAtDepth) {
-    outerDiameter = outerCasingAtDepth.innerDiameter;
-  } else if (holeAtDepth) {
-    outerDiameter = holeAtDepth.diameter - HOLE_OUTLINE;
-  } else {
-    outerDiameter = defaultCementWidth;
+    return outerCasingAtDepth.innerDiameter;
   }
 
-  return outerDiameter;
+  if (holeAtDepth) {
+    return holeAtDepth.diameter - HOLE_OUTLINE;
+  }
+
+  return defaultCementWidth;
 };
 
 export const createComplexRopeSegmentsForCement = (
@@ -117,18 +115,16 @@ export const createComplexRopeSegmentsForCement = (
 
   const changeDepths = cementDiameterChangeDepths(cement, bottomOfCement, outerDiameterIntervals);
 
-  const diameterIntervals = changeDepths
-    .map((depth, index, list) => {
-      if (index === 0) {
-        return;
-      }
+  const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
+    if (index === 0) {
+      return [];
+    }
 
-      const nextDepth = list[index - 1];
-      const diameter = findCementOuterDiameterAtDepth(attachedCasings, outerCasings, overlappingHoles, depth) * exaggerationFactor;
+    const nextDepth = list[index - 1];
+    const diameter = findCementOuterDiameterAtDepth(attachedCasings, outerCasings, overlappingHoles, depth) * exaggerationFactor;
 
-      return { top: nextDepth, bottom: depth, diameter };
-    })
-    .filter((d) => d);
+    return [{ top: nextDepth, bottom: depth, diameter }];
+  });
 
   const ropeSegments = diameterIntervals.map((interval) => {
     const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);

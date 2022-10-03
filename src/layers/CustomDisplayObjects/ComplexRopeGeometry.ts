@@ -3,22 +3,14 @@ import { sum, max } from 'd3-array';
 import { ComplexRopeSegment } from './ComplexRope';
 
 /**
- * RopeGeometry allows you to draw a geometry across several points and then manipulate these points.
- * @example
- * import { RopeGeometry, Point } from 'pixi.js';
- *
- * for (let i = 0; i < 20; i++) {
- *     points.push(new Point(i * 50, 0));
- * };
- * const rope = new RopeGeometry(100, points);
- * @memberof PIXI
+ * RopeGeometry allows you to draw a geometry across several several segments of points and then manipulate these points.
  */
 export class ComplexRopeGeometry extends MeshGeometry {
   /** An array of segments with points and diameter that determine the rope. */
-  public segments: ComplexRopeSegment[];
+  private segments: ComplexRopeSegment[];
 
   /** Rope texture scale. */
-  public readonly textureScale: number;
+  private readonly textureScale: number;
 
   /**
    * The width (i.e., thickness) of the rope.
@@ -27,12 +19,12 @@ export class ComplexRopeGeometry extends MeshGeometry {
   _width: number;
 
   /**
+   * @param segments - An array of segments with points and diameter to construct this rope.
    * @param width - The width (i.e., thickness) of the rope.
-   * @param points - An array of {@link PIXI.Point} objects to construct this rope.
    * @param textureScale - scaling factor for repeated texture. To create a tiling rope
-   *     set baseTexture.wrapMode to {@link PIXI.WRAP_MODES.REPEAT} and use a power of two texture.
+   *     set baseTexture.wrapMode to PIXI.WRAP_MODES.REPEAT and use a power of two texture.
    */
-  constructor(width = 200, segments: ComplexRopeSegment[], textureScale = 0) {
+  constructor(segments: ComplexRopeSegment[], width = 200, textureScale = 0) {
     const pointCount = sum(segments, (segment) => segment.points.length);
 
     // eslint-disable-next-line no-magic-numbers
@@ -46,12 +38,11 @@ export class ComplexRopeGeometry extends MeshGeometry {
   }
 
   /**
-   * The width (i.e., thickness) of the rope.
+   * The max width (i.e., thickness) of the rope.
    * @readonly
    */
   get width(): number {
-    // TODO Update this if ever used
-    return this._width * this.textureScale;
+    return max(this.segments, (segment) => segment.diameter) * this.textureScale;
   }
 
   /** Refreshes Rope indices and uvs */
@@ -68,7 +59,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
 
     const pointCount = sum(segments, (segment) => segment.points.length);
 
-    // if too little points, or texture hasn't got UVs set yet just move on.
+    // if too few points, or texture hasn't got UVs set yet just move on.
     if (pointCount < 1) {
       return;
     }
@@ -197,16 +188,11 @@ export class ComplexRopeGeometry extends MeshGeometry {
   }
 
   public update(): void {
-    // TODO check what we need here
-    // this.build() calls this.updateVertices()
+    // TODO: Possible optimiztion to be had here
+    // Figure out if/when it is enough to only update verticies with this.updateVertices()
+    // See PIXI.SimpleRope.update() for ideas
+
+    // build() sets indicies and uvs and then calls this.updateVertices()
     this.build();
-
-    // if (this.textureScale > 0) {
-    // this.build(); // we need to update UVs
-    // } else {
-    //   this.updateVertices();
-    // }
-
-    // this.updateVertices();
   }
 }
