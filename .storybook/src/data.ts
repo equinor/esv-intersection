@@ -20,8 +20,7 @@ export const getPositionLog = (): Promise<any> => {
 };
 
 export const getCompletion = (): Promise<any[]> => {
-  const compl = completion.map((c: any) => ({ start: c.mdTop, end: c.mdBottom, diameter: c.odMax }));
-  return Promise.resolve(compl);
+  return Promise.resolve(completion);
 };
 
 export const getSurfaces = (): Promise<any[]> => {
