@@ -198,6 +198,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
   private generateShoe = (casingEnd: number, casingRadius: number, length: number, width: number): Point[] => {
     const start = casingEnd - length;
     const end = casingEnd;
+
     const path = this.getZFactorScaledPathForPoints(start, end, [start, end]);
 
     const points = path.map((p) => p.point);

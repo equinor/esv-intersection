@@ -27,7 +27,7 @@ export const HoleSizeLayerUsingLowLevelInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const pixiContext = new PixiRenderApplication();
+    const pixiContext = new PixiRenderApplication({ width, height });
     const holeSizeLayer = new HoleSizeLayer(pixiContext, 'webgl', options);
 
     holeSizeLayer.onMount({ elm: container, height, width });
@@ -66,7 +66,7 @@ export const HoleSizeLayerUsingHighLevelInterface = () => {
       data: holesize,
     };
 
-    const pixiContext = new PixiRenderApplication();
+    const pixiContext = new PixiRenderApplication({ width, height });
     const holeSizeLayer = new HoleSizeLayer(pixiContext, 'webgl', options);
 
     const controller = new Controller({ container, layers: [holeSizeLayer] });

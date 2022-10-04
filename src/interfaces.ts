@@ -5,6 +5,10 @@ import { ScaleLinear } from 'd3-scale';
 import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
 import { CurveInterpolator } from 'curve-interpolator';
 
+export function assertNever(x: never): never {
+  throw new Error(`Unexpected object: ${JSON.stringify(x)}`);
+}
+
 interface LayerEvent {
   elm?: HTMLElement;
 }
@@ -40,13 +44,6 @@ export interface OnUpdateEvent<T> extends LayerEvent {
   data?: T;
 }
 
-export type CompletionData = {
-  shape: string;
-  start: number;
-  end: number;
-  diameter: number;
-};
-
 export interface ZoomAndPanOptions {
   maxZoomLevel: number;
   minZoomLevel: number;
@@ -81,6 +78,35 @@ export interface Casing {
   innerDiameter: number;
   casingId: string;
 }
+
+interface BaseCompletion {
+  diameter: number;
+  start: number;
+  end: number;
+}
+
+export interface Screen extends BaseCompletion {
+  kind: 'screen';
+}
+export interface Tubing extends BaseCompletion {
+  kind: 'tubing';
+}
+
+export type Completion = Tubing | Screen;
+
+export const foldCompletion =
+  <T>(fScreen: (obj: Screen) => T, fTubing: (obj: Tubing) => T) =>
+  (completion: Completion): T => {
+    switch (completion.kind) {
+      case 'screen':
+        return fScreen(completion);
+      case 'tubing':
+        return fTubing(completion);
+      default:
+        return assertNever(completion);
+    }
+  };
+
 export interface Cement {
   toc: number;
   casingIds?: string[];
