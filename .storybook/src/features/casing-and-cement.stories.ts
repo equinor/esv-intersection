@@ -25,7 +25,7 @@ export const CasingAndCementInterface = () => {
       order: 1,
       referenceSystem,
     };
-    const renderer = new PixiRenderApplication();
+    const renderer = new PixiRenderApplication({ width, height });
     const casingLayer = new CasingAndCementLayer(renderer, 'webgl', options);
 
     const controller = new Controller({ container, layers: [casingLayer] });

@@ -5,6 +5,7 @@ import { LayerOptions } from './base';
 
 export interface WellComponentBaseOptions<T> extends LayerOptions<T> {
   exaggerationFactor?: number;
+  defaultZFactor?: number;
 }
 
 export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
@@ -17,6 +18,7 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     this.options = {
       ...this.options,
       exaggerationFactor: 2,
+      defaultZFactor: 1,
       ...options,
     };
     this.render = this.render.bind(this);
@@ -87,7 +89,9 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
   };
 
   getZFactorScaledPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
-    const y = (y: number): number => y * this.rescaleEvent.zFactor;
+    const { defaultZFactor } = this.options as WellComponentBaseOptions<T>;
+    const zFactor = this.rescaleEvent?.zFactor ?? defaultZFactor;
+    const y = (y: number): number => y * zFactor;
 
     const path = this.getPathForPoints(start, end, interestPoints);
     return path.map((p) => ({
@@ -108,13 +112,8 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
   };
 
   drawBigTexturedPolygon = (coords: Point[], t: Texture): Graphics => {
-    const polygon = new Graphics();
-    polygon.beginTextureFill({ texture: t });
-    polygon.drawPolygon(coords);
-    polygon.endFill();
-
+    const polygon = new Graphics().beginTextureFill({ texture: t }).drawPolygon(coords).endFill();
     this.addChild(polygon);
-
     return polygon;
   };
 

@@ -155,7 +155,7 @@ export class IntersectionReferenceSystem {
    */
   getCurtainPath(start: number, end: number): { point: number[]; md: number }[] {
     if (!this._curtainPathCache) {
-      const points = [];
+      const points: MDPoint[] = [];
       let prevAngle = Math.PI * 2; // Always add first point
       for (let i = this._offset; i <= this.length + this._offset; i += CURTAIN_SAMPLING_INTERVAL) {
         const point = this.project(i);
