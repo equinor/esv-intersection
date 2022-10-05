@@ -16,7 +16,7 @@ export class UniformTextureStretchRope extends Mesh {
    * @param points - An array of {@link PIXI.Point} objects to construct this rope.
    */
   constructor(texture: Texture, points: IPoint[]) {
-    const ropeGeometry = new UniformTextureStretchRopeGeometry(texture.height, points);
+    const ropeGeometry = new UniformTextureStretchRopeGeometry(points, texture.height);
     const meshMaterial = new MeshMaterial(texture);
 
     super(ropeGeometry, meshMaterial);

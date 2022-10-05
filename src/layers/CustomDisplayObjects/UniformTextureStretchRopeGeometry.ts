@@ -16,9 +16,9 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
 
   /**
    * @param width - The width (i.e., thickness) of the rope.
-   * @param points - An array of {@link PIXI.Point} objects to construct this rope.
+   * @param points - An array of PIXI.Point objects to construct this rope.
    */
-  constructor(width = 200, points: IPoint[]) {
+  constructor(points: IPoint[], width = 200) {
     // eslint-disable-next-line no-magic-numbers
     super(new Float32Array(points.length * 4), new Float32Array(points.length * 4), new Uint16Array((points.length - 1) * 6));
 

@@ -32,7 +32,7 @@ export class ImageComponentLayer<T extends ImageComponent[]> extends WellboreBas
       ...options,
     };
 
-    const images = (this.options as ImageComponentLayerOptions<T>).images;
+    const { images } = this.options as ImageComponentLayerOptions<T>;
     this._textureCacheArray = Object.entries(images).reduce((list: { [key: string]: Texture }, [key, image]) => {
       list[key] = Texture.from(image);
       return list;
