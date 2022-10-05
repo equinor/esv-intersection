@@ -28,7 +28,7 @@ import {
 import { seismicColorMap } from '../exampledata';
 
 import { getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks, getCompletion } from '../data';
-import { Annotation, CasingAndCementData, CasingAndCementLayer, Completion, HoleSize } from '../../../src';
+import { Annotation, CasingAndCementData, CasingAndCementLayer, Completion, HoleSize, ImageComponentLayer } from '../../../src';
 
 export const intersection = () => {
   const xBounds: [number, number] = [0, 1000];
@@ -119,6 +119,45 @@ const renderIntersection = (scaleOptions: any) => {
     const completionLayer = new CompletionLayer<Completion[]>(pixiContext, 'completion', { order: 6, data: completion, referenceSystem });
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
+
+    const CSDSVGList = {
+      completionImage1:
+        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMCAwSDkwVjEwMEgxMFYwWiIgZmlsbD0iI0Q5RDlEOSIvPgo8cGF0aCBkPSJNMCAyNUgxMFY3NUgwVjI1WiIgZmlsbD0iI0I1QjJCMiIvPgo8cGF0aCBkPSJNNDUgMjVINTVWNzVINDVWMjVaIiBmaWxsPSIjQjVCMkIyIi8+CjxwYXRoIGQ9Ik05MCAyNUgxMDBWNzVIOTBWMjVaIiBmaWxsPSIjQjVCMkIyIi8+Cjwvc3ZnPgo=',
+      completionImage2:
+        'tubing1.svg', // Fetched from URL. Full URL with protocol and hostname is allowed. 
+      completionImage3:
+        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMCAwSDkwVjEwMEgxMFYwWiIgZmlsbD0iI0Q5RDlEOSIvPgo8cGF0aCBkPSJNMCAyNUgxMFY3NUgwVjI1WiIgZmlsbD0iI0I1QjJCMiIvPgo8cGF0aCBkPSJNNDUgMjVINTVWNzVINDVWMjVaIiBmaWxsPSIjQjVCMkIyIi8+CjxwYXRoIGQ9Ik0yNSA2NUgzMFY4MEgyNVY2NVoiIGZpbGw9IiMzMTMxMzEiLz4KPHBhdGggZD0iTTI1IDQySDMwVjU3SDI1VjQyWiIgZmlsbD0iIzMxMzEzMSIvPgo8cGF0aCBkPSJNMjUgMjFIMzBWMzZIMjVWMjFaIiBmaWxsPSIjMzEzMTMxIi8+CjxwYXRoIGQ9Ik03MCA2NEg3NVY3OUg3MFY2NFoiIGZpbGw9IiMzMTMxMzEiLz4KPHBhdGggZD0iTTcwIDQxSDc1VjU2SDcwVjQxWiIgZmlsbD0iIzMxMzEzMSIvPgo8cGF0aCBkPSJNNzAgMjBINzVWMzVINzBWMjBaIiBmaWxsPSIjMzEzMTMxIi8+CjxwYXRoIGQ9Ik05MCAyNUgxMDBWNzVIOTBWMjVaIiBmaWxsPSIjQjVCMkIyIi8+Cjwvc3ZnPgo='
+    };
+
+    const imageComponentLayer = new ImageComponentLayer(pixiContext, 'svgcomponents', {
+      order: 6,
+      data: [
+        {
+          id: 'completion-svg-1',
+          start: 5250,
+          end: 5252,
+          diameter: 8.5,
+          imageKey: 'completionImage1',
+        },
+        {
+          id: 'completion-svg-2',
+          start: 5252,
+          end: 5274,
+          diameter: 8.5,
+          imageKey: 'completionImage2',
+        },
+        {
+          id: 'completion-svg-3',
+          start: 5274,
+          end: 5276,
+          diameter: 8.5,
+          imageKey: 'completionImage3',
+        },
+      ],
+      images: CSDSVGList,
+      referenceSystem,
+    });
+
     const layers = [
       gridLayer,
       geomodelLayer,
@@ -128,6 +167,7 @@ const renderIntersection = (scaleOptions: any) => {
       holeSizeLayer,
       casingAndCementLayer,
       completionLayer,
+      imageComponentLayer,
       calloutLayer,
     ];
 
