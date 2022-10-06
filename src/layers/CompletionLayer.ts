@@ -1,8 +1,10 @@
-import { Application, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
-import { OnUpdateEvent, PixiRenderApplication } from '..';
+import { Application, Point, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { PixiRenderApplication } from '..';
+import { SCREEN_OUTLINE } from '../constants';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { Completion, foldCompletion, Screen, Tubing, OnRescaleEvent } from '../interfaces';
+import { Completion, foldCompletion, Screen, Tubing } from '../interfaces';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
+import { StaticWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
 
 interface TubularRenderingObject {
@@ -36,37 +38,25 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
     this.render = this.render.bind(this);
   }
 
-  override onRescale(event: OnRescaleEvent): void {
-    super.onRescale(event);
-    this.clearLayer();
-    this.preRender();
-    this.render();
-  }
-
-  override onUpdate(event: OnUpdateEvent<T>): void {
-    super.onUpdate(event);
-    this.clearLayer();
-    this.preRender();
-    this.render();
-  }
-
   preRender(): void {
     const wellborePath = this.referenceSystem ? this.referenceSystem.projectedPath : [];
 
     if (wellborePath == null || !this.data?.length) {
       return;
     }
-    const { screenScalingFactor, tubingScalingFactor, screenLineColor } = this.options as CompletionLayerOptions<T>;
+    const { screenLineColor } = this.options as CompletionLayerOptions<T>;
     this.data.map(
       foldCompletion(
-        (obj: Screen) => this.drawScreen(obj, screenScalingFactor, screenLineColor),
-        (obj: Tubing) => this.drawTubing(obj, tubingScalingFactor),
+        (obj: Screen) => this.drawScreen(obj, screenLineColor),
+        (obj: Tubing) => this.drawTubing(obj),
       ),
     );
   }
 
-  private drawScreen(screen: Screen, scalingFactor: number, lineColor: number): void {
-    const texture = this.createScreenTexture(screen.diameter);
+  private drawScreen(screen: Screen, lineColor: number): void {
+    const { exaggerationFactor } = this.options as CompletionLayerOptions<T>;
+
+    const texture = this.createScreenTexture();
     const { pathPoints, polygon, leftPath, rightPath } = this.createTubularPolygon(screen);
 
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
@@ -75,13 +65,13 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
       this.drawCompletionRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
-        scalingFactor,
+        screen.diameter,
       );
     }
-    this.drawOutline(leftPath, rightPath, lineColor, 0.5, true);
+    this.drawOutline(leftPath, rightPath, lineColor, SCREEN_OUTLINE * exaggerationFactor, false);
   }
 
-  private drawTubing(tubing: Tubing, scalingFactor: number): void {
+  private drawTubing(tubing: Tubing): void {
     const texture = this.createTubingTexture(tubing.diameter);
     const { pathPoints, polygon } = this.createTubularPolygon(tubing);
 
@@ -91,7 +81,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
       this.drawCompletionRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
-        scalingFactor,
+        tubing.diameter,
       );
     }
   }
@@ -101,7 +91,9 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
       return;
     }
 
-    const diameter = completion.diameter;
+    const { exaggerationFactor } = this.options as CompletionLayerOptions<T>;
+
+    const diameter = completion.diameter * exaggerationFactor;
 
     const radius = diameter / 2;
 
@@ -146,26 +138,26 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
     return this.tubingTextureCache[diameter];
   }
 
-  private createScreenTexture(diameter: number): Texture {
+  private createScreenTexture(): Texture {
     const { screenScalingFactor } = this.options as CompletionLayerOptions<T>;
 
     if (!this.screenTextureCache) {
       const canvas = document.createElement('canvas');
-      const size = 512;
-      canvas.width = size * screenScalingFactor;
-      canvas.height = size * screenScalingFactor;
+      const size = 64 * screenScalingFactor;
+      canvas.width = size;
+      canvas.height = size;
       const canvasCtx = canvas.getContext('2d');
 
       if (canvasCtx instanceof CanvasRenderingContext2D) {
         canvasCtx.fillStyle = 'white';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-        const baseLineWidth = 6;
+        const baseLineWidth = size / 10;
         canvasCtx.strokeStyle = '#AAAAAA';
-        canvasCtx.lineWidth = baseLineWidth * screenScalingFactor;
+        canvasCtx.lineWidth = baseLineWidth;
         canvasCtx.beginPath();
 
-        const distanceBetweenLines = 16 * screenScalingFactor;
+        const distanceBetweenLines = size / 3;
         for (let i = -canvas.width; i < canvas.width; i++) {
           canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
           canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
@@ -174,17 +166,17 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
       }
       this.screenTextureCache = Texture.from(canvas);
     }
-
-    const resizedTexture = this.screenTextureCache.clone();
-    resizedTexture.frame = new Rectangle(0, 0, 16 * screenScalingFactor, diameter * screenScalingFactor);
-    return resizedTexture;
+    return this.screenTextureCache;
   }
 
-  private drawCompletionRope(path: Point[], texture: Texture, textureScaleFactor: number): void {
+  private drawCompletionRope(path: Point[], texture: Texture, diameter: number): void {
     if (path.length === 0) {
       return;
     }
-    const rope: SimpleRope = new SimpleRope(texture, path, 1 / textureScaleFactor);
+
+    const { exaggerationFactor } = this.options as CompletionLayerOptions<T>;
+
+    const rope: SimpleRope = new StaticWidthSimpleRope(texture, path, exaggerationFactor, diameter);
     this.addChild(rope);
   }
 
