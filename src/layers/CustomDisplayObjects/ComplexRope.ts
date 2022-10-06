@@ -22,7 +22,7 @@ export class ComplexRope extends Mesh {
    * @param {number} textureScale - Optional. Adjust interval of repeated texture
    */
   constructor(texture: Texture, segments: ComplexRopeSegment[], textureScale = 0) {
-    const ropeGeometry = new ComplexRopeGeometry(segments, texture.height, textureScale);
+    const ropeGeometry = new ComplexRopeGeometry(segments, textureScale);
     const meshMaterial = new MeshMaterial(texture);
 
     // attempt to set UV wrapping, will fail on non-power of two textures
@@ -36,10 +36,7 @@ export class ComplexRope extends Mesh {
   _render(renderer: Renderer): void {
     const geometry: ComplexRopeGeometry = this.geometry as ComplexRopeGeometry;
 
-    // TODO: Possible optimiztion here
-    // Find correct check for when to update geometry
-    if (this.autoUpdate || geometry._width !== this.shader.texture.height) {
-      geometry._width = this.shader.texture.height;
+    if (this.autoUpdate) {
       geometry.update();
     }
 

@@ -13,25 +13,17 @@ export class ComplexRopeGeometry extends MeshGeometry {
   private readonly textureScale: number;
 
   /**
-   * The width (i.e., thickness) of the rope.
-   * @readonly
-   */
-  _width: number;
-
-  /**
    * @param segments - An array of segments with points and diameter to construct this rope.
-   * @param width - The width (i.e., thickness) of the rope.
    * @param textureScale - scaling factor for repeated texture. To create a tiling rope
    *     set baseTexture.wrapMode to PIXI.WRAP_MODES.REPEAT and use a power of two texture.
    */
-  constructor(segments: ComplexRopeSegment[], width = 200, textureScale = 0) {
+  constructor(segments: ComplexRopeSegment[], textureScale = 0) {
     const pointCount = sum(segments, (segment) => segment.points.length);
 
     // eslint-disable-next-line no-magic-numbers
     super(new Float32Array(pointCount * 4), new Float32Array(pointCount * 4), new Uint16Array((pointCount - 1) * 6));
 
     this.segments = segments;
-    this._width = width;
     this.textureScale = textureScale;
 
     this.build();
@@ -42,7 +34,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
    * @readonly
    */
   get width(): number {
-    return max(this.segments, (segment) => segment.diameter) * this.textureScale;
+    return max(this.segments, (segment) => segment.diameter);
   }
 
   /** Refreshes Rope indices and uvs */
@@ -80,7 +72,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
     uvs[3] = 1;
 
     const segmentCount = segments.length;
-    const maxDiameter = max(segments, (segment) => segment.diameter) * this.textureScale;
+    const maxDiameter = max(segments, (segment) => segment.diameter);
 
     let amount = 0;
     let uvIndex = 0;
@@ -89,7 +81,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
 
     for (let i = 0; i < segmentCount; i++) {
       let prev = segments[i].points[0];
-      const textureWidth = this._width * this.textureScale;
+      const textureWidth = maxDiameter;
       const radius = segments[i].diameter / maxDiameter / 2;
 
       const total = segments[i].points.length; // - 1;

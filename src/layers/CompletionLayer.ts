@@ -1,6 +1,6 @@
 import { Application, Point, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { PixiRenderApplication } from '..';
-import { SCREEN_OUTLINE } from '../constants';
+import { DEFAULT_TEXTURE_SIZE, SCREEN_OUTLINE } from '../constants';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { Completion, foldCompletion, Screen, Tubing } from '../interfaces';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
@@ -143,7 +143,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
 
     if (!this.screenTextureCache) {
       const canvas = document.createElement('canvas');
-      const size = 64 * screenScalingFactor;
+      const size = DEFAULT_TEXTURE_SIZE * screenScalingFactor;
       canvas.width = size;
       canvas.height = size;
       const canvasCtx = canvas.getContext('2d');
@@ -152,7 +152,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
         canvasCtx.fillStyle = 'white';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-        const baseLineWidth = size / 10;
+        const baseLineWidth = size / 10; // eslint-disable-line no-magic-numbers
         canvasCtx.strokeStyle = '#AAAAAA';
         canvasCtx.lineWidth = baseLineWidth;
         canvasCtx.beginPath();

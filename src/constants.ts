@@ -9,5 +9,7 @@ export const SCREEN_OUTLINE = 0.5;
 export const SHOE_WIDTH = 25;
 export const SHOE_LENGTH = 12;
 
+export const DEFAULT_TEXTURE_SIZE = 64;
+
 // Surface lines are drawn as LINES and not TRIANGLE_STRIP so width can only be 1
 export const SURFACE_LINE_WIDTH = 1;
