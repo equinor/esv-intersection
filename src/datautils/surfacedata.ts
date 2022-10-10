@@ -14,9 +14,6 @@ import { StratUnit, SurfaceMetaAndValues, SurfaceLine, SurfaceArea, SurfaceData 
  * @return  Surface areas ready for rendering in geolayer
  */
 export function generateSurfaceData(trajectory: number[][], stratColumn: StratUnit[], surfaceData: SurfaceMetaAndValues[]): SurfaceData {
-  if (trajectory.length < 0) {
-    return;
-  }
   const filteredSurfaces: SurfaceMetaAndValues[] = surfaceData.filter((s) => s.data.values);
   const mappedSurfaces: any = mapSurfaceData(filteredSurfaces);
 
