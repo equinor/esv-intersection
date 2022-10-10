@@ -144,17 +144,23 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
 
     this.addChild(rope);
   }
-
-  drawOutline(leftPath: Point[], rightPath: Point[], lineColor: number, lineWidth = 1, close: boolean = false): void {
-    const DRAW_ALIGNMENT_INSIDE = 1;
-
+  /**
+   *
+   * @param leftPath Points for line on left side
+   * @param rightPath Points for line on right side
+   * @param lineColor Color of line
+   * @param lineWidth Width of line
+   * @param close If line should close in top and bottom to form a loop
+   * @param lineAlignment alignment of the line to draw, (0 = inner, 0.5 = middle, 1 = outer).
+   */
+  drawOutline(leftPath: Point[], rightPath: Point[], lineColor: number, lineWidth = 1, close: boolean = false, lineAlignment = 1): void {
     const leftPathReverse = leftPath.map<Point>((d) => d.clone()).reverse();
 
     const startPointRight = rightPath[0];
     const startPointLeft = leftPathReverse[0];
 
     const line = new Graphics();
-    line.lineStyle(lineWidth, lineColor, undefined, DRAW_ALIGNMENT_INSIDE);
+    line.lineStyle(lineWidth, lineColor, undefined, lineAlignment);
     line.moveTo(startPointRight.x, startPointRight.y);
     rightPath.forEach((p: Point) => line.lineTo(p.x, p.y));
 
