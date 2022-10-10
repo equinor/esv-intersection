@@ -1,6 +1,6 @@
 import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
-import { SHOE_LENGTH, SHOE_WIDTH } from '../constants';
+import { DEFAULT_TEXTURE_SIZE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import { createComplexRopeSegmentsForCement, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { Casing, Cement, HoleSize } from '../interfaces';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
@@ -37,6 +37,7 @@ export interface CasingAndCementLayerOptions<T extends CasingAndCementData> exte
   firstCementColor?: string;
   secondCementColor?: string;
   casingShoeSize?: CasingShoeSize;
+  cementTextureScalingFactor?: number;
   exaggerationFactor?: number;
   internalLayers?: {
     casingId: string;
@@ -60,6 +61,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
       casingSolidColor: 0xdcdcdc,
       casingLineColor: 0x575757,
       casingShoeSize: defaultCasingShoeSize,
+      cementTextureScalingFactor: 4,
       firstCementColor: '#c7b9ab',
       secondCementColor: '#5b5b5b',
       ...options,
@@ -222,23 +224,23 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
       return this._textureCache;
     }
 
-    const { firstCementColor, secondCementColor } = this.options as CasingAndCementLayerOptions<T>;
+    const { firstCementColor, secondCementColor, cementTextureScalingFactor } = this.options as CasingAndCementLayerOptions<T>;
 
     const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
+
+    const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+    const lineWidth = cementTextureScalingFactor;
+    canvas.width = size;
+    canvas.height = size;
     const canvasCtx = canvas.getContext('2d');
 
     canvasCtx.fillStyle = firstCementColor;
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-    canvasCtx.lineWidth = 1;
+    canvasCtx.lineWidth = lineWidth;
     canvasCtx.fillStyle = secondCementColor;
-
     canvasCtx.beginPath();
-    canvasCtx.lineWidth = 1;
 
-    const distanceBetweenLines = 10;
+    const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
     for (let i = -canvas.width; i < canvas.width; i++) {
       canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
       canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);

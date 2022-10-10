@@ -5,6 +5,7 @@ import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { convertColor } from '../utils/color';
 import { HOLE_OUTLINE } from '../constants';
+import { max } from 'd3-array';
 
 const createGradientFill = (
   canvas: HTMLCanvasElement,
@@ -53,7 +54,7 @@ export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLa
     }
 
     data.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
-    this.maxDiameter = data.length > 0 ? data[0].diameter : EXAGGERATED_DIAMETER;
+    this.maxDiameter = data.length > 0 ? max(data, (d) => d.diameter) : EXAGGERATED_DIAMETER;
     data.forEach((hole: HoleSize) => this.drawHoleSize(hole));
   }
 
