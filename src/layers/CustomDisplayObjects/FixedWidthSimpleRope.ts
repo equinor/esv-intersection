@@ -13,14 +13,14 @@ export class StaticWidthSimpleRope extends Mesh {
 
   /**
    * Note: The wrap mode of the texture is set to REPEAT if `textureScale` is positive.
-   * @param texture - The texture to use on the rope.
+   * @param texture - The texture to use on the rope. (attempt to set UV wrapping, will fail on non-power of two textures)
    * @param points - An array of {@link PIXI.Point} objects to construct this rope.
+   * @param width - Width of rope
    * @param {number} textureScale - Optional. Positive values scale rope texture
    * keeping its aspect ratio. You can reduce alpha channel artifacts by providing a larger texture
    * and downsampling here. If set to zero, texture will be stretched instead.
-   * @param width - Width of rope
    */
-  constructor(texture: Texture, points: IPoint[], textureScale = 0, width: number) {
+  constructor(texture: Texture, points: IPoint[], width: number, textureScale = 0) {
     const ropeGeometry = new RopeGeometry(width, points, textureScale);
     const meshMaterial = new MeshMaterial(texture);
 

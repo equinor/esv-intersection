@@ -176,7 +176,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
 
     const { exaggerationFactor } = this.options as CompletionLayerOptions<T>;
 
-    const rope: SimpleRope = new StaticWidthSimpleRope(texture, path, exaggerationFactor, diameter);
+    const rope: SimpleRope = new StaticWidthSimpleRope(texture, path, diameter, exaggerationFactor);
     this.addChild(rope);
   }
 
