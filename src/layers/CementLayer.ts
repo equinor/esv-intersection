@@ -4,12 +4,14 @@ import { Cement, Casing, HoleSize } from '../interfaces';
 import { createComplexRopeSegmentsForCement } from '../datautils/wellboreItemShapeGenerator';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
 import { PixiRenderApplication } from './base';
+import { DEFAULT_TEXTURE_SIZE } from '../constants';
 
 export type CementData = { cement: Cement[]; casings: Casing[]; holes: HoleSize[] };
 
 export interface CementLayerOptions<T extends CementData> extends WellComponentBaseOptions<T> {
   firstColor?: string;
   secondColor?: string;
+  cementTextureScalingFactor?: number;
 }
 
 export class CementLayer<T extends CementData> extends WellboreBaseComponentLayer<T> {
@@ -19,6 +21,7 @@ export class CementLayer<T extends CementData> extends WellboreBaseComponentLaye
       ...this.options,
       firstColor: '#c7b9ab',
       secondColor: '#5b5b5b',
+      cementTextureScalingFactor: 4,
       ...options,
     };
   }
@@ -57,26 +60,28 @@ export class CementLayer<T extends CementData> extends WellboreBaseComponentLaye
       return this._textureCache;
     }
 
-    const { firstColor, secondColor } = this.options as CementLayerOptions<T>;
+    const { firstColor, secondColor, cementTextureScalingFactor } = this.options as CementLayerOptions<T>;
 
     const canvas = document.createElement('canvas');
-    canvas.width = 150;
-    canvas.height = 150;
+
+    const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+    const lineWidth = cementTextureScalingFactor;
+    canvas.width = size;
+    canvas.height = size;
     const canvasCtx = canvas.getContext('2d');
 
     canvasCtx.fillStyle = firstColor;
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-    canvasCtx.lineWidth = 1;
+    canvasCtx.lineWidth = lineWidth;
     canvasCtx.fillStyle = secondColor;
 
     canvasCtx.beginPath();
-    canvasCtx.lineWidth = 1;
 
-    const distanceBetweenLines = 10;
+    const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
     for (let i = -canvas.width; i < canvas.width; i++) {
       canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
-      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
+      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
     }
     canvasCtx.stroke();
 

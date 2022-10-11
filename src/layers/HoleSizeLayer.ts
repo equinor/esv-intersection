@@ -90,7 +90,7 @@ export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLa
       );
     }
 
-    this.drawOutline(leftPath, rightPath, lineColor, HOLE_OUTLINE * exaggerationFactor, false);
+    this.drawOutline(leftPath, rightPath, lineColor, HOLE_OUTLINE * exaggerationFactor, false, 0);
   };
 
   drawRope(path: Point[], texture: Texture, tint?: number): void {
