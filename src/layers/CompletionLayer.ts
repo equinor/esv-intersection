@@ -1,10 +1,10 @@
-import { Application, Point, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { Application, Point, RENDERER_TYPE, Texture } from 'pixi.js';
 import { PixiRenderApplication } from '..';
 import { DEFAULT_TEXTURE_SIZE, SCREEN_OUTLINE } from '../constants';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { Completion, foldCompletion, Screen, Tubing } from '../interfaces';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
-import { StaticWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
+import { FixedWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
 
 interface TubularRenderingObject {
@@ -24,7 +24,7 @@ export interface CompletionLayerOptions<T extends Completion[]> extends WellComp
 export class CompletionLayer<T extends Completion[]> extends WellboreBaseComponentLayer<T> {
   private screenTextureCache: Texture | undefined = undefined;
 
-  private tubingTextureCache: Texture[] = [];
+  private tubingTextureCache: Texture;
 
   constructor(ctx: Application | PixiRenderApplication, id: string, options: CompletionLayerOptions<T>) {
     super(ctx, id, options);
@@ -72,7 +72,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
   }
 
   private drawTubing(tubing: Tubing): void {
-    const texture = this.createTubingTexture(tubing.diameter);
+    const texture = this.createTubingTexture();
     const { pathPoints, polygon } = this.createTubularPolygon(tubing);
 
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
@@ -109,18 +109,20 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
     return { pathPoints, polygon, leftPath, rightPath, radius };
   }
 
-  private createTubingTexture(diameter: number): Texture {
+  private createTubingTexture(): Texture {
     const { tubingScalingFactor } = this.options as CompletionLayerOptions<T>;
     const innerColor = '#EEEEFF';
     const outerColor = '#777788';
 
-    if (!this.tubingTextureCache[diameter]) {
+    if (!this.tubingTextureCache) {
+      const size = DEFAULT_TEXTURE_SIZE * tubingScalingFactor;
+
       const canvas = document.createElement('canvas');
-      canvas.width = 16;
-      canvas.height = diameter * tubingScalingFactor;
+      canvas.width = size;
+      canvas.height = size;
       const canvasCtx = canvas.getContext('2d');
       if (canvasCtx instanceof CanvasRenderingContext2D) {
-        const gradient = canvasCtx.createLinearGradient(0, 0, 0, diameter * tubingScalingFactor);
+        const gradient = canvasCtx.createLinearGradient(0, 0, 0, size);
 
         const innerColorStart = 0.3;
         const innerColorEnd = 0.7;
@@ -132,10 +134,10 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
         canvasCtx.fillStyle = gradient;
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-        this.tubingTextureCache[diameter] = Texture.from(canvas);
+        this.tubingTextureCache = Texture.from(canvas);
       }
     }
-    return this.tubingTextureCache[diameter];
+    return this.tubingTextureCache;
   }
 
   private createScreenTexture(): Texture {
@@ -160,7 +162,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
         const distanceBetweenLines = size / 3;
         for (let i = -canvas.width; i < canvas.width; i++) {
           canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
-          canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
+          canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
         }
         canvasCtx.stroke();
       }
@@ -176,7 +178,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
 
     const { exaggerationFactor } = this.options as CompletionLayerOptions<T>;
 
-    const rope: SimpleRope = new StaticWidthSimpleRope(texture, path, diameter, exaggerationFactor);
+    const rope: FixedWidthSimpleRope = new FixedWidthSimpleRope(texture, path, diameter, exaggerationFactor);
     this.addChild(rope);
   }
 

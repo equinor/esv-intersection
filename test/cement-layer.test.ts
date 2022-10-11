@@ -1,4 +1,5 @@
 /* eslint-disable no-magic-numbers */
+import { Point } from 'pixi.js';
 import { createComplexRopeSegmentsForCement } from '../src/datautils/wellboreItemShapeGenerator';
 import { CementLayer, IntersectionReferenceSystem, PixiRenderApplication } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
@@ -97,11 +98,8 @@ describe('CementLayer', () => {
 
       expect(ropeSegments).toEqual([
         {
-          diameter: 35.5,
-          points: [
-            { x: 0, y: 150 },
-            { x: 0, y: 200 },
-          ],
+          diameter: 36,
+          points: [new Point(0, 150), new Point(0, 200)],
         },
       ]);
     });
@@ -119,17 +117,11 @@ describe('CementLayer', () => {
       expect(ropeSegments).toEqual([
         {
           diameter: 30,
-          points: [
-            { x: 0, y: 100 },
-            { x: 0, y: 150 },
-          ],
+          points: [new Point(0, 100), new Point(0, 150)],
         },
         {
-          diameter: 35.5,
-          points: [
-            { x: 0, y: 150 },
-            { x: 0, y: 200 },
-          ],
+          diameter: 36,
+          points: [new Point(0, 150), new Point(0, 200)],
         },
       ]);
     });
@@ -148,31 +140,19 @@ describe('CementLayer', () => {
       expect(ropeSegments).toEqual([
         {
           diameter: 30,
-          points: [
-            { x: 0, y: 25 },
-            { x: 0, y: 50 },
-          ],
+          points: [new Point(0, 25), new Point(0, 50)],
         },
         {
           diameter: 20,
-          points: [
-            { x: 0, y: 50 },
-            { x: 0, y: 100 },
-          ],
+          points: [new Point(0, 50), new Point(0, 100)],
         },
         {
           diameter: 20,
-          points: [
-            { x: 0, y: 100 },
-            { x: 0, y: 150 },
-          ],
+          points: [new Point(0, 100), new Point(0, 150)],
         },
         {
-          diameter: 35.5,
-          points: [
-            { x: 0, y: 150 },
-            { x: 0, y: 200 },
-          ],
+          diameter: 36,
+          points: [new Point(0, 150), new Point(0, 200)],
         },
       ]);
     });

@@ -1,6 +1,5 @@
 import { IPoint, Point } from 'pixi.js';
 import { Cement, Casing, HoleSize, MDPoint } from '..';
-import { HOLE_OUTLINE } from '../constants';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 
 export const getEndLines = (
@@ -80,7 +79,7 @@ export const findCementOuterDiameterAtDepth = (innerCasing: Casing[], nonAttache
   }
 
   if (holeAtDepth) {
-    return holeAtDepth.diameter - HOLE_OUTLINE;
+    return holeAtDepth.diameter;
   }
 
   return defaultCementWidth;
