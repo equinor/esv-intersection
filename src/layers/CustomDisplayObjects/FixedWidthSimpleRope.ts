@@ -4,7 +4,7 @@ import { IPoint, Mesh, MeshMaterial, Renderer, RopeGeometry, Texture, WRAP_MODES
  * The rope allows you to draw a texture across several points and then manipulate these points
  * Width of rope is given in constructor
  */
-export class StaticWidthSimpleRope extends Mesh {
+export class FixedWidthSimpleRope extends Mesh {
   /**
    * re-calculate vertices by rope points each frame
    * @member {boolean}

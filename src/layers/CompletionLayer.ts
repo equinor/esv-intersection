@@ -4,7 +4,7 @@ import { DEFAULT_TEXTURE_SIZE, SCREEN_OUTLINE } from '../constants';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { Completion, foldCompletion, Screen, Tubing } from '../interfaces';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
-import { StaticWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
+import { FixedWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
 
 interface TubularRenderingObject {
@@ -176,7 +176,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
 
     const { exaggerationFactor } = this.options as CompletionLayerOptions<T>;
 
-    const rope: SimpleRope = new StaticWidthSimpleRope(texture, path, diameter, exaggerationFactor);
+    const rope: FixedWidthSimpleRope = new FixedWidthSimpleRope(texture, path, diameter, exaggerationFactor);
     this.addChild(rope);
   }
 
