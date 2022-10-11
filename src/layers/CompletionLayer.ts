@@ -1,4 +1,4 @@
-import { Application, Point, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { Application, Point, RENDERER_TYPE, Texture } from 'pixi.js';
 import { PixiRenderApplication } from '..';
 import { DEFAULT_TEXTURE_SIZE, SCREEN_OUTLINE } from '../constants';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
@@ -24,7 +24,7 @@ export interface CompletionLayerOptions<T extends Completion[]> extends WellComp
 export class CompletionLayer<T extends Completion[]> extends WellboreBaseComponentLayer<T> {
   private screenTextureCache: Texture | undefined = undefined;
 
-  private tubingTextureCache: Texture[] = [];
+  private tubingTextureCache: Texture;
 
   constructor(ctx: Application | PixiRenderApplication, id: string, options: CompletionLayerOptions<T>) {
     super(ctx, id, options);
@@ -109,18 +109,20 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
     return { pathPoints, polygon, leftPath, rightPath, radius };
   }
 
-  private createTubingTexture(diameter: number): Texture {
+  private createTubingTexture(): Texture {
     const { tubingScalingFactor } = this.options as CompletionLayerOptions<T>;
     const innerColor = '#EEEEFF';
     const outerColor = '#777788';
 
-    if (!this.tubingTextureCache[diameter]) {
+    if (!this.tubingTextureCache) {
+      const size = DEFAULT_TEXTURE_SIZE * tubingScalingFactor;
+
       const canvas = document.createElement('canvas');
-      canvas.width = 16;
-      canvas.height = diameter * tubingScalingFactor;
+      canvas.width = size;
+      canvas.height = size;
       const canvasCtx = canvas.getContext('2d');
       if (canvasCtx instanceof CanvasRenderingContext2D) {
-        const gradient = canvasCtx.createLinearGradient(0, 0, 0, diameter * tubingScalingFactor);
+        const gradient = canvasCtx.createLinearGradient(0, 0, 0, size);
 
         const innerColorStart = 0.3;
         const innerColorEnd = 0.7;
@@ -132,10 +134,10 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
         canvasCtx.fillStyle = gradient;
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-        this.tubingTextureCache[diameter] = Texture.from(canvas);
+        this.tubingTextureCache = Texture.from(canvas);
       }
     }
-    return this.tubingTextureCache[diameter];
+    return this.tubingTextureCache;
   }
 
   private createScreenTexture(): Texture {
