@@ -81,7 +81,7 @@ export class CementLayer<T extends CementData> extends WellboreBaseComponentLaye
     const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
     for (let i = -canvas.width; i < canvas.width; i++) {
       canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
-      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
+      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
     }
     canvasCtx.stroke();
 

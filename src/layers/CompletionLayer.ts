@@ -160,7 +160,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
         const distanceBetweenLines = size / 3;
         for (let i = -canvas.width; i < canvas.width; i++) {
           canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
-          canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
+          canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
         }
         canvasCtx.stroke();
       }
