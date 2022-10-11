@@ -4,6 +4,7 @@ export const DEFAULT_LAYER_HEIGHT = 300;
 export const HORIZONTAL_AXIS_MARGIN = 40;
 export const VERTICAL_AXIS_MARGIN = 30;
 
+export const EXAGGERATED_DIAMETER = 100;
 export const HOLE_OUTLINE = 0.5;
 export const SCREEN_OUTLINE = 0.5;
 export const SHOE_WIDTH = 25;

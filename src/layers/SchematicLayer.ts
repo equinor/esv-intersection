@@ -1,11 +1,35 @@
-import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
+import { max } from 'd3-array';
+import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
-import { DEFAULT_TEXTURE_SIZE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
+import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import { createComplexRopeSegmentsForCement, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
 import { Casing, Cement, HoleSize } from '../interfaces';
+import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
+
+const createGradientFill = (
+  canvas: HTMLCanvasElement,
+  canvasCtx: CanvasRenderingContext2D,
+  firstColor: string,
+  secondColor: string,
+  startPctOffset: number,
+): CanvasGradient => {
+  const halfWayPct = 0.5;
+  const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, firstColor);
+  gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
+  gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
+  gradient.addColorStop(1, firstColor);
+
+  return gradient;
+};
+
+interface CementShape {
+  segments: ComplexRopeSegment[];
+  casingIds: string[];
+}
 
 interface CasingRenderObject {
   casingId: string;
@@ -47,14 +71,11 @@ export interface SchematicLayerOptions<T extends SchematicData> extends WellComp
   };
 }
 
-interface CementShape {
-  segments: ComplexRopeSegment[];
-  casingIds: string[];
-}
-
 export class SchematicLayer<T extends SchematicData> extends WellboreBaseComponentLayer<T> {
   private casingVisibility = true;
   private cementVisibility = true;
+
+  private maxDiameter: number;
 
   constructor(ctx: PixiRenderApplication, id?: string, options?: SchematicLayerOptions<T>) {
     super(ctx, id, options);
@@ -80,6 +101,10 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
 
     const { holeSizes, casings, cements } = this.data;
 
+    holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
+    this.maxDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) : EXAGGERATED_DIAMETER;
+    holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
+
     const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
     const casingRenderObjects: CasingRenderObject[] = sortedCasings.map(this.prepareCasingRenderObject);
     const cementShapes: CementShape[] = cements.map(
@@ -101,6 +126,88 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
         }
       },
     );
+  }
+
+  private drawHoleSize = (holeObject: HoleSize): void => {
+    if (holeObject == null) {
+      return;
+    }
+
+    const { exaggerationFactor, holeFirstColor, holeLineColor } = this.options as SchematicLayerOptions<T>;
+
+    const diameter = holeObject.diameter * exaggerationFactor;
+    const radius = diameter / 2;
+
+    const path = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end, [holeObject.start, holeObject.end]);
+    const pathPoints = path.map((p) => p.point);
+    const normals = createNormals(pathPoints);
+
+    const rightPath = offsetPoints(pathPoints, normals, radius);
+    const leftPath = offsetPoints(pathPoints, normals, -radius);
+
+    if (pathPoints.length === 0) {
+      return;
+    }
+
+    if (this.renderType() === RENDERER_TYPE.CANVAS) {
+      const polygonCoords = makeTubularPolygon(leftPath, rightPath);
+      this.drawBigPolygon(polygonCoords, convertColor(holeFirstColor));
+    } else {
+      const texture = this.createTexture(diameter);
+      this.drawHoleRope(
+        pathPoints.map((p) => new Point(p[0], p[1])),
+        texture,
+      );
+    }
+
+    this.drawOutline(leftPath, rightPath, holeLineColor, HOLE_OUTLINE * exaggerationFactor, false, 0);
+  };
+
+  private drawHoleRope(path: Point[], texture: Texture, tint?: number): void {
+    if (path.length === 0) {
+      return null;
+    }
+
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+
+    const rope: SimpleRope = new SimpleRope(texture, path, exaggerationFactor);
+
+    rope.tint = tint || rope.tint;
+
+    this.addChild(rope);
+  }
+
+  private createTexture(diameter: number): Texture {
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+
+    const exaggeratedDiameter = diameter / exaggerationFactor;
+    const height = this.maxDiameter;
+    const width = 16;
+
+    if (!this._textureCache) {
+      this._textureCache = this.createBaseTexture(width, height);
+    }
+
+    const baseTexture = this._textureCache.baseTexture;
+    const sidePadding = (height - exaggeratedDiameter) / 2;
+    const frame = new Rectangle(0, sidePadding, width, exaggeratedDiameter);
+    const texture = new Texture(baseTexture, frame);
+
+    return texture;
+  }
+
+  private createBaseTexture(width: number, height: number): Texture {
+    const { holeFirstColor, holeSecondColor } = this.options as SchematicLayerOptions<T>;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const canvasCtx = canvas.getContext('2d');
+
+    canvasCtx.fillStyle = createGradientFill(canvas, canvasCtx, holeFirstColor, holeSecondColor, 0);
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+    return Texture.from(canvas);
   }
 
   private pairCementAndCasingRenderObjects(
@@ -177,7 +284,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       this.drawBigPolygon(polygon, casingSolidColor);
     } else {
       const texture = this.createCasingTexture(diameter);
-      this.drawRope(
+      this.drawHoleRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
         casingSolidColor,
