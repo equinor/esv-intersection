@@ -72,7 +72,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
   }
 
   private drawTubing(tubing: Tubing): void {
-    const texture = this.createTubingTexture(tubing.diameter);
+    const texture = this.createTubingTexture();
     const { pathPoints, polygon } = this.createTubularPolygon(tubing);
 
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
