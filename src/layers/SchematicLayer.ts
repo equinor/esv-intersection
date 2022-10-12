@@ -3,11 +3,12 @@ import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import { createComplexRopeSegmentsForCement, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { Casing, Cement, Completion, foldCompletion, HoleSize, Tubing, Screen } from '../interfaces';
+import { Casing, Cement, Completion, foldCompletion, HoleSize, Tubing, Screen, CompletionImage, PlugAndAbandonment } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
 import { FixedWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
+import { UniformTextureStretchRope } from './CustomDisplayObjects/UniformTextureStretchRope';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
 
 const createGradientFill = (
@@ -26,6 +27,12 @@ const createGradientFill = (
 
   return gradient;
 };
+
+interface ComponentRenderObject {
+  pathPoints: number[][];
+  diameter: number;
+  imageKey: string;
+}
 
 interface CementShape {
   segments: ComplexRopeSegment[];
@@ -63,6 +70,10 @@ export interface SchematicData {
   casings: Casing[];
   cements: Cement[];
   completion: Completion[];
+  plugAndAbandonment: PlugAndAbandonment[];
+  images: {
+    [key: string]: string;
+  };
 }
 
 export interface SchematicLayerOptions<T extends SchematicData> extends WellComponentBaseOptions<T> {
@@ -93,6 +104,8 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   private screenTextureCache: Texture;
   private tubingTextureCache: Texture;
 
+  private textureImageCacheArray: { [key: string]: Texture };
+
   private maxDiameter: number;
 
   constructor(ctx: PixiRenderApplication, id?: string, options?: SchematicLayerOptions<T>) {
@@ -120,7 +133,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       return;
     }
 
-    const { holeSizes, casings, cements, completion } = this.data;
+    const { holeSizes, casings, cements, completion, images } = this.data;
 
     // eslint-disable-next-line max-len
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
@@ -149,12 +162,68 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       },
     );
 
+    this.textureImageCacheArray = Object.entries(images).reduce((list: { [key: string]: Texture }, [key, image]: [string, string]) => {
+      list[key] = Texture.from(image);
+      return list;
+    }, {});
+
     completion.map(
       foldCompletion(
         (obj: Screen) => this.drawScreen(obj),
         (obj: Tubing) => this.drawTubing(obj),
+        (obj: CompletionImage) => {
+          const imageRenderObject = this.prepareImageRenderObject(obj);
+          this.drawImageComponent(imageRenderObject);
+        },
       ),
     );
+  }
+
+  private prepareImageRenderObject = (component: CompletionImage): ComponentRenderObject => {
+    if (component == null) {
+      return;
+    }
+    const { exaggerationFactor } = this.options as WellComponentBaseOptions<T>;
+
+    const diameter = component.diameter * exaggerationFactor;
+
+    const pathPoints = this.getZFactorScaledPathForPoints(component.start, component.end, [component.start, component.end]).map((d) => d.point);
+
+    return {
+      pathPoints,
+      diameter,
+      imageKey: component.imageKey,
+    };
+  };
+
+  private drawImageComponent = (renderObject: ComponentRenderObject): void => {
+    const { pathPoints, diameter, imageKey } = renderObject;
+
+    // Pixi.js-legacy with Canvas render type handles advanced render methods poorly
+    if (this.renderType() === RENDERER_TYPE.CANVAS) {
+      // TODO implement this
+      // this.drawBigPolygon(polygon, solidColor);
+    } else {
+      const texture = this.createImageTexture(imageKey, diameter);
+      this.drawSVGRope(
+        pathPoints.map((p) => new Point(p[0], p[1])),
+        texture,
+      );
+    }
+  };
+
+  private drawSVGRope(path: Point[], texture: Texture): void {
+    if (path.length === 0) {
+      return null;
+    }
+
+    const rope: UniformTextureStretchRope = new UniformTextureStretchRope(texture, path);
+
+    this.addChild(rope);
+  }
+
+  private createImageTexture(imageKey: string, diameter: number): Texture {
+    return new Texture(this.textureImageCacheArray[imageKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, 2);
   }
 
   private drawHoleSize = (holeObject: HoleSize): void => {

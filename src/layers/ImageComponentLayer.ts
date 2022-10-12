@@ -1,18 +1,11 @@
 import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
-import { PixiRenderApplication } from '..';
+import { ImageComponent, PixiRenderApplication } from '..';
 import { UniformTextureStretchRope } from './CustomDisplayObjects/UniformTextureStretchRope';
 
 interface ComponentRenderObject {
   pathPoints: number[][];
   diameter: number;
-  imageKey: string;
-}
-
-export interface ImageComponent {
-  diameter: number;
-  start: number;
-  end: number;
   imageKey: string;
 }
 

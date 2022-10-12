@@ -8,6 +8,7 @@ import {
   HoleSizeLayerOptions,
   HoleSize,
   HoleSizeLayer,
+  Completion,
 } from '../../../src';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
@@ -25,14 +26,43 @@ export const SchematicLayerUsingLowLevelInterface = () => {
     const referenceSystem = new IntersectionReferenceSystem(wbp);
     const renderer = new PixiRenderApplication({ width, height });
 
-    const holeOptions: HoleSizeLayerOptions<HoleSize[]> = {
-      order: 1,
-      referenceSystem,
-      data: holeSizes
+    const CSDSVGList = {
+      completionImage1:
+        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMCAwSDkwVjEwMEgxMFYwWiIgZmlsbD0iI0Q5RDlEOSIvPgo8cGF0aCBkPSJNMCAyNUgxMFY3NUgwVjI1WiIgZmlsbD0iI0I1QjJCMiIvPgo8cGF0aCBkPSJNNDUgMjVINTVWNzVINDVWMjVaIiBmaWxsPSIjQjVCMkIyIi8+CjxwYXRoIGQ9Ik05MCAyNUgxMDBWNzVIOTBWMjVaIiBmaWxsPSIjQjVCMkIyIi8+Cjwvc3ZnPgo=',
+      completionImage2:
+        'tubing1.svg', // Fetched from URL. Full URL with protocol and hostname is allowed.
+      completionImage3:
+        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMCAwSDkwVjEwMEgxMFYwWiIgZmlsbD0iI0Q5RDlEOSIvPgo8cGF0aCBkPSJNMCAyNUgxMFY3NUgwVjI1WiIgZmlsbD0iI0I1QjJCMiIvPgo8cGF0aCBkPSJNNDUgMjVINTVWNzVINDVWMjVaIiBmaWxsPSIjQjVCMkIyIi8+CjxwYXRoIGQ9Ik0yNSA2NUgzMFY4MEgyNVY2NVoiIGZpbGw9IiMzMTMxMzEiLz4KPHBhdGggZD0iTTI1IDQySDMwVjU3SDI1VjQyWiIgZmlsbD0iIzMxMzEzMSIvPgo8cGF0aCBkPSJNMjUgMjFIMzBWMzZIMjVWMjFaIiBmaWxsPSIjMzEzMTMxIi8+CjxwYXRoIGQ9Ik03MCA2NEg3NVY3OUg3MFY2NFoiIGZpbGw9IiMzMTMxMzEiLz4KPHBhdGggZD0iTTcwIDQxSDc1VjU2SDcwVjQxWiIgZmlsbD0iIzMxMzEzMSIvPgo8cGF0aCBkPSJNNzAgMjBINzVWMzVINzBWMjBaIiBmaWxsPSIjMzEzMTMxIi8+CjxwYXRoIGQ9Ik05MCAyNUgxMDBWNzVIOTBWMjVaIiBmaWxsPSIjQjVCMkIyIi8+Cjwvc3ZnPgo='
     };
-    const holeSizeLayer = new HoleSizeLayer(renderer, 'holesize-webgl', holeOptions);
 
-    const schematicData: SchematicData = { holeSizes, cements, casings, completion }
+    const completionImages = [
+      {
+        kind: 'image',
+        id: 'completion-svg-1',
+        start: 5250,
+        end: 5252,
+        diameter: 8.5,
+        imageKey: 'completionImage1',
+      },
+      {
+        kind: 'image',
+        id: 'completion-svg-2',
+        start: 5252,
+        end: 5274,
+        diameter: 8.5,
+        imageKey: 'completionImage2',
+      },
+      {
+        kind: 'image',
+        id: 'completion-svg-3',
+        start: 5274,
+        end: 5276,
+        diameter: 8.5,
+        imageKey: 'completionImage3',
+      },
+    ]
+
+    const schematicData: SchematicData = { holeSizes, cements, casings, completion: [...completion, ...completionImages], plugAndAbandonment: [], images: {...CSDSVGList} }
     const options: SchematicLayerOptions<SchematicData> = {
       order: 2,
       referenceSystem,
@@ -40,7 +70,7 @@ export const SchematicLayerUsingLowLevelInterface = () => {
     };
     const schematicLayer = new SchematicLayer(renderer, 'schematic-webgl-layer', options);
 
-    const controller = new Controller({ container, layers: [holeSizeLayer, schematicLayer] });
+    const controller = new Controller({ container, layers: [schematicLayer] });
 
     controller.setBounds([0, 1000], [0, 1000]);
     controller.adjustToSize(width, height);
