@@ -12,7 +12,7 @@ import {
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
 
-import { getWellborePath, getCasings, getCement, getHolesize } from '../data';
+import { getWellborePath, getCasings, getCement, getHolesize, getCompletion } from '../data';
 
 const width: number = 700;
 const height: number = 600;
@@ -21,7 +21,7 @@ export const SchematicLayerUsingLowLevelInterface = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  Promise.all([getWellborePath(), getCement(), getCasings(), getHolesize()]).then(([wbp, cements, casings, holeSizes]) => {
+  Promise.all([getWellborePath(), getHolesize(), getCasings(), getCement(), getCompletion() ]).then(([wbp, holeSizes, casings, cements, completion]) => {
     const referenceSystem = new IntersectionReferenceSystem(wbp);
     const renderer = new PixiRenderApplication({ width, height });
 
@@ -32,7 +32,7 @@ export const SchematicLayerUsingLowLevelInterface = () => {
     };
     const holeSizeLayer = new HoleSizeLayer(renderer, 'holesize-webgl', holeOptions);
 
-    const schematicData: SchematicData = { holeSizes, cements, casings }
+    const schematicData: SchematicData = { holeSizes, cements, casings, completion }
     const options: SchematicLayerOptions<SchematicData> = {
       order: 2,
       referenceSystem,

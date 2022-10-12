@@ -1,12 +1,13 @@
 import { max } from 'd3-array';
 import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
-import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
+import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import { createComplexRopeSegmentsForCement, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { Casing, Cement, HoleSize } from '../interfaces';
+import { Casing, Cement, Completion, foldCompletion, HoleSize, Tubing, Screen } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
+import { FixedWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
 
 const createGradientFill = (
@@ -44,6 +45,14 @@ interface CasingRenderObject {
   bottom: number;
 }
 
+interface TubularRenderingObject {
+  pathPoints: number[][];
+  polygon: Point[];
+  leftPath: Point[];
+  rightPath: Point[];
+  radius: number;
+}
+
 const defaultCasingShoeSize: CasingShoeSize = {
   width: SHOE_WIDTH,
   length: SHOE_LENGTH,
@@ -53,6 +62,7 @@ export interface SchematicData {
   holeSizes: HoleSize[];
   casings: Casing[];
   cements: Cement[];
+  completion: Completion[];
 }
 
 export interface SchematicLayerOptions<T extends SchematicData> extends WellComponentBaseOptions<T> {
@@ -65,6 +75,9 @@ export interface SchematicLayerOptions<T extends SchematicData> extends WellComp
   cementSecondColor?: string;
   casingShoeSize?: CasingShoeSize;
   cementTextureScalingFactor?: number;
+  screenScalingFactor?: number;
+  tubingScalingFactor?: number;
+  screenLineColor?: number;
   internalLayers?: {
     casingId: string;
     cementId: string;
@@ -74,8 +87,11 @@ export interface SchematicLayerOptions<T extends SchematicData> extends WellComp
 export class SchematicLayer<T extends SchematicData> extends WellboreBaseComponentLayer<T> {
   private casingVisibility = true;
   private cementVisibility = true;
+
   private cementTextureCache: Texture;
   private holeTextureCache: Texture;
+  private screenTextureCache: Texture;
+  private tubingTextureCache: Texture;
 
   private maxDiameter: number;
 
@@ -92,6 +108,9 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       cementTextureScalingFactor: 4,
       cementFirstColor: '#c7b9ab',
       cementSecondColor: '#5b5b5b',
+      screenScalingFactor: 4,
+      tubingScalingFactor: 1,
+      screenLineColor: 0x63666a,
       ...options,
     };
   }
@@ -101,7 +120,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       return;
     }
 
-    const { holeSizes, casings, cements } = this.data;
+    const { holeSizes, casings, cements, completion } = this.data;
 
     // eslint-disable-next-line max-len
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
@@ -128,6 +147,13 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
           this.casingVisibility && this.drawShoe(casingRenderObject.bottom, casingRenderObject.radius);
         }
       },
+    );
+
+    completion.map(
+      foldCompletion(
+        (obj: Screen) => this.drawScreen(obj),
+        (obj: Tubing) => this.drawTubing(obj),
+      ),
     );
   }
 
@@ -365,6 +391,135 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.cementTextureCache = Texture.from(canvas);
 
     return this.cementTextureCache;
+  }
+
+  private drawScreen(screen: Screen): void {
+    const { exaggerationFactor, screenLineColor } = this.options as SchematicLayerOptions<T>;
+
+    const texture = this.createScreenTexture();
+    const { pathPoints, polygon, leftPath, rightPath } = this.createTubularPolygon(screen);
+
+    if (this.renderType() === RENDERER_TYPE.CANVAS) {
+      this.drawBigTexturedPolygon(polygon, texture);
+    } else {
+      this.drawCompletionRope(
+        pathPoints.map((p) => new Point(p[0], p[1])),
+        texture,
+        screen.diameter,
+      );
+    }
+    this.drawOutline(leftPath, rightPath, screenLineColor, SCREEN_OUTLINE * exaggerationFactor, false);
+  }
+
+  private drawTubing(tubing: Tubing): void {
+    const texture = this.createTubingTexture();
+    const { pathPoints, polygon } = this.createTubularPolygon(tubing);
+
+    if (this.renderType() === RENDERER_TYPE.CANVAS) {
+      this.drawBigTexturedPolygon(polygon, texture);
+    } else {
+      this.drawCompletionRope(
+        pathPoints.map((p) => new Point(p[0], p[1])),
+        texture,
+        tubing.diameter,
+      );
+    }
+  }
+
+  private createTubularPolygon(completion: Screen | Tubing): TubularRenderingObject {
+    if (completion == null) {
+      return;
+    }
+
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+
+    const diameter = completion.diameter * exaggerationFactor;
+
+    const radius = diameter / 2;
+
+    const path = this.getZFactorScaledPathForPoints(completion.start, completion.end, [completion.start, completion.end]);
+
+    const pathPoints = path.map((p) => p.point);
+    const normals = createNormals(pathPoints);
+    const rightPath = offsetPoints(pathPoints, normals, radius);
+    const leftPath = offsetPoints(pathPoints, normals, -radius);
+
+    const polygon = makeTubularPolygon(leftPath, rightPath);
+
+    return { pathPoints, polygon, leftPath, rightPath, radius };
+  }
+
+  private createTubingTexture(): Texture {
+    const { tubingScalingFactor } = this.options as SchematicLayerOptions<T>;
+    const innerColor = '#EEEEFF';
+    const outerColor = '#777788';
+
+    if (!this.tubingTextureCache) {
+      const size = DEFAULT_TEXTURE_SIZE * tubingScalingFactor;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const canvasCtx = canvas.getContext('2d');
+      if (canvasCtx instanceof CanvasRenderingContext2D) {
+        const gradient = canvasCtx.createLinearGradient(0, 0, 0, size);
+
+        const innerColorStart = 0.3;
+        const innerColorEnd = 0.7;
+        gradient.addColorStop(0, outerColor);
+        gradient.addColorStop(innerColorStart, innerColor);
+        gradient.addColorStop(innerColorEnd, innerColor);
+        gradient.addColorStop(1, outerColor);
+
+        canvasCtx.fillStyle = gradient;
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+        this.tubingTextureCache = Texture.from(canvas);
+      }
+    }
+    return this.tubingTextureCache;
+  }
+
+  private createScreenTexture(): Texture {
+    const { screenScalingFactor } = this.options as SchematicLayerOptions<T>;
+
+    if (!this.screenTextureCache) {
+      const canvas = document.createElement('canvas');
+      const size = DEFAULT_TEXTURE_SIZE * screenScalingFactor;
+      canvas.width = size;
+      canvas.height = size;
+      const canvasCtx = canvas.getContext('2d');
+
+      if (canvasCtx instanceof CanvasRenderingContext2D) {
+        canvasCtx.fillStyle = 'white';
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const baseLineWidth = size / 10; // eslint-disable-line no-magic-numbers
+        canvasCtx.strokeStyle = '#AAAAAA';
+        canvasCtx.lineWidth = baseLineWidth;
+        canvasCtx.beginPath();
+
+        const distanceBetweenLines = size / 3;
+        for (let i = -canvas.width; i < canvas.width; i++) {
+          canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+          canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
+        }
+        canvasCtx.stroke();
+      }
+      this.screenTextureCache = Texture.from(canvas);
+    }
+    return this.screenTextureCache;
+  }
+
+  private drawCompletionRope(path: Point[], texture: Texture, diameter: number): void {
+    if (path.length === 0) {
+      return;
+    }
+
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+
+    const rope: FixedWidthSimpleRope = new FixedWidthSimpleRope(texture, path, diameter, exaggerationFactor);
+    this.addChild(rope);
   }
 
   getInternalLayerIds(): string[] {
