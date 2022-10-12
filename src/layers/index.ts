@@ -17,3 +17,4 @@ export * from './base/PixiLayer';
 export * from './CompletionLayer';
 export * from './CasingAndCementLayer';
 export * from './ImageComponentLayer';
+export * from './SchematicLayer';

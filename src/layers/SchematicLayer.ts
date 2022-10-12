@@ -74,6 +74,8 @@ export interface SchematicLayerOptions<T extends SchematicData> extends WellComp
 export class SchematicLayer<T extends SchematicData> extends WellboreBaseComponentLayer<T> {
   private casingVisibility = true;
   private cementVisibility = true;
+  private cementTextureCache: Texture;
+  private holeTextureCache: Texture;
 
   private maxDiameter: number;
 
@@ -101,6 +103,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
 
     const { holeSizes, casings, cements } = this.data;
 
+    // eslint-disable-next-line max-len
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
     this.maxDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) : EXAGGERATED_DIAMETER;
     holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
@@ -153,7 +156,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       const polygonCoords = makeTubularPolygon(leftPath, rightPath);
       this.drawBigPolygon(polygonCoords, convertColor(holeFirstColor));
     } else {
-      const texture = this.createTexture(diameter);
+      const texture = this.createHoleTexture(diameter);
       this.drawHoleRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
@@ -177,18 +180,18 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.addChild(rope);
   }
 
-  private createTexture(diameter: number): Texture {
+  private createHoleTexture(diameter: number): Texture {
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
 
     const exaggeratedDiameter = diameter / exaggerationFactor;
     const height = this.maxDiameter;
     const width = 16;
 
-    if (!this._textureCache) {
-      this._textureCache = this.createBaseTexture(width, height);
+    if (!this.holeTextureCache) {
+      this.holeTextureCache = this.createHoleBaseTexture(width, height);
     }
 
-    const baseTexture = this._textureCache.baseTexture;
+    const baseTexture = this.holeTextureCache.baseTexture;
     const sidePadding = (height - exaggeratedDiameter) / 2;
     const frame = new Rectangle(0, sidePadding, width, exaggeratedDiameter);
     const texture = new Texture(baseTexture, frame);
@@ -196,7 +199,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     return texture;
   }
 
-  private createBaseTexture(width: number, height: number): Texture {
+  private createHoleBaseTexture(width: number, height: number): Texture {
     const { holeFirstColor, holeSecondColor } = this.options as SchematicLayerOptions<T>;
 
     const canvas = document.createElement('canvas');
@@ -264,7 +267,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     };
   };
 
-  drawComplexRope(intervals: ComplexRopeSegment[], texture: Texture): void {
+  private drawComplexRope(intervals: ComplexRopeSegment[], texture: Texture): void {
     if (intervals.length === 0) {
       return null;
     }
@@ -284,7 +287,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       this.drawBigPolygon(polygon, casingSolidColor);
     } else {
       const texture = this.createCasingTexture(diameter);
-      this.drawHoleRope(
+      this.drawRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
         casingSolidColor,
@@ -326,17 +329,17 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     return [...shoeEdge, shoeTip];
   };
 
-  createCementShape = (cement: Cement, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
+  private createCementShape = (cement: Cement, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     return createComplexRopeSegmentsForCement(cement, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };
 
   private createCementTexture(): Texture {
-    if (this._textureCache) {
-      return this._textureCache;
+    if (this.cementTextureCache) {
+      return this.cementTextureCache;
     }
 
-    const { firstCementColor, secondCementColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
+    const { cementFirstColor, cementSecondColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
 
     const canvas = document.createElement('canvas');
 
@@ -346,10 +349,10 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     canvas.height = size;
     const canvasCtx = canvas.getContext('2d');
 
-    canvasCtx.fillStyle = firstCementColor;
+    canvasCtx.fillStyle = cementFirstColor;
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
     canvasCtx.lineWidth = lineWidth;
-    canvasCtx.fillStyle = secondCementColor;
+    canvasCtx.fillStyle = cementSecondColor;
     canvasCtx.beginPath();
 
     const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
@@ -359,9 +362,9 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     }
     canvasCtx.stroke();
 
-    this._textureCache = Texture.from(canvas);
+    this.cementTextureCache = Texture.from(canvas);
 
-    return this._textureCache;
+    return this.cementTextureCache;
   }
 
   getInternalLayerIds(): string[] {
