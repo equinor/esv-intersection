@@ -101,18 +101,20 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
       }),
     );
 
-    const CEMENT_SQUEEZE_SHAPES: CementSqueezeShape[] = cementSqueezes.map((squeeze: CementSqueeze) => {
-      return {
-        segments: this.createCementSqueezeShape(squeeze, sortedCasings, holeSizes),
-        casingIds: squeeze.casingIds,
-      };
-    });
-
-    this.pairCementAndCasingRenderObjects(casingRenderObjects, cementShapes).forEach(
-      ([cementShape, casingRenderObject]: [CementShape | undefined, CasingRenderObject]) => {
+    this.groupCementAndCasingRenderObjects(casingRenderObjects, cementShapes, cementSqueezes).forEach(
+      ([cementShape, casingRenderObject, squeezes]: [CementShape | undefined, CasingRenderObject, CementSqueeze[]]) => {
         if (cementShape) {
           this.cementVisibility && this.drawComplexRope(cementShape.segments, this.createCementTexture());
         }
+
+        squeezes.forEach((squeeze) => {
+          const shape = {
+            segments: this.createCementSqueezeShape(squeeze, sortedCasings, holeSizes),
+            casingIds: squeeze.casingIds,
+          };
+          this.drawComplexRope(shape.segments, this.createCementSqueezeTexture());
+        });
+
         this.casingVisibility && this.drawCasing(casingRenderObject);
 
         if (casingRenderObject.hasShoe) {
@@ -120,25 +122,24 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
         }
       },
     );
-
-    CEMENT_SQUEEZE_SHAPES.forEach((squeeze) => {
-      this.drawComplexRope(squeeze.segments, this.createCementSqueezeTexture());
-    });
   }
 
-  private pairCementAndCasingRenderObjects(
+  private groupCementAndCasingRenderObjects(
     casingRenderObjects: CasingRenderObject[],
     cementShapes: CementShape[],
-  ): [CementShape | undefined, CasingRenderObject][] {
+    cementSqueezes: CementSqueeze[],
+  ): [CementShape | undefined, CasingRenderObject, CementSqueeze[]][] {
     const { tuples } = casingRenderObjects.reduce(
       (acc, casingRenderObject) => {
         const foundCementShape = acc.remainingCement.find((cement) => cement.casingIds.includes(casingRenderObject.casingId));
+        const foundCementSqueezes = acc.remainingCementSqueezes.filter((squeeze) => squeeze.casingIds.includes(casingRenderObject.casingId));
         return {
-          tuples: [...acc.tuples, [foundCementShape, casingRenderObject]],
+          tuples: [...acc.tuples, [foundCementShape, casingRenderObject, foundCementSqueezes]],
           remainingCement: acc.remainingCement.filter((c) => c !== foundCementShape),
+          remainingCementSqueezes: acc.remainingCementSqueezes.filter((squeeze) => !foundCementSqueezes.includes(squeeze)),
         };
       },
-      { tuples: [], remainingCement: cementShapes },
+      { tuples: [], remainingCement: cementShapes, remainingCementSqueezes: cementSqueezes },
     );
     return tuples;
   }
