@@ -90,8 +90,6 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
 
     const { holeSizes, casings, cements, cementSqueezes } = this.data;
 
-    console.log({ data: this.data });
-
     // cement does not have enough data on its own to render it, so we add the bottom here
     // cementSqueeze does not need to have such a thing added since it comes with it's own top and bottom
     const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
@@ -109,8 +107,6 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
         casingIds: squeeze.casingIds,
       };
     });
-
-    console.log({ CEMENT_SQUEEZE_SHAPES });
 
     this.pairCementAndCasingRenderObjects(casingRenderObjects, cementShapes).forEach(
       ([cementShape, casingRenderObject]: [CementShape | undefined, CasingRenderObject]) => {
