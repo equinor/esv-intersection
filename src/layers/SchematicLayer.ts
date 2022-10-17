@@ -192,7 +192,6 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     const diameter = component.diameter * exaggerationFactor;
 
     const pathPoints = this.getZFactorScaledPathForPoints(component.start, component.end, [component.start, component.end]);
-    console.log(component, pathPoints);
 
     return {
       pathPoints: pathPoints.map((d) => d.point),
