@@ -3,7 +3,7 @@ import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import { createComplexRopeSegmentsForCement, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { Casing, Cement, Completion, foldCompletion, HoleSize, Tubing, Screen, CompletionImage, PlugAndAbandonment } from '../interfaces';
+import { Casing, Cement, Completion, foldCompletion, HoleSize, Tubing, Screen, CompletionImage, PlugAndAbandonment, PNAImage } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
@@ -28,7 +28,7 @@ const createGradientFill = (
   return gradient;
 };
 
-interface ComponentRenderObject {
+interface ImageRenderObject {
   pathPoints: number[][];
   diameter: number;
   imageKey: string;
@@ -103,7 +103,6 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   private holeTextureCache: Texture;
   private screenTextureCache: Texture;
   private tubingTextureCache: Texture;
-
   private textureImageCacheArray: { [key: string]: Texture };
 
   private maxDiameter: number;
@@ -133,7 +132,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       return;
     }
 
-    const { holeSizes, casings, cements, completion, images } = this.data;
+    const { holeSizes, casings, cements, completion, images, plugAndAbandonment } = this.data;
 
     // eslint-disable-next-line max-len
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
@@ -167,7 +166,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       return list;
     }, {});
 
-    completion.map(
+    completion.forEach(
       foldCompletion(
         (obj: Screen) => this.drawScreen(obj),
         (obj: Tubing) => this.drawTubing(obj),
@@ -177,9 +176,14 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
         },
       ),
     );
+
+    plugAndAbandonment.forEach((obj: PNAImage) => {
+      const imageRenderObject = this.prepareImageRenderObject(obj);
+      this.drawImageComponent(imageRenderObject);
+    });
   }
 
-  private prepareImageRenderObject = (component: CompletionImage): ComponentRenderObject => {
+  private prepareImageRenderObject = (component: CompletionImage | PNAImage): ImageRenderObject => {
     if (component == null) {
       return;
     }
@@ -187,16 +191,17 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
 
     const diameter = component.diameter * exaggerationFactor;
 
-    const pathPoints = this.getZFactorScaledPathForPoints(component.start, component.end, [component.start, component.end]).map((d) => d.point);
+    const pathPoints = this.getZFactorScaledPathForPoints(component.start, component.end, [component.start, component.end]);
+    console.log(component, pathPoints);
 
     return {
-      pathPoints,
+      pathPoints: pathPoints.map((d) => d.point),
       diameter,
       imageKey: component.imageKey,
     };
   };
 
-  private drawImageComponent = (renderObject: ComponentRenderObject): void => {
+  private drawImageComponent = (renderObject: ImageRenderObject): void => {
     const { pathPoints, diameter, imageKey } = renderObject;
 
     // Pixi.js-legacy with Canvas render type handles advanced render methods poorly

@@ -1,10 +1,11 @@
-import { Application, Point, RENDERER_TYPE, Texture } from 'pixi.js';
+import { Application, Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
 import { PixiRenderApplication } from '..';
 import { DEFAULT_TEXTURE_SIZE, SCREEN_OUTLINE } from '../constants';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { Completion, foldCompletion, Screen, Tubing } from '../interfaces';
+import { Completion, CompletionImage, foldCompletion, Screen, Tubing } from '../interfaces';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { FixedWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
+import { UniformTextureStretchRope } from './CustomDisplayObjects/UniformTextureStretchRope';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
 
 interface TubularRenderingObject {
@@ -15,16 +16,27 @@ interface TubularRenderingObject {
   radius: number;
 }
 
+interface ComponentRenderObject {
+  pathPoints: number[][];
+  diameter: number;
+  imageKey: string;
+}
+
 export interface CompletionLayerOptions<T extends Completion[]> extends WellComponentBaseOptions<T> {
   screenScalingFactor?: number;
   screenLineColor?: number;
   tubingScalingFactor?: number;
+  images?: {
+    [key: string]: string;
+  };
 }
 
 export class CompletionLayer<T extends Completion[]> extends WellboreBaseComponentLayer<T> {
   private screenTextureCache: Texture | undefined = undefined;
 
   private tubingTextureCache: Texture;
+
+  private textureImageCacheArray: { [key: string]: Texture };
 
   constructor(ctx: Application | PixiRenderApplication, id: string, options: CompletionLayerOptions<T>) {
     super(ctx, id, options);
@@ -33,6 +45,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
       screenScalingFactor: 4,
       tubingScalingFactor: 1,
       screenLineColor: 0x63666a,
+      images: {},
       ...options,
     };
     this.render = this.render.bind(this);
@@ -44,17 +57,73 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
     if (wellborePath == null || !this.data?.length) {
       return;
     }
-    const { screenLineColor } = this.options as CompletionLayerOptions<T>;
+
+    const { images } = this.options as CompletionLayerOptions<T>;
+    this.textureImageCacheArray = Object.entries(images).reduce((list: { [key: string]: Texture }, [key, image]: [string, string]) => {
+      list[key] = Texture.from(image);
+      return list;
+    }, {});
     this.data.map(
       foldCompletion(
-        (obj: Screen) => this.drawScreen(obj, screenLineColor),
+        (obj: Screen) => this.drawScreen(obj),
         (obj: Tubing) => this.drawTubing(obj),
+        (obj: CompletionImage) => {
+          const imageRenderObject = this.prepareImageRenderObject(obj);
+          this.drawImageComponent(imageRenderObject);
+        },
       ),
     );
   }
 
-  private drawScreen(screen: Screen, lineColor: number): void {
-    const { exaggerationFactor } = this.options as CompletionLayerOptions<T>;
+  private prepareImageRenderObject = (component: CompletionImage): ComponentRenderObject => {
+    if (component == null) {
+      return;
+    }
+    const { exaggerationFactor } = this.options as WellComponentBaseOptions<T>;
+
+    const diameter = component.diameter * exaggerationFactor;
+
+    const pathPoints = this.getZFactorScaledPathForPoints(component.start, component.end, [component.start, component.end]).map((d) => d.point);
+
+    return {
+      pathPoints,
+      diameter,
+      imageKey: component.imageKey,
+    };
+  };
+
+  private drawImageComponent = (renderObject: ComponentRenderObject): void => {
+    const { pathPoints, diameter, imageKey } = renderObject;
+
+    // Pixi.js-legacy with Canvas render type handles advanced render methods poorly
+    if (this.renderType() === RENDERER_TYPE.CANVAS) {
+      // TODO implement this
+      // this.drawBigPolygon(polygon, solidColor);
+    } else {
+      const texture = this.createImageTexture(imageKey, diameter);
+      this.drawSVGRope(
+        pathPoints.map((p) => new Point(p[0], p[1])),
+        texture,
+      );
+    }
+  };
+
+  private drawSVGRope(path: Point[], texture: Texture): void {
+    if (path.length === 0) {
+      return null;
+    }
+
+    const rope: UniformTextureStretchRope = new UniformTextureStretchRope(texture, path);
+
+    this.addChild(rope);
+  }
+
+  private createImageTexture(imageKey: string, diameter: number): Texture {
+    return new Texture(this.textureImageCacheArray[imageKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, 2);
+  }
+
+  private drawScreen(screen: Screen): void {
+    const { exaggerationFactor, screenLineColor } = this.options as CompletionLayerOptions<T>;
 
     const texture = this.createScreenTexture();
     const { pathPoints, polygon, leftPath, rightPath } = this.createTubularPolygon(screen);
@@ -68,7 +137,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
         screen.diameter,
       );
     }
-    this.drawOutline(leftPath, rightPath, lineColor, SCREEN_OUTLINE * exaggerationFactor, false);
+    this.drawOutline(leftPath, rightPath, screenLineColor, SCREEN_OUTLINE * exaggerationFactor, false);
   }
 
   private drawTubing(tubing: Tubing): void {
