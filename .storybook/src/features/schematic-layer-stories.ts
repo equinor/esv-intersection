@@ -5,10 +5,6 @@ import {
   SchematicLayerOptions,
   SchematicData,
   SchematicLayer,
-  HoleSizeLayerOptions,
-  HoleSize,
-  HoleSizeLayer,
-  Completion,
 } from '../../../src';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
