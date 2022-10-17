@@ -108,7 +108,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
         }
 
         squeezes.forEach((squeeze) => {
-          const shape = {
+          const shape: CementSqueezeShape = {
             segments: this.createCementSqueezeShape(squeeze, sortedCasings, holeSizes),
             casingIds: squeeze.casingIds,
           };
