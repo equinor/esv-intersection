@@ -161,8 +161,8 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       },
     );
 
-    this.textureSymbolCacheArray = Object.entries(symbols).reduce((list: { [key: string]: Texture }, [key, image]: [string, string]) => {
-      list[key] = Texture.from(image);
+    this.textureSymbolCacheArray = Object.entries(symbols).reduce((list: { [key: string]: Texture }, [key, symbol]: [string, string]) => {
+      list[key] = Texture.from(symbol);
       return list;
     }, {});
 
@@ -196,7 +196,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     return {
       pathPoints: pathPoints.map((d) => d.point),
       diameter,
-      symbolKey: component.imageKey,
+      symbolKey: component.symbolKey,
     };
   };
 

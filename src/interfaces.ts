@@ -79,14 +79,14 @@ export interface Casing {
   casingId: string;
 }
 
-export interface ImageComponent {
+interface SymbolComponent {
   diameter: number;
   start: number;
   end: number;
-  imageKey: string;
+  symbolKey: string;
 }
 
-export interface PAndASymbol extends ImageComponent {
+export interface PAndASymbol extends SymbolComponent {
   kind: 'pAndA-symbol';
 }
 
@@ -107,7 +107,7 @@ export interface Tubing extends BaseCompletion {
 
 export interface CompletionSymbol extends BaseCompletion {
   kind: 'completion-symbol';
-  imageKey: string;
+  symbolKey: string;
 }
 
 export type Completion = Tubing | Screen | CompletionSymbol;
