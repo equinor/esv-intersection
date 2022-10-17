@@ -26,7 +26,7 @@ import {
 //Data
 import { seismicColorMap } from '../exampledata';
 
-import { getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks, getCompletion } from '../data';
+import { getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks, getCompletion, getCementSqueezes } from '../data';
 import { Annotation, CasingAndCementData, CasingAndCementLayer, Completion, HoleSize, SchematicLayer } from '../../../src';
 
 export const intersection = () => {
@@ -74,9 +74,10 @@ const renderIntersection = (scaleOptions: any) => {
     getHolesize(),
     getCement(),
     getPicks(),
+    getCementSqueezes(),
   ];
   Promise.all(promises).then((values) => {
-    const [path, completion, seismic, surfaces, stratColumns, casings, holeSizes, cement, picks] = values;
+    const [path, completion, seismic, surfaces, stratColumns, casings, holeSizes, cement, picks, cementSqueezes] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
     referenceSystem.offset = path[0][2]; // Offset should be md at start of path
     const displacement = referenceSystem.displacement || 1;

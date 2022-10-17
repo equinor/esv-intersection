@@ -137,6 +137,12 @@ export interface Cement {
   casingId?: string;
 }
 
+export interface CementSqueeze {
+  top: number;
+  bottom: number;
+  casingIds?: string[];
+}
+
 export interface MDPoint {
   point: number[];
   normal?: Vector2;

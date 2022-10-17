@@ -1,8 +1,12 @@
 import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
-import { createComplexRopeSegmentsForCement, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { Casing, Cement, HoleSize } from '../interfaces';
+import {
+  createComplexRopeSegmentsForCement,
+  makeTubularPolygon,
+  createComplexRopeSegmentsForCementSqueeze,
+} from '../datautils/wellboreItemShapeGenerator';
+import { Casing, Cement, CementSqueeze, HoleSize } from '../interfaces';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
@@ -29,6 +33,7 @@ export interface CasingAndCementData {
   holeSizes: HoleSize[];
   casings: Casing[];
   cements: Cement[];
+  cementSqueezes: CementSqueeze[];
 }
 
 export interface CasingAndCementLayerOptions<T extends CasingAndCementData> extends WellComponentBaseOptions<T> {
@@ -36,6 +41,8 @@ export interface CasingAndCementLayerOptions<T extends CasingAndCementData> exte
   casingLineColor?: number;
   firstCementColor?: string;
   secondCementColor?: string;
+  firstCementSqueezeColor?: string;
+  secondCementSqueezeColor?: string;
   casingShoeSize?: CasingShoeSize;
   cementTextureScalingFactor?: number;
   exaggerationFactor?: number;
@@ -50,9 +57,15 @@ interface CementShape {
   casingIds: string[];
 }
 
+interface CementSqueezeShape {
+  segments: ComplexRopeSegment[];
+  casingIds: string[];
+}
+
 export class CasingAndCementLayer<T extends CasingAndCementData> extends WellboreBaseComponentLayer<T> {
   private casingVisibility = true;
   private cementVisibility = true;
+  private _cementSqueezeTextureCache: Texture = null;
 
   constructor(ctx: PixiRenderApplication, id?: string, options?: CasingAndCementLayerOptions<T>) {
     super(ctx, id, options);
@@ -64,6 +77,8 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
       cementTextureScalingFactor: 4,
       firstCementColor: '#c7b9ab',
       secondCementColor: '#5b5b5b',
+      firstCementSqueezeColor: 'rgb(139, 69, 19)',
+      secondCementSqueezeColor: 'rgb(139, 103, 19)',
       ...options,
     };
   }
@@ -73,8 +88,12 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
       return;
     }
 
-    const { holeSizes, casings, cements } = this.data;
+    const { holeSizes, casings, cements, cementSqueezes } = this.data;
 
+    console.log({ data: this.data });
+
+    // cement does not have enough data on its own to render it, so we add the bottom here
+    // cementSqueeze does not need to have such a thing added since it comes with it's own top and bottom
     const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
     const casingRenderObjects: CasingRenderObject[] = sortedCasings.map(this.prepareCasingRenderObject);
     const cementShapes: CementShape[] = cements.map(
@@ -83,6 +102,15 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
         casingIds: [cement.casingId, ...(cement.casingIds || [])].filter((id) => id),
       }),
     );
+
+    const CEMENT_SQUEEZE_SHAPES: CementSqueezeShape[] = cementSqueezes.map((squeeze: CementSqueeze) => {
+      return {
+        segments: this.createCementSqueezeShape(squeeze, sortedCasings, holeSizes),
+        casingIds: squeeze.casingIds,
+      };
+    });
+
+    console.log({ CEMENT_SQUEEZE_SHAPES });
 
     this.pairCementAndCasingRenderObjects(casingRenderObjects, cementShapes).forEach(
       ([cementShape, casingRenderObject]: [CementShape | undefined, CasingRenderObject]) => {
@@ -96,6 +124,10 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
         }
       },
     );
+
+    CEMENT_SQUEEZE_SHAPES.forEach((squeeze) => {
+      this.drawComplexRope(squeeze.segments, this.createCementSqueezeTexture());
+    });
   }
 
   private pairCementAndCasingRenderObjects(
@@ -219,6 +251,11 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     return createComplexRopeSegmentsForCement(cement, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };
 
+  createCementSqueezeShape = (squeeze: CementSqueeze, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
+    const { exaggerationFactor } = this.options as CasingAndCementLayerOptions<T>;
+    return createComplexRopeSegmentsForCementSqueeze(squeeze, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
+  };
+
   private createCementTexture(): Texture {
     if (this._textureCache) {
       return this._textureCache;
@@ -250,6 +287,40 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     this._textureCache = Texture.from(canvas);
 
     return this._textureCache;
+  }
+
+  private createCementSqueezeTexture(): Texture {
+    if (this._cementSqueezeTextureCache) {
+      return this._cementSqueezeTextureCache;
+    }
+
+    const { firstCementSqueezeColor, secondCementSqueezeColor, cementTextureScalingFactor } = this.options as CasingAndCementLayerOptions<T>;
+
+    const canvas = document.createElement('canvas');
+
+    const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+    const lineWidth = cementTextureScalingFactor;
+    canvas.width = size;
+    canvas.height = size;
+    const canvasCtx = canvas.getContext('2d');
+
+    canvasCtx.fillStyle = firstCementSqueezeColor;
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    canvasCtx.lineWidth = lineWidth;
+    canvasCtx.fillStyle = secondCementSqueezeColor;
+    canvasCtx.beginPath();
+
+    canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
+    const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+    for (let i = -canvas.width; i < canvas.width; i++) {
+      canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
+    }
+    canvasCtx.stroke();
+
+    this._cementSqueezeTextureCache = Texture.from(canvas);
+
+    return this._cementSqueezeTextureCache;
   }
 
   getInternalLayerIds(): string[] {

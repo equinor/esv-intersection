@@ -8,6 +8,7 @@ import {
   stratColumns,
   picks,
   seismic,
+  cementSqueezes,
 } from './esv-intersection-data';
 
 export const getWellborePath = (): Promise<any> => {
@@ -51,5 +52,9 @@ export const getPicks = (): Promise<any[]> => {
   return Promise.resolve(picks);
 };
 
+export const getCementSqueezes = (): Promise<typeof cementSqueezes[]> => {
+  return Promise.resolve(cementSqueezes)
+}
+
 // Nothing for mock
-export const fetchData = async (fileName: string) => {};
+export const fetchData = async (fileName: string) => { };
