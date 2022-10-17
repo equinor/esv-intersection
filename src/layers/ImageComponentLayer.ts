@@ -1,4 +1,4 @@
-import { Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
+import { Point, Rectangle, RENDERER_TYPE, Texture, groupD8 } from 'pixi.js';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
 import { ImageComponent, PixiRenderApplication } from '..';
 import { UniformTextureStretchRope } from './CustomDisplayObjects/UniformTextureStretchRope';
@@ -90,7 +90,7 @@ export class ImageComponentLayer<T extends ImageComponent[]> extends WellboreBas
   }
 
   createTexture(imageKey: string, diameter: number): Texture {
-    return new Texture(this._textureCacheArray[imageKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, 2);
+    return new Texture(this._textureCacheArray[imageKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, groupD8.MAIN_DIAGONAL);
   }
 
   getInternalLayerIds(): string[] {
