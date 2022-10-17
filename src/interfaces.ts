@@ -86,11 +86,11 @@ export interface ImageComponent {
   imageKey: string;
 }
 
-export interface PNAImage extends ImageComponent {
-  kind: 'image';
+export interface PAndASymbol extends ImageComponent {
+  kind: 'pAndA-symbol';
 }
 
-export type PlugAndAbandonment = PNAImage;
+export type PAndA = PAndASymbol;
 
 interface BaseCompletion {
   diameter: number;
@@ -105,23 +105,23 @@ export interface Tubing extends BaseCompletion {
   kind: 'tubing';
 }
 
-export interface CompletionImage extends BaseCompletion {
-  kind: 'image';
+export interface CompletionSymbol extends BaseCompletion {
+  kind: 'completion-symbol';
   imageKey: string;
 }
 
-export type Completion = Tubing | Screen | CompletionImage;
+export type Completion = Tubing | Screen | CompletionSymbol;
 
 export const foldCompletion =
-  <T>(fScreen: (obj: Screen) => T, fTubing: (obj: Tubing) => T, fImage: (obj: CompletionImage) => T) =>
+  <T>(fScreen: (obj: Screen) => T, fTubing: (obj: Tubing) => T, fSymbol: (obj: CompletionSymbol) => T) =>
   (completion: Completion): T => {
     switch (completion.kind) {
       case 'screen':
         return fScreen(completion);
       case 'tubing':
         return fTubing(completion);
-      case 'image':
-        return fImage(completion);
+      case 'completion-symbol':
+        return fSymbol(completion);
       default:
         return assertNever(completion);
     }

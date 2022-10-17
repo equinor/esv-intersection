@@ -3,7 +3,7 @@ import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import { createComplexRopeSegmentsForCement, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { Casing, Cement, Completion, foldCompletion, HoleSize, Tubing, Screen, CompletionImage, PlugAndAbandonment, PNAImage } from '../interfaces';
+import { Casing, Cement, Completion, foldCompletion, HoleSize, Tubing, Screen, CompletionSymbol, PAndA, PAndASymbol } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
@@ -28,10 +28,10 @@ const createGradientFill = (
   return gradient;
 };
 
-interface ImageRenderObject {
+interface SymbolRenderObject {
   pathPoints: number[][];
   diameter: number;
-  imageKey: string;
+  symbolKey: string;
 }
 
 interface CementShape {
@@ -70,8 +70,8 @@ export interface SchematicData {
   casings: Casing[];
   cements: Cement[];
   completion: Completion[];
-  plugAndAbandonment: PlugAndAbandonment[];
-  images: {
+  pAndA: PAndA[];
+  symbols: {
     [key: string]: string;
   };
 }
@@ -103,7 +103,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   private holeTextureCache: Texture;
   private screenTextureCache: Texture;
   private tubingTextureCache: Texture;
-  private textureImageCacheArray: { [key: string]: Texture };
+  private textureSymbolCacheArray: { [key: string]: Texture };
 
   private maxDiameter: number;
 
@@ -132,7 +132,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       return;
     }
 
-    const { holeSizes, casings, cements, completion, images, plugAndAbandonment } = this.data;
+    const { holeSizes, casings, cements, completion, symbols, pAndA } = this.data;
 
     // eslint-disable-next-line max-len
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
@@ -161,7 +161,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       },
     );
 
-    this.textureImageCacheArray = Object.entries(images).reduce((list: { [key: string]: Texture }, [key, image]: [string, string]) => {
+    this.textureSymbolCacheArray = Object.entries(symbols).reduce((list: { [key: string]: Texture }, [key, image]: [string, string]) => {
       list[key] = Texture.from(image);
       return list;
     }, {});
@@ -170,20 +170,20 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       foldCompletion(
         (obj: Screen) => this.drawScreen(obj),
         (obj: Tubing) => this.drawTubing(obj),
-        (obj: CompletionImage) => {
-          const imageRenderObject = this.prepareImageRenderObject(obj);
-          this.drawImageComponent(imageRenderObject);
+        (obj: CompletionSymbol) => {
+          const symbolRenderObject = this.prepareSymbolRenderObject(obj);
+          this.drawSymbolComponent(symbolRenderObject);
         },
       ),
     );
 
-    plugAndAbandonment.forEach((obj: PNAImage) => {
-      const imageRenderObject = this.prepareImageRenderObject(obj);
-      this.drawImageComponent(imageRenderObject);
+    pAndA.forEach((obj: PAndASymbol) => {
+      const symbolRenderObject = this.prepareSymbolRenderObject(obj);
+      this.drawSymbolComponent(symbolRenderObject);
     });
   }
 
-  private prepareImageRenderObject = (component: CompletionImage | PNAImage): ImageRenderObject => {
+  private prepareSymbolRenderObject = (component: CompletionSymbol | PAndASymbol): SymbolRenderObject => {
     if (component == null) {
       return;
     }
@@ -196,19 +196,19 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     return {
       pathPoints: pathPoints.map((d) => d.point),
       diameter,
-      imageKey: component.imageKey,
+      symbolKey: component.imageKey,
     };
   };
 
-  private drawImageComponent = (renderObject: ImageRenderObject): void => {
-    const { pathPoints, diameter, imageKey } = renderObject;
+  private drawSymbolComponent = (renderObject: SymbolRenderObject): void => {
+    const { pathPoints, diameter, symbolKey } = renderObject;
 
     // Pixi.js-legacy with Canvas render type handles advanced render methods poorly
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       // TODO implement this
       // this.drawBigPolygon(polygon, solidColor);
     } else {
-      const texture = this.createImageTexture(imageKey, diameter);
+      const texture = this.createSymbolTexture(symbolKey, diameter);
       this.drawSVGRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
@@ -226,8 +226,8 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.addChild(rope);
   }
 
-  private createImageTexture(imageKey: string, diameter: number): Texture {
-    return new Texture(this.textureImageCacheArray[imageKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, 2);
+  private createSymbolTexture(symbolKey: string, diameter: number): Texture {
+    return new Texture(this.textureSymbolCacheArray[symbolKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, 2);
   }
 
   private drawHoleSize = (holeObject: HoleSize): void => {

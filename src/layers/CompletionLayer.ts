@@ -2,7 +2,7 @@ import { Application, Point, Rectangle, RENDERER_TYPE, Texture } from 'pixi.js';
 import { PixiRenderApplication } from '..';
 import { DEFAULT_TEXTURE_SIZE, SCREEN_OUTLINE } from '../constants';
 import { makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { Completion, CompletionImage, foldCompletion, Screen, Tubing } from '../interfaces';
+import { Completion, CompletionSymbol, foldCompletion, Screen, Tubing } from '../interfaces';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 import { FixedWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
 import { UniformTextureStretchRope } from './CustomDisplayObjects/UniformTextureStretchRope';
@@ -67,7 +67,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
       foldCompletion(
         (obj: Screen) => this.drawScreen(obj),
         (obj: Tubing) => this.drawTubing(obj),
-        (obj: CompletionImage) => {
+        (obj: CompletionSymbol) => {
           const imageRenderObject = this.prepareImageRenderObject(obj);
           this.drawImageComponent(imageRenderObject);
         },
@@ -75,7 +75,7 @@ export class CompletionLayer<T extends Completion[]> extends WellboreBaseCompone
     );
   }
 
-  private prepareImageRenderObject = (component: CompletionImage): ComponentRenderObject => {
+  private prepareImageRenderObject = (component: CompletionSymbol): ComponentRenderObject => {
     if (component == null) {
       return;
     }
