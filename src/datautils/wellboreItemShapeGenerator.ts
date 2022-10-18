@@ -1,5 +1,5 @@
 import { IPoint, Point } from 'pixi.js';
-import { Cement, Casing, HoleSize, MDPoint, CementSqueeze } from '..';
+import { Cement, Casing, HoleSize, MDPoint, CementSqueeze, CementPlug } from '..';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 
 export const getEndLines = (
@@ -85,6 +85,21 @@ export const findCementOuterDiameterAtDepth = (innerCasing: Casing[], nonAttache
   return defaultCementWidth;
 };
 
+export const findCementInnerDiameterAtDepth = (innerCasing: Casing[], _nonAttachedCasings: Casing[], holes: HoleSize[], depth: number): number => {
+  const innerCasingAtDepth = innerCasing.find((casing) => casing.start <= depth && casing.end >= depth);
+  const innerDiameter = innerCasingAtDepth ? innerCasingAtDepth.innerDiameter : 0;
+
+  const holeAtDepth = holes.find((hole) => hole.start <= depth && hole.end >= depth && hole.diameter > innerDiameter);
+
+  if (innerCasingAtDepth) {
+    return innerDiameter;
+  }
+
+  if (holeAtDepth) {
+    return holeAtDepth.diameter;
+  }
+};
+
 export const createComplexRopeSegmentsForCement = (
   cement: Cement,
   casings: Casing[],
@@ -98,7 +113,7 @@ export const createComplexRopeSegmentsForCement = (
 
   const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement data, cement is missing attached casing');
+    throw new Error('Invalid cement plug data, cement plug is missing attached casing');
   }
 
   const topOfCement = cement.toc;
@@ -158,6 +173,26 @@ export const cementSqueezeDiameterChangeDepths = (
   return uniqDepths.sort((a: number, b: number) => a - b);
 };
 
+export const cementPlugDiameterChangeDepths = (
+  plug: CementPlug,
+  diameterIntervals: {
+    start: number;
+    end: number;
+  }[],
+): number[] => {
+  const { top: topOfCement, bottom: bottomOfCement } = plug;
+
+  const diameterChangeDepths = diameterIntervals.flatMap((d) => [d.start, d.end]);
+  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfCement && d <= bottomOfCement); // trim
+
+  trimmedChangedDepths.push(topOfCement);
+  trimmedChangedDepths.push(bottomOfCement);
+
+  const uniqDepths = uniq(trimmedChangedDepths);
+
+  return uniqDepths.sort((a: number, b: number) => a - b);
+};
+
 export const createComplexRopeSegmentsForCementSqueeze = (
   squeeze: CementSqueeze,
   casings: Casing[],
@@ -187,7 +222,59 @@ export const createComplexRopeSegmentsForCementSqueeze = (
     }
 
     const nextDepth = list[index - 1];
+
     const diameter = findCementOuterDiameterAtDepth(attachedCasings, outerCasings, overlappingHoles, depth) * exaggerationFactor;
+
+    return [{ top: nextDepth, bottom: depth, diameter }];
+  });
+
+  const ropeSegments = diameterIntervals.map((interval) => {
+    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
+    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+
+    return {
+      diameter: interval.diameter,
+      points,
+    };
+  });
+
+  return ropeSegments;
+};
+
+export const createComplexRopeSegmentsForCementPlug = (
+  plug: CementPlug,
+  casings: Casing[],
+  holes: HoleSize[],
+  exaggerationFactor: number,
+  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+): ComplexRopeSegment[] => {
+  const { casingId, secondCasingId, top: topOfCementPlug, bottom: bottomOfCementPlug } = plug;
+
+  const attachedCasings = [casings.find((c) => c.casingId === casingId), casings.find((c) => c.casingId === secondCasingId)].filter((c) => c);
+  if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
+    throw new Error('Invalid cement data, cement is missing attached casing');
+  }
+  console.log({ attachedCasings });
+  const { overlappingHoles } = findIntersectingItems(topOfCementPlug, bottomOfCementPlug, attachedCasings, casings, holes);
+  console.log({ attachedCasings, overlappingHoles });
+  const innerDiameterIntervals = [...attachedCasings, ...overlappingHoles].map((d) => ({
+    start: d.start,
+    end: d.end,
+  }));
+
+  const changeDepths = cementPlugDiameterChangeDepths(plug, innerDiameterIntervals);
+
+  console.log({ changeDepths });
+
+  const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
+    if (index === 0) {
+      return [];
+    }
+
+    const nextDepth = list[index - 1];
+    const diameter = findCementInnerDiameterAtDepth(attachedCasings, attachedCasings, overlappingHoles, depth) * exaggerationFactor;
+
+    console.log({ diameter });
 
     return [{ top: nextDepth, bottom: depth, diameter }];
   });

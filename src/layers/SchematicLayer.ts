@@ -5,6 +5,7 @@ import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLIN
 import {
   createComplexRopeSegmentsForCement,
   createComplexRopeSegmentsForCementSqueeze,
+  createComplexRopeSegmentsForCementPlug,
   makeTubularPolygon,
 } from '../datautils/wellboreItemShapeGenerator';
 import {
@@ -20,6 +21,7 @@ import {
   PAndASymbol,
   CementSqueeze,
   isCementSqueeze,
+  CementPlug,
 } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
@@ -117,6 +119,8 @@ export interface SchematicLayerOptions<T extends SchematicData> extends WellComp
     casingId: string;
     cementId: string;
   };
+  firstCementPlugColor?: string;
+  secondCementPlugColor?: string;
 }
 
 export class SchematicLayer<T extends SchematicData> extends WellboreBaseComponentLayer<T> {
@@ -125,6 +129,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
 
   private cementTextureCache: Texture;
   private cementSqueezeTextureCache: Texture;
+  private cementPlugTextureCache: Texture;
   private holeTextureCache: Texture;
   private screenTextureCache: Texture;
   private tubingTextureCache: Texture;
@@ -150,6 +155,8 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       screenScalingFactor: 4,
       tubingScalingFactor: 1,
       screenLineColor: 0x63666a,
+      firstCementPlugColor: 'rgb(199,185,171)',
+      secondCementPlugColor: 'rgb(199,185,171)',
       ...options,
     };
   }
@@ -218,10 +225,69 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       ),
     );
 
-    remainingPAndA.forEach((obj: PAndASymbol) => {
-      const symbolRenderObject = this.prepareSymbolRenderObject(obj);
-      this.drawSymbolComponent(symbolRenderObject);
+    remainingPAndA.forEach((obj) => {
+      if (obj.kind === 'pAndA-symbol') {
+        const symbolRenderObject = this.prepareSymbolRenderObject(obj);
+        this.drawSymbolComponent(symbolRenderObject);
+      }
+      if (obj.kind === 'cementPlug') {
+        const cementPlugSegments = this.createCementPlugShape(obj, casings, holeSizes);
+        this.drawComplexRope(cementPlugSegments, this.createCementPlugTexture());
+      }
     });
+  }
+
+  private createCementPlugTexture(): Texture {
+    if (this.cementPlugTextureCache) {
+      return this.cementPlugTextureCache;
+    }
+
+    const { firstCementPlugColor, secondCementPlugColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
+
+    const canvas = document.createElement('canvas');
+
+    const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+    const lineWidth = cementTextureScalingFactor;
+    canvas.width = size;
+    canvas.height = size;
+    const canvasCtx = canvas.getContext('2d');
+
+    canvasCtx.fillStyle = firstCementPlugColor;
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    canvasCtx.lineWidth = lineWidth;
+    canvasCtx.fillStyle = secondCementPlugColor;
+    canvasCtx.beginPath();
+
+    canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
+    const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+    for (let i = -canvas.width; i < canvas.width; i++) {
+      canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
+    }
+    canvasCtx.stroke();
+
+    canvasCtx.setLineDash([]);
+    canvasCtx.strokeStyle = '#000';
+    canvasCtx.lineWidth = 10;
+
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, 0);
+    canvasCtx.lineTo(canvas.width, 0);
+    canvasCtx.stroke();
+
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, canvas.height);
+    canvasCtx.lineTo(canvas.width, canvas.height);
+    canvasCtx.stroke();
+
+    this.cementPlugTextureCache = Texture.from(canvas);
+
+    return this.cementPlugTextureCache;
+  }
+
+  private createCementPlugShape(plug: CementPlug, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] {
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+    return createComplexRopeSegmentsForCementPlug(plug, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   }
 
   private prepareSymbolRenderObject = (component: CompletionSymbol | PAndASymbol): SymbolRenderObject => {
