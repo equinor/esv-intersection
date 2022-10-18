@@ -84,7 +84,7 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
   }
 
   preRender(): void {
-    if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
+    if (!this.data || !this.referenceSystem) {
       return;
     }
 
@@ -156,9 +156,8 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     const radius = diameter / 2;
     const innerRadius = innerDiameter / 2;
 
-    const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end]);
+    const pathPoints = this.getZFactorScaledPathForPoints(casing.start, casing.end);
 
-    const pathPoints = path.map((p) => p.point);
     const normals = createNormals(pathPoints);
     const rightPath = offsetPoints(pathPoints, normals, radius);
     const leftPath = offsetPoints(pathPoints, normals, -radius);
@@ -230,9 +229,8 @@ export class CasingAndCementLayer<T extends CasingAndCementData> extends Wellbor
     const start = casingEnd - length;
     const end = casingEnd;
 
-    const path = this.getZFactorScaledPathForPoints(start, end, [start, end]);
+    const points = this.getZFactorScaledPathForPoints(start, end);
 
-    const points = path.map((p) => p.point);
     const normal = createNormals(points);
     const shoeEdge: Point[] = offsetPoints(points, normal, casingRadius * (width < 0 ? -1 : 1));
 

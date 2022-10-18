@@ -123,7 +123,7 @@ export const createComplexRopeSegmentsForCement = (
   casings: Casing[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+  getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
   // Merge deprecated casingId and casingIds array
   // TODO remove casingId now?
@@ -159,8 +159,8 @@ export const createComplexRopeSegmentsForCement = (
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
-    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
-    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+    const segmentPoints = getPoints(interval.top, interval.bottom);
+    const points = segmentPoints.map(([x, y]) => new Point(x, y));
 
     return {
       diameter: interval.diameter,
@@ -216,7 +216,7 @@ export const createComplexRopeSegmentsForCementSqueeze = (
   casings: Casing[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+  getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
   const { casingIds, top: topOfCement, bottom: bottomOfCement } = squeeze;
 
@@ -247,8 +247,8 @@ export const createComplexRopeSegmentsForCementSqueeze = (
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
-    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
-    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+    const segmentPoints = getPoints(interval.top, interval.bottom);
+    const points = segmentPoints.map(([x, y]) => new Point(x, y));
 
     return {
       diameter: interval.diameter,
@@ -409,26 +409,25 @@ export const createTubularPolygon = (
   diameter: number,
   start: number,
   end: number,
-  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+  getPoints: (start: number, end: number) => [number, number][],
 ): TubularRenderingObject => {
   const exaggeratedDiameter = diameter * exaggerationFactor;
 
-  const radius = exaggeratedDiameter / 2;
+  const exaggeratedRadius = exaggeratedDiameter / 2;
 
-  const path = getPoints(start, end, [start, end]);
+  const pathPoints = getPoints(start, end);
 
-  const pathPoints = path.map((p) => p.point);
   const normals = createNormals(pathPoints);
-  const rightPath = offsetPoints(pathPoints, normals, radius);
-  const leftPath = offsetPoints(pathPoints, normals, -radius);
+  const rightPath = offsetPoints(pathPoints, normals, exaggeratedRadius);
+  const leftPath = offsetPoints(pathPoints, normals, -exaggeratedRadius);
 
   const polygon = makeTubularPolygon(leftPath, rightPath);
 
-  return { pathPoints, polygon, leftPath, rightPath, diameter: exaggeratedDiameter, radius };
+  return { pathPoints, polygon, leftPath, rightPath, diameter: exaggeratedDiameter, radius: exaggeratedRadius };
 };
 
 export const prepareCasingRenderObject =
-  (exaggerationFactor: number, getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[]) =>
+  (exaggerationFactor: number, getPoints: (start: number, end: number) => [number, number][]) =>
   (casing: Casing): CasingRenderObject => {
     const renderObject = createTubularPolygon(exaggerationFactor, casing.diameter, casing.start, casing.end, getPoints);
     const exaggeratedInnerDiameter = casing.innerDiameter * exaggerationFactor;

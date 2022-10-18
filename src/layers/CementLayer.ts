@@ -27,7 +27,7 @@ export class CementLayer<T extends CementData> extends WellboreBaseComponentLaye
   }
 
   preRender(): void {
-    if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
+    if (!this.data || !this.referenceSystem) {
       return;
     }
 

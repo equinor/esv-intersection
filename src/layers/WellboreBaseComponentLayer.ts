@@ -2,23 +2,25 @@ import { Graphics, Texture, Point, SimpleRope, Application } from 'pixi.js';
 import { PixiLayer, PixiRenderApplication } from './base/PixiLayer';
 import { OnUpdateEvent, OnRescaleEvent, MDPoint, OnUnmountEvent } from '../interfaces';
 import { LayerOptions } from './base';
+import { scaleLinear, ScaleLinear } from 'd3-scale';
 
 export interface WellComponentBaseOptions<T> extends LayerOptions<T> {
   exaggerationFactor?: number;
-  defaultZFactor?: number;
 }
 
 export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
   _textureCache: Texture;
-
-  rescaleEvent: OnRescaleEvent;
+  scalingFactors = {
+    height: 800,
+    zFactor: 1,
+    yScale: scaleLinear(),
+  };
 
   constructor(ctx: Application | PixiRenderApplication, id?: string, options?: WellComponentBaseOptions<T>) {
     super(ctx, id, options);
     this.options = {
       ...this.options,
       exaggerationFactor: 2,
-      defaultZFactor: 1,
       ...options,
     };
     this.render = this.render.bind(this);
@@ -29,7 +31,6 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
   onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
     this._textureCache = null;
-    this.rescaleEvent = null;
   }
 
   onUpdate(event: OnUpdateEvent<T>): void {
@@ -40,9 +41,9 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
   }
 
   override onRescale(event: OnRescaleEvent): void {
-    const shouldRecalculate = this.rescaleEvent?.zFactor !== event.zFactor;
+    const shouldRecalculate = this.scalingFactors.zFactor !== event.zFactor;
 
-    this.rescaleEvent = event;
+    this.scalingFactors = { height: event.height, zFactor: event.zFactor, yScale: event.yScale };
     super.optionsRescale(event);
     const yRatio = this.yRatio();
     const flippedX = event.xBounds[0] > event.xBounds[1];
@@ -62,11 +63,11 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
    * TODO consider to move this into ZoomPanHandler
    */
   yRatio(): number {
-    const domain = this.rescaleEvent.yScale.domain();
+    const domain = this.scalingFactors.yScale.domain();
     const ySpan = domain[1] - domain[0];
-    const baseYSpan = ySpan * this.rescaleEvent.zFactor;
+    const baseYSpan = ySpan * this.scalingFactors.zFactor;
     const baseDomain = [domain[0], domain[0] + baseYSpan];
-    return Math.abs(this.rescaleEvent.height / (baseDomain[1] - baseDomain[0]));
+    return Math.abs(this.scalingFactors.height / (baseDomain[1] - baseDomain[0]));
   }
 
   getMdPoint = (md: number): MDPoint => {
@@ -75,40 +76,20 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
     return point;
   };
 
-  getPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
-    const pathPoints = this.referenceSystem.getCurtainPath(start, end);
+  getZFactorScaledPathForPoints = (start: number, end: number): [number, number][] => {
+    const y = (y: number): number => y * this.scalingFactors.zFactor;
 
-    // Filter duplicate points
-    const uniqueInterestPoints = interestPoints.filter((ip) => !pathPoints.some((p) => p.md === ip));
-    const interestMdPoints = uniqueInterestPoints.map(this.getMdPoint);
-
-    const points = [...pathPoints, ...interestMdPoints];
-    points.sort((a, b) => a.md - b.md);
-
-    return points;
+    const path = this.referenceSystem.getCurtainPath(start, end, true);
+    return path.map((p) => [p.point[0], y(p.point[1])]);
   };
 
-  getZFactorScaledPathForPoints = (start: number, end: number, interestPoints: number[]): MDPoint[] => {
-    const { defaultZFactor } = this.options as WellComponentBaseOptions<T>;
-    const zFactor = this.rescaleEvent?.zFactor ?? defaultZFactor;
-    const y = (y: number): number => y * zFactor;
-
-    const path = this.getPathForPoints(start, end, interestPoints);
-    return path.map((p) => ({
-      point: [p.point[0], y(p.point[1])],
-      md: p.md,
-    }));
-  };
-
-  drawBigPolygon = (coords: Point[], color = 0x000000): Graphics => {
+  drawBigPolygon = (coords: Point[], color = 0x000000) => {
     const polygon = new Graphics();
     polygon.beginFill(color);
     polygon.drawPolygon(coords);
     polygon.endFill();
 
     this.addChild(polygon);
-
-    return polygon;
   };
 
   drawBigTexturedPolygon = (coords: Point[], t: Texture): Graphics => {

@@ -8,8 +8,8 @@ export const EXAGGERATED_DIAMETER = 100;
 export const HOLE_OUTLINE = 0.6;
 export const SCREEN_OUTLINE = 0.3;
 
-export const SHOE_WIDTH = 25;
-export const SHOE_LENGTH = 12;
+export const SHOE_WIDTH = 8;
+export const SHOE_LENGTH = 24;
 
 export const DEFAULT_TEXTURE_SIZE = 64;
 

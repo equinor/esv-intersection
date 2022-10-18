@@ -49,7 +49,7 @@ export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLa
   preRender(): void {
     const { data } = this;
 
-    if (!data || !this.rescaleEvent || !this.referenceSystem) {
+    if (!data || !this.referenceSystem) {
       return;
     }
 
@@ -68,8 +68,7 @@ export class HoleSizeLayer<T extends HoleSize[]> extends WellboreBaseComponentLa
     const diameter = holeObject.diameter * exaggerationFactor;
     const radius = diameter / 2;
 
-    const path = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end, [holeObject.start, holeObject.end]);
-    const pathPoints = path.map((p) => p.point);
+    const pathPoints = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end);
     const normals = createNormals(pathPoints);
 
     const rightPath = offsetPoints(pathPoints, normals, radius);

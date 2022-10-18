@@ -147,7 +147,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   }
 
   preRender(): void {
-    if (!this.data || !this.rescaleEvent || !this.referenceSystem) {
+    if (!this.data || !this.referenceSystem) {
       return;
     }
 
@@ -289,10 +289,10 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
 
     const diameter = component.diameter * exaggerationFactor;
 
-    const pathPoints = this.getZFactorScaledPathForPoints(component.start, component.end, [component.start, component.end]);
+    const pathPoints = this.getZFactorScaledPathForPoints(component.start, component.end);
 
     return {
-      pathPoints: pathPoints.map((d) => d.point),
+      pathPoints,
       diameter,
       symbolKey: component.symbolKey,
     };
@@ -338,8 +338,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     const diameter = holeObject.diameter * exaggerationFactor;
     const radius = diameter / 2;
 
-    const path = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end, [holeObject.start, holeObject.end]);
-    const pathPoints = path.map((p) => p.point);
+    const pathPoints = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end);
     const normals = createNormals(pathPoints);
 
     const rightPath = offsetPoints(pathPoints, normals, radius);
@@ -466,15 +465,14 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     const start = casingEnd - length;
     const end = casingEnd;
 
-    const path = this.getZFactorScaledPathForPoints(start, end, [start, end]);
+    const points = this.getZFactorScaledPathForPoints(start, end);
 
-    const points = path.map((p) => p.point);
     const normal = createNormals(points);
     const shoeEdge: Point[] = offsetPoints(points, normal, casingRadius * (width < 0 ? -1 : 1));
 
     const shoeTipPoint = points[points.length - 1];
     const shoeTipNormal = normal[normal.length - 1];
-    const shoeTip: Point = offsetPoint(shoeTipPoint, shoeTipNormal, width);
+    const shoeTip: Point = offsetPoint(shoeTipPoint, shoeTipNormal, width + casingRadius * (width < 0 ? -1 : 1));
 
     return [...shoeEdge, shoeTip];
   };
