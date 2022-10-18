@@ -8,9 +8,15 @@ export interface WellComponentBaseOptions<T> extends LayerOptions<T> {
   exaggerationFactor?: number;
 }
 
+interface ScalingFactors {
+  height: number;
+  zFactor: number;
+  yScale: ScaleLinear<number, number, never>;
+}
+
 export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
-  _textureCache: Texture;
-  scalingFactors = {
+  _textureCache: Texture; // TODO remove once the inheriting layers reduced to SchematicLayer
+  protected scalingFactors: ScalingFactors = {
     height: 800,
     zFactor: 1,
     yScale: scaleLinear(),

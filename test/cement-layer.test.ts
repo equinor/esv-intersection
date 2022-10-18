@@ -78,15 +78,9 @@ describe('CementLayer', () => {
   });
 
   describe('createComplexRopeSegmentsForCement', () => {
-    const getMockPoints = (start: number, end: number) => [
-      {
-        point: [0, start],
-        md: start,
-      },
-      {
-        point: [0, end],
-        md: end,
-      },
+    const getMockPoints = (start: number, end: number): [number, number][] => [
+      [0, start],
+      [0, end],
     ];
 
     it('Give correct diameter for data set 1', () => {

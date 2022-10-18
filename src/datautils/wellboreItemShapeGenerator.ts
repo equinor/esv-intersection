@@ -9,8 +9,8 @@ export interface TubularRenderingObject {
   polygon: Point[];
   leftPath: Point[];
   rightPath: Point[];
-  diameter: number;
-  radius: number;
+  referenceDiameter: number;
+  referenceRadius: number;
 }
 
 export interface CasingRenderObject extends TubularRenderingObject {
@@ -404,42 +404,31 @@ export const createCementTexture = (firstColor: string, secondColor: string, sca
   return Texture.from(canvas);
 };
 
-export const createTubularPolygon = (
-  exaggerationFactor: number,
-  diameter: number,
-  start: number,
-  end: number,
-  getPoints: (start: number, end: number) => [number, number][],
-): TubularRenderingObject => {
-  const exaggeratedDiameter = diameter * exaggerationFactor;
-
-  const exaggeratedRadius = exaggeratedDiameter / 2;
-
-  const pathPoints = getPoints(start, end);
+export const createTubularPolygon = (diameter: number, pathPoints: [number, number][]): TubularRenderingObject => {
+  const radius = diameter / 2;
 
   const normals = createNormals(pathPoints);
-  const rightPath = offsetPoints(pathPoints, normals, exaggeratedRadius);
-  const leftPath = offsetPoints(pathPoints, normals, -exaggeratedRadius);
+  const rightPath = offsetPoints(pathPoints, normals, radius);
+  const leftPath = offsetPoints(pathPoints, normals, -radius);
 
   const polygon = makeTubularPolygon(leftPath, rightPath);
 
-  return { pathPoints, polygon, leftPath, rightPath, diameter: exaggeratedDiameter, radius: exaggeratedRadius };
+  return { pathPoints, polygon, leftPath, rightPath, referenceDiameter: diameter, referenceRadius: radius };
 };
 
-export const prepareCasingRenderObject =
-  (exaggerationFactor: number, getPoints: (start: number, end: number) => [number, number][]) =>
-  (casing: Casing): CasingRenderObject => {
-    const renderObject = createTubularPolygon(exaggerationFactor, casing.diameter, casing.start, casing.end, getPoints);
-    const exaggeratedInnerDiameter = casing.innerDiameter * exaggerationFactor;
-    const innerRadius = exaggeratedInnerDiameter / 2;
+export const prepareCasingRenderObject = (exaggerationFactor: number, casing: Casing, pathPoints: [number, number][]): CasingRenderObject => {
+  const exaggeratedDiameter = casing.diameter * exaggerationFactor;
+  const exaggeratedInnerDiameter = casing.innerDiameter * exaggerationFactor;
+  const exaggeratedInnerRadius = exaggeratedInnerDiameter / 2;
+  const renderObject = createTubularPolygon(exaggeratedDiameter, pathPoints);
 
-    const casingWallWidth = renderObject.radius - innerRadius;
+  const casingWallWidth = renderObject.referenceRadius - exaggeratedInnerRadius;
 
-    return {
-      ...renderObject,
-      casingId: casing.casingId,
-      casingWallWidth,
-      hasShoe: casing.hasShoe,
-      bottom: casing.end,
-    };
+  return {
+    ...renderObject,
+    casingId: casing.casingId,
+    casingWallWidth,
+    hasShoe: casing.hasShoe,
+    bottom: casing.end,
   };
+};
