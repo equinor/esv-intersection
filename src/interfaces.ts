@@ -79,6 +79,19 @@ export interface Casing {
   casingId: string;
 }
 
+interface SymbolComponent {
+  diameter: number;
+  start: number;
+  end: number;
+  symbolKey: string;
+}
+
+export interface PAndASymbol extends SymbolComponent {
+  kind: 'pAndA-symbol';
+}
+
+export type PAndA = PAndASymbol;
+
 interface BaseCompletion {
   diameter: number;
   start: number;
@@ -92,16 +105,23 @@ export interface Tubing extends BaseCompletion {
   kind: 'tubing';
 }
 
-export type Completion = Tubing | Screen;
+export interface CompletionSymbol extends BaseCompletion {
+  kind: 'completion-symbol';
+  symbolKey: string;
+}
+
+export type Completion = Tubing | Screen | CompletionSymbol;
 
 export const foldCompletion =
-  <T>(fScreen: (obj: Screen) => T, fTubing: (obj: Tubing) => T) =>
+  <T>(fScreen: (obj: Screen) => T, fTubing: (obj: Tubing) => T, fSymbol: (obj: CompletionSymbol) => T) =>
   (completion: Completion): T => {
     switch (completion.kind) {
       case 'screen':
         return fScreen(completion);
       case 'tubing':
         return fTubing(completion);
+      case 'completion-symbol':
+        return fSymbol(completion);
       default:
         return assertNever(completion);
     }
