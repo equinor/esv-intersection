@@ -504,8 +504,40 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   getSurfacesAreaEdges(): number[] {
-    const data = [...this.data.areas.map((d) => d.data), ...this.data.lines.map((d) => d.data)];
-    const endPoints = data.map((d) => [d[0][0], d[d.length - 1][0]]).flat();
+    const endPoints = this.data.areas.reduce((acc, area) => {
+      const { data } = area;
+      const firstValidPoint = data.find((d: number[]) => d[1] != null);
+      if (firstValidPoint) {
+        acc.push(firstValidPoint[0]);
+      }
+      // TODO: Use findLast() when TypeScript stops complaining about it
+      for (let i = data.length - 1; i >= 0; i--) {
+        if (data[i][1] != null) {
+          acc.push(data[i][0]);
+          break;
+        }
+      }
+
+      return acc;
+    }, []);
+    endPoints.push(
+      ...this.data.lines.reduce((acc, line) => {
+        const { data } = line;
+        const firstValidPoint = data.find((d: number[]) => d[1] != null);
+        if (firstValidPoint) {
+          acc.push(firstValidPoint[0]);
+        }
+        // TODO: Use findLast() when TypeScript stops complaining about it
+        for (let i = data.length - 1; i >= 0; i--) {
+          if (data[i][1] != null) {
+            acc.push(data[i][0]);
+            break;
+          }
+        }
+        return acc;
+      }, []),
+    );
+
     const minX = Math.min(...endPoints);
     const maxX = Math.max(...endPoints);
     const marginsInWorldCoords = this.getMarginsInWorldCoordinates();
