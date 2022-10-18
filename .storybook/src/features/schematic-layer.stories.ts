@@ -9,7 +9,7 @@ import {
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
 
-import { getWellborePath, getCasings, getCement, getHolesize, getCompletion } from '../data';
+import { getWellborePath, getCasings, getCement, getHolesize, getCompletion, getCementSqueezes } from '../data';
 
 const width: number = 700;
 const height: number = 600;
@@ -18,8 +18,8 @@ export const SchematicLayerUsingHighLevelInterface = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  Promise.all([getWellborePath(), getHolesize(), getCasings(), getCement(), getCompletion()]).then(
-    ([wbp, holeSizes, casings, cements, completion]) => {
+  Promise.all([getWellborePath(), getHolesize(), getCasings(), getCement(), getCompletion(), getCementSqueezes()]).then(
+    ([wbp, holeSizes, casings, cements, completion, cementSqueezes]) => {
       const referenceSystem = new IntersectionReferenceSystem(wbp);
       referenceSystem.offset = wbp[0][2];
       const renderer = new PixiRenderApplication({ width, height });
@@ -80,7 +80,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
         cements,
         casings,
         completion: [...completion, ...completionSymbols],
-        pAndA: pAndASymbols,
+        pAndA: [...pAndASymbols, ...cementSqueezes],
         symbols: { ...CSDSVGs, ...pAndASVGs },
       };
       const options: SchematicLayerOptions<SchematicData> = {

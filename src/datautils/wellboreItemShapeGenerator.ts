@@ -1,5 +1,5 @@
 import { IPoint, Point } from 'pixi.js';
-import { Cement, Casing, HoleSize, MDPoint } from '..';
+import { Cement, Casing, HoleSize, MDPoint, CementSqueeze } from '..';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 
 export const getEndLines = (
@@ -113,6 +113,73 @@ export const createComplexRopeSegmentsForCement = (
   }));
 
   const changeDepths = cementDiameterChangeDepths(cement, bottomOfCement, outerDiameterIntervals);
+
+  const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
+    if (index === 0) {
+      return [];
+    }
+
+    const nextDepth = list[index - 1];
+    const diameter = findCementOuterDiameterAtDepth(attachedCasings, outerCasings, overlappingHoles, depth) * exaggerationFactor;
+
+    return [{ top: nextDepth, bottom: depth, diameter }];
+  });
+
+  const ropeSegments = diameterIntervals.map((interval) => {
+    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
+    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+
+    return {
+      diameter: interval.diameter,
+      points,
+    };
+  });
+
+  return ropeSegments;
+};
+
+export const cementSqueezeDiameterChangeDepths = (
+  squeeze: CementSqueeze,
+  diameterIntervals: {
+    start: number;
+    end: number;
+  }[],
+): number[] => {
+  const { top: topOfCement, bottom: bottomOfCement } = squeeze;
+
+  const diameterChangeDepths = diameterIntervals.flatMap((d) => [d.start, d.end]);
+  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfCement && d <= bottomOfCement); // trim
+
+  trimmedChangedDepths.push(topOfCement);
+  trimmedChangedDepths.push(bottomOfCement);
+
+  const uniqDepths = uniq(trimmedChangedDepths);
+
+  return uniqDepths.sort((a: number, b: number) => a - b);
+};
+
+export const createComplexRopeSegmentsForCementSqueeze = (
+  squeeze: CementSqueeze,
+  casings: Casing[],
+  holes: HoleSize[],
+  exaggerationFactor: number,
+  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+): ComplexRopeSegment[] => {
+  const { casingIds, top: topOfCement, bottom: bottomOfCement } = squeeze;
+
+  const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
+  if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
+    throw new Error('Invalid cement data, cement is missing attached casing');
+  }
+
+  const { outerCasings, overlappingHoles } = findIntersectingItems(topOfCement, bottomOfCement, attachedCasings, casings, holes);
+
+  const outerDiameterIntervals = [...outerCasings, ...overlappingHoles].map((d) => ({
+    start: d.start,
+    end: d.end,
+  }));
+
+  const changeDepths = cementSqueezeDiameterChangeDepths(squeeze, outerDiameterIntervals);
 
   const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
     if (index === 0) {
