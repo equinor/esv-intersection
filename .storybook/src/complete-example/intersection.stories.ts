@@ -163,7 +163,7 @@ const renderIntersection = (scaleOptions: any) => {
       cements: cement,
       casings,
       completion: [...completion, ...completionSymbols],
-      pAndA: pAndASymbols,
+      pAndA: [...pAndASymbols, ...cementSqueezes],
       symbols: { ...CSDSVGs, ...pAndASVGs },
     };
 

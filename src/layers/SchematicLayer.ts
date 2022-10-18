@@ -2,8 +2,25 @@ import { max } from 'd3-array';
 import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
-import { createComplexRopeSegmentsForCement, makeTubularPolygon } from '../datautils/wellboreItemShapeGenerator';
-import { Casing, Cement, Completion, foldCompletion, HoleSize, Tubing, Screen, CompletionSymbol, PAndA, PAndASymbol } from '../interfaces';
+import {
+  createComplexRopeSegmentsForCement,
+  createComplexRopeSegmentsForCementSqueeze,
+  makeTubularPolygon,
+} from '../datautils/wellboreItemShapeGenerator';
+import {
+  Casing,
+  Cement,
+  Completion,
+  foldCompletion,
+  HoleSize,
+  Tubing,
+  Screen,
+  CompletionSymbol,
+  PAndA,
+  PAndASymbol,
+  CementSqueeze,
+  isCementSqueeze,
+} from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
@@ -35,6 +52,11 @@ interface SymbolRenderObject {
 }
 
 interface CementShape {
+  segments: ComplexRopeSegment[];
+  casingIds: string[];
+}
+
+interface CementSqueezeShape {
   segments: ComplexRopeSegment[];
   casingIds: string[];
 }
@@ -84,6 +106,8 @@ export interface SchematicLayerOptions<T extends SchematicData> extends WellComp
   casingLineColor?: number;
   cementFirstColor?: string;
   cementSecondColor?: string;
+  cementSqueezeFirstColor?: string;
+  cementSqueezeSecondColor?: string;
   casingShoeSize?: CasingShoeSize;
   cementTextureScalingFactor?: number;
   screenScalingFactor?: number;
@@ -100,6 +124,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   private cementVisibility = true;
 
   private cementTextureCache: Texture;
+  private cementSqueezeTextureCache: Texture;
   private holeTextureCache: Texture;
   private screenTextureCache: Texture;
   private tubingTextureCache: Texture;
@@ -120,6 +145,8 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       cementTextureScalingFactor: 4,
       cementFirstColor: '#c7b9ab',
       cementSecondColor: '#5b5b5b',
+      cementSqueezeFirstColor: 'rgb(139, 69, 19)',
+      cementSqueezeSecondColor: 'rgb(139, 103, 19)',
       screenScalingFactor: 4,
       tubingScalingFactor: 1,
       screenLineColor: 0x63666a,
@@ -139,6 +166,8 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.maxDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) : EXAGGERATED_DIAMETER;
     holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
 
+    // cement does not have enough data on its own to render it, so we add the bottom here
+    // cementSqueeze does not need to have such a thing added since it comes with it's own top and bottom
     const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
     const casingRenderObjects: CasingRenderObject[] = sortedCasings.map(this.prepareCasingRenderObject);
     const cementShapes: CementShape[] = cements.map(
@@ -148,11 +177,23 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       }),
     );
 
-    this.pairCementAndCasingRenderObjects(casingRenderObjects, cementShapes).forEach(
-      ([cementShape, casingRenderObject]: [CementShape | undefined, CasingRenderObject]) => {
+    const cementSqueezes = pAndA.filter(isCementSqueeze);
+    const remainingPAndA = pAndA.filter((item: PAndA): boolean => !isCementSqueeze(item)) as Exclude<PAndA, CementSqueeze>[];
+    const cementSqueezesShape: CementSqueezeShape[] = cementSqueezes.map((squeeze) => ({
+      segments: this.createCementSqueezeShape(squeeze, sortedCasings, holeSizes),
+      casingIds: squeeze.casingIds,
+    }));
+
+    this.groupCementAndCasingRenderObjects(casingRenderObjects, cementShapes, cementSqueezesShape).forEach(
+      ([cementShape, casingRenderObject, squeezes]: [CementShape | undefined, CasingRenderObject, CementSqueezeShape[]]) => {
         if (cementShape) {
           this.cementVisibility && this.drawComplexRope(cementShape.segments, this.createCementTexture());
         }
+
+        squeezes.forEach((squeeze) => {
+          this.drawComplexRope(squeeze.segments, this.createCementSqueezeTexture());
+        });
+
         this.casingVisibility && this.drawCasing(casingRenderObject);
 
         if (casingRenderObject.hasShoe) {
@@ -177,7 +218,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       ),
     );
 
-    pAndA.forEach((obj: PAndASymbol) => {
+    remainingPAndA.forEach((obj: PAndASymbol) => {
       const symbolRenderObject = this.prepareSymbolRenderObject(obj);
       this.drawSymbolComponent(symbolRenderObject);
     });
@@ -312,19 +353,23 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     return Texture.from(canvas);
   }
 
-  private pairCementAndCasingRenderObjects(
+  private groupCementAndCasingRenderObjects(
     casingRenderObjects: CasingRenderObject[],
     cementShapes: CementShape[],
-  ): [CementShape | undefined, CasingRenderObject][] {
+    cementSqueezes: CementSqueezeShape[],
+  ): [CementShape | undefined, CasingRenderObject, CementSqueezeShape[]][] {
+    // TODO check if we can type it better here!
     const { tuples } = casingRenderObjects.reduce(
       (acc, casingRenderObject) => {
         const foundCementShape = acc.remainingCement.find((cement) => cement.casingIds.includes(casingRenderObject.casingId));
+        const foundCementSqueezes = acc.remainingCementSqueezes.filter((squeeze) => squeeze.casingIds.includes(casingRenderObject.casingId));
         return {
-          tuples: [...acc.tuples, [foundCementShape, casingRenderObject]],
+          tuples: [...acc.tuples, [foundCementShape, casingRenderObject, foundCementSqueezes]],
           remainingCement: acc.remainingCement.filter((c) => c !== foundCementShape),
+          remainingCementSqueezes: acc.remainingCementSqueezes.filter((squeeze) => !foundCementSqueezes.includes(squeeze)),
         };
       },
-      { tuples: [], remainingCement: cementShapes },
+      { tuples: [], remainingCement: cementShapes, remainingCementSqueezes: cementSqueezes },
     );
     return tuples;
   }
@@ -433,6 +478,11 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     return createComplexRopeSegmentsForCement(cement, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };
 
+  createCementSqueezeShape = (squeeze: CementSqueeze, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+    return createComplexRopeSegmentsForCementSqueeze(squeeze, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
+  };
+
   private createCementTexture(): Texture {
     if (this.cementTextureCache) {
       return this.cementTextureCache;
@@ -464,6 +514,40 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.cementTextureCache = Texture.from(canvas);
 
     return this.cementTextureCache;
+  }
+
+  private createCementSqueezeTexture(): Texture {
+    if (this.cementSqueezeTextureCache) {
+      return this.cementSqueezeTextureCache;
+    }
+
+    const { cementSqueezeFirstColor, cementSqueezeSecondColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
+
+    const canvas = document.createElement('canvas');
+
+    const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+    const lineWidth = cementTextureScalingFactor;
+    canvas.width = size;
+    canvas.height = size;
+    const canvasCtx = canvas.getContext('2d');
+
+    canvasCtx.fillStyle = cementSqueezeFirstColor;
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    canvasCtx.lineWidth = lineWidth;
+    canvasCtx.fillStyle = cementSqueezeSecondColor;
+    canvasCtx.beginPath();
+
+    canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
+    const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+    for (let i = -canvas.width; i < canvas.width; i++) {
+      canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
+    }
+    canvasCtx.stroke();
+
+    this.cementSqueezeTextureCache = Texture.from(canvas);
+
+    return this.cementSqueezeTextureCache;
   }
 
   private drawScreen(screen: Screen): void {
