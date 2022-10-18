@@ -3,10 +3,16 @@ import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import {
+  createCementTexture,
   createComplexRopeSegmentsForCement,
   createComplexRopeSegmentsForCementSqueeze,
   createComplexRopeSegmentsForCementPlug,
+  createHoleBaseTexture,
+  createScreenTexture,
+  createTubingTexture,
+  createTubularPolygon,
   makeTubularPolygon,
+  prepareCasingRenderObject,
 } from '../datautils/wellboreItemShapeGenerator';
 import {
   Casing,
@@ -19,9 +25,9 @@ import {
   CompletionSymbol,
   PAndA,
   PAndASymbol,
-  CementSqueeze,
   isCementSqueeze,
   CementPlug,
+  CementSqueeze,
 } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
@@ -29,23 +35,6 @@ import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexR
 import { FixedWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
 import { UniformTextureStretchRope } from './CustomDisplayObjects/UniformTextureStretchRope';
 import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
-
-const createGradientFill = (
-  canvas: HTMLCanvasElement,
-  canvasCtx: CanvasRenderingContext2D,
-  firstColor: string,
-  secondColor: string,
-  startPctOffset: number,
-): CanvasGradient => {
-  const halfWayPct = 0.5;
-  const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, firstColor);
-  gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
-  gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
-  gradient.addColorStop(1, firstColor);
-
-  return gradient;
-};
 
 interface SymbolRenderObject {
   pathPoints: number[][];
@@ -74,14 +63,6 @@ interface CasingRenderObject {
   casingWallWidth: number;
   hasShoe: boolean;
   bottom: number;
-}
-
-interface TubularRenderingObject {
-  pathPoints: number[][];
-  polygon: Point[];
-  leftPath: Point[];
-  rightPath: Point[];
-  radius: number;
 }
 
 const defaultCasingShoeSize: CasingShoeSize = {
@@ -114,6 +95,8 @@ export interface SchematicLayerOptions<T extends SchematicData> extends WellComp
   cementTextureScalingFactor?: number;
   screenScalingFactor?: number;
   tubingScalingFactor?: number;
+  tubingInnerColor?: string;
+  tubingOuterColor?: string;
   screenLineColor?: number;
   internalLayers?: {
     casingId: string;
@@ -154,6 +137,8 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       cementSqueezeSecondColor: 'rgb(139, 103, 19)',
       screenScalingFactor: 4,
       tubingScalingFactor: 1,
+      tubingInnerColor: '#EEEEFF',
+      tubingOuterColor: '#777788',
       screenLineColor: 0x63666a,
       firstCementPlugColor: 'rgb(199,185,171)',
       secondCementPlugColor: 'rgb(199,185,171)',
@@ -166,6 +151,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       return;
     }
 
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     const { holeSizes, casings, cements, completion, symbols, pAndA } = this.data;
 
     // eslint-disable-next-line max-len
@@ -176,7 +162,9 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     // cement does not have enough data on its own to render it, so we add the bottom here
     // cementSqueeze does not need to have such a thing added since it comes with it's own top and bottom
     const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
-    const casingRenderObjects: CasingRenderObject[] = sortedCasings.map(this.prepareCasingRenderObject);
+    const casingRenderObjects: CasingRenderObject[] = sortedCasings.map(
+      prepareCasingRenderObject(exaggerationFactor, this.getZFactorScaledPathForPoints),
+    );
     const cementShapes: CementShape[] = cements.map(
       (cement: Cement): CementShape => ({
         segments: this.createCementShape(cement, sortedCasings, holeSizes),
@@ -194,7 +182,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.groupCementAndCasingRenderObjects(casingRenderObjects, cementShapes, cementSqueezesShape).forEach(
       ([cementShape, casingRenderObject, squeezes]: [CementShape | undefined, CasingRenderObject, CementSqueezeShape[]]) => {
         if (cementShape) {
-          this.cementVisibility && this.drawComplexRope(cementShape.segments, this.createCementTexture());
+          this.cementVisibility && this.drawComplexRope(cementShape.segments, this.getCementTexture());
         }
 
         squeezes.forEach((squeeze) => {
@@ -318,7 +306,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       // TODO implement this
       // this.drawBigPolygon(polygon, solidColor);
     } else {
-      const texture = this.createSymbolTexture(symbolKey, diameter);
+      const texture = this.getSymbolTexture(symbolKey, diameter);
       this.drawSVGRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
@@ -336,7 +324,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.addChild(rope);
   }
 
-  private createSymbolTexture(symbolKey: string, diameter: number): Texture {
+  private getSymbolTexture(symbolKey: string, diameter: number): Texture {
     return new Texture(this.textureSymbolCacheArray[symbolKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, 2);
   }
 
@@ -365,7 +353,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       const polygonCoords = makeTubularPolygon(leftPath, rightPath);
       this.drawBigPolygon(polygonCoords, convertColor(holeFirstColor));
     } else {
-      const texture = this.createHoleTexture(diameter);
+      const texture = this.getHoleTexture(diameter);
       this.drawHoleRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
@@ -389,15 +377,15 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.addChild(rope);
   }
 
-  private createHoleTexture(diameter: number): Texture {
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+  private getHoleTexture(diameter: number): Texture {
+    const { exaggerationFactor, holeFirstColor, holeSecondColor } = this.options as SchematicLayerOptions<T>;
 
     const exaggeratedDiameter = diameter / exaggerationFactor;
     const height = this.maxDiameter;
     const width = 16;
 
     if (!this.holeTextureCache) {
-      this.holeTextureCache = this.createHoleBaseTexture(width, height);
+      this.holeTextureCache = createHoleBaseTexture(holeFirstColor, holeSecondColor, width, height);
     }
 
     const baseTexture = this.holeTextureCache.baseTexture;
@@ -406,20 +394,6 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     const texture = new Texture(baseTexture, frame);
 
     return texture;
-  }
-
-  private createHoleBaseTexture(width: number, height: number): Texture {
-    const { holeFirstColor, holeSecondColor } = this.options as SchematicLayerOptions<T>;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const canvasCtx = canvas.getContext('2d');
-
-    canvasCtx.fillStyle = createGradientFill(canvas, canvasCtx, holeFirstColor, holeSecondColor, 0);
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-    return Texture.from(canvas);
   }
 
   private groupCementAndCasingRenderObjects(
@@ -442,43 +416,6 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     );
     return tuples;
   }
-
-  private prepareCasingRenderObject = (casing: Casing): CasingRenderObject => {
-    if (casing == null) {
-      return;
-    }
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-
-    const diameter = casing.diameter * exaggerationFactor;
-    const innerDiameter = casing.innerDiameter * exaggerationFactor;
-
-    const radius = diameter / 2;
-    const innerRadius = innerDiameter / 2;
-
-    const path = this.getZFactorScaledPathForPoints(casing.start, casing.end, [casing.start, casing.end]);
-
-    const pathPoints = path.map((p) => p.point);
-    const normals = createNormals(pathPoints);
-    const rightPath = offsetPoints(pathPoints, normals, radius);
-    const leftPath = offsetPoints(pathPoints, normals, -radius);
-
-    const polygon = makeTubularPolygon(leftPath, rightPath);
-
-    const casingWallWidth = radius - innerRadius;
-
-    return {
-      casingId: casing.casingId,
-      pathPoints,
-      polygon,
-      leftPath,
-      rightPath,
-      radius,
-      diameter,
-      casingWallWidth,
-      hasShoe: casing.hasShoe,
-      bottom: casing.end,
-    };
-  };
 
   private drawComplexRope(intervals: ComplexRopeSegment[], texture: Texture): void {
     if (intervals.length === 0) {
@@ -552,35 +489,11 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     return createComplexRopeSegmentsForCementSqueeze(squeeze, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };
 
-  private createCementTexture(): Texture {
-    if (this.cementTextureCache) {
-      return this.cementTextureCache;
+  private getCementTexture(): Texture {
+    if (!this.cementTextureCache) {
+      const { cementFirstColor, cementSecondColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
+      this.cementTextureCache = createCementTexture(cementFirstColor, cementSecondColor, cementTextureScalingFactor);
     }
-
-    const { cementFirstColor, cementSecondColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
-
-    const canvas = document.createElement('canvas');
-
-    const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
-    const lineWidth = cementTextureScalingFactor;
-    canvas.width = size;
-    canvas.height = size;
-    const canvasCtx = canvas.getContext('2d');
-
-    canvasCtx.fillStyle = cementFirstColor;
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-    canvasCtx.lineWidth = lineWidth;
-    canvasCtx.fillStyle = cementSecondColor;
-    canvasCtx.beginPath();
-
-    const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
-    for (let i = -canvas.width; i < canvas.width; i++) {
-      canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
-      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
-    }
-    canvasCtx.stroke();
-
-    this.cementTextureCache = Texture.from(canvas);
 
     return this.cementTextureCache;
   }
@@ -622,8 +535,15 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   private drawScreen(screen: Screen): void {
     const { exaggerationFactor, screenLineColor } = this.options as SchematicLayerOptions<T>;
 
-    const texture = this.createScreenTexture();
-    const { pathPoints, polygon, leftPath, rightPath } = this.createTubularPolygon(screen);
+    const texture = this.getScreenTexture();
+    const { start, end, diameter } = screen;
+    const { pathPoints, polygon, leftPath, rightPath } = createTubularPolygon(
+      exaggerationFactor,
+      diameter,
+      start,
+      end,
+      this.getZFactorScaledPathForPoints,
+    );
 
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigTexturedPolygon(polygon, texture);
@@ -638,8 +558,10 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   }
 
   private drawTubing(tubing: Tubing): void {
-    const texture = this.createTubingTexture();
-    const { pathPoints, polygon } = this.createTubularPolygon(tubing);
+    const texture = this.getTubingTexture();
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+    const { diameter, start, end } = tubing;
+    const { pathPoints, polygon } = createTubularPolygon(exaggerationFactor, diameter, start, end, this.getZFactorScaledPathForPoints);
 
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigTexturedPolygon(polygon, texture);
@@ -652,87 +574,18 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     }
   }
 
-  private createTubularPolygon(completion: Screen | Tubing): TubularRenderingObject {
-    if (completion == null) {
-      return;
-    }
-
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-
-    const diameter = completion.diameter * exaggerationFactor;
-
-    const radius = diameter / 2;
-
-    const path = this.getZFactorScaledPathForPoints(completion.start, completion.end, [completion.start, completion.end]);
-
-    const pathPoints = path.map((p) => p.point);
-    const normals = createNormals(pathPoints);
-    const rightPath = offsetPoints(pathPoints, normals, radius);
-    const leftPath = offsetPoints(pathPoints, normals, -radius);
-
-    const polygon = makeTubularPolygon(leftPath, rightPath);
-
-    return { pathPoints, polygon, leftPath, rightPath, radius };
-  }
-
-  private createTubingTexture(): Texture {
-    const { tubingScalingFactor } = this.options as SchematicLayerOptions<T>;
-    const innerColor = '#EEEEFF';
-    const outerColor = '#777788';
-
+  private getTubingTexture(): Texture {
     if (!this.tubingTextureCache) {
-      const size = DEFAULT_TEXTURE_SIZE * tubingScalingFactor;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-      const canvasCtx = canvas.getContext('2d');
-      if (canvasCtx instanceof CanvasRenderingContext2D) {
-        const gradient = canvasCtx.createLinearGradient(0, 0, 0, size);
-
-        const innerColorStart = 0.3;
-        const innerColorEnd = 0.7;
-        gradient.addColorStop(0, outerColor);
-        gradient.addColorStop(innerColorStart, innerColor);
-        gradient.addColorStop(innerColorEnd, innerColor);
-        gradient.addColorStop(1, outerColor);
-
-        canvasCtx.fillStyle = gradient;
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-        this.tubingTextureCache = Texture.from(canvas);
-      }
+      const { tubingScalingFactor, tubingInnerColor, tubingOuterColor } = this.options as SchematicLayerOptions<T>;
+      this.tubingTextureCache = createTubingTexture(tubingInnerColor, tubingOuterColor, tubingScalingFactor);
     }
     return this.tubingTextureCache;
   }
 
-  private createScreenTexture(): Texture {
-    const { screenScalingFactor } = this.options as SchematicLayerOptions<T>;
-
+  private getScreenTexture(): Texture {
     if (!this.screenTextureCache) {
-      const canvas = document.createElement('canvas');
-      const size = DEFAULT_TEXTURE_SIZE * screenScalingFactor;
-      canvas.width = size;
-      canvas.height = size;
-      const canvasCtx = canvas.getContext('2d');
-
-      if (canvasCtx instanceof CanvasRenderingContext2D) {
-        canvasCtx.fillStyle = 'white';
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const baseLineWidth = size / 10; // eslint-disable-line no-magic-numbers
-        canvasCtx.strokeStyle = '#AAAAAA';
-        canvasCtx.lineWidth = baseLineWidth;
-        canvasCtx.beginPath();
-
-        const distanceBetweenLines = size / 3;
-        for (let i = -canvas.width; i < canvas.width; i++) {
-          canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
-          canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
-        }
-        canvasCtx.stroke();
-      }
-      this.screenTextureCache = Texture.from(canvas);
+      const { screenScalingFactor } = this.options as SchematicLayerOptions<T>;
+      this.screenTextureCache = createScreenTexture(screenScalingFactor);
     }
     return this.screenTextureCache;
   }

@@ -1,6 +1,24 @@
-import { IPoint, Point } from 'pixi.js';
+import { IPoint, Point, Texture } from 'pixi.js';
 import { Cement, Casing, HoleSize, MDPoint, CementSqueeze, CementPlug } from '..';
+import { DEFAULT_TEXTURE_SIZE } from '../constants';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
+import { createNormals, offsetPoints } from '../utils/vectorUtils';
+
+export interface TubularRenderingObject {
+  pathPoints: number[][];
+  polygon: Point[];
+  leftPath: Point[];
+  rightPath: Point[];
+  diameter: number;
+  radius: number;
+}
+
+export interface CasingRenderObject extends TubularRenderingObject {
+  casingId: string;
+  casingWallWidth: number;
+  hasShoe: boolean;
+  bottom: number;
+}
 
 export const getEndLines = (
   rightPath: IPoint[],
@@ -129,7 +147,7 @@ export const createComplexRopeSegmentsForCement = (
 
   const changeDepths = cementDiameterChangeDepths(cement, bottomOfCement, outerDiameterIntervals);
 
-  const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
+  const diameterIntervals = changeDepths.flatMap((depth: number, index: number, list: number[]) => {
     if (index === 0) {
       return [];
     }
@@ -285,3 +303,144 @@ export const createComplexRopeSegmentsForCementPlug = (
 
   return ropeSegments;
 };
+
+const createGradientFill = (
+  canvas: HTMLCanvasElement,
+  canvasCtx: CanvasRenderingContext2D,
+  firstColor: string,
+  secondColor: string,
+  startPctOffset: number,
+): CanvasGradient => {
+  const halfWayPct = 0.5;
+  const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, firstColor);
+  gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
+  gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
+  gradient.addColorStop(1, firstColor);
+
+  return gradient;
+};
+
+export const createHoleBaseTexture = (firstColor: string, secondColor: string, width: number, height: number): Texture => {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = createGradientFill(canvas, canvasCtx, firstColor, secondColor, 0);
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+  return Texture.from(canvas);
+};
+
+export const createScreenTexture = (scalingFactor: number): Texture => {
+  const canvas = document.createElement('canvas');
+  const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
+  canvas.width = size;
+  canvas.height = size;
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = 'white';
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const baseLineWidth = size / 10; // eslint-disable-line no-magic-numbers
+  canvasCtx.strokeStyle = '#AAAAAA';
+  canvasCtx.lineWidth = baseLineWidth;
+  canvasCtx.beginPath();
+
+  const distanceBetweenLines = size / 3;
+  for (let i = -canvas.width; i < canvas.width; i++) {
+    canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+    canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
+  }
+  canvasCtx.stroke();
+  return Texture.from(canvas);
+};
+
+export const createTubingTexture = (innerColor: string, outerColor: string, scalingFactor: number): Texture => {
+  const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const canvasCtx = canvas.getContext('2d');
+  const gradient = canvasCtx.createLinearGradient(0, 0, 0, size);
+
+  const innerColorStart = 0.3;
+  const innerColorEnd = 0.7;
+  gradient.addColorStop(0, outerColor);
+  gradient.addColorStop(innerColorStart, innerColor);
+  gradient.addColorStop(innerColorEnd, innerColor);
+  gradient.addColorStop(1, outerColor);
+
+  canvasCtx.fillStyle = gradient;
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+  return Texture.from(canvas);
+};
+
+export const createCementTexture = (firstColor: string, secondColor: string, scalingFactor: number) => {
+  const canvas = document.createElement('canvas');
+
+  const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
+  const lineWidth = scalingFactor;
+  canvas.width = size;
+  canvas.height = size;
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = firstColor;
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+  canvasCtx.lineWidth = lineWidth;
+  canvasCtx.fillStyle = secondColor;
+  canvasCtx.beginPath();
+
+  const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+  for (let i = -canvas.width; i < canvas.width; i++) {
+    canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+    canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
+  }
+  canvasCtx.stroke();
+
+  return Texture.from(canvas);
+};
+
+export const createTubularPolygon = (
+  exaggerationFactor: number,
+  diameter: number,
+  start: number,
+  end: number,
+  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+): TubularRenderingObject => {
+  const exaggeratedDiameter = diameter * exaggerationFactor;
+
+  const radius = exaggeratedDiameter / 2;
+
+  const path = getPoints(start, end, [start, end]);
+
+  const pathPoints = path.map((p) => p.point);
+  const normals = createNormals(pathPoints);
+  const rightPath = offsetPoints(pathPoints, normals, radius);
+  const leftPath = offsetPoints(pathPoints, normals, -radius);
+
+  const polygon = makeTubularPolygon(leftPath, rightPath);
+
+  return { pathPoints, polygon, leftPath, rightPath, diameter: exaggeratedDiameter, radius };
+};
+
+export const prepareCasingRenderObject =
+  (exaggerationFactor: number, getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[]) =>
+  (casing: Casing): CasingRenderObject => {
+    const renderObject = createTubularPolygon(exaggerationFactor, casing.diameter, casing.start, casing.end, getPoints);
+    const exaggeratedInnerDiameter = casing.innerDiameter * exaggerationFactor;
+    const innerRadius = exaggeratedInnerDiameter / 2;
+
+    const casingWallWidth = renderObject.radius - innerRadius;
+
+    return {
+      ...renderObject,
+      casingId: casing.casingId,
+      casingWallWidth,
+      hasShoe: casing.hasShoe,
+      bottom: casing.end,
+    };
+  };
