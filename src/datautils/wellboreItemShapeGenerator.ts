@@ -165,8 +165,6 @@ export const createComplexRopeSegmentsForCementSqueeze = (
   exaggerationFactor: number,
   getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
 ): ComplexRopeSegment[] => {
-  // Merge deprecated casingId and casingIds array
-  // TODO remove casingId now?
   const { casingIds, top: topOfCement, bottom: bottomOfCement } = squeeze;
 
   const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
