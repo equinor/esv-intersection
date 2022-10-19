@@ -75,8 +75,8 @@ export const SchematicLayerUsingHighLevelInterface = () => {
         },
         { kind: 'cementPlug' as const,
           id: 'cement-plug-2',
-          top: 5150,
-          bottom: 5230,
+          top: 5000,
+          bottom: 5110,
           casingId: '7',
         }
       ];
