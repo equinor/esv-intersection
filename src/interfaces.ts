@@ -90,7 +90,17 @@ export interface PAndASymbol extends SymbolComponent {
   kind: 'pAndA-symbol';
 }
 
-export type PAndA = PAndASymbol | CementSqueeze;
+export type PAndA = PAndASymbol | CementSqueeze | CementPlug;
+
+export interface CementPlug {
+  id: string;
+  top: number;
+  bottom: number;
+  kind: 'cementPlug';
+  holeId?: string;
+  casingId?: string;
+  secondCasingId?: string;
+}
 
 interface BaseCompletion {
   diameter: number;
