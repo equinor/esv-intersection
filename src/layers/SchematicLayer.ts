@@ -114,7 +114,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   private tubingTextureCache: Texture;
   private textureSymbolCacheArray: { [key: string]: Texture };
 
-  private maxDiameter: number;
+  private maxHoleDiameter: number;
 
   constructor(ctx: PixiRenderApplication, id?: string, options?: SchematicLayerOptions<T>) {
     super(ctx, id, options);
@@ -166,7 +166,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     }, {});
 
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter);
-    this.maxDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) : EXAGGERATED_DIAMETER;
+    this.maxHoleDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) * exaggerationFactor : EXAGGERATED_DIAMETER * exaggerationFactor;
     holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
 
     const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
@@ -342,9 +342,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       return null;
     }
 
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-
-    const rope: SimpleRope = new SimpleRope(texture, path, exaggerationFactor);
+    const rope: SimpleRope = new SimpleRope(texture, path, this.maxHoleDiameter / DEFAULT_TEXTURE_SIZE);
 
     rope.tint = tint || rope.tint;
 
@@ -352,19 +350,21 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   }
 
   private getHoleTexture(diameter: number): Texture {
-    const { exaggerationFactor, holeFirstColor, holeSecondColor } = this.options as SchematicLayerOptions<T>;
+    const { holeFirstColor, holeSecondColor } = this.options as SchematicLayerOptions<T>;   
 
-    const exaggeratedDiameter = diameter / exaggerationFactor;
-    const height = this.maxDiameter;
-    const width = 16;
+    const size = DEFAULT_TEXTURE_SIZE
+    const height = size
+    const width = size;
+
+    const textureDiameter = (diameter / this.maxHoleDiameter) * size
 
     if (!this.holeTextureCache) {
       this.holeTextureCache = createHoleBaseTexture(holeFirstColor, holeSecondColor, width, height);
     }
 
     const baseTexture = this.holeTextureCache.baseTexture;
-    const sidePadding = (height - exaggeratedDiameter) / 2;
-    const frame = new Rectangle(0, sidePadding, width, exaggeratedDiameter);
+    const sidePadding = (height - textureDiameter) / 2;
+    const frame = new Rectangle(0, sidePadding, width, textureDiameter);
     const texture = new Texture(baseTexture, frame);
 
     return texture;
@@ -402,9 +402,9 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.addChild(rope);
   }
 
-  private drawCasing = (zippedRenderObject: CasingRenderObject): void => {
+  private drawCasing = (casingRenderObject: CasingRenderObject): void => {
     const { casingLineColor, casingSolidColor } = this.options as SchematicLayerOptions<T>;
-    const { pathPoints, polygon, leftPath, rightPath, referenceDiameter, casingWallWidth } = zippedRenderObject;
+    const { pathPoints, polygon, leftPath, rightPath, referenceDiameter, casingWallWidth } = casingRenderObject;
 
     // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
