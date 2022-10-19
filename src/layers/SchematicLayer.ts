@@ -1,5 +1,5 @@
 import { max } from 'd3-array';
-import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { Graphics, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import {
@@ -233,6 +233,23 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       if (obj.kind === 'cementPlug') {
         const cementPlugSegments = this.createCementPlugShape(obj, casings, holeSizes);
         this.drawComplexRope(cementPlugSegments, this.createCementPlugTexture());
+
+        const { rightPath, leftPath } = cementPlugSegments.reduce(
+          (acc, current) => {
+            const pathPoints = current.points.map((p) => [p.x, p.y]);
+            const normals = createNormals(pathPoints);
+            const rightPath = offsetPoints(pathPoints, normals, current.diameter / 2);
+            const leftPath = offsetPoints(pathPoints, normals, -current.diameter / 2);
+
+            return {
+              rightPath: [...acc.rightPath, ...rightPath],
+              leftPath: [...acc.leftPath, ...leftPath],
+            };
+          },
+          { rightPath: [], leftPath: [] },
+        );
+        // eslint-disable-next-line no-magic-numbers
+        this.drawOutline(leftPath, rightPath, convertColor('black'), 0.25, true);
       }
     });
   }
@@ -264,20 +281,6 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
       canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
     }
-    canvasCtx.stroke();
-
-    canvasCtx.setLineDash([]);
-    canvasCtx.strokeStyle = '#000';
-    canvasCtx.lineWidth = 10;
-
-    canvasCtx.beginPath();
-    canvasCtx.moveTo(0, 0);
-    canvasCtx.lineTo(canvas.width, 0);
-    canvasCtx.stroke();
-
-    canvasCtx.beginPath();
-    canvasCtx.moveTo(0, canvas.height);
-    canvasCtx.lineTo(canvas.width, canvas.height);
     canvasCtx.stroke();
 
     this.cementPlugTextureCache = Texture.from(canvas);
