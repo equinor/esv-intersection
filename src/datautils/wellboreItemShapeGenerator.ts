@@ -254,17 +254,13 @@ export const createComplexRopeSegmentsForCementPlug = (
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
     throw new Error('Invalid cement data, cement is missing attached casing');
   }
-  console.log({ attachedCasings });
   const { overlappingHoles } = findIntersectingItems(topOfCementPlug, bottomOfCementPlug, attachedCasings, casings, holes);
-  console.log({ attachedCasings, overlappingHoles });
   const innerDiameterIntervals = [...attachedCasings, ...overlappingHoles].map((d) => ({
     start: d.start,
     end: d.end,
   }));
 
   const changeDepths = cementPlugDiameterChangeDepths(plug, innerDiameterIntervals);
-
-  console.log({ changeDepths });
 
   const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
     if (index === 0) {
@@ -273,8 +269,6 @@ export const createComplexRopeSegmentsForCementPlug = (
 
     const nextDepth = list[index - 1];
     const diameter = findCementInnerDiameterAtDepth(attachedCasings, attachedCasings, overlappingHoles, depth) * exaggerationFactor;
-
-    console.log({ diameter });
 
     return [{ top: nextDepth, bottom: depth, diameter }];
   });
