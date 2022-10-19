@@ -9,7 +9,7 @@ export const HOLE_OUTLINE = 0.6;
 export const SCREEN_OUTLINE = 0.3;
 
 export const SHOE_WIDTH = 8;
-export const SHOE_LENGTH = 24;
+export const SHOE_LENGTH = 16;
 
 export const DEFAULT_TEXTURE_SIZE = 64;
 
