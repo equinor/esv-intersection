@@ -98,8 +98,8 @@ export interface SchematicLayerOptions<T extends SchematicData> extends WellComp
     casingId: string;
     cementId: string;
   };
-  firstCementPlugColor?: string;
-  secondCementPlugColor?: string;
+  cementPlugFirstColor?: string;
+  cementPlugCecondColor?: string;
 }
 
 export class SchematicLayer<T extends SchematicData> extends WellboreBaseComponentLayer<T> {
@@ -136,8 +136,8 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       tubingInnerColor: '#EEEEFF',
       tubingOuterColor: '#777788',
       screenLineColor: 0x63666a,
-      firstCementPlugColor: 'rgb(199,185,171)',
-      secondCementPlugColor: 'rgb(199,185,171)',
+      cementPlugFirstColor: 'rgb(199,185,171)',
+      cementPlugCecondColor: 'rgb(199,185,171)',
       ...options,
     };
   }
@@ -250,8 +250,8 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
 
   private getCementPlugTexture(): Texture {
     if (!this.cementPlugTextureCache) {
-      const { firstCementPlugColor, secondCementPlugColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
-      this.cementPlugTextureCache = createCementPlugTexture(firstCementPlugColor, secondCementPlugColor, cementTextureScalingFactor);
+      const { cementPlugFirstColor, cementPlugCecondColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
+      this.cementPlugTextureCache = createCementPlugTexture(cementPlugFirstColor, cementPlugCecondColor, cementTextureScalingFactor);
     }
 
     return this.cementPlugTextureCache;

@@ -404,7 +404,7 @@ export const createCementTexture = (firstColor: string, secondColor: string, sca
   return Texture.from(canvas);
 };
 
-export const createCementPlugTexture = (firstCementPlugColor: string, secondCementPlugColor: string, cementTextureScalingFactor: number) => {
+export const createCementPlugTexture = (cementPlugFirstColor: string, cementPlugCecondColor: string, cementTextureScalingFactor: number) => {
   const canvas = document.createElement('canvas');
 
   const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
@@ -413,10 +413,10 @@ export const createCementPlugTexture = (firstCementPlugColor: string, secondCeme
   canvas.height = size;
   const canvasCtx = canvas.getContext('2d');
 
-  canvasCtx.fillStyle = firstCementPlugColor;
+  canvasCtx.fillStyle = cementPlugFirstColor;
   canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
   canvasCtx.lineWidth = lineWidth;
-  canvasCtx.fillStyle = secondCementPlugColor;
+  canvasCtx.fillStyle = cementPlugCecondColor;
   canvasCtx.beginPath();
 
   canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
