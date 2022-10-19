@@ -1,12 +1,10 @@
 import { IPoint, Point, Texture } from 'pixi.js';
-import { Cement, Casing, HoleSize, MDPoint, CementSqueeze, CementPlug } from '..';
+import { Cement, Casing, HoleSize, CementSqueeze, CementPlug } from '..';
 import { DEFAULT_TEXTURE_SIZE } from '../constants';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 
 export interface TubularRenderingObject {
-  pathPoints: number[][];
-  polygon: Point[];
   leftPath: Point[];
   rightPath: Point[];
   referenceDiameter: number;
@@ -14,6 +12,8 @@ export interface TubularRenderingObject {
 }
 
 export interface CasingRenderObject extends TubularRenderingObject {
+  pathPoints: number[][];
+  polygon: Point[];
   casingId: string;
   casingWallWidth: number;
   hasShoe: boolean;
@@ -264,7 +264,7 @@ export const createComplexRopeSegmentsForCementPlug = (
   casings: Casing[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+  getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
   const { casingId, secondCasingId, top: topOfCementPlug, bottom: bottomOfCementPlug } = plug;
 
@@ -292,8 +292,8 @@ export const createComplexRopeSegmentsForCementPlug = (
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
-    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
-    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+    const mdPoints = getPoints(interval.top, interval.bottom);
+    const points = mdPoints.map(([x, y]) => new Point(x, y));
 
     return {
       diameter: interval.diameter,
@@ -404,28 +404,56 @@ export const createCementTexture = (firstColor: string, secondColor: string, sca
   return Texture.from(canvas);
 };
 
-export const createTubularPolygon = (diameter: number, pathPoints: [number, number][]): TubularRenderingObject => {
+export const createCementPlugTexture = (firstCementPlugColor: string, secondCementPlugColor: string, cementTextureScalingFactor: number) => {
+  const canvas = document.createElement('canvas');
+
+  const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+  const lineWidth = cementTextureScalingFactor;
+  canvas.width = size;
+  canvas.height = size;
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = firstCementPlugColor;
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+  canvasCtx.lineWidth = lineWidth;
+  canvasCtx.fillStyle = secondCementPlugColor;
+  canvasCtx.beginPath();
+
+  canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
+  const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+  for (let i = -canvas.width; i < canvas.width; i++) {
+    canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+    canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
+  }
+  canvasCtx.stroke();
+
+  return Texture.from(canvas);
+};
+
+export const createTubularRenderingObject = (diameter: number, pathPoints: [number, number][]): TubularRenderingObject => {
   const radius = diameter / 2;
 
   const normals = createNormals(pathPoints);
   const rightPath = offsetPoints(pathPoints, normals, radius);
   const leftPath = offsetPoints(pathPoints, normals, -radius);
 
-  const polygon = makeTubularPolygon(leftPath, rightPath);
-
-  return { pathPoints, polygon, leftPath, rightPath, referenceDiameter: diameter, referenceRadius: radius };
+  return { leftPath, rightPath, referenceDiameter: diameter, referenceRadius: radius };
 };
 
 export const prepareCasingRenderObject = (exaggerationFactor: number, casing: Casing, pathPoints: [number, number][]): CasingRenderObject => {
   const exaggeratedDiameter = casing.diameter * exaggerationFactor;
   const exaggeratedInnerDiameter = casing.innerDiameter * exaggerationFactor;
   const exaggeratedInnerRadius = exaggeratedInnerDiameter / 2;
-  const renderObject = createTubularPolygon(exaggeratedDiameter, pathPoints);
+  const renderObject = createTubularRenderingObject(exaggeratedDiameter, pathPoints);
 
   const casingWallWidth = renderObject.referenceRadius - exaggeratedInnerRadius;
 
+  const polygon = makeTubularPolygon(renderObject.leftPath, renderObject.rightPath);
+
   return {
     ...renderObject,
+    pathPoints,
+    polygon,
     casingId: casing.casingId,
     casingWallWidth,
     hasShoe: casing.hasShoe,

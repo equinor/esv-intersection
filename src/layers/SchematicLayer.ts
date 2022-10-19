@@ -1,6 +1,6 @@
 import { max } from 'd3-array';
-import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
-import { CasingShoeSize, PixiRenderApplication } from '.';
+import { IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import {
   CasingRenderObject,
@@ -11,9 +11,10 @@ import {
   createHoleBaseTexture,
   createScreenTexture,
   createTubingTexture,
-  createTubularPolygon,
+  createTubularRenderingObject,
   makeTubularPolygon,
   prepareCasingRenderObject,
+  createCementPlugTexture,
 } from '../datautils/wellboreItemShapeGenerator';
 import {
   Casing,
@@ -30,6 +31,8 @@ import {
   CementPlug,
   CementSqueeze,
   OnUnmountEvent,
+  isPAndASymbol,
+  isCementPlug,
 } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
@@ -40,7 +43,7 @@ import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './Wellbore
 
 interface SymbolRenderObject {
   pathPoints: number[][];
-  diameter: number;
+  referenceDiameter: number;
   symbolKey: string;
 }
 
@@ -52,6 +55,10 @@ interface CementShape {
 interface CementSqueezeShape {
   segments: ComplexRopeSegment[];
   casingIds: string[];
+}
+export interface CasingShoeSize {
+  width: number;
+  length: number;
 }
 
 const defaultCasingShoeSize: CasingShoeSize = {
@@ -153,17 +160,20 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     const { holeSizes, casings, cements, completion, symbols, pAndA } = this.data;
 
-    // eslint-disable-next-line max-len
-    holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter); // draw smaller casings and holes inside bigger ones if overlapping
+    this.textureSymbolCacheArray = Object.entries(symbols).reduce((list: { [key: string]: Texture }, [key, symbol]: [string, string]) => {
+      list[key] = Texture.from(symbol);
+      return list;
+    }, {});
+
+    holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter);
     this.maxDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) : EXAGGERATED_DIAMETER;
     holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
 
-    // cement does not have enough data on its own to render it, so we add the bottom here
-    // cementSqueeze does not need to have such a thing added since it comes with it's own top and bottom
     const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
     const casingRenderObjects: CasingRenderObject[] = sortedCasings.map((casing: Casing) =>
       prepareCasingRenderObject(exaggerationFactor, casing, this.getZFactorScaledPathForPoints(casing.start, casing.end)),
     );
+
     const cementShapes: CementShape[] = cements.map(
       (cement: Cement): CementShape => ({
         segments: this.createCementShape(cement, sortedCasings, holeSizes),
@@ -172,15 +182,11 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     );
 
     const [cementSqueezes, remainingPAndA] = pAndA.reduce(
-      ([squeezes, remaining], current: PAndA) => {
-        if (isCementSqueeze(current)) {
-          return [[current, ...squeezes], remaining];
-        } else {
-          return [squeezes, [current, ...remaining]];
-        }
-      },
+      ([squeezes, remaining], current: PAndA) =>
+        isCementSqueeze(current) ? [[current, ...squeezes], remaining] : [squeezes, [current, ...remaining]],
       <[CementSqueeze[], Exclude<PAndA, CementSqueeze>[]]>[[], []],
     );
+
     const cementSqueezesShape: CementSqueezeShape[] = cementSqueezes.map((squeeze) => ({
       segments: this.createCementSqueezeShape(squeeze, sortedCasings, holeSizes),
       casingIds: squeeze.casingIds,
@@ -204,11 +210,6 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       },
     );
 
-    this.textureSymbolCacheArray = Object.entries(symbols).reduce((list: { [key: string]: Texture }, [key, symbol]: [string, string]) => {
-      list[key] = Texture.from(symbol);
-      return list;
-    }, {});
-
     completion.forEach(
       foldCompletion(
         (obj: Screen) => this.drawScreen(obj),
@@ -221,20 +222,18 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     );
 
     remainingPAndA.forEach((obj) => {
-      if (obj.kind === 'pAndA-symbol') {
+      if (isPAndASymbol(obj)) {
         const symbolRenderObject = this.prepareSymbolRenderObject(obj);
         this.drawSymbolComponent(symbolRenderObject);
       }
-      if (obj.kind === 'cementPlug') {
+      if (isCementPlug(obj)) {
         const cementPlugSegments = this.createCementPlugShape(obj, casings, holeSizes);
-        this.drawComplexRope(cementPlugSegments, this.createCementPlugTexture());
+        this.drawComplexRope(cementPlugSegments, this.getCementPlugTexture());
 
         const { rightPath, leftPath } = cementPlugSegments.reduce(
           (acc, current) => {
-            const pathPoints = current.points.map((p) => [p.x, p.y]);
-            const normals = createNormals(pathPoints);
-            const rightPath = offsetPoints(pathPoints, normals, current.diameter / 2);
-            const leftPath = offsetPoints(pathPoints, normals, -current.diameter / 2);
+            const pathPoints = current.points.map<[number, number]>((p: IPoint) => [p.x, p.y]);
+            const { leftPath, rightPath } = createTubularRenderingObject(current.diameter, pathPoints);
 
             return {
               rightPath: [...acc.rightPath, ...rightPath],
@@ -249,36 +248,11 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     });
   }
 
-  private createCementPlugTexture(): Texture {
-    if (this.cementPlugTextureCache) {
-      return this.cementPlugTextureCache;
+  private getCementPlugTexture(): Texture {
+    if (!this.cementPlugTextureCache) {
+      const { firstCementPlugColor, secondCementPlugColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
+      this.cementPlugTextureCache = createCementPlugTexture(firstCementPlugColor, secondCementPlugColor, cementTextureScalingFactor);
     }
-
-    const { firstCementPlugColor, secondCementPlugColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
-
-    const canvas = document.createElement('canvas');
-
-    const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
-    const lineWidth = cementTextureScalingFactor;
-    canvas.width = size;
-    canvas.height = size;
-    const canvasCtx = canvas.getContext('2d');
-
-    canvasCtx.fillStyle = firstCementPlugColor;
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-    canvasCtx.lineWidth = lineWidth;
-    canvasCtx.fillStyle = secondCementPlugColor;
-    canvasCtx.beginPath();
-
-    canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
-    const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
-    for (let i = -canvas.width; i < canvas.width; i++) {
-      canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
-      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
-    }
-    canvasCtx.stroke();
-
-    this.cementPlugTextureCache = Texture.from(canvas);
 
     return this.cementPlugTextureCache;
   }
@@ -294,19 +268,19 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     }
     const { exaggerationFactor } = this.options as WellComponentBaseOptions<T>;
 
-    const diameter = component.diameter * exaggerationFactor;
+    const exaggeratedDiameter = component.diameter * exaggerationFactor;
 
     const pathPoints = this.getZFactorScaledPathForPoints(component.start, component.end);
 
     return {
       pathPoints,
-      diameter,
+      referenceDiameter: exaggeratedDiameter,
       symbolKey: component.symbolKey,
     };
   };
 
   private drawSymbolComponent = (renderObject: SymbolRenderObject): void => {
-    const { pathPoints, diameter, symbolKey } = renderObject;
+    const { pathPoints, referenceDiameter: diameter, symbolKey } = renderObject;
 
     // Pixi.js-legacy with Canvas render type handles advanced render methods poorly
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
@@ -340,26 +314,20 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
       return;
     }
 
-    const { exaggerationFactor, holeFirstColor, holeLineColor } = this.options as SchematicLayerOptions<T>;
-
-    const diameter = holeObject.diameter * exaggerationFactor;
-    const radius = diameter / 2;
-
     const pathPoints = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end);
-    const normals = createNormals(pathPoints);
-
-    const rightPath = offsetPoints(pathPoints, normals, radius);
-    const leftPath = offsetPoints(pathPoints, normals, -radius);
-
     if (pathPoints.length === 0) {
       return;
     }
+
+    const { exaggerationFactor, holeFirstColor, holeLineColor } = this.options as SchematicLayerOptions<T>;
+    const diameter = holeObject.diameter * exaggerationFactor;
+    const { rightPath, leftPath, referenceDiameter } = createTubularRenderingObject(diameter, pathPoints);
 
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       const polygonCoords = makeTubularPolygon(leftPath, rightPath);
       this.drawBigPolygon(polygonCoords, convertColor(holeFirstColor));
     } else {
-      const texture = this.getHoleTexture(diameter);
+      const texture = this.getHoleTexture(referenceDiameter);
       this.drawHoleRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
@@ -539,30 +507,34 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
 
   private drawScreen({ start, end, diameter }: Screen): void {
     const { exaggerationFactor, screenLineColor } = this.options as SchematicLayerOptions<T>;
+    const exaggeratedDiameter = exaggerationFactor * diameter;
+
+    const pathPoints = this.getZFactorScaledPathForPoints(start, end);
+    const { leftPath, rightPath, referenceDiameter } = createTubularRenderingObject(exaggeratedDiameter, pathPoints);
+    const polygon = makeTubularPolygon(leftPath, rightPath);
 
     const texture = this.getScreenTexture();
-    const exaggeratedDiameter = exaggerationFactor * diameter;
-    const { pathPoints, polygon, leftPath, rightPath } = createTubularPolygon(exaggeratedDiameter, this.getZFactorScaledPathForPoints(start, end));
-
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigTexturedPolygon(polygon, texture);
     } else {
       this.drawCompletionRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
-        exaggeratedDiameter,
+        referenceDiameter,
       );
     }
     this.drawOutline(leftPath, rightPath, screenLineColor, SCREEN_OUTLINE * exaggerationFactor, false);
   }
 
   private drawTubing({ diameter, start, end }: Tubing): void {
-    const texture = this.getTubingTexture();
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
-    const { pathPoints, polygon, referenceDiameter } = createTubularPolygon(exaggeratedDiameter, this.getZFactorScaledPathForPoints(start, end));
+    const pathPoints = this.getZFactorScaledPathForPoints(start, end);
+    const { leftPath, rightPath, referenceDiameter } = createTubularRenderingObject(exaggeratedDiameter, pathPoints);
+    const polygon = makeTubularPolygon(leftPath, rightPath);
 
+    const texture = this.getTubingTexture();
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigTexturedPolygon(polygon, texture);
     } else {

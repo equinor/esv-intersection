@@ -90,7 +90,16 @@ export interface PAndASymbol extends SymbolComponent {
   kind: 'pAndA-symbol';
 }
 
-export type PAndA = PAndASymbol | CementSqueeze | CementPlug;
+export const isPAndASymbol = (item: PAndA): item is PAndASymbol => item.kind === 'pAndA-symbol';
+
+export interface CementSqueeze {
+  kind: 'cementSqueeze';
+  top: number;
+  bottom: number;
+  casingIds?: string[];
+}
+
+export const isCementSqueeze = (item: PAndA): item is CementSqueeze => item.kind === 'cementSqueeze';
 
 export interface CementPlug {
   id: string;
@@ -101,6 +110,10 @@ export interface CementPlug {
   casingId?: string;
   secondCasingId?: string;
 }
+
+export const isCementPlug = (item: PAndA): item is CementSqueeze => item.kind === 'cementPlug';
+
+export type PAndA = PAndASymbol | CementSqueeze | CementPlug;
 
 interface BaseCompletion {
   diameter: number;
@@ -146,15 +159,6 @@ export interface Cement {
    */
   casingId?: string;
 }
-
-export interface CementSqueeze {
-  kind: 'cementSqueeze';
-  top: number;
-  bottom: number;
-  casingIds?: string[];
-}
-
-export const isCementSqueeze = (item: PAndA): item is CementSqueeze => item.kind === 'cementSqueeze';
 
 export interface MDPoint {
   point: number[];

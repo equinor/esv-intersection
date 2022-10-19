@@ -15,7 +15,6 @@ interface ScalingFactors {
 }
 
 export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
-  _textureCache: Texture; // TODO remove once the inheriting layers reduced to SchematicLayer
   protected scalingFactors: ScalingFactors = {
     height: 800,
     zFactor: 1,
@@ -36,7 +35,6 @@ export abstract class WellboreBaseComponentLayer<T> extends PixiLayer<T> {
 
   onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
-    this._textureCache = null;
   }
 
   onUpdate(event: OnUpdateEvent<T>): void {
