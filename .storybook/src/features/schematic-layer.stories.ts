@@ -73,6 +73,12 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           diameter: 8.5,
           symbolKey: 'mechanicalPlug',
         },
+        { kind: 'cementPlug' as const,
+          id: 'cement-plug-2',
+          top: 5150,
+          bottom: 5230,
+          casingId: '7',
+        }
       ];
 
       const schematicData: SchematicData = {
