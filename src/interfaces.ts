@@ -91,6 +91,7 @@ export interface PAndASymbol extends SymbolComponent {
 }
 
 export type PAndA = PAndASymbol | CementSqueeze | CementPlug;
+
 export interface CementPlug {
   id: string;
   top: number;

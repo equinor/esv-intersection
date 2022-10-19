@@ -1,5 +1,5 @@
 import { max } from 'd3-array';
-import { Graphics, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { CasingShoeSize, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import {
