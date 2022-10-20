@@ -468,19 +468,14 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   };
 
   private drawSymbolComponent = (renderObject: SymbolRenderObject): void => {
-    const { pathPoints, referenceDiameter: diameter, symbolKey } = renderObject;
+    const { pathPoints, referenceDiameter, symbolKey } = renderObject;
 
-    // Pixi.js-legacy with Canvas render type handles advanced render methods poorly
-    if (this.renderType() === RENDERER_TYPE.CANVAS) {
-      // TODO implement this
-      // this.drawBigPolygon(polygon, solidColor);
-    } else {
-      const texture = this.getSymbolTexture(symbolKey, diameter);
-      this.drawSVGRope(
-        pathPoints.map((p) => new Point(p[0], p[1])),
-        texture,
-      );
-    }
+    const texture = this.getSymbolTexture(symbolKey, referenceDiameter);
+    // The rope renders fine in CANVAS/fallback mode
+    this.drawSVGRope(
+      pathPoints.map((p) => new Point(p[0], p[1])),
+      texture,
+    );
   };
 
   private drawSVGRope(path: Point[], texture: Texture): void {

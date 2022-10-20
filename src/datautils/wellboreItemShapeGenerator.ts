@@ -138,9 +138,7 @@ export const createComplexRopeSegmentsForCement = (
   exaggerationFactor: number,
   getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
-  // Merge deprecated casingId and casingIds array
-  // TODO remove casingId now?
-  const casingIds = [cement.casingId, ...(cement.casingIds || [])].filter((id) => id);
+  const casingIds = (cement.casingIds || []).filter((id) => id);
 
   const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
