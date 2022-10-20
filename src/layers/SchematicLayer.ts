@@ -42,7 +42,7 @@ import {
   makeTubularPolygon,
   prepareCasingRenderObject,
   createCementPlugTexture,
-} from '../datautils/wellboreItemShapeGenerator';
+} from '../datautils/schematicShapeGenerator';
 import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
