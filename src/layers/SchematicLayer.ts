@@ -1,6 +1,7 @@
 import { max } from 'd3-array';
-import { IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
-import { PixiRenderApplication } from '.';
+import { scaleLinear, ScaleLinear } from 'd3-scale';
+import { Graphics, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import {
   CasingRenderObject,
@@ -33,13 +34,20 @@ import {
   OnUnmountEvent,
   isPAndASymbol,
   isCementPlug,
+  OnUpdateEvent,
+  OnRescaleEvent,
 } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
 import { FixedWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
 import { UniformTextureStretchRope } from './CustomDisplayObjects/UniformTextureStretchRope';
-import { WellboreBaseComponentLayer, WellComponentBaseOptions } from './WellboreBaseComponentLayer';
+
+interface ScalingFactors {
+  height: number;
+  zFactor: number;
+  yScale: ScaleLinear<number, number, never>;
+}
 
 interface SymbolRenderObject {
   pathPoints: number[][];
@@ -77,7 +85,8 @@ export interface SchematicData {
   };
 }
 
-export interface SchematicLayerOptions<T extends SchematicData> extends WellComponentBaseOptions<T> {
+export interface SchematicLayerOptions<T extends SchematicData> extends LayerOptions<T> {
+  exaggerationFactor?: number;
   holeFirstColor?: string;
   holeSecondColor?: string;
   holeLineColor?: number;
@@ -102,7 +111,7 @@ export interface SchematicLayerOptions<T extends SchematicData> extends WellComp
   cementPlugCecondColor?: string;
 }
 
-export class SchematicLayer<T extends SchematicData> extends WellboreBaseComponentLayer<T> {
+export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   private casingVisibility = true;
   private cementVisibility = true;
 
@@ -116,10 +125,17 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
 
   private maxHoleDiameter: number;
 
+  protected scalingFactors: ScalingFactors = {
+    height: 800,
+    zFactor: 1,
+    yScale: scaleLinear(),
+  };
+
   constructor(ctx: PixiRenderApplication, id?: string, options?: SchematicLayerOptions<T>) {
     super(ctx, id, options);
     this.options = {
       ...this.options,
+      exaggerationFactor: 2,
       holeFirstColor: '#8c541d',
       holeSecondColor: '#eee3d8',
       holeLineColor: 0x8b4513,
@@ -142,7 +158,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     };
   }
 
-  onUnmount(event?: OnUnmountEvent): void {
+  public onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
     this.cementTextureCache = null;
     this.cementSqueezeTextureCache = null;
@@ -152,7 +168,141 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     this.textureSymbolCacheArray = null;
   }
 
-  preRender(): void {
+  public onUpdate(event: OnUpdateEvent<T>): void {
+    super.onUpdate(event);
+    this.clearLayer();
+    this.preRender();
+    this.render();
+  }
+
+  public override onRescale(event: OnRescaleEvent): void {
+    const shouldRecalculate = this.scalingFactors.zFactor !== event.zFactor;
+
+    this.scalingFactors = { height: event.height, zFactor: event.zFactor, yScale: event.yScale };
+    super.optionsRescale(event);
+    const yRatio = this.yRatio();
+    const flippedX = event.xBounds[0] > event.xBounds[1];
+    const flippedY = event.yBounds[0] > event.yBounds[1];
+    this.setContainerPosition(event.xScale(0), event.yScale(0));
+    this.setContainerScale(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
+    if (shouldRecalculate) {
+      this.clearLayer();
+      this.preRender();
+    }
+
+    this.render();
+  }
+
+  public override setVisibility(isVisible: boolean, layerId: string) {
+    if (layerId === this.id) {
+      super.setVisibility(isVisible, layerId);
+      return;
+    }
+
+    const isCement = (this.options as SchematicLayerOptions<T>)?.internalLayers?.cementId === layerId;
+    const isCasing = (this.options as SchematicLayerOptions<T>)?.internalLayers?.casingId === layerId;
+
+    if (!isCement && !isCasing) {
+      return;
+    }
+
+    if (isCement) {
+      this.cementVisibility = isVisible;
+    }
+
+    if (isCasing) {
+      this.casingVisibility = isVisible;
+    }
+
+    this.clearLayer();
+    this.preRender();
+    this.render();
+  }
+
+  public getInternalLayerIds(): string[] {
+    const { internalLayers } = this.options as SchematicLayerOptions<T>;
+    return internalLayers ? [internalLayers.casingId, internalLayers.cementId] : [];
+  }
+
+  /**
+   * Calculate yRatio without zFactor
+   * TODO consider to move this into ZoomPanHandler
+   */
+  protected yRatio(): number {
+    const domain = this.scalingFactors.yScale.domain();
+    const ySpan = domain[1] - domain[0];
+    const baseYSpan = ySpan * this.scalingFactors.zFactor;
+    const baseDomain = [domain[0], domain[0] + baseYSpan];
+    return Math.abs(this.scalingFactors.height / (baseDomain[1] - baseDomain[0]));
+  }
+
+  protected getZFactorScaledPathForPoints = (start: number, end: number): [number, number][] => {
+    const y = (y: number): number => y * this.scalingFactors.zFactor;
+
+    const path = this.referenceSystem.getCurtainPath(start, end, true);
+    return path.map((p) => [p.point[0], y(p.point[1])]);
+  };
+
+  protected drawBigPolygon = (coords: Point[], color = 0x000000) => {
+    const polygon = new Graphics();
+    polygon.beginFill(color);
+    polygon.drawPolygon(coords);
+    polygon.endFill();
+
+    this.addChild(polygon);
+  };
+
+  protected drawBigTexturedPolygon = (coords: Point[], t: Texture): Graphics => {
+    const polygon = new Graphics().beginTextureFill({ texture: t }).drawPolygon(coords).endFill();
+    this.addChild(polygon);
+    return polygon;
+  };
+
+  protected drawRope(path: Point[], texture: Texture, tint?: number): void {
+    if (path.length === 0) {
+      return null;
+    }
+
+    const rope: SimpleRope = new SimpleRope(texture, path, 1);
+
+    rope.tint = tint || rope.tint;
+
+    this.addChild(rope);
+  }
+  /**
+   *
+   * @param leftPath Points for line on left side
+   * @param rightPath Points for line on right side
+   * @param lineColor Color of line
+   * @param lineWidth Width of line
+   * @param close If line should close in top and bottom to form a loop
+   * @param lineAlignment alignment of the line to draw, (0 = inner, 0.5 = middle, 1 = outer).
+   */
+  protected drawOutline(leftPath: Point[], rightPath: Point[], lineColor: number, lineWidth = 1, close: boolean = false, lineAlignment = 1): void {
+    const leftPathReverse = leftPath.map<Point>((d) => d.clone()).reverse();
+
+    const startPointRight = rightPath[0];
+    const startPointLeft = leftPathReverse[0];
+
+    const line = new Graphics();
+    line.lineStyle(lineWidth, lineColor, undefined, lineAlignment);
+    line.moveTo(startPointRight.x, startPointRight.y);
+    rightPath.forEach((p: Point) => line.lineTo(p.x, p.y));
+
+    if (!close) {
+      line.moveTo(startPointLeft.x, startPointLeft.y);
+    }
+
+    leftPathReverse.forEach((p: Point) => line.lineTo(p.x, p.y));
+
+    if (close) {
+      line.lineTo(startPointRight.x, startPointRight.y);
+    }
+
+    this.addChild(line);
+  }
+
+  public preRender(): void {
     if (!this.data || !this.referenceSystem) {
       return;
     }
@@ -266,7 +416,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     if (component == null) {
       return;
     }
-    const { exaggerationFactor } = this.options as WellComponentBaseOptions<T>;
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
 
     const exaggeratedDiameter = component.diameter * exaggerationFactor;
 
@@ -457,7 +607,7 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
     return createComplexRopeSegmentsForCement(cement, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };
 
-  createCementSqueezeShape = (squeeze: CementSqueeze, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
+  private createCementSqueezeShape = (squeeze: CementSqueeze, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     return createComplexRopeSegmentsForCementSqueeze(squeeze, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };
@@ -569,36 +719,5 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
 
     const rope: FixedWidthSimpleRope = new FixedWidthSimpleRope(texture, path, diameter);
     this.addChild(rope);
-  }
-
-  getInternalLayerIds(): string[] {
-    const { internalLayers } = this.options as SchematicLayerOptions<T>;
-    return internalLayers ? [internalLayers.casingId, internalLayers.cementId] : [];
-  }
-
-  override setVisibility(isVisible: boolean, layerId: string) {
-    if (layerId === this.id) {
-      super.setVisibility(isVisible, layerId);
-      return;
-    }
-
-    const isCement = (this.options as SchematicLayerOptions<T>)?.internalLayers?.cementId === layerId;
-    const isCasing = (this.options as SchematicLayerOptions<T>)?.internalLayers?.casingId === layerId;
-
-    if (!isCement && !isCasing) {
-      return;
-    }
-
-    if (isCement) {
-      this.cementVisibility = isVisible;
-    }
-
-    if (isCasing) {
-      this.casingVisibility = isVisible;
-    }
-
-    this.clearLayer();
-    this.preRender();
-    this.render();
   }
 }
