@@ -36,6 +36,7 @@ import {
   isCementPlug,
   OnUpdateEvent,
   OnRescaleEvent,
+  assertNever,
 } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
@@ -55,15 +56,36 @@ interface SymbolRenderObject {
   symbolKey: string;
 }
 
-interface CementShape {
+interface CementRenderObject {
+  kind: 'cement';
   segments: ComplexRopeSegment[];
   casingIds: string[];
+  zIndex?: number;
 }
 
-interface CementSqueezeShape {
+interface CementSqueezeRenderObject {
+  kind: 'cement-squeeze';
   segments: ComplexRopeSegment[];
   casingIds: string[];
+  zIndex?: number;
 }
+
+type InterlacedRenderObjects = CasingRenderObject | CementRenderObject | CementSqueezeRenderObject;
+
+export const foldInterlacedRenderObjects =
+  <T>(fCasing: (obj: CasingRenderObject) => T, fCement: (obj: CementRenderObject) => T, fCementSqueeze: (obj: CementSqueezeRenderObject) => T) =>
+  (renderObject: InterlacedRenderObjects): T => {
+    switch (renderObject.kind) {
+      case 'casing':
+        return fCasing(renderObject);
+      case 'cement':
+        return fCement(renderObject);
+      case 'cement-squeeze':
+        return fCementSqueeze(renderObject);
+      default:
+        return assertNever(renderObject);
+    }
+  };
 export interface CasingShoeSize {
   width: number;
   length: number;
@@ -324,8 +346,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       prepareCasingRenderObject(exaggerationFactor, casing, this.getZFactorScaledPathForPoints(casing.start, casing.end)),
     );
 
-    const cementShapes: CementShape[] = cements.map(
-      (cement: Cement): CementShape => ({
+    const cementShapes: CementRenderObject[] = cements.map(
+      (cement: Cement): CementRenderObject => ({
+        kind: 'cement',
         segments: this.createCementShape(cement, sortedCasings, holeSizes),
         casingIds: [cement.casingId, ...(cement.casingIds || [])].filter((id) => id),
       }),
@@ -337,27 +360,23 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       <[CementSqueeze[], Exclude<PAndA, CementSqueeze>[]]>[[], []],
     );
 
-    const cementSqueezesShape: CementSqueezeShape[] = cementSqueezes.map((squeeze) => ({
+    const cementSqueezesShape: CementSqueezeRenderObject[] = cementSqueezes.map((squeeze) => ({
+      kind: 'cement-squeeze',
       segments: this.createCementSqueezeShape(squeeze, sortedCasings, holeSizes),
       casingIds: squeeze.casingIds,
     }));
 
-    this.groupCementAndCasingRenderObjects(casingRenderObjects, cementShapes, cementSqueezesShape).forEach(
-      ([cementShape, casingRenderObject, squeezes]: [CementShape | undefined, CasingRenderObject, CementSqueezeShape[]]) => {
-        if (cementShape) {
-          this.cementVisibility && this.drawComplexRope(cementShape.segments, this.getCementTexture());
-        }
-
-        squeezes.forEach((squeeze) => {
-          this.drawComplexRope(squeeze.segments, this.createCementSqueezeTexture());
-        });
-
-        this.casingVisibility && this.drawCasing(casingRenderObject);
-
-        if (casingRenderObject.hasShoe) {
-          this.casingVisibility && this.drawShoe(casingRenderObject.bottom, casingRenderObject.referenceRadius);
-        }
-      },
+    this.sortCementAndCasingRenderObjects(casingRenderObjects, cementShapes, cementSqueezesShape).forEach(
+      foldInterlacedRenderObjects(
+        (casingRO: CasingRenderObject) => {
+          if (this.casingVisibility) {
+            this.drawCasing(casingRO);
+            casingRO.hasShoe && this.drawShoe(casingRO.bottom, casingRO.referenceRadius);
+          }
+        },
+        (cementRO: CementRenderObject) => this.cementVisibility && this.drawComplexRope(cementRO.segments, this.getCementTexture()),
+        (cementSqueezesRO: CementSqueezeRenderObject) => this.drawComplexRope(cementSqueezesRO.segments, this.createCementSqueezeTexture()),
+      ),
     );
 
     completion.forEach(
@@ -520,25 +539,40 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return texture;
   }
 
-  private groupCementAndCasingRenderObjects(
+  private sortCementAndCasingRenderObjects(
     casingRenderObjects: CasingRenderObject[],
-    cementShapes: CementShape[],
-    cementSqueezes: CementSqueezeShape[],
-  ): [CementShape | undefined, CasingRenderObject, CementSqueezeShape[]][] {
-    // TODO check if we can type it better here!
-    const { tuples } = casingRenderObjects.reduce(
-      (acc, casingRenderObject) => {
+    cementRenderObject: CementRenderObject[],
+    cementSqueezes: CementSqueezeRenderObject[],
+  ): InterlacedRenderObjects[] {
+    type InterlaceReducerAcc = {
+      result: InterlacedRenderObjects[];
+      remainingCement: CementRenderObject[];
+      remainingCementSqueezes: CementSqueezeRenderObject[];
+    };
+
+    let zIndex = 0;
+
+    const { result } = casingRenderObjects.reduce(
+      (acc: InterlaceReducerAcc, casingRenderObject): InterlaceReducerAcc => {
         const foundCementShape = acc.remainingCement.find((cement) => cement.casingIds.includes(casingRenderObject.casingId));
         const foundCementSqueezes = acc.remainingCementSqueezes.filter((squeeze) => squeeze.casingIds.includes(casingRenderObject.casingId));
+
+        if (foundCementShape) {
+          foundCementShape.zIndex = zIndex++;
+        }
+        foundCementSqueezes.forEach((item) => (item.zIndex = zIndex++));
+        casingRenderObject.zIndex = zIndex++;
+
         return {
-          tuples: [...acc.tuples, [foundCementShape, casingRenderObject, foundCementSqueezes]],
+          result: [...acc.result, foundCementShape, casingRenderObject, ...foundCementSqueezes],
           remainingCement: acc.remainingCement.filter((c) => c !== foundCementShape),
           remainingCementSqueezes: acc.remainingCementSqueezes.filter((squeeze) => !foundCementSqueezes.includes(squeeze)),
         };
       },
-      { tuples: [], remainingCement: cementShapes, remainingCementSqueezes: cementSqueezes },
+      { result: [], remainingCement: cementRenderObject, remainingCementSqueezes: cementSqueezes },
     );
-    return tuples;
+
+    return result.filter((item) => item !== undefined).sort((a, b) => a.zIndex - b.zIndex);
   }
 
   private drawComplexRope(intervals: ComplexRopeSegment[], texture: Texture): void {

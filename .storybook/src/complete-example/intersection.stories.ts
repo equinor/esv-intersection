@@ -27,7 +27,7 @@ import {
 import { seismicColorMap } from '../exampledata';
 
 import { getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks, getCompletion, getCementSqueezes } from '../data';
-import { Annotation, CasingAndCementData, CasingAndCementLayer, Completion, HoleSize, SchematicLayer } from '../../../src';
+import { Annotation, SchematicLayer } from '../../../src';
 
 export const intersection = () => {
   const xBounds: [number, number] = [0, 1000];

@@ -12,12 +12,14 @@ export interface TubularRenderingObject {
 }
 
 export interface CasingRenderObject extends TubularRenderingObject {
+  kind: 'casing';
   pathPoints: number[][];
   polygon: Point[];
   casingId: string;
   casingWallWidth: number;
   hasShoe: boolean;
   bottom: number;
+  zIndex?: number;
 }
 
 export const getEndLines = (
@@ -452,6 +454,7 @@ export const prepareCasingRenderObject = (exaggerationFactor: number, casing: Ca
 
   return {
     ...renderObject,
+    kind: 'casing',
     pathPoints,
     polygon,
     casingId: casing.casingId,
