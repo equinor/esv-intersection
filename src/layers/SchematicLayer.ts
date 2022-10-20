@@ -330,27 +330,24 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return;
     }
 
-    const { exaggerationFactor, cementPlugOptions } = this.options as SchematicLayerOptions<T>;
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     const { holeSizes, casings, cements, completion, symbols, pAndA } = this.data;
 
-    this.textureSymbolCacheArray = Object.entries(symbols).reduce((list: { [key: string]: Texture }, [key, symbol]: [string, string]) => {
-      list[key] = Texture.from(symbol);
-      return list;
-    }, {});
+    this.updateSymbolCache(symbols);
 
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter);
     this.maxHoleDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) * exaggerationFactor : EXAGGERATED_DIAMETER * exaggerationFactor;
     holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
 
-    const sortedCasings = casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
-    const casingRenderObjects: CasingRenderObject[] = sortedCasings.map((casing: Casing) =>
+    casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
+    const casingRenderObjects: CasingRenderObject[] = casings.map((casing: Casing) =>
       prepareCasingRenderObject(exaggerationFactor, casing, this.getZFactorScaledPathForPoints(casing.start, casing.end)),
     );
 
     const cementShapes: CementRenderObject[] = cements.map(
       (cement: Cement): CementRenderObject => ({
         kind: 'cement',
-        segments: this.createCementShape(cement, sortedCasings, holeSizes),
+        segments: createComplexRopeSegmentsForCement(cement, casings, holeSizes, exaggerationFactor, this.getZFactorScaledPathForPoints),
         casingIds: [cement.casingId, ...(cement.casingIds || [])].filter((id) => id),
       }),
     );
@@ -363,7 +360,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
     const cementSqueezesShape: CementSqueezeRenderObject[] = cementSqueezes.map((squeeze) => ({
       kind: 'cement-squeeze',
-      segments: this.createCementSqueezeShape(squeeze, sortedCasings, holeSizes),
+      segments: this.createCementSqueezeShape(squeeze, casings, holeSizes),
       casingIds: squeeze.casingIds,
     }));
 
@@ -397,38 +394,60 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         this.drawSymbolComponent(symbolRenderObject);
       }
       if (isCementPlug(obj)) {
-        const cementPlugSegments = this.createCementPlugShape(obj, casings, holeSizes);
-        this.drawComplexRope(cementPlugSegments, this.getCementPlugTexture(cementPlugOptions));
-
-        const { rightPath, leftPath } = cementPlugSegments.reduce(
-          (acc, current) => {
-            const pathPoints = current.points.map<[number, number]>((p: IPoint) => [p.x, p.y]);
-            const { leftPath, rightPath } = createTubularRenderingObject(current.diameter, pathPoints);
-
-            return {
-              rightPath: [...acc.rightPath, ...rightPath],
-              leftPath: [...acc.leftPath, ...leftPath],
-            };
-          },
-          { rightPath: [], leftPath: [] },
-        );
-        // eslint-disable-next-line no-magic-numbers
-        this.drawOutline(leftPath, rightPath, convertColor('black'), 0.25, true);
+        this.drawCementPlug(obj, casings, holeSizes);
       }
     });
+  }
+
+  private updateSymbolCache(symbols: { [key: string]: string }) {
+    if (!this.textureSymbolCacheArray) {
+      this.textureSymbolCacheArray = {};
+    }
+    if (!symbols) {
+      return;
+    }
+
+    const existingKeys = Object.keys(this.textureSymbolCacheArray);
+    Object.entries(symbols).forEach(([key, symbol]: [string, string]) => {
+      if (!existingKeys.includes(key)) {
+        this.textureSymbolCacheArray[key] = Texture.from(symbol);
+      }
+    });
+  }
+
+  private drawCementPlug(cementPlug: CementPlug, casings: Casing[], holes: HoleSize[]) {
+    const { exaggerationFactor, cementPlugOptions } = this.options as SchematicLayerOptions<T>;
+
+    const cementPlugSegments = createComplexRopeSegmentsForCementPlug(
+      cementPlug,
+      casings,
+      holes,
+      exaggerationFactor,
+      this.getZFactorScaledPathForPoints,
+    );
+    this.drawComplexRope(cementPlugSegments, this.getCementPlugTexture(cementPlugOptions));
+
+    const { rightPath, leftPath } = cementPlugSegments.reduce(
+      (acc, current) => {
+        const pathPoints = current.points.map<[number, number]>((p: IPoint) => [p.x, p.y]);
+        const { leftPath, rightPath } = createTubularRenderingObject(current.diameter, pathPoints);
+
+        return {
+          rightPath: [...acc.rightPath, ...rightPath],
+          leftPath: [...acc.leftPath, ...leftPath],
+        };
+      },
+      { rightPath: [], leftPath: [] },
+    );
+    // eslint-disable-next-line no-magic-numbers
+    this.drawOutline(leftPath, rightPath, convertColor('black'), 0.25, true);
   }
 
   private getCementPlugTexture(cementPlugOptions: CementPlugOptions): Texture {
     if (!this.cementPlugTextureCache) {
       this.cementPlugTextureCache = createCementPlugTexture(cementPlugOptions);
     }
-
     return this.cementPlugTextureCache;
-  }
-
-  private createCementPlugShape(plug: CementPlug, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] {
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-    return createComplexRopeSegmentsForCementPlug(plug, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   }
 
   private prepareSymbolRenderObject = (component: CompletionSymbol | PAndASymbol): SymbolRenderObject => {
@@ -535,6 +554,13 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return texture;
   }
 
+  /**
+   * The rendering order of these components needs to be aligned
+   * @param casingRenderObjects
+   * @param cementRenderObject
+   * @param cementSqueezes
+   * @returns ordered rendering list
+   */
   private sortCementAndCasingRenderObjects(
     casingRenderObjects: CasingRenderObject[],
     cementRenderObject: CementRenderObject[],
@@ -632,11 +658,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const shoeTip: Point = offsetPoint(shoeTipPoint, shoeTipNormal, width + casingRadius * (width < 0 ? -1 : 1));
 
     return [...shoeEdge, shoeTip];
-  };
-
-  private createCementShape = (cement: Cement, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-    return createComplexRopeSegmentsForCement(cement, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };
 
   private createCementSqueezeShape = (squeeze: CementSqueeze, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
