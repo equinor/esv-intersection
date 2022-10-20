@@ -22,6 +22,11 @@ describe('color', () => {
       const convertedColor = convertColor('white');
       expect(convertedColor).toEqual(0xffffff);
     });
+
+    it('should convert rgb() color', () => {
+      const convertedColor = convertColor('rgb(139, 69, 19)');
+      expect(convertedColor).toEqual(0x8b4513);
+    });
   });
 
   describe('colorToCSSColor', () => {
