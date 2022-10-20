@@ -109,29 +109,83 @@ export interface SchematicData {
 
 export interface SchematicLayerOptions<T extends SchematicData> extends LayerOptions<T> {
   exaggerationFactor?: number;
-  holeFirstColor?: string;
-  holeSecondColor?: string;
-  holeLineColor?: string;
-  casingSolidColor?: string;
-  casingLineColor?: string;
-  cementFirstColor?: string;
-  cementSecondColor?: string;
-  cementSqueezeFirstColor?: string;
-  cementSqueezeSecondColor?: string;
-  casingShoeSize?: CasingShoeSize;
-  cementTextureScalingFactor?: number;
-  screenScalingFactor?: number;
-  tubingScalingFactor?: number;
-  tubingInnerColor?: string;
-  tubingOuterColor?: string;
-  screenLineColor?: string;
   internalLayers?: {
     casingId: string;
     cementId: string;
   };
-  cementPlugFirstColor?: string;
-  cementPlugCecondColor?: string;
+  holeOptions?: {
+    firstColor: string;
+    secondColor: string;
+    lineColor: string;
+  };
+  casingOptions?: {
+    solidColor: string;
+    lineColor: string;
+    shoeSize: CasingShoeSize;
+  };
+  cementOptions?: {
+    firstColor: string;
+    secondColor: string;
+    scalingFactor: number;
+  };
+  cementSqueezeOptions?: {
+    firstColor: string;
+    secondColor: string;
+    scalingFactor: number;
+  };
+  screenOptions?: {
+    scalingFactor: number;
+    lineColor: string;
+  };
+  tubingOptions?: {
+    innerColor: string;
+    outerColor: string;
+    scalingFactor: number;
+  };
+  cementPlugOptions?: {
+    firstColor: string;
+    secondColor: string;
+    scalingFactor: number;
+  };
 }
+
+const defaultSchematicLayerOptions: SchematicLayerOptions<SchematicData> = {
+  exaggerationFactor: 2,
+  holeOptions: {
+    firstColor: '#8c541d',
+    secondColor: '#eee3d8',
+    lineColor: '#8b4513',
+  },
+  casingOptions: {
+    solidColor: '#dcdcdc',
+    lineColor: '#575757',
+    shoeSize: defaultCasingShoeSize,
+  },
+  cementOptions: {
+    firstColor: '#c7b9ab',
+    secondColor: '#5b5b5b',
+    scalingFactor: 4,
+  },
+  cementSqueezeOptions: {
+    firstColor: '#8b4513',
+    secondColor: '#8b6713',
+    scalingFactor: 4,
+  },
+  screenOptions: {
+    scalingFactor: 4,
+    lineColor: '#63666a',
+  },
+  tubingOptions: {
+    scalingFactor: 1,
+    innerColor: '#EEEEFF',
+    outerColor: '#777788',
+  },
+  cementPlugOptions: {
+    firstColor: '#c7b9ab',
+    secondColor: '#c7b9ab',
+    scalingFactor: 4,
+  },
+};
 
 export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   private casingVisibility = true;
@@ -148,34 +202,16 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   private maxHoleDiameter: number;
 
   protected scalingFactors: ScalingFactors = {
-    height: 800,
+    height: 600,
     zFactor: 1,
     yScale: scaleLinear(),
   };
 
   constructor(ctx: PixiRenderApplication, id?: string, options?: SchematicLayerOptions<T>) {
     super(ctx, id, options);
-    this.options = {
+    this.options = <SchematicLayerOptions<T>>{
       ...this.options,
-      exaggerationFactor: 2,
-      holeFirstColor: '#8c541d',
-      holeSecondColor: '#eee3d8',
-      holeLineColor: '#8b4513',
-      casingSolidColor: '#dcdcdc',
-      casingLineColor: '#575757',
-      casingShoeSize: defaultCasingShoeSize,
-      cementTextureScalingFactor: 4,
-      cementFirstColor: '#c7b9ab',
-      cementSecondColor: '#5b5b5b',
-      cementSqueezeFirstColor: '#8b4513',
-      cementSqueezeSecondColor: '#8b6713',
-      screenScalingFactor: 4,
-      tubingScalingFactor: 1,
-      tubingInnerColor: '#EEEEFF',
-      tubingOuterColor: '#777788',
-      screenLineColor: '#63666a',
-      cementPlugFirstColor: '#c7b9ab',
-      cementPlugCecondColor: '#c7b9ab',
+      ...defaultSchematicLayerOptions,
       ...options,
     };
   }
@@ -291,6 +327,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
     this.addChild(rope);
   }
+
   /**
    *
    * @param leftPath Points for line on left side
@@ -419,8 +456,12 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
   private getCementPlugTexture(): Texture {
     if (!this.cementPlugTextureCache) {
-      const { cementPlugFirstColor, cementPlugCecondColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
-      this.cementPlugTextureCache = createCementPlugTexture(cementPlugFirstColor, cementPlugCecondColor, cementTextureScalingFactor);
+      const { cementPlugOptions } = this.options as SchematicLayerOptions<T>;
+      this.cementPlugTextureCache = createCementPlugTexture(
+        cementPlugOptions.firstColor,
+        cementPlugOptions.secondColor,
+        cementPlugOptions.scalingFactor,
+      );
     }
 
     return this.cementPlugTextureCache;
@@ -488,13 +529,13 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return;
     }
 
-    const { exaggerationFactor, holeFirstColor, holeLineColor } = this.options as SchematicLayerOptions<T>;
+    const { exaggerationFactor, holeOptions } = this.options as SchematicLayerOptions<T>;
     const diameter = holeObject.diameter * exaggerationFactor;
     const { rightPath, leftPath, referenceDiameter } = createTubularRenderingObject(diameter, pathPoints);
 
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       const polygonCoords = makeTubularPolygon(leftPath, rightPath);
-      this.drawBigPolygon(polygonCoords, convertColor(holeFirstColor));
+      this.drawBigPolygon(polygonCoords, convertColor(holeOptions.firstColor));
     } else {
       const texture = this.getHoleTexture(referenceDiameter);
       this.drawHoleRope(
@@ -503,7 +544,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       );
     }
 
-    this.drawOutline(leftPath, rightPath, convertColor(holeLineColor), HOLE_OUTLINE * exaggerationFactor, false, 0);
+    this.drawOutline(leftPath, rightPath, convertColor(holeOptions.lineColor), HOLE_OUTLINE * exaggerationFactor, false, 0);
   };
 
   private drawHoleRope(path: Point[], texture: Texture, tint?: number): void {
@@ -519,7 +560,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private getHoleTexture(diameter: number): Texture {
-    const { holeFirstColor, holeSecondColor } = this.options as SchematicLayerOptions<T>;
+    const { holeOptions } = this.options as SchematicLayerOptions<T>;
 
     const size = DEFAULT_TEXTURE_SIZE;
     const height = size;
@@ -528,7 +569,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const textureDiameter = (diameter / this.maxHoleDiameter) * size;
 
     if (!this.holeTextureCache) {
-      this.holeTextureCache = createHoleBaseTexture(holeFirstColor, holeSecondColor, width, height);
+      this.holeTextureCache = createHoleBaseTexture(holeOptions.firstColor, holeOptions.secondColor, width, height);
     }
 
     const baseTexture = this.holeTextureCache.baseTexture;
@@ -587,9 +628,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private drawCasing = (casingRenderObject: CasingRenderObject): void => {
-    const { casingLineColor, casingSolidColor } = this.options as SchematicLayerOptions<T>;
+    const { casingOptions } = this.options as SchematicLayerOptions<T>;
     const { pathPoints, polygon, leftPath, rightPath, referenceDiameter, casingWallWidth } = casingRenderObject;
-    const casingSolidColorNumber = convertColor(casingSolidColor);
+    const casingSolidColorNumber = convertColor(casingOptions.solidColor);
 
     // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
@@ -603,7 +644,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       );
     }
 
-    this.drawOutline(leftPath, rightPath, convertColor(casingLineColor), casingWallWidth, true);
+    this.drawOutline(leftPath, rightPath, convertColor(casingOptions.lineColor), casingWallWidth, true);
   };
 
   private createCasingTexture(diameter: number): Texture {
@@ -612,9 +653,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private drawShoe(casingEnd: number, casingRadius: number): void {
-    const { exaggerationFactor, casingShoeSize } = this.options as SchematicLayerOptions<T>;
-    const shoeWidth = casingShoeSize.width * exaggerationFactor;
-    const shoeLength = casingShoeSize.length * exaggerationFactor;
+    const { exaggerationFactor, casingOptions } = this.options as SchematicLayerOptions<T>;
+    const shoeWidth = casingOptions.shoeSize.width * exaggerationFactor;
+    const shoeLength = casingOptions.shoeSize.length * exaggerationFactor;
+
     const shoeCoords = this.generateShoe(casingEnd, casingRadius, shoeLength, shoeWidth);
     const shoeCoords2 = this.generateShoe(casingEnd, casingRadius, shoeLength, -shoeWidth);
     this.drawBigPolygon(shoeCoords2);
@@ -649,8 +691,8 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
   private getCementTexture(): Texture {
     if (!this.cementTextureCache) {
-      const { cementFirstColor, cementSecondColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
-      this.cementTextureCache = createCementTexture(cementFirstColor, cementSecondColor, cementTextureScalingFactor);
+      const { cementOptions } = this.options as SchematicLayerOptions<T>;
+      this.cementTextureCache = createCementTexture(cementOptions.firstColor, cementOptions.secondColor, cementOptions.scalingFactor);
     }
 
     return this.cementTextureCache;
@@ -661,20 +703,20 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return this.cementSqueezeTextureCache;
     }
 
-    const { cementSqueezeFirstColor, cementSqueezeSecondColor, cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
+    const { cementSqueezeOptions } = this.options as SchematicLayerOptions<T>;
 
     const canvas = document.createElement('canvas');
 
-    const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
-    const lineWidth = cementTextureScalingFactor;
+    const size = DEFAULT_TEXTURE_SIZE * cementSqueezeOptions.scalingFactor;
+    const lineWidth = cementSqueezeOptions.scalingFactor;
     canvas.width = size;
     canvas.height = size;
     const canvasCtx = canvas.getContext('2d');
 
-    canvasCtx.fillStyle = cementSqueezeFirstColor;
+    canvasCtx.fillStyle = cementSqueezeOptions.firstColor;
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
     canvasCtx.lineWidth = lineWidth;
-    canvasCtx.fillStyle = cementSqueezeSecondColor;
+    canvasCtx.fillStyle = cementSqueezeOptions.secondColor;
     canvasCtx.beginPath();
 
     canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
@@ -691,7 +733,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private drawScreen({ start, end, diameter }: Screen): void {
-    const { exaggerationFactor, screenLineColor } = this.options as SchematicLayerOptions<T>;
+    const { exaggerationFactor, screenOptions } = this.options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
@@ -708,7 +750,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         referenceDiameter,
       );
     }
-    this.drawOutline(leftPath, rightPath, convertColor(screenLineColor), SCREEN_OUTLINE * exaggerationFactor, false);
+    this.drawOutline(leftPath, rightPath, convertColor(screenOptions.lineColor), SCREEN_OUTLINE * exaggerationFactor, false);
   }
 
   private drawTubing({ diameter, start, end }: Tubing): void {
@@ -733,16 +775,16 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
   private getTubingTexture(): Texture {
     if (!this.tubingTextureCache) {
-      const { tubingScalingFactor, tubingInnerColor, tubingOuterColor } = this.options as SchematicLayerOptions<T>;
-      this.tubingTextureCache = createTubingTexture(tubingInnerColor, tubingOuterColor, tubingScalingFactor);
+      const { tubingOptions } = this.options as SchematicLayerOptions<T>;
+      this.tubingTextureCache = createTubingTexture(tubingOptions.innerColor, tubingOptions.outerColor, tubingOptions.scalingFactor);
     }
     return this.tubingTextureCache;
   }
 
   private getScreenTexture(): Texture {
     if (!this.screenTextureCache) {
-      const { screenScalingFactor } = this.options as SchematicLayerOptions<T>;
-      this.screenTextureCache = createScreenTexture(screenScalingFactor);
+      const { screenOptions } = this.options as SchematicLayerOptions<T>;
+      this.screenTextureCache = createScreenTexture(screenOptions.scalingFactor);
     }
     return this.screenTextureCache;
   }
