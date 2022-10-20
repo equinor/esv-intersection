@@ -350,13 +350,13 @@ export class SchematicLayer<T extends SchematicData> extends WellboreBaseCompone
   }
 
   private getHoleTexture(diameter: number): Texture {
-    const { holeFirstColor, holeSecondColor } = this.options as SchematicLayerOptions<T>;   
+    const { holeFirstColor, holeSecondColor } = this.options as SchematicLayerOptions<T>;
 
-    const size = DEFAULT_TEXTURE_SIZE
-    const height = size
+    const size = DEFAULT_TEXTURE_SIZE;
+    const height = size;
     const width = size;
 
-    const textureDiameter = (diameter / this.maxHoleDiameter) * size
+    const textureDiameter = (diameter / this.maxHoleDiameter) * size;
 
     if (!this.holeTextureCache) {
       this.holeTextureCache = createHoleBaseTexture(holeFirstColor, holeSecondColor, width, height);

@@ -131,7 +131,7 @@ export const createComplexRopeSegmentsForCement = (
 
   const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement plug data, cement plug is missing attached casing');
+    throw new Error('Invalid cement data, cement is missing attached casing');
   }
 
   const topOfCement = cement.toc;
@@ -222,7 +222,7 @@ export const createComplexRopeSegmentsForCementSqueeze = (
 
   const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement data, cement is missing attached casing');
+    throw new Error('Invalid cement squeeze data, cement is missing attached casing');
   }
 
   const { outerCasings, overlappingHoles } = findIntersectingItems(topOfCement, bottomOfCement, attachedCasings, casings, holes);
@@ -270,7 +270,7 @@ export const createComplexRopeSegmentsForCementPlug = (
 
   const attachedCasings = [casings.find((c) => c.casingId === casingId), casings.find((c) => c.casingId === secondCasingId)].filter((c) => c);
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement data, cement is missing attached casing');
+    throw new Error('Invalid cement plug data, cement is missing attached casing');
   }
   const { overlappingHoles } = findIntersectingItems(topOfCementPlug, bottomOfCementPlug, attachedCasings, casings, holes);
   const innerDiameterIntervals = [...attachedCasings, ...overlappingHoles].map((d) => ({
