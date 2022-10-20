@@ -1,5 +1,6 @@
 /* eslint-disable no-magic-numbers */
-import { SchematicLayer, SchematicData, SchematicLayerOptions, IntersectionReferenceSystem, PixiRenderApplication } from '../src/index';
+import { SchematicData } from '../src/control/schematicInterfaces';
+import { SchematicLayer, SchematicLayerOptions, IntersectionReferenceSystem, PixiRenderApplication } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
 
 describe('SchematicLayer', () => {

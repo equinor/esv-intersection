@@ -4,6 +4,32 @@ import { Graphics, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture 
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
 import {
+  assertNever,
+  Casing,
+  CasingOptions,
+  CasingShoeSize,
+  Cement,
+  CementOptions,
+  CementPlugOptions,
+  CementSqueeze,
+  CementSqueezeOptions,
+  foldCompletion,
+  HoleOptions,
+  HoleSize,
+  isCementSqueeze,
+  PAndA,
+  SchematicData,
+  ScreenOptions,
+  TubingOptions,
+  Screen,
+  Tubing,
+  CompletionSymbol,
+  isPAndASymbol,
+  isCementPlug,
+  CementPlug,
+  PAndASymbol,
+} from '../control/schematicInterfaces';
+import {
   CasingRenderObject,
   createCementTexture,
   createComplexRopeSegmentsForCement,
@@ -17,27 +43,7 @@ import {
   prepareCasingRenderObject,
   createCementPlugTexture,
 } from '../datautils/wellboreItemShapeGenerator';
-import {
-  Casing,
-  Cement,
-  Completion,
-  foldCompletion,
-  HoleSize,
-  Tubing,
-  Screen,
-  CompletionSymbol,
-  PAndA,
-  PAndASymbol,
-  isCementSqueeze,
-  CementPlug,
-  CementSqueeze,
-  OnUnmountEvent,
-  isPAndASymbol,
-  isCementPlug,
-  OnUpdateEvent,
-  OnRescaleEvent,
-  assertNever,
-} from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
@@ -72,7 +78,7 @@ interface CementSqueezeRenderObject {
 
 type InterlacedRenderObjects = CasingRenderObject | CementRenderObject | CementSqueezeRenderObject;
 
-export const foldInterlacedRenderObjects =
+const foldInterlacedRenderObjects =
   <T>(fCasing: (obj: CasingRenderObject) => T, fCement: (obj: CementRenderObject) => T, fCementSqueeze: (obj: CementSqueezeRenderObject) => T) =>
   (renderObject: InterlacedRenderObjects): T => {
     switch (renderObject.kind) {
@@ -86,26 +92,11 @@ export const foldInterlacedRenderObjects =
         return assertNever(renderObject);
     }
   };
-export interface CasingShoeSize {
-  width: number;
-  length: number;
-}
 
 const defaultCasingShoeSize: CasingShoeSize = {
   width: SHOE_WIDTH,
   length: SHOE_LENGTH,
 };
-
-export interface SchematicData {
-  holeSizes: HoleSize[];
-  casings: Casing[];
-  cements: Cement[];
-  completion: Completion[];
-  pAndA: PAndA[];
-  symbols: {
-    [key: string]: string;
-  };
-}
 
 export interface SchematicLayerOptions<T extends SchematicData> extends LayerOptions<T> {
   exaggerationFactor?: number;
@@ -113,40 +104,13 @@ export interface SchematicLayerOptions<T extends SchematicData> extends LayerOpt
     casingId: string;
     cementId: string;
   };
-  holeOptions?: {
-    firstColor: string;
-    secondColor: string;
-    lineColor: string;
-  };
-  casingOptions?: {
-    solidColor: string;
-    lineColor: string;
-    shoeSize: CasingShoeSize;
-  };
-  cementOptions?: {
-    firstColor: string;
-    secondColor: string;
-    scalingFactor: number;
-  };
-  cementSqueezeOptions?: {
-    firstColor: string;
-    secondColor: string;
-    scalingFactor: number;
-  };
-  screenOptions?: {
-    scalingFactor: number;
-    lineColor: string;
-  };
-  tubingOptions?: {
-    innerColor: string;
-    outerColor: string;
-    scalingFactor: number;
-  };
-  cementPlugOptions?: {
-    firstColor: string;
-    secondColor: string;
-    scalingFactor: number;
-  };
+  holeOptions?: HoleOptions;
+  casingOptions?: CasingOptions;
+  cementOptions?: CementOptions;
+  cementSqueezeOptions?: CementSqueezeOptions;
+  screenOptions?: ScreenOptions;
+  tubingOptions?: TubingOptions;
+  cementPlugOptions?: CementPlugOptions;
 }
 
 const defaultSchematicLayerOptions: SchematicLayerOptions<SchematicData> = {
@@ -366,7 +330,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return;
     }
 
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+    const { exaggerationFactor, cementPlugOptions } = this.options as SchematicLayerOptions<T>;
     const { holeSizes, casings, cements, completion, symbols, pAndA } = this.data;
 
     this.textureSymbolCacheArray = Object.entries(symbols).reduce((list: { [key: string]: Texture }, [key, symbol]: [string, string]) => {
@@ -434,7 +398,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       }
       if (isCementPlug(obj)) {
         const cementPlugSegments = this.createCementPlugShape(obj, casings, holeSizes);
-        this.drawComplexRope(cementPlugSegments, this.getCementPlugTexture());
+        this.drawComplexRope(cementPlugSegments, this.getCementPlugTexture(cementPlugOptions));
 
         const { rightPath, leftPath } = cementPlugSegments.reduce(
           (acc, current) => {
@@ -454,14 +418,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     });
   }
 
-  private getCementPlugTexture(): Texture {
+  private getCementPlugTexture(cementPlugOptions: CementPlugOptions): Texture {
     if (!this.cementPlugTextureCache) {
-      const { cementPlugOptions } = this.options as SchematicLayerOptions<T>;
-      this.cementPlugTextureCache = createCementPlugTexture(
-        cementPlugOptions.firstColor,
-        cementPlugOptions.secondColor,
-        cementPlugOptions.scalingFactor,
-      );
+      this.cementPlugTextureCache = createCementPlugTexture(cementPlugOptions);
     }
 
     return this.cementPlugTextureCache;
@@ -537,7 +496,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       const polygonCoords = makeTubularPolygon(leftPath, rightPath);
       this.drawBigPolygon(polygonCoords, convertColor(holeOptions.firstColor));
     } else {
-      const texture = this.getHoleTexture(referenceDiameter);
+      const texture = this.getHoleTexture(holeOptions, referenceDiameter);
       this.drawHoleRope(
         pathPoints.map((p) => new Point(p[0], p[1])),
         texture,
@@ -547,21 +506,17 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.drawOutline(leftPath, rightPath, convertColor(holeOptions.lineColor), HOLE_OUTLINE * exaggerationFactor, false, 0);
   };
 
-  private drawHoleRope(path: Point[], texture: Texture, tint?: number): void {
+  private drawHoleRope(path: Point[], texture: Texture): void {
     if (path.length === 0) {
       return null;
     }
 
     const rope: SimpleRope = new SimpleRope(texture, path, this.maxHoleDiameter / DEFAULT_TEXTURE_SIZE);
 
-    rope.tint = tint || rope.tint;
-
     this.addChild(rope);
   }
 
-  private getHoleTexture(diameter: number): Texture {
-    const { holeOptions } = this.options as SchematicLayerOptions<T>;
-
+  private getHoleTexture(holeOptions: HoleOptions, diameter: number): Texture {
     const size = DEFAULT_TEXTURE_SIZE;
     const height = size;
     const width = size;
@@ -569,7 +524,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const textureDiameter = (diameter / this.maxHoleDiameter) * size;
 
     if (!this.holeTextureCache) {
-      this.holeTextureCache = createHoleBaseTexture(holeOptions.firstColor, holeOptions.secondColor, width, height);
+      this.holeTextureCache = createHoleBaseTexture(holeOptions, width, height);
     }
 
     const baseTexture = this.holeTextureCache.baseTexture;
@@ -692,7 +647,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   private getCementTexture(): Texture {
     if (!this.cementTextureCache) {
       const { cementOptions } = this.options as SchematicLayerOptions<T>;
-      this.cementTextureCache = createCementTexture(cementOptions.firstColor, cementOptions.secondColor, cementOptions.scalingFactor);
+      this.cementTextureCache = createCementTexture(cementOptions);
     }
 
     return this.cementTextureCache;
@@ -754,14 +709,14 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private drawTubing({ diameter, start, end }: Tubing): void {
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+    const { exaggerationFactor, tubingOptions } = this.options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
     const { leftPath, rightPath, referenceDiameter } = createTubularRenderingObject(exaggeratedDiameter, pathPoints);
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
-    const texture = this.getTubingTexture();
+    const texture = this.getTubingTexture(tubingOptions);
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigTexturedPolygon(polygon, texture);
     } else {
@@ -773,10 +728,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
   }
 
-  private getTubingTexture(): Texture {
+  private getTubingTexture(tubingOptions: TubingOptions): Texture {
     if (!this.tubingTextureCache) {
-      const { tubingOptions } = this.options as SchematicLayerOptions<T>;
-      this.tubingTextureCache = createTubingTexture(tubingOptions.innerColor, tubingOptions.outerColor, tubingOptions.scalingFactor);
+      this.tubingTextureCache = createTubingTexture(tubingOptions);
     }
     return this.tubingTextureCache;
   }
@@ -784,7 +738,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   private getScreenTexture(): Texture {
     if (!this.screenTextureCache) {
       const { screenOptions } = this.options as SchematicLayerOptions<T>;
-      this.screenTextureCache = createScreenTexture(screenOptions.scalingFactor);
+      this.screenTextureCache = createScreenTexture(screenOptions);
     }
     return this.screenTextureCache;
   }

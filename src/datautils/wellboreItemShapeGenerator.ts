@@ -1,6 +1,17 @@
 import { IPoint, Point, Texture } from 'pixi.js';
-import { Cement, Casing, HoleSize, CementSqueeze, CementPlug } from '..';
 import { DEFAULT_TEXTURE_SIZE } from '../constants';
+import {
+  Casing,
+  Cement,
+  CementOptions,
+  CementPlug,
+  CementPlugOptions,
+  CementSqueeze,
+  HoleOptions,
+  HoleSize,
+  ScreenOptions,
+  TubingOptions,
+} from '../control/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 
@@ -323,7 +334,7 @@ const createGradientFill = (
   return gradient;
 };
 
-export const createHoleBaseTexture = (firstColor: string, secondColor: string, width: number, height: number): Texture => {
+export const createHoleBaseTexture = ({ firstColor, secondColor }: HoleOptions, width: number, height: number): Texture => {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -335,7 +346,7 @@ export const createHoleBaseTexture = (firstColor: string, secondColor: string, w
   return Texture.from(canvas);
 };
 
-export const createScreenTexture = (scalingFactor: number): Texture => {
+export const createScreenTexture = ({ scalingFactor }: ScreenOptions): Texture => {
   const canvas = document.createElement('canvas');
   const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
   canvas.width = size;
@@ -359,7 +370,7 @@ export const createScreenTexture = (scalingFactor: number): Texture => {
   return Texture.from(canvas);
 };
 
-export const createTubingTexture = (innerColor: string, outerColor: string, scalingFactor: number): Texture => {
+export const createTubingTexture = ({ innerColor, outerColor, scalingFactor }: TubingOptions): Texture => {
   const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
 
   const canvas = document.createElement('canvas');
@@ -381,7 +392,7 @@ export const createTubingTexture = (innerColor: string, outerColor: string, scal
   return Texture.from(canvas);
 };
 
-export const createCementTexture = (firstColor: string, secondColor: string, scalingFactor: number) => {
+export const createCementTexture = ({ firstColor, secondColor, scalingFactor }: CementOptions) => {
   const canvas = document.createElement('canvas');
 
   const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
@@ -406,7 +417,7 @@ export const createCementTexture = (firstColor: string, secondColor: string, sca
   return Texture.from(canvas);
 };
 
-export const createCementPlugTexture = (firstColor: string, secondColor: string, scalingFactor: number) => {
+export const createCementPlugTexture = ({ firstColor, secondColor, scalingFactor }: CementPlugOptions) => {
   const canvas = document.createElement('canvas');
 
   const size = DEFAULT_TEXTURE_SIZE * scalingFactor;

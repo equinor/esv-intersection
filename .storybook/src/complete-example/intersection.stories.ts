@@ -8,7 +8,6 @@ import {
   SeismicCanvasLayer,
   CalloutCanvasLayer,
   PixiRenderApplication,
-  SchematicData,
 } from '../../../src/layers';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
@@ -28,6 +27,7 @@ import { seismicColorMap } from '../exampledata';
 
 import { getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks, getCompletion, getCementSqueezes } from '../data';
 import { Annotation, SchematicLayer } from '../../../src';
+import { SchematicData } from '../../../src/control/schematicInterfaces';
 
 export const intersection = () => {
   const xBounds: [number, number] = [0, 1000];

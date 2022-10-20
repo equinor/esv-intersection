@@ -3,13 +3,13 @@ import {
   Controller,
   PixiRenderApplication,
   SchematicLayerOptions,
-  SchematicData,
   SchematicLayer,
 } from '../../../src';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
 
 import { getWellborePath, getCasings, getCement, getHolesize, getCompletion, getCementSqueezes } from '../data';
+import { SchematicData } from '../../../src/control/schematicInterfaces';
 
 const width: number = 700;
 const height: number = 600;
