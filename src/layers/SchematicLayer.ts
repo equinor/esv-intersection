@@ -78,7 +78,7 @@ interface CementRenderObject {
 }
 
 interface CementSqueezeRenderObject {
-  kind: 'cement-squeeze';
+  kind: 'cementSqueeze';
   segments: ComplexRopeSegment[];
   casingIds: string[];
   zIndex?: number;
@@ -94,7 +94,7 @@ const foldInterlacedRenderObjects =
         return fCasing(renderObject);
       case 'cement':
         return fCement(renderObject);
-      case 'cement-squeeze':
+      case 'cementSqueeze':
         return fCementSqueeze(renderObject);
       default:
         return assertNever(renderObject);
@@ -333,7 +333,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     );
 
     const cementSqueezesShape: CementSqueezeRenderObject[] = cementSqueezes.map((squeeze) => ({
-      kind: 'cement-squeeze',
+      kind: 'cementSqueeze',
       segments: this.createCementSqueezeShape(squeeze, casings, holeSizes),
       casingIds: squeeze.casingIds,
     }));

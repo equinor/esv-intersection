@@ -5,6 +5,8 @@ export function assertNever(x: never): never {
 }
 
 export interface HoleSize {
+  kind: 'hole';
+  id: string;
   diameter: number;
   start: number;
   end: number;
@@ -12,15 +14,18 @@ export interface HoleSize {
 }
 
 export interface Casing {
+  kind: 'casing';
+  id: string;
+  casingId: string;
   diameter: number;
   start: number;
   end: number;
   hasShoe: boolean;
   innerDiameter: number;
-  casingId: string;
 }
 
 interface SymbolComponent {
+  id: string;
   diameter: number;
   start: number;
   end: number;
@@ -28,13 +33,14 @@ interface SymbolComponent {
 }
 
 export interface PAndASymbol extends SymbolComponent {
-  kind: 'pAndA-symbol';
+  kind: 'pAndASymbol';
 }
 
-export const isPAndASymbol = (item: PAndA): item is PAndASymbol => item.kind === 'pAndA-symbol';
+export const isPAndASymbol = (item: PAndA): item is PAndASymbol => item.kind === 'pAndASymbol';
 
 export interface CementSqueeze {
   kind: 'cementSqueeze';
+  id: string;
   top: number;
   bottom: number;
   casingIds?: string[];
@@ -43,10 +49,10 @@ export interface CementSqueeze {
 export const isCementSqueeze = (item: PAndA): item is CementSqueeze => item.kind === 'cementSqueeze';
 
 export interface CementPlug {
+  kind: 'cementPlug';
   id: string;
   top: number;
   bottom: number;
-  kind: 'cementPlug';
   holeId?: string;
   casingId?: string;
   secondCasingId?: string;
@@ -57,6 +63,7 @@ export const isCementPlug = (item: PAndA): item is CementSqueeze => item.kind ==
 export type PAndA = PAndASymbol | CementSqueeze | CementPlug;
 
 interface BaseCompletion {
+  id: string;
   diameter: number;
   start: number;
   end: number;
@@ -70,7 +77,7 @@ export interface Tubing extends BaseCompletion {
 }
 
 export interface CompletionSymbol extends BaseCompletion {
-  kind: 'completion-symbol';
+  kind: 'completionSymbol';
   symbolKey: string;
 }
 
@@ -84,7 +91,7 @@ export const foldCompletion =
         return fScreen(completion);
       case 'tubing':
         return fTubing(completion);
-      case 'completion-symbol':
+      case 'completionSymbol':
         return fSymbol(completion);
       default:
         return assertNever(completion);
@@ -92,8 +99,10 @@ export const foldCompletion =
   };
 
 export interface Cement {
-  toc: number;
+  kind: 'cement';
+  id: string;
   casingIds?: string[];
+  toc: number;
 }
 
 export interface SchematicData {

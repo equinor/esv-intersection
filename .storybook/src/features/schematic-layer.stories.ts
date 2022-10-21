@@ -35,7 +35,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
 
       const completionSymbols = [
         {
-          kind: 'completion-symbol',
+          kind: 'completionSymbol',
           id: 'completion-svg-1',
           start: 5250,
           end: 5252,
@@ -43,7 +43,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           symbolKey: 'completionSymbol1',
         },
         {
-          kind: 'completion-symbol',
+          kind: 'completionSymbol',
           id: 'completion-svg-2',
           start: 5252,
           end: 5274,
@@ -51,7 +51,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           symbolKey: 'completionSymbol2',
         },
         {
-          kind: 'completion-symbol',
+          kind: 'completionSymbol',
           id: 'completion-svg-3',
           start: 5274,
           end: 5276,
@@ -67,7 +67,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
 
       const pAndASymbols = [
         {
-          kind: 'pAndA-symbol' as const,
+          kind: 'pAndASymbol' as const,
           id: 'mechanical-plug-1',
           start: 5100,
           end: 5110,
