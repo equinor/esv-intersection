@@ -25,9 +25,20 @@ import {
 //Data
 import { seismicColorMap } from '../exampledata';
 
-import { getSeismic, getSurfaces, getWellborePath, getStratColumns, getHolesize, getCasings, getCement, getPicks, getCompletion, getCementSqueezes } from '../data';
-import { Annotation, SchematicLayer } from '../../../src';
-import { SchematicData } from '../../../src/control/schematicInterfaces';
+import {
+  getSeismic,
+  getSurfaces,
+  getWellborePath,
+  getStratColumns,
+  getHolesize,
+  getCasings,
+  getCement,
+  getPicks,
+  getCompletion,
+  getCementSqueezes,
+} from '../data';
+import { Annotation, SchematicLayer, SchematicLayerOptions } from '../../../src';
+import { InternalLayerOptions, SchematicData } from '../../../src/control/schematicInterfaces';
 
 export const intersection = () => {
   const xBounds: [number, number] = [0, 1000];
@@ -61,6 +72,7 @@ const renderIntersection = (scaleOptions: any) => {
   const root = createRootContainer(width);
   const btnToggleContainer = createButtonContainer(width);
   const btnAdjustSizeContainer = createButtonContainer(width);
+  const btnSchematicContainer = createButtonContainer(width);
   const btnMiscContainer = createButtonContainer(width);
   const container = createLayerContainer(width, height);
 
@@ -167,23 +179,26 @@ const renderIntersection = (scaleOptions: any) => {
       symbols: { ...CSDSVGs, ...pAndASVGs },
     };
 
-    const schematicLayer = new SchematicLayer(pixiContext, 'schematic-webgl-layer', {
+    const internalLayerIds: InternalLayerOptions = {
+      holeLayerId: 'hole-id',
+      casingLayerId: 'casing-id',
+      completionLayerId: 'completion-id',
+      cementLayerId: 'cement-id',
+      pAndALayerId: 'pAndA-id',
+    };
+
+    const schematicLayerOptions: SchematicLayerOptions<SchematicData> = {
       order: 5,
       referenceSystem,
-      data: schematicData
-    });
+      internalLayerOptions: internalLayerIds,
+      data: schematicData,
+    };
+
+    const schematicLayer = new SchematicLayer(pixiContext, 'schematic-webgl-layer', schematicLayerOptions);
 
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
-    const layers = [
-      gridLayer,
-      geomodelLayer,
-      wellboreLayer,
-      geomodelLabelsLayer,
-      seismicLayer,
-      schematicLayer,
-      calloutLayer,
-    ];
+    const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, schematicLayer, calloutLayer];
 
     const opts = {
       scaleOptions,
@@ -216,6 +231,14 @@ const renderIntersection = (scaleOptions: any) => {
     const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
     const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
     const btnPicks = createButton(controller, calloutLayer, 'Picks');
+
+    const internalLayerVisibilityButtons = [
+      ['Holes', internalLayerIds.holeLayerId],
+      ['Casings', internalLayerIds.casingLayerId],
+      ['Cement', internalLayerIds.cementLayerId],
+      ['Completion', internalLayerIds.completionLayerId],
+      ['Plug & Abandonment', internalLayerIds.pAndALayerId],
+    ].map(([description, internalLayerId]) => createInternalLayerVisibilityButton(controller, internalLayerId, description))
 
     let show = true;
     const toggleAxis = createButtonWithCb(
@@ -277,6 +300,7 @@ const renderIntersection = (scaleOptions: any) => {
     btnAdjustSizeContainer.appendChild(btnSmaller);
     btnAdjustSizeContainer.appendChild(btnDefault);
     btnMiscContainer.appendChild(btnClearData);
+    internalLayerVisibilityButtons.forEach((button) => btnSchematicContainer.appendChild(button));
 
     root.appendChild(
       createHelpText(
@@ -286,6 +310,8 @@ const renderIntersection = (scaleOptions: any) => {
     root.appendChild(container);
     root.appendChild(createHelpText('Toggle'));
     root.appendChild(btnToggleContainer);
+    root.appendChild(createHelpText('Schematic toggle'));
+    root.appendChild(btnSchematicContainer);
     root.appendChild(createHelpText('Adjust size'));
     root.appendChild(btnAdjustSizeContainer);
     root.appendChild(createHelpText('Miscellaneous'));
@@ -348,6 +374,26 @@ const createButton = <T>(manager: Controller, layer: Layer<T>, title: string) =>
       btn.style.color = '';
     } else {
       manager.hideLayer(layer.id);
+      btn.style.backgroundColor = 'red';
+      btn.style.color = 'white';
+    }
+    show = !show;
+  };
+  return btn;
+};
+
+const createInternalLayerVisibilityButton = (manager: Controller, internalLayerId: string, title: string) => {
+  const btn = document.createElement('button');
+  btn.innerHTML = `${title}`;
+  btn.setAttribute('style', 'width: 170px;height:32px;margin-top:12px;background: lightblue;');
+  let show = false;
+  btn.onclick = () => {
+    if (show) {
+      manager.showLayer(internalLayerId);
+      btn.style.backgroundColor = 'lightblue';
+      btn.style.color = '';
+    } else {
+      manager.hideLayer(internalLayerId);
       btn.style.backgroundColor = 'red';
       btn.style.color = 'white';
     }
