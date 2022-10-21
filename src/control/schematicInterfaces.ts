@@ -1,3 +1,5 @@
+import { SHOE_LENGTH, SHOE_WIDTH } from '../constants';
+
 export function assertNever(x: never): never {
   throw new Error(`Unexpected object: ${JSON.stringify(x)}`);
 }
@@ -92,11 +94,6 @@ export const foldCompletion =
 export interface Cement {
   toc: number;
   casingIds?: string[];
-  /**
-   * Should remove optional on casingIds when casingId is removed in next major release
-   * @‌deprecated use casingIds
-   */
-  casingId?: string;
 }
 
 export interface SchematicData {
@@ -110,10 +107,36 @@ export interface SchematicData {
   };
 }
 
+export interface InternalLayerOptions {
+  holeLayerId: string;
+  casingLayerId: string;
+  completionLayerId: string;
+  cementLayerId: string;
+  pAndALayerId: string;
+}
+
+export const defaultInternalLayerOptions = (layerId: string) => ({
+  holeLayerId: `${layerId}-hole`,
+  casingLayerId: `${layerId}-casing`,
+  completionLayerId: `${layerId}-completion`,
+  pAndALayerId: `${layerId}-pAndA`,
+  cementLayerId: `${layerId}-cement`,
+});
+
 export interface HoleOptions {
   firstColor: string;
   secondColor: string;
   lineColor: string;
+}
+export const defaultHoleOptions: HoleOptions = {
+  firstColor: '#8c541d',
+  secondColor: '#eee3d8',
+  lineColor: '#8b4513',
+};
+
+export interface CasingShoeSize {
+  width: number;
+  length: number;
 }
 
 export interface CasingOptions {
@@ -122,11 +145,26 @@ export interface CasingOptions {
   shoeSize: CasingShoeSize;
 }
 
+export const defaultCasingOptions = {
+  solidColor: '#dcdcdc',
+  lineColor: '#575757',
+  shoeSize: {
+    width: SHOE_WIDTH,
+    length: SHOE_LENGTH,
+  },
+};
+
 export interface CementOptions {
   firstColor: string;
   secondColor: string;
   scalingFactor: number;
 }
+
+export const defaultCementOptions = {
+  firstColor: '#c7b9ab',
+  secondColor: '#5b5b5b',
+  scalingFactor: 4,
+};
 
 export interface CementSqueezeOptions {
   firstColor: string;
@@ -134,15 +172,21 @@ export interface CementSqueezeOptions {
   scalingFactor: number;
 }
 
-export interface CasingShoeSize {
-  width: number;
-  length: number;
-}
+export const defaultCementSqueezeOptions = {
+  firstColor: '#8b4513',
+  secondColor: '#8b6713',
+  scalingFactor: 4,
+};
 
 export interface ScreenOptions {
   scalingFactor: number;
   lineColor: string;
 }
+
+export const defaultScreenOptions = {
+  scalingFactor: 4,
+  lineColor: '#63666a',
+};
 
 export interface TubingOptions {
   innerColor: string;
@@ -150,8 +194,20 @@ export interface TubingOptions {
   scalingFactor: number;
 }
 
+export const defaultTubingOptions = {
+  scalingFactor: 1,
+  innerColor: '#eeeeff',
+  outerColor: '#777788',
+};
+
 export interface CementPlugOptions {
   firstColor: string;
   secondColor: string;
   scalingFactor: number;
 }
+
+export const defaultCementPlugOptions = {
+  firstColor: '#c7b9ab',
+  secondColor: '#c7b9ab',
+  scalingFactor: 4,
+};

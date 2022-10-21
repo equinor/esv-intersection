@@ -2,12 +2,11 @@ import { max } from 'd3-array';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
 import { Graphics, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
-import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
+import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
 import {
   assertNever,
   Casing,
   CasingOptions,
-  CasingShoeSize,
   Cement,
   CementOptions,
   CementPlugOptions,
@@ -28,6 +27,15 @@ import {
   isCementPlug,
   CementPlug,
   PAndASymbol,
+  InternalLayerOptions,
+  defaultHoleOptions,
+  defaultCasingOptions,
+  defaultCementOptions,
+  defaultCementSqueezeOptions,
+  defaultCementPlugOptions,
+  defaultScreenOptions,
+  defaultTubingOptions,
+  defaultInternalLayerOptions,
 } from '../control/schematicInterfaces';
 import {
   CasingRenderObject,
@@ -93,17 +101,9 @@ const foldInterlacedRenderObjects =
     }
   };
 
-const defaultCasingShoeSize: CasingShoeSize = {
-  width: SHOE_WIDTH,
-  length: SHOE_LENGTH,
-};
-
 export interface SchematicLayerOptions<T extends SchematicData> extends LayerOptions<T> {
   exaggerationFactor?: number;
-  internalLayers?: {
-    casingId: string;
-    cementId: string;
-  };
+  internalLayerOptions?: InternalLayerOptions;
   holeOptions?: HoleOptions;
   casingOptions?: CasingOptions;
   cementOptions?: CementOptions;
@@ -113,47 +113,28 @@ export interface SchematicLayerOptions<T extends SchematicData> extends LayerOpt
   cementPlugOptions?: CementPlugOptions;
 }
 
-const defaultSchematicLayerOptions: SchematicLayerOptions<SchematicData> = {
+const defaultSchematicLayerOptions = (layerId: string): SchematicLayerOptions<SchematicData> => ({
   exaggerationFactor: 2,
-  holeOptions: {
-    firstColor: '#8c541d',
-    secondColor: '#eee3d8',
-    lineColor: '#8b4513',
-  },
-  casingOptions: {
-    solidColor: '#dcdcdc',
-    lineColor: '#575757',
-    shoeSize: defaultCasingShoeSize,
-  },
-  cementOptions: {
-    firstColor: '#c7b9ab',
-    secondColor: '#5b5b5b',
-    scalingFactor: 4,
-  },
-  cementSqueezeOptions: {
-    firstColor: '#8b4513',
-    secondColor: '#8b6713',
-    scalingFactor: 4,
-  },
-  screenOptions: {
-    scalingFactor: 4,
-    lineColor: '#63666a',
-  },
-  tubingOptions: {
-    scalingFactor: 1,
-    innerColor: '#EEEEFF',
-    outerColor: '#777788',
-  },
-  cementPlugOptions: {
-    firstColor: '#c7b9ab',
-    secondColor: '#c7b9ab',
-    scalingFactor: 4,
-  },
-};
+  internalLayerOptions: defaultInternalLayerOptions(layerId),
+  holeOptions: defaultHoleOptions,
+  casingOptions: defaultCasingOptions,
+  cementOptions: defaultCementOptions,
+  cementSqueezeOptions: defaultCementSqueezeOptions,
+  screenOptions: defaultScreenOptions,
+  tubingOptions: defaultTubingOptions,
+  cementPlugOptions: defaultCementPlugOptions,
+});
+
+type InternalLayerVisibility = { [K in keyof InternalLayerOptions]: boolean };
 
 export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
-  private casingVisibility = true;
-  private cementVisibility = true;
+  private internalLayerVisibility: InternalLayerVisibility = {
+    holeLayerId: true,
+    casingLayerId: true,
+    completionLayerId: true,
+    cementLayerId: true,
+    pAndALayerId: true,
+  };
 
   private cementTextureCache: Texture;
   private cementSqueezeTextureCache: Texture;
@@ -175,19 +156,21 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     super(ctx, id, options);
     this.options = <SchematicLayerOptions<T>>{
       ...this.options,
-      ...defaultSchematicLayerOptions,
+      ...defaultSchematicLayerOptions(this.id),
       ...options,
     };
   }
 
   public onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
+    this.scalingFactors = null;
     this.cementTextureCache = null;
     this.cementSqueezeTextureCache = null;
     this.holeTextureCache = null;
     this.screenTextureCache = null;
     this.tubingTextureCache = null;
     this.textureSymbolCacheArray = null;
+    this.internalLayerVisibility = null;
   }
 
   public onUpdate(event: OnUpdateEvent<T>): void {
@@ -221,29 +204,20 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return;
     }
 
-    const isCement = (this.options as SchematicLayerOptions<T>)?.internalLayers?.cementId === layerId;
-    const isCasing = (this.options as SchematicLayerOptions<T>)?.internalLayers?.casingId === layerId;
+    const { internalLayerOptions } = this.options as SchematicLayerOptions<T>;
 
-    if (!isCement && !isCasing) {
-      return;
+    const [keyFound] = Object.entries(internalLayerOptions).find(([_key, id]: [string, string]) => id === layerId);
+    if (keyFound) {
+      this.internalLayerVisibility[keyFound as keyof InternalLayerVisibility] = isVisible;
+      this.clearLayer();
+      this.preRender();
+      this.render();
     }
-
-    if (isCement) {
-      this.cementVisibility = isVisible;
-    }
-
-    if (isCasing) {
-      this.casingVisibility = isVisible;
-    }
-
-    this.clearLayer();
-    this.preRender();
-    this.render();
   }
 
   public getInternalLayerIds(): string[] {
-    const { internalLayers } = this.options as SchematicLayerOptions<T>;
-    return internalLayers ? [internalLayers.casingId, internalLayers.cementId] : [];
+    const { internalLayerOptions } = this.options as SchematicLayerOptions<T>;
+    return Object.values(internalLayerOptions);
   }
 
   /**
@@ -337,7 +311,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter);
     this.maxHoleDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) * exaggerationFactor : EXAGGERATED_DIAMETER * exaggerationFactor;
-    holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
+    this.internalLayerVisibility.holeLayerId && holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
 
     casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
     const casingRenderObjects: CasingRenderObject[] = casings.map((casing: Casing) =>
@@ -348,7 +322,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       (cement: Cement): CementRenderObject => ({
         kind: 'cement',
         segments: createComplexRopeSegmentsForCement(cement, casings, holeSizes, exaggerationFactor, this.getZFactorScaledPathForPoints),
-        casingIds: [cement.casingId, ...(cement.casingIds || [])].filter((id) => id),
+        casingIds: (cement.casingIds || []).filter((id) => id),
       }),
     );
 
@@ -367,36 +341,40 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.sortCementAndCasingRenderObjects(casingRenderObjects, cementShapes, cementSqueezesShape).forEach(
       foldInterlacedRenderObjects(
         (casingRO: CasingRenderObject) => {
-          if (this.casingVisibility) {
+          if (this.internalLayerVisibility.casingLayerId) {
             this.drawCasing(casingRO);
             casingRO.hasShoe && this.drawShoe(casingRO.bottom, casingRO.referenceRadius);
           }
         },
-        (cementRO: CementRenderObject) => this.cementVisibility && this.drawComplexRope(cementRO.segments, this.getCementTexture()),
-        (cementSqueezesRO: CementSqueezeRenderObject) => this.drawComplexRope(cementSqueezesRO.segments, this.createCementSqueezeTexture()),
+        (cementRO: CementRenderObject) =>
+          this.internalLayerVisibility.cementLayerId && this.drawComplexRope(cementRO.segments, this.getCementTexture()),
+        (cementSqueezesRO: CementSqueezeRenderObject) =>
+          this.internalLayerVisibility.pAndALayerId && this.drawComplexRope(cementSqueezesRO.segments, this.createCementSqueezeTexture()),
       ),
     );
 
-    completion.forEach(
-      foldCompletion(
-        (obj: Screen) => this.drawScreen(obj),
-        (obj: Tubing) => this.drawTubing(obj),
-        (obj: CompletionSymbol) => {
+    this.internalLayerVisibility.completionLayerId &&
+      completion.forEach(
+        foldCompletion(
+          (obj: Screen) => this.drawScreen(obj),
+          (obj: Tubing) => this.drawTubing(obj),
+          (obj: CompletionSymbol) => {
+            const symbolRenderObject = this.prepareSymbolRenderObject(obj);
+            this.drawSymbolComponent(symbolRenderObject);
+          },
+        ),
+      );
+
+    this.internalLayerVisibility.pAndALayerId &&
+      remainingPAndA.forEach((obj) => {
+        if (isPAndASymbol(obj)) {
           const symbolRenderObject = this.prepareSymbolRenderObject(obj);
           this.drawSymbolComponent(symbolRenderObject);
-        },
-      ),
-    );
-
-    remainingPAndA.forEach((obj) => {
-      if (isPAndASymbol(obj)) {
-        const symbolRenderObject = this.prepareSymbolRenderObject(obj);
-        this.drawSymbolComponent(symbolRenderObject);
-      }
-      if (isCementPlug(obj)) {
-        this.drawCementPlug(obj, casings, holeSizes);
-      }
-    });
+        }
+        if (isCementPlug(obj)) {
+          this.drawCementPlug(obj, casings, holeSizes);
+        }
+      });
   }
 
   private updateSymbolCache(symbols: { [key: string]: string }) {
