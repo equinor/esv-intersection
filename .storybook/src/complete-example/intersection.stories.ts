@@ -38,7 +38,7 @@ import {
   getCementSqueezes,
 } from '../data';
 import { Annotation, SchematicLayer, SchematicLayerOptions } from '../../../src';
-import { InternalLayerOptions, SchematicData } from '../../../src/control/schematicInterfaces';
+import { InternalLayerOptions, SchematicData } from '../../../src/layers/schematicInterfaces';
 
 export const intersection = () => {
   const xBounds: [number, number] = [0, 1000];
@@ -103,7 +103,8 @@ const renderIntersection = (scaleOptions: any) => {
     const transformedPicksData = transformFormationData(picks, stratColumns);
     const picksData = getPicksData(transformedPicksData);
 
-    const pixiContext = new PixiRenderApplication({ width, height });
+    const pixiContext1 = new PixiRenderApplication({ width, height });
+    const pixiContext2 = new PixiRenderApplication({ width, height });
 
     // Instantiate layers
     const gridLayer = new GridLayer('grid', {
@@ -114,7 +115,7 @@ const renderIntersection = (scaleOptions: any) => {
       order: 1,
       referenceSystem,
     });
-    const geomodelLayer = new GeomodelLayerV2<SurfaceData>(pixiContext, 'geomodel', { order: 2, layerOpacity: 0.6, data: geolayerdata });
+    const geomodelLayer = new GeomodelLayerV2<SurfaceData>(pixiContext1, 'geomodel', { order: 2, layerOpacity: 0.6, data: geolayerdata });
     const wellboreLayer = new WellborepathLayer('wellborepath', { order: 3, strokeWidth: '2px', stroke: 'red', referenceSystem });
     const geomodelLabelsLayer = new GeomodelLabelsLayer<SurfaceData>('geomodellabels', { order: 3, data: geolayerdata });
     const seismicLayer = new SeismicCanvasLayer('seismic', { order: 1 });
@@ -194,7 +195,7 @@ const renderIntersection = (scaleOptions: any) => {
       data: schematicData,
     };
 
-    const schematicLayer = new SchematicLayer(pixiContext, 'schematic-webgl-layer', schematicLayerOptions);
+    const schematicLayer = new SchematicLayer(pixiContext2, 'schematic-webgl-layer', schematicLayerOptions);
 
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 

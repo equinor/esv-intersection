@@ -215,7 +215,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
   }
 
-  public getInternalLayerIds(): string[] {
+  public override getInternalLayerIds(): string[] {
     const { internalLayerOptions } = this.options as SchematicLayerOptions<T>;
     return Object.values(internalLayerOptions);
   }

@@ -616,8 +616,4 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
     return isLabelsOnLeftSide;
   }
-
-  getInternalLayerIds(): string[] {
-    return [];
-  }
 }
