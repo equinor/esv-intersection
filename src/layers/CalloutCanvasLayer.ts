@@ -335,8 +335,4 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
       }
     }
   }
-
-  getInternalLayerIds(): string[] {
-    return [];
-  }
 }

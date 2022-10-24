@@ -43,8 +43,4 @@ export class SeismicCanvasLayer extends CanvasLayer<SeismicCanvasData> {
 
     ctx.drawImage(image, options.x, options.y, options.width, options.height);
   }
-
-  getInternalLayerIds(): string[] {
-    return [];
-  }
 }

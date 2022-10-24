@@ -204,5 +204,14 @@ export abstract class Layer<T> {
 
   abstract onInteractivityChanged(interactive: boolean): void;
 
-  abstract getInternalLayerIds(): string[];
+  /**
+   *
+   * Some layers might be built up of several internal layers that should individually be visibility-togglable.
+   * Reasons for having multiple internal layers might be tightly related data between layers or need for sharing render context
+   *
+   * @returns list of internal layer ids
+   */
+  getInternalLayerIds(): string[] {
+    return [];
+  }
 }

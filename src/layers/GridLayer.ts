@@ -142,8 +142,4 @@ export class GridLayer<T> extends CanvasLayer<T> {
   set offsetY(offset: number) {
     this._offsetY = offset;
   }
-
-  getInternalLayerIds(): string[] {
-    return [];
-  }
 }

@@ -107,8 +107,4 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     }
     this.addChild(g);
   };
-
-  getInternalLayerIds(): string[] {
-    return [];
-  }
 }
