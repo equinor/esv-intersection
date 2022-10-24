@@ -11,7 +11,7 @@ import {
   HoleSize,
   ScreenOptions,
   TubingOptions,
-} from '../control/schematicInterfaces';
+} from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
 

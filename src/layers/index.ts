@@ -3,6 +3,7 @@ export * from './base/Layer';
 export * from './base/HTMLLayer';
 export * from './base/SVGLayer';
 export * from './base/PixiLayer';
+export * from './schematicInterfaces';
 export * from './CalloutCanvasLayer';
 export * from './GeomodelCanvasLayer';
 export * from './GeomodelLabelsLayer';

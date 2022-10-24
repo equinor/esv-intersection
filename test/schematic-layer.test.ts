@@ -1,5 +1,5 @@
 /* eslint-disable no-magic-numbers */
-import { SchematicData } from '../src/control/schematicInterfaces';
+import { SchematicData } from '../src/layers/schematicInterfaces';
 import { SchematicLayer, SchematicLayerOptions, IntersectionReferenceSystem, PixiRenderApplication } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
 
@@ -20,7 +20,7 @@ describe('SchematicLayer', () => {
   });
   describe('when setting reference system', () => {
     const data: SchematicData = {
-      holeSizes: [{ start: 50, end: 500, diameter: 36 }],
+      holeSizes: [{ kind: 'hole', id: 'test-hole-1', start: 50, end: 500, diameter: 36 }],
       casings: [],
       cements: [],
       completion: [],

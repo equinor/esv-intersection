@@ -36,7 +36,7 @@ import {
   defaultScreenOptions,
   defaultTubingOptions,
   defaultInternalLayerOptions,
-} from '../control/schematicInterfaces';
+} from './schematicInterfaces';
 import {
   CasingRenderObject,
   createCementTexture,

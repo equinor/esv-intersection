@@ -137,6 +137,7 @@ export interface HoleOptions {
   secondColor: string;
   lineColor: string;
 }
+
 export const defaultHoleOptions: HoleOptions = {
   firstColor: '#8c541d',
   secondColor: '#eee3d8',
