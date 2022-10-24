@@ -1,5 +1,5 @@
-export * from './Layer';
 export * from './CanvasLayer';
 export * from './HTMLLayer';
-export * from './SVGLayer';
+export * from './Layer';
 export * from './PixiLayer';
+export * from './SVGLayer';

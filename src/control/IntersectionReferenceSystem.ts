@@ -150,10 +150,11 @@ export class IntersectionReferenceSystem {
    * a sample in between is discarded.
    *
    * The start and the end are not guaranteed to be part of the returned set of points
-   * @param start in MD
-   * @param end in MD
+   * @param startMd in MD
+   * @param endMd in MD
+   * @param includeStartEnd guarantee to include the starting and end points
    */
-  getCurtainPath(start: number, end: number): { point: number[]; md: number }[] {
+  getCurtainPath(startMd: number, endMd: number, includeStartEnd = false): MDPoint[] {
     if (!this._curtainPathCache) {
       const points: MDPoint[] = [];
       let prevAngle = Math.PI * 2; // Always add first point
@@ -170,7 +171,13 @@ export class IntersectionReferenceSystem {
       this._curtainPathCache = points;
     }
 
-    return this._curtainPathCache.filter((p) => p.md >= start && p.md <= end);
+    if (includeStartEnd) {
+      const startPoint = { point: this.project(startMd), md: startMd };
+      const pointsBetween = this._curtainPathCache.filter((p) => p.md > startMd && p.md < endMd);
+      const endPoint = { point: this.project(endMd), md: endMd };
+      return [startPoint, ...pointsBetween, endPoint];
+    }
+    return this._curtainPathCache.filter((p) => p.md >= startMd && p.md <= endMd);
   }
 
   /**

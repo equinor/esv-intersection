@@ -1,6 +1,37 @@
-import { IPoint, Point } from 'pixi.js';
-import { Cement, Casing, HoleSize, MDPoint, CementSqueeze, CementPlug } from '..';
+import { IPoint, Point, Texture } from 'pixi.js';
+import { DEFAULT_TEXTURE_SIZE } from '../constants';
+import {
+  Casing,
+  Cement,
+  CementOptions,
+  CementPlug,
+  CementPlugOptions,
+  CementSqueeze,
+  HoleOptions,
+  HoleSize,
+  ScreenOptions,
+  TubingOptions,
+} from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
+import { createNormals, offsetPoints } from '../utils/vectorUtils';
+
+export interface TubularRenderingObject {
+  leftPath: Point[];
+  rightPath: Point[];
+  referenceDiameter: number;
+  referenceRadius: number;
+}
+
+export interface CasingRenderObject extends TubularRenderingObject {
+  kind: 'casing';
+  pathPoints: number[][];
+  polygon: Point[];
+  casingId: string;
+  casingWallWidth: number;
+  hasShoe: boolean;
+  bottom: number;
+  zIndex?: number;
+}
 
 export const getEndLines = (
   rightPath: IPoint[],
@@ -105,15 +136,13 @@ export const createComplexRopeSegmentsForCement = (
   casings: Casing[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+  getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
-  // Merge deprecated casingId and casingIds array
-  // TODO remove casingId now?
-  const casingIds = [cement.casingId, ...(cement.casingIds || [])].filter((id) => id);
+  const casingIds = (cement.casingIds || []).filter((id) => id);
 
   const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement plug data, cement plug is missing attached casing');
+    throw new Error('Invalid cement data, cement is missing attached casing');
   }
 
   const topOfCement = cement.toc;
@@ -129,7 +158,7 @@ export const createComplexRopeSegmentsForCement = (
 
   const changeDepths = cementDiameterChangeDepths(cement, bottomOfCement, outerDiameterIntervals);
 
-  const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
+  const diameterIntervals = changeDepths.flatMap((depth: number, index: number, list: number[]) => {
     if (index === 0) {
       return [];
     }
@@ -141,8 +170,8 @@ export const createComplexRopeSegmentsForCement = (
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
-    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
-    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+    const segmentPoints = getPoints(interval.top, interval.bottom);
+    const points = segmentPoints.map(([x, y]) => new Point(x, y));
 
     return {
       diameter: interval.diameter,
@@ -198,13 +227,13 @@ export const createComplexRopeSegmentsForCementSqueeze = (
   casings: Casing[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+  getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
   const { casingIds, top: topOfCement, bottom: bottomOfCement } = squeeze;
 
   const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement data, cement is missing attached casing');
+    throw new Error('Invalid cement squeeze data, cement is missing attached casing');
   }
 
   const { outerCasings, overlappingHoles } = findIntersectingItems(topOfCement, bottomOfCement, attachedCasings, casings, holes);
@@ -229,8 +258,8 @@ export const createComplexRopeSegmentsForCementSqueeze = (
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
-    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
-    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+    const segmentPoints = getPoints(interval.top, interval.bottom);
+    const points = segmentPoints.map(([x, y]) => new Point(x, y));
 
     return {
       diameter: interval.diameter,
@@ -246,13 +275,13 @@ export const createComplexRopeSegmentsForCementPlug = (
   casings: Casing[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+  getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
   const { casingId, secondCasingId, top: topOfCementPlug, bottom: bottomOfCementPlug } = plug;
 
   const attachedCasings = [casings.find((c) => c.casingId === casingId), casings.find((c) => c.casingId === secondCasingId)].filter((c) => c);
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement data, cement is missing attached casing');
+    throw new Error('Invalid cement plug data, cement is missing attached casing');
   }
   const { overlappingHoles } = findIntersectingItems(topOfCementPlug, bottomOfCementPlug, attachedCasings, casings, holes);
   const innerDiameterIntervals = [...attachedCasings, ...overlappingHoles].map((d) => ({
@@ -274,8 +303,8 @@ export const createComplexRopeSegmentsForCementPlug = (
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
-    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
-    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+    const mdPoints = getPoints(interval.top, interval.bottom);
+    const points = mdPoints.map(([x, y]) => new Point(x, y));
 
     return {
       diameter: interval.diameter,
@@ -284,4 +313,161 @@ export const createComplexRopeSegmentsForCementPlug = (
   });
 
   return ropeSegments;
+};
+
+const createGradientFill = (
+  canvas: HTMLCanvasElement,
+  canvasCtx: CanvasRenderingContext2D,
+  firstColor: string,
+  secondColor: string,
+  startPctOffset: number,
+): CanvasGradient => {
+  const halfWayPct = 0.5;
+  const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, firstColor);
+  gradient.addColorStop(halfWayPct - startPctOffset, secondColor);
+  gradient.addColorStop(halfWayPct + startPctOffset, secondColor);
+  gradient.addColorStop(1, firstColor);
+
+  return gradient;
+};
+
+export const createHoleBaseTexture = ({ firstColor, secondColor }: HoleOptions, width: number, height: number): Texture => {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = createGradientFill(canvas, canvasCtx, firstColor, secondColor, 0);
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+  return Texture.from(canvas);
+};
+
+export const createScreenTexture = ({ scalingFactor }: ScreenOptions): Texture => {
+  const canvas = document.createElement('canvas');
+  const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
+  canvas.width = size;
+  canvas.height = size;
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = 'white';
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const baseLineWidth = size / 10; // eslint-disable-line no-magic-numbers
+  canvasCtx.strokeStyle = '#AAAAAA';
+  canvasCtx.lineWidth = baseLineWidth;
+  canvasCtx.beginPath();
+
+  const distanceBetweenLines = size / 3;
+  for (let i = -canvas.width; i < canvas.width; i++) {
+    canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+    canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
+  }
+  canvasCtx.stroke();
+  return Texture.from(canvas);
+};
+
+export const createTubingTexture = ({ innerColor, outerColor, scalingFactor }: TubingOptions): Texture => {
+  const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const canvasCtx = canvas.getContext('2d');
+  const gradient = canvasCtx.createLinearGradient(0, 0, 0, size);
+
+  const innerColorStart = 0.3;
+  const innerColorEnd = 0.7;
+  gradient.addColorStop(0, outerColor);
+  gradient.addColorStop(innerColorStart, innerColor);
+  gradient.addColorStop(innerColorEnd, innerColor);
+  gradient.addColorStop(1, outerColor);
+
+  canvasCtx.fillStyle = gradient;
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+  return Texture.from(canvas);
+};
+
+export const createCementTexture = ({ firstColor, secondColor, scalingFactor }: CementOptions) => {
+  const canvas = document.createElement('canvas');
+
+  const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
+  const lineWidth = scalingFactor;
+  canvas.width = size;
+  canvas.height = size;
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = firstColor;
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+  canvasCtx.lineWidth = lineWidth;
+  canvasCtx.fillStyle = secondColor;
+  canvasCtx.beginPath();
+
+  const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+  for (let i = -canvas.width; i < canvas.width; i++) {
+    canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+    canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
+  }
+  canvasCtx.stroke();
+
+  return Texture.from(canvas);
+};
+
+export const createCementPlugTexture = ({ firstColor, secondColor, scalingFactor }: CementPlugOptions) => {
+  const canvas = document.createElement('canvas');
+
+  const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
+  canvas.width = size;
+  canvas.height = size;
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = firstColor;
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+  canvasCtx.lineWidth = scalingFactor;
+  canvasCtx.fillStyle = secondColor;
+  canvasCtx.beginPath();
+
+  canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
+  const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+  for (let i = -canvas.width; i < canvas.width; i++) {
+    canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+    canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
+  }
+  canvasCtx.stroke();
+
+  return Texture.from(canvas);
+};
+
+export const createTubularRenderingObject = (diameter: number, pathPoints: [number, number][]): TubularRenderingObject => {
+  const radius = diameter / 2;
+
+  const normals = createNormals(pathPoints);
+  const rightPath = offsetPoints(pathPoints, normals, radius);
+  const leftPath = offsetPoints(pathPoints, normals, -radius);
+
+  return { leftPath, rightPath, referenceDiameter: diameter, referenceRadius: radius };
+};
+
+export const prepareCasingRenderObject = (exaggerationFactor: number, casing: Casing, pathPoints: [number, number][]): CasingRenderObject => {
+  const exaggeratedDiameter = casing.diameter * exaggerationFactor;
+  const exaggeratedInnerDiameter = casing.innerDiameter * exaggerationFactor;
+  const exaggeratedInnerRadius = exaggeratedInnerDiameter / 2;
+  const renderObject = createTubularRenderingObject(exaggeratedDiameter, pathPoints);
+
+  const casingWallWidth = renderObject.referenceRadius - exaggeratedInnerRadius;
+
+  const polygon = makeTubularPolygon(renderObject.leftPath, renderObject.rightPath);
+
+  return {
+    ...renderObject,
+    kind: 'casing',
+    pathPoints,
+    polygon,
+    casingId: casing.casingId,
+    casingWallWidth,
+    hasShoe: casing.hasShoe,
+    bottom: casing.end,
+  };
 };

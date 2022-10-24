@@ -3,13 +3,13 @@ import {
   Controller,
   PixiRenderApplication,
   SchematicLayerOptions,
-  SchematicData,
   SchematicLayer,
 } from '../../../src';
 
-import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText } from '../utils';
+import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText, createButtonContainer } from '../utils';
 
 import { getWellborePath, getCasings, getCement, getHolesize, getCompletion, getCementSqueezes } from '../data';
+import { InternalLayerOptions, SchematicData } from '../../../src/control/schematicInterfaces';
 
 const width: number = 700;
 const height: number = 600;
@@ -17,6 +17,7 @@ const height: number = 600;
 export const SchematicLayerUsingHighLevelInterface = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
+  const btnContainer = createButtonContainer(width);
 
   Promise.all([getWellborePath(), getHolesize(), getCasings(), getCement(), getCompletion(), getCementSqueezes()]).then(
     ([wbp, holeSizes, casings, cements, completion, cementSqueezes]) => {
@@ -34,7 +35,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
 
       const completionSymbols = [
         {
-          kind: 'completion-symbol',
+          kind: 'completionSymbol',
           id: 'completion-svg-1',
           start: 5250,
           end: 5252,
@@ -42,7 +43,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           symbolKey: 'completionSymbol1',
         },
         {
-          kind: 'completion-symbol',
+          kind: 'completionSymbol',
           id: 'completion-svg-2',
           start: 5252,
           end: 5274,
@@ -50,7 +51,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           symbolKey: 'completionSymbol2',
         },
         {
-          kind: 'completion-symbol',
+          kind: 'completionSymbol',
           id: 'completion-svg-3',
           start: 5274,
           end: 5276,
@@ -66,7 +67,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
 
       const pAndASymbols = [
         {
-          kind: 'pAndA-symbol' as const,
+          kind: 'pAndASymbol' as const,
           id: 'mechanical-plug-1',
           start: 5100,
           end: 5110,
@@ -75,8 +76,8 @@ export const SchematicLayerUsingHighLevelInterface = () => {
         },
         { kind: 'cementPlug' as const,
           id: 'cement-plug-2',
-          top: 5150,
-          bottom: 5230,
+          top: 5000,
+          bottom: 5110,
           casingId: '7',
         }
       ];
@@ -89,11 +90,22 @@ export const SchematicLayerUsingHighLevelInterface = () => {
         pAndA: [...pAndASymbols, ...cementSqueezes],
         symbols: { ...CSDSVGs, ...pAndASVGs },
       };
-      const options: SchematicLayerOptions<SchematicData> = {
-        order: 2,
-        referenceSystem,
+
+      const internalLayerIds: InternalLayerOptions = {
+        holeLayerId: 'hole-id',
+        casingLayerId: 'casing-id',
+        completionLayerId: 'completion-id',
+        cementLayerId: 'cement-id',
+        pAndALayerId: 'pAndA-id',
       };
-      const schematicLayer = new SchematicLayer(renderer, 'schematic-webgl-layer', options);
+
+      const schematicLayerOptions: SchematicLayerOptions<SchematicData> = {
+        order: 1,
+        referenceSystem,
+        internalLayerOptions: internalLayerIds,
+        data: schematicData,
+      };
+      const schematicLayer = new SchematicLayer(renderer, 'schematic-webgl-layer', schematicLayerOptions);
 
       const controller = new Controller({ container, layers: [schematicLayer] });
 
@@ -104,12 +116,43 @@ export const SchematicLayerUsingHighLevelInterface = () => {
       controller.zoomPanHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
       controller.zoomPanHandler.enableTranslateExtent = false;
       controller.setViewport(1000, 1000, 5000);
+
+      const internalLayerVisibilityButtons: [string, string][] = [
+        ['Holes', internalLayerIds.holeLayerId],
+        ['Casings', internalLayerIds.casingLayerId],
+        ['Cement', internalLayerIds.cementLayerId],
+        ['Completion', internalLayerIds.completionLayerId],
+        ['Plug & Abandonment', internalLayerIds.pAndALayerId],
+      ]
+      btnContainer.append(...internalLayerVisibilityButtons.map(createInternalLayerVisibilityButton(controller)))
     },
   );
 
   root.appendChild(createHelpText('High level interface for creating and displaying a wellbore schematic. This layer is made using webGL.'));
   root.appendChild(container);
   root.appendChild(createFPSLabel());
+  root.appendChild(createHelpText('Schematic layer toggles'));
+  root.appendChild(btnContainer);
 
   return root;
+};
+
+const createInternalLayerVisibilityButton = (manager: Controller) => ([title, internalLayerId]: [string, string]) => {
+  const btn = document.createElement('button');
+  btn.innerHTML = `${title}`;
+  btn.setAttribute('style', 'width: 170px;height:32px;margin-top:12px;background: lightblue;');
+  let show = false;
+  btn.onclick = () => {
+    if (show) {
+      manager.showLayer(internalLayerId);
+      btn.style.backgroundColor = 'lightblue';
+      btn.style.color = '';
+    } else {
+      manager.hideLayer(internalLayerId);
+      btn.style.backgroundColor = 'red';
+      btn.style.color = 'white';
+    }
+    show = !show;
+  };
+  return btn;
 };
