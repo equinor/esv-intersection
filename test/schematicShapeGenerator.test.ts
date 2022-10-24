@@ -1,4 +1,4 @@
-import { overlaps } from '../src/datautils/wellboreItemShapeGenerator';
+import { overlaps } from '../src/datautils/schematicShapeGenerator';
 
 describe('SVG', () => {
   it('object above/below each other should not overlap', () => {
