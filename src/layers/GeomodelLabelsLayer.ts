@@ -504,7 +504,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
   }
 
   getSurfacesAreaEdges(): number[] {
-    const endPoints = this.data.areas.reduce((acc, area) => {
+    const endPoints = this.data.areas.reduce((acc: number[], area: SurfaceArea) => {
       const { data } = area;
       const firstValidPoint = data.find((d: number[]) => d[1] != null);
       if (firstValidPoint) {
@@ -521,7 +521,7 @@ export class GeomodelLabelsLayer extends CanvasLayer {
       return acc;
     }, []);
     endPoints.push(
-      ...this.data.lines.reduce((acc, line) => {
+      ...this.data.lines.reduce((acc: number[], line: SurfaceLine) => {
         const { data } = line;
         const firstValidPoint = data.find((d: number[]) => d[1] != null);
         if (firstValidPoint) {
