@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.0
+
+- Fix bugs in GeomodelLabelsLayer
+- Upgrade dependencies
+- Upgrade peer dependency `pixi.js@6.5.3`
+
 ## v2.1.0
 
 - Allow setting `CasingShoeSize` for the `CasingLayer`
