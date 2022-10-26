@@ -1,8 +1,8 @@
-name: Publish Package
+name: Publish Beta Package
 
 on:
   release:
-    types: [released]
+    types: [prereleased]
 
 jobs:
   publish-npm:
@@ -14,6 +14,6 @@ jobs:
           node-version: '16'
           registry-url: 'https://registry.npmjs.org/'
       - run: npm ci
-      - run: npm run pub
+      - run: npm run pub-beta
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

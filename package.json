@@ -14,6 +14,7 @@
     "build": "rollup -c",
     "prepub": "npm run build",
     "pub": "npm publish --access=public",
+    "pub-beta": "npm publish --tag=beta --access=public",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src test",
     "test": "tsc --project tsconfig.test.json && jest",
     "test:watch": "jest --watchAll",
