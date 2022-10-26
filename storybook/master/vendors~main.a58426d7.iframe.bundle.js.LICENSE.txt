@@ -5,288 +5,288 @@ object-assign
 */
 
 /*!
- * @pixi/accessibility - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/accessibility - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/accessibility is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/app - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/app - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/app is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/compressed-textures - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/compressed-textures - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/compressed-textures is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/constants - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/constants - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/constants is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/core - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/core - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/display - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/display - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/display is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/extensions - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/extensions - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/extensions is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/extract - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/extract - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/extract is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/filter-alpha - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/filter-alpha - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/filter-alpha is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/filter-blur - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/filter-blur - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/filter-blur is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/filter-color-matrix - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/filter-color-matrix - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/filter-color-matrix is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/filter-displacement - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/filter-displacement - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/filter-displacement is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/filter-fxaa - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/filter-fxaa - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/filter-fxaa is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/filter-noise - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/filter-noise - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/filter-noise is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/graphics - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/graphics - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/graphics is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/interaction - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/interaction - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/interaction is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/loaders - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/loaders - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/loaders is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/math - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/math - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/math is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/mesh - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/mesh - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/mesh is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/mesh-extras - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/mesh-extras - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/mesh-extras is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/mixin-cache-as-bitmap - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/mixin-cache-as-bitmap - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/mixin-cache-as-bitmap is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/mixin-get-child-by-name - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/mixin-get-child-by-name - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/mixin-get-child-by-name is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/mixin-get-global-position - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/mixin-get-global-position - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/mixin-get-global-position is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/particle-container - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/particle-container - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/particle-container is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/polyfill - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/polyfill - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/polyfill is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/prepare - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/prepare - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/prepare is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/runner - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/runner - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/runner is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/settings - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/settings - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/settings is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/sprite - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/sprite - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/sprite is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/sprite-animated - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/sprite-animated - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/sprite-animated is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/sprite-tiling - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/sprite-tiling - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/sprite-tiling is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/spritesheet - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/spritesheet - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/spritesheet is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/text - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/text - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/text is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/text-bitmap - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/text-bitmap - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/text-bitmap is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/ticker - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/ticker - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/ticker is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /*!
- * @pixi/utils - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * @pixi/utils - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * @pixi/utils is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -316,8 +316,8 @@ object-assign
  */
 
 /*!
- * pixi.js - v6.5.3
- * Compiled Fri, 09 Sep 2022 13:55:20 UTC
+ * pixi.js - v6.5.8
+ * Compiled Sun, 23 Oct 2022 23:01:45 UTC
  *
  * pixi.js is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
