@@ -1,10 +1,24 @@
 # Changelog
 
-## TO BE RELEASED
+## v3.0.0-beta.0
+### Breaking Changes
 
-- Removed `any` from type definitions in the library
+- Many Layers are made generic and type for layers data needs to be specified when extending and using the Layers
+- Pixi Layers (SchematicLayer, GeomodelLayerV2) needs to pass inn a Pixi render context. Class PixiRenderApplication can be used for this
+- HoleSizeLayer, CasingLayer, CementLayer and WellboreBaseComponentLayer are removed, but functionality is retained and improved in new SchematicLayer
 - Removed deprecated layer `GeomodelLayer`, in favor of `GeomodelLayerV2`
-- Upgraded peer dependency `pixi.js@6.5.3`
+
+### Changes
+
+- Data type for for new layer SchematicLayer is based on data for the old layers HoleSizeLayer, CasingLayer and CementLayer, but now requires id and kind specified
+- Removed `any` from type definitions in the library
+- Upgraded peer dependency `pixi.js@6.5.8`
+
+## v2.2.0
+
+- Fix bugs in GeomodelLabelsLayer
+- Upgrade dependencies
+- Upgrade peer dependency `pixi.js@6.5.3`
 
 ## v2.1.0
 
