@@ -1,6 +1,6 @@
 {
   "name": "@equinor/esv-intersection",
-  "version": "3.0.0-beta.0",
+  "version": "3.0.0-beta.1",
   "description": "Intersection component package with testing and automatic documentation.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -14,6 +14,7 @@
     "build": "rollup -c",
     "prepub": "npm run build",
     "pub": "npm publish --access=public",
+    "prepub-beta": "npm run build",
     "pub-beta": "npm publish --tag=beta --access=public",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src test",
     "test": "tsc --project tsconfig.test.json && jest",
