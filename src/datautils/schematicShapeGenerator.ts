@@ -11,9 +11,11 @@ import {
   HoleSize,
   ScreenOptions,
   TubingOptions,
+  Perforation,
 } from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
+import { MDPoint } from '../interfaces';
 
 export interface TubularRenderingObject {
   leftPath: Point[];
@@ -222,6 +224,26 @@ export const cementPlugDiameterChangeDepths = (
   return uniqDepths.sort((a: number, b: number) => a - b);
 };
 
+export const perforationDiameterChangeDepths = (
+  perforation: Perforation,
+  diameterIntervals: {
+    start: number;
+    end: number;
+  }[],
+): number[] => {
+  const { top: topOfPerforation, bottom: bottomOfPerforation } = perforation;
+
+  const diameterChangeDepths = diameterIntervals.flatMap((d) => [d.start, d.end]);
+  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfPerforation && d <= bottomOfPerforation); // trim
+
+  trimmedChangedDepths.push(topOfPerforation);
+  trimmedChangedDepths.push(bottomOfPerforation);
+
+  const uniqDepths = uniq(trimmedChangedDepths);
+
+  return uniqDepths.sort((a: number, b: number) => a - b);
+};
+
 export const createComplexRopeSegmentsForCementSqueeze = (
   squeeze: CementSqueeze,
   casings: Casing[],
@@ -281,7 +303,7 @@ export const createComplexRopeSegmentsForCementPlug = (
 
   const attachedCasings = [casings.find((c) => c.casingId === casingId), casings.find((c) => c.casingId === secondCasingId)].filter((c) => c);
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement plug data, cement is missing attached casing');
+    throw new Error('Invalid cement plug data, cement plug is missing attached casing');
   }
   const { overlappingHoles } = findIntersectingItems(topOfCementPlug, bottomOfCementPlug, attachedCasings, casings, holes);
   const innerDiameterIntervals = [...attachedCasings, ...overlappingHoles].map((d) => ({
@@ -470,4 +492,52 @@ export const prepareCasingRenderObject = (exaggerationFactor: number, casing: Ca
     hasShoe: casing.hasShoe,
     bottom: casing.end,
   };
+};
+
+export const createComplexRopeSegmentsForPerforation = (
+  perforation: Perforation,
+  casings: Casing[],
+  holes: HoleSize[],
+  exaggerationFactor: number,
+  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+): ComplexRopeSegment[] => {
+  const { casingIds, top: topOfCement, bottom: bottomOfCement } = perforation;
+
+  const attachedCasings = casingIds.map((casingId: string) => casings.find((casing) => casing.casingId === casingId));
+  if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
+    throw new Error('Invalid cement data, cement is missing attached casing');
+  }
+
+  const { outerCasings, overlappingHoles } = findIntersectingItems(topOfCement, bottomOfCement, attachedCasings, casings, holes);
+
+  const outerDiameterIntervals = [...outerCasings, ...overlappingHoles].map((d) => ({
+    start: d.start,
+    end: d.end,
+  }));
+
+  const changeDepths = perforationDiameterChangeDepths(perforation, outerDiameterIntervals);
+
+  const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
+    if (index === 0) {
+      return [];
+    }
+
+    const nextDepth = list[index - 1];
+
+    const diameter = findCementOuterDiameterAtDepth(attachedCasings, outerCasings, overlappingHoles, depth) * exaggerationFactor;
+
+    return [{ top: nextDepth, bottom: depth, diameter }];
+  });
+
+  const ropeSegments = diameterIntervals.map((interval) => {
+    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
+    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+
+    return {
+      diameter: interval.diameter,
+      points,
+    };
+  });
+
+  return ropeSegments;
 };

@@ -59,6 +59,156 @@ export interface Annotation {
   pos?: [number, number];
 }
 
+export interface HoleSize {
+  diameter: number;
+  start: number;
+  end: number;
+  innerDiameter?: number;
+}
+
+export interface Casing {
+  diameter: number;
+  start: number;
+  end: number;
+  hasShoe: boolean;
+  innerDiameter: number;
+  casingId: string;
+}
+
+interface SymbolComponent {
+  diameter: number;
+  start: number;
+  end: number;
+  symbolKey: string;
+}
+
+export interface PAndASymbol extends SymbolComponent {
+  kind: 'pAndA-symbol';
+}
+
+export type PAndA = PAndASymbol | CementSqueeze | CementPlug;
+
+export interface CementPlug {
+  id: string;
+  top: number;
+  bottom: number;
+  kind: 'cementPlug';
+  holeId?: string;
+  casingId?: string;
+  secondCasingId?: string;
+}
+
+export type PerforationSubKind =
+  | 'Perforation'
+  | 'Open hole gravel pack'
+  | 'Open hole screen'
+  | 'Open hole'
+  | 'Open hole frac pack'
+  | 'Cased hole frac pack'
+  | 'Cased hole gravel pack'
+  | 'Cased hole fracturation';
+
+export interface Perforation {
+  kind: 'perforation';
+  subKind: PerforationSubKind;
+  id: string;
+  top: number;
+  bottom: number;
+  isOpen: boolean;
+  casingIds: string[];
+  holeId?: string[];
+}
+
+// wellx-welllog ViewModel
+export interface PerforationPacking {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
+}
+export interface PerforationSpike {
+  x: number;
+  y: number;
+  scale: { x: number; y: number };
+  d?: string;
+  color: string;
+}
+
+export interface PerforationFracLine {
+  x: number;
+  y: number;
+  scale: { x: number; y: number };
+  color: string;
+}
+export interface PerforationShapeParts {
+  spikes?: PerforationSpike[];
+  packing?: PerforationPacking;
+  frackLines?: PerforationFracLine[];
+}
+
+export interface PerforationShape {
+  kind: 'perforation';
+  subKind: PerforationSubKind;
+  id: string;
+  parts: PerforationShapeParts;
+  strokeWidth: number;
+}
+
+interface BaseCompletion {
+  diameter: number;
+  start: number;
+  end: number;
+}
+
+export interface Screen extends BaseCompletion {
+  kind: 'screen';
+}
+export interface Tubing extends BaseCompletion {
+  kind: 'tubing';
+}
+
+export interface CompletionSymbol extends BaseCompletion {
+  kind: 'completion-symbol';
+  symbolKey: string;
+}
+
+export type Completion = Tubing | Screen | CompletionSymbol;
+
+export const foldCompletion =
+  <T>(fScreen: (obj: Screen) => T, fTubing: (obj: Tubing) => T, fSymbol: (obj: CompletionSymbol) => T) =>
+  (completion: Completion): T => {
+    switch (completion.kind) {
+      case 'screen':
+        return fScreen(completion);
+      case 'tubing':
+        return fTubing(completion);
+      case 'completion-symbol':
+        return fSymbol(completion);
+      default:
+        return assertNever(completion);
+    }
+  };
+
+export interface Cement {
+  toc: number;
+  casingIds?: string[];
+  /**
+   * Should remove optional on casingIds when casingId is removed in next major release
+   * @‌deprecated use casingIds
+   */
+  casingId?: string;
+}
+
+export interface CementSqueeze {
+  kind: 'cementSqueeze';
+  top: number;
+  bottom: number;
+  casingIds?: string[];
+}
+
+export const isCementSqueeze = (item: PAndA): item is CementSqueeze => item.kind === 'cementSqueeze';
+
 export interface MDPoint {
   point: number[];
   normal?: Vector2;

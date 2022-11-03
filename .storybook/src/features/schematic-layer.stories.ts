@@ -4,6 +4,7 @@ import {
   PixiRenderApplication,
   SchematicLayerOptions,
   SchematicLayer,
+  Perforation,
 } from '../../../src';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText, createButtonContainer } from '../utils';
@@ -82,6 +83,27 @@ export const SchematicLayerUsingHighLevelInterface = () => {
         }
       ];
 
+      const perforations: Perforation[] = [
+        {
+          kind: 'perforation',
+          subKind: 'Perforation',
+          id: 'PerforationDemo1',
+          top: 4000,
+          bottom: 4500,
+          isOpen: true,
+          casingIds: ['7'],
+        },
+        {
+          kind: 'perforation',
+          subKind: 'Cased hole frac pack',
+          id: 'PerforationDemo2',
+          top: 3500,
+          bottom: 4500,
+          isOpen: true,
+          casingIds: ['7'],
+        },
+      ];
+
       const schematicData: SchematicData = {
         holeSizes,
         cements,
@@ -89,6 +111,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
         completion: [...completion, ...completionSymbols],
         pAndA: [...pAndASymbols, ...cementSqueezes],
         symbols: { ...CSDSVGs, ...pAndASVGs },
+        perforations,
       };
 
       const internalLayerIds: InternalLayerOptions = {

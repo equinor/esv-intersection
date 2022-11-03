@@ -1,4 +1,5 @@
 import { SHOE_LENGTH, SHOE_WIDTH } from '../constants';
+import { Perforation } from '../interfaces';
 
 export function assertNever(x: never): never {
   throw new Error(`Unexpected object: ${JSON.stringify(x)}`);
@@ -114,6 +115,7 @@ export interface SchematicData {
   symbols: {
     [key: string]: string;
   };
+  perforations: Perforation[];
 }
 
 export interface InternalLayerOptions {

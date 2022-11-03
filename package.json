@@ -51,6 +51,7 @@
     "@types/d3": "^7.4.0",
     "@types/jest": "^29.0.2",
     "@types/mock-raf": "^1.0.3",
+    "@types/ramda": "^0.28.18",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
     "babel-jest": "^29.0.3",
@@ -103,6 +104,7 @@
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
     "d3-shape": "^3.1.0",
-    "d3-zoom": "^3.0.0"
+    "d3-zoom": "^3.0.0",
+    "ramda": "^0.28.0"
   }
 }
