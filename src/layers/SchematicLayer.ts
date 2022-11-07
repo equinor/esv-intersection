@@ -391,13 +391,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         ),
     );
 
-    // Øystein: det skal gå ut fra casing når den er på en casing og fra hull når det er en open hole perforering
     shouldStartAtHoleDiameter.forEach((perforation) => {
       const perfShape = this.createPerforationShape(perforation, casings, holeSizes).map((p) => ({ ...p, diameter: p.diameter * 4 }));
-      if (isSubKindPerforation) {
-        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
-        this.drawComplexRope(perfShape, this.createPerforationTexture(perforation, perfShape, otherPerforations));
-      }
+      const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+      this.drawComplexRope(perfShape, this.createPerforationTexture(perforation, perfShape, otherPerforations));
     });
 
     this.updateSymbolCache(symbols);
