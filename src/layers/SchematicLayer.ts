@@ -37,6 +37,7 @@ import {
   defaultScreenOptions,
   defaultTubingOptions,
   defaultInternalLayerOptions,
+  CasingShoeSize,
 } from './schematicInterfaces';
 import {
   CasingRenderObject,
@@ -53,7 +54,19 @@ import {
   createCementPlugTexture,
   createComplexRopeSegmentsForPerforation
 } from '../datautils/schematicShapeGenerator';
-import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent, Completion, Perforation, } from '../interfaces';
+import {
+  OnUpdateEvent,
+  OnRescaleEvent,
+  OnUnmountEvent,
+  Completion,
+  Perforation,
+  foldPerforationSubKind,
+  PerforationShape,
+  hasGravelPack,
+  intersect,
+  isSubKindCasedHoleFracPack,
+  isSubKindPerforation,
+} from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
@@ -88,6 +101,7 @@ interface CementSqueezeRenderObject {
 
 type InterlacedRenderObjects = CasingRenderObject | CementRenderObject | CementSqueezeRenderObject;
 
+
 const foldInterlacedRenderObjects =
   <T>(fCasing: (obj: CasingRenderObject) => T, fCement: (obj: CementRenderObject) => T, fCementSqueeze: (obj: CementSqueezeRenderObject) => T) =>
   (renderObject: InterlacedRenderObjects): T => {
@@ -102,6 +116,39 @@ const foldInterlacedRenderObjects =
         return assertNever(renderObject);
     }
   };
+
+interface TubularRenderingObject {
+  pathPoints: number[][];
+  polygon: Point[];
+  leftPath: Point[];
+  rightPath: Point[];
+  radius: number;
+}
+  
+const defaultCasingShoeSize: CasingShoeSize = {
+  width: SHOE_WIDTH,
+  length: SHOE_LENGTH,
+};
+  
+// Perforation
+const perforationColors = {
+  stroke: 'rgba(0, 0, 0, 0.25)',
+  yellow: '#FFFC00',
+  grey: 'gray',
+  red: '#FF5050',
+  transparent: 'rgba(255, 255, 255, 0)',
+};
+  
+export interface SchematicData {
+  holeSizes: HoleSize[];
+  casings: Casing[];
+  cements: Cement[];
+  completion: Completion[];
+  pAndA: PAndA[];
+  symbols: {
+    [key: string]: string;
+  }
+}
 
 export interface SchematicLayerOptions<T extends SchematicData> extends LayerOptions<T> {
   exaggerationFactor?: number;
@@ -316,16 +363,13 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     // The perf spikes should not always start behind a hole
     // if there is a casing they should start there
     // will fix
-    perforations
-      .filter((perf) => perf.subKind === 'Perforation')
-      .forEach((perforation) => {
-        const perfShape = this.createPerforationShape(perforation, casings, holeSizes).map((p) => ({ ...p, diameter: p.diameter * 4 }));
-        if (perforation.subKind === 'Perforation') {
-          const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
-          console.log({ perforations, otherPerforations });
-          this.drawComplexRope(perfShape, this.createPerforationTexture(perforation, perfShape, otherPerforations));
-        }
-      });
+    perforations.filter(isSubKindPerforation).forEach((perforation) => {
+      const perfShape = this.createPerforationShape(perforation, casings, holeSizes).map((p) => ({ ...p, diameter: p.diameter * 4 }));
+      if (isSubKindPerforation) {
+        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+        this.drawComplexRope(perfShape, this.createPerforationTexture(perforation, perfShape, otherPerforations));
+      }
+    });
 
     this.updateSymbolCache(symbols);
 
@@ -428,7 +472,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     // if there is a casing they should start there
     // will fix
     perforations
-      .filter((perf) => perf.subKind !== 'Perforation')
+      .filter((perf) => !isSubKindPerforation(perf))
       .forEach((perforation) => {
         const perfShape = this.createPerforationShape(perforation, casings, holeSizes).map((p) => {
           if (perforation.subKind === 'Open hole frac pack') {
@@ -437,9 +481,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           return { ...p, diameter: p.diameter };
         });
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
-        this.drawComplexRope(
-          perfShape,
-          this.createPerforationTexture(perforation, perfShape, otherPerforations));
+        this.drawComplexRope(perfShape, this.createPerforationTexture(perforation, perfShape, otherPerforations));
       });
   }
 
@@ -499,14 +541,12 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return createComplexRopeSegmentsForCementPlug(plug, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   }
 
-  private createPerforationTexture(perforation: any, perfShapes: any[], otherPerforations: Perforation[]): Texture {
-    console.log({ perforation, perfShapes });
+  private createPerforationTexture(perforation: Perforation, perfShapes: PerforationShape[], otherPerforations: Perforation[]): Texture {
     if (this.perforationTextureCache) {
       return this.perforationTextureCache;
     }
 
     const { cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
-    const perforationColor = '#ff0000';
     const canvas = document.createElement('canvas');
 
     const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
@@ -515,135 +555,15 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     canvas.height = size;
     const canvasCtx = canvas.getContext('2d');
 
-    canvasCtx.fillStyle = perforationColor;
-
-    const assertNever = (x: never): never => {
-      throw new Error(`Unexpected object: ${x}`);
-    };
-
-    type PerforationSubKind =
-      | 'Perforation'
-      | 'Open hole gravel pack'
-      | 'Open hole screen'
-      | 'Open hole'
-      | 'Open hole frac pack'
-      | 'Cased hole frac pack'
-      | 'Cased hole gravel pack'
-      | 'Cased hole fracturation';
-
-    const foldPerforationSubKind = <T>(
-      options: {
-        Perforation: (kind: 'Perforation') => T;
-        OpenHole: (kind: 'Open hole') => T;
-        OpenHoleGravelPack: (kind: 'Open hole gravel pack') => T;
-        OpenHoleFracPack: (kind: 'Open hole frac pack') => T;
-        OpenHoleScreen: (kind: 'Open hole screen') => T;
-        CasedHoleGravelPack: (kind: 'Cased hole gravel pack') => T;
-        CasedHoleFracPack: (kind: 'Cased hole frac pack') => T;
-        CasedHoleFracturation: (kind: 'Cased hole fracturation') => T;
-      },
-      subKind: PerforationSubKind,
-    ) => {
-      switch (subKind) {
-        case 'Perforation':
-          return options.Perforation(subKind);
-
-        case 'Open hole':
-          return options.OpenHole(subKind);
-
-        case 'Open hole gravel pack':
-          return options.OpenHoleGravelPack(subKind);
-
-        case 'Open hole frac pack':
-          return options.OpenHoleFracPack(subKind);
-
-        case 'Open hole screen':
-          return options.OpenHoleScreen(subKind);
-
-        case 'Cased hole fracturation':
-          return options.CasedHoleFracturation(subKind);
-
-        case 'Cased hole frac pack':
-          return options.CasedHoleFracPack(subKind);
-
-        case 'Cased hole gravel pack':
-          return options.CasedHoleGravelPack(subKind);
-
-        default:
-          return assertNever(subKind);
-      }
-    };
+    canvasCtx.fillStyle = perforationColors.red;
 
     const spikeWidth = 25;
     const amountOfSpikes = canvas.width / spikeWidth;
-
-    function hasGravelPack(perf: Perforation): boolean {
-      return foldPerforationSubKind(
-        {
-          Perforation: () => false,
-          OpenHole: () => false,
-          OpenHoleGravelPack: () => true,
-          OpenHoleFracPack: () => false,
-          OpenHoleScreen: () => false,
-          CasedHoleFracturation: () => false,
-          CasedHoleGravelPack: () => true,
-          CasedHoleFracPack: () => false,
-        },
-        perf.subKind,
-      );
-    }
-
-    function isSubKindPerforation(perf: Perforation): boolean {
-      return foldPerforationSubKind(
-        {
-          Perforation: () => true,
-          OpenHole: () => false,
-          OpenHoleGravelPack: () => false,
-          OpenHoleFracPack: () => false,
-          OpenHoleScreen: () => false,
-          CasedHoleFracturation: () => false,
-          CasedHoleGravelPack: () => false,
-          CasedHoleFracPack: () => false,
-        },
-        perf.subKind,
-      );
-    }
-
-    function isSubKindCasedHoleFracPack(perf: Perforation): boolean {
-      return foldPerforationSubKind(
-        {
-          Perforation: () => false,
-          OpenHole: () => false,
-          OpenHoleGravelPack: () => false,
-          OpenHoleFracPack: () => false,
-          OpenHoleScreen: () => false,
-          CasedHoleFracturation: () => false,
-          CasedHoleGravelPack: () => false,
-          CasedHoleFracPack: () => true,
-        },
-        perf.subKind,
-      );
-    }
-
-    const colors = {
-      stroke: 'rgba(0, 0, 0, 0.25)',
-      yellow: '#FFFC00',
-      grey: 'gray',
-      red: '#FF5050',
-      transparent: 'rgba(255, 255, 255, 0)',
-    };
-
-    const intersect = (a, b) => {
-      return a.top < b.bottom && a.bottom > b.top;
-    };
-
-    console.log({ otherPerforations });
+    const fracLineHalfWidth = 10;
 
     // how to start the spike at the right diameter position if it has multiple perforationShapes with different diameters?
     // maybe good enough to just render it behind casings or holes?
-    // I WILL FIX THIS LATER
-    // First I have to draw all the parts, right color, overlap detection
-    // Take a look at the wellx-wellog logic!
+    // @ooystein
 
     // https://app.zenhub.com/workspaces/wellx-5f89a0db386bba0014989b28/issues/equinor/wellx-designer/222
     foldPerforationSubKind(
@@ -665,30 +585,30 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
           // Cased hole frac pack
           // Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
-          const intersectionsWithCasedHoleFracPack = R.pipe(
+          const intersectionsWithCasedHoleFracPack: Perforation[] = R.pipe(
             R.filter(isSubKindCasedHoleFracPack),
             R.map((gPack) => (intersect(perforation, gPack) ? gPack : null)),
             R.filter((gPack) => gPack !== null),
           )(otherPerforations);
 
-          console.log('I LOVE YOU DUA LIPA!', { intersectionsWithGravel, intersectionsWithCasedHoleFracPack });
+          let hasFracLines = false;
 
           if (intersectionsWithGravel.length > 0 || intersectionsWithCasedHoleFracPack.length > 0) {
+            hasFracLines = true;
             if (perforation.isOpen) {
-              canvasCtx.fillStyle = colors.yellow;
-              canvasCtx.strokeStyle = colors.yellow;
+              canvasCtx.fillStyle = perforationColors.yellow;
+              canvasCtx.strokeStyle = perforationColors.yellow;
             } else {
-              canvasCtx.fillStyle = colors.grey;
-              canvasCtx.strokeStyle = colors.grey;
+              canvasCtx.fillStyle = perforationColors.grey;
+              canvasCtx.strokeStyle = perforationColors.grey;
             }
           } else {
-            console.log({ isOpen: perforation.isOpen });
             if (perforation.isOpen) {
-              canvasCtx.fillStyle = colors.red;
-              canvasCtx.strokeStyle = colors.red;
+              canvasCtx.fillStyle = perforationColors.red;
+              canvasCtx.strokeStyle = perforationColors.red;
             } else {
-              canvasCtx.fillStyle = colors.grey;
-              canvasCtx.strokeStyle = colors.grey;
+              canvasCtx.fillStyle = perforationColors.grey;
+              canvasCtx.strokeStyle = perforationColors.grey;
             }
           }
 
@@ -718,8 +638,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
             canvasCtx.fill();
           }
 
-          const hasFracLines = true;
-
           if (hasFracLines) {
             for (let i = 0; i < amountOfSpikes; i++) {
               const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
@@ -728,9 +646,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
               canvasCtx.beginPath();
 
               const start: [number, number] = [...top];
-              const controlPoint1: [number, number] = [top[0] - 10, fracLineLenght / 2];
+              const controlPoint1: [number, number] = [top[0] - fracLineHalfWidth, fracLineLenght / 2];
               const middle: [number, number] = [top[0], fracLineLenght / 2];
-              const controlPoint2: [number, number] = [top[0] + 10, fracLineLenght / 4];
+              const controlPoint2: [number, number] = [top[0] + fracLineHalfWidth, fracLineLenght / 4];
               const end: [number, number] = [top[0], 0];
 
               canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
@@ -745,9 +663,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
               canvasCtx.beginPath();
 
               const start: [number, number] = [...bottom];
-              const controlPoint1: [number, number] = [bottom[0] - 10, canvas.height - fracLineLenght / 2];
+              const controlPoint1: [number, number] = [bottom[0] - fracLineHalfWidth, canvas.height - fracLineLenght / 2];
               const middle: [number, number] = [bottom[0], canvas.height - fracLineLenght / 2];
-              const controlPoint2: [number, number] = [bottom[0] + 10, canvas.height - fracLineLenght / 4];
+              const controlPoint2: [number, number] = [bottom[0] + fracLineHalfWidth, canvas.height - fracLineLenght / 4];
               const end: [number, number] = [bottom[0], canvas.height];
 
               canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
@@ -763,15 +681,14 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
           canvas.width = size / 2;
           canvas.height = size;
-          canvasCtx.fillStyle = colors.yellow;
+          canvasCtx.fillStyle = perforationColors.yellow;
           canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
         },
         // Yellow gravel. Yellow frac lines from hole OD into formation
         OpenHoleFracPack: () => {
-          canvasCtx.fillStyle = colors.yellow;
-          canvasCtx.strokeStyle = colors.yellow;
+          canvasCtx.fillStyle = perforationColors.yellow;
+          canvasCtx.strokeStyle = perforationColors.yellow;
           const fracLineLenght = 25;
-          const hasFracLines = true;
 
           console.log('OPEN HOLE FRAC PACK');
 
@@ -779,44 +696,43 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           const wh: [number, number] = [canvas.width, perfShapes[0].diameter];
           canvasCtx.fillRect(...xy, ...wh);
 
-          if (hasFracLines) {
-            for (let i = 0; i < amountOfSpikes; i++) {
-              const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-              const top: [number, number] = [right[0] - spikeWidth / 2, fracLineLenght + perfShapes[0].diameter];
+          for (let i = 0; i < amountOfSpikes; i++) {
+            const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
+            const top: [number, number] = [right[0] - spikeWidth / 2, fracLineLenght + perfShapes[0].diameter];
 
-              canvasCtx.beginPath();
+            canvasCtx.beginPath();
 
-              // TODO
-              // Is it OK to always use perfShape[0].diameter or do I need to change it up along the path?
-              // Perhaps check per loop iteration?
-              // How would I do that?
-              const start: [number, number] = [...top];
-              const controlPoint1: [number, number] = [top[0] - 10, fracLineLenght / 2 + perfShapes[0].diameter];
-              const middle: [number, number] = [top[0], fracLineLenght / 2 + perfShapes[0].diameter];
-              const controlPoint2: [number, number] = [top[0] + 10, fracLineLenght / 4 + perfShapes[0].diameter];
-              const end: [number, number] = [top[0], perfShapes[0].diameter];
+            // TODO
+            // Is it OK to always use perfShape[0].diameter or do I need to change it up along the path?
+            // Perhaps check per loop iteration?
+            // How would I do that?
+            // @ooystein
+            const start: [number, number] = [...top];
+            const controlPoint1: [number, number] = [top[0] - fracLineHalfWidth, fracLineLenght / 2 + perfShapes[0].diameter];
+            const middle: [number, number] = [top[0], fracLineLenght / 2 + perfShapes[0].diameter];
+            const controlPoint2: [number, number] = [top[0] + fracLineHalfWidth, fracLineLenght / 4 + perfShapes[0].diameter];
+            const end: [number, number] = [top[0], perfShapes[0].diameter];
 
-              canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
-              canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
-              canvasCtx.stroke();
-            }
+            canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
+            canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
+            canvasCtx.stroke();
+          }
 
-            for (let i = 0; i < amountOfSpikes; i++) {
-              const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-              const bottom: [number, number] = [right[0] - spikeWidth / 2, canvas.height - fracLineLenght - perfShapes[0].diameter];
+          for (let i = 0; i < amountOfSpikes; i++) {
+            const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
+            const bottom: [number, number] = [right[0] - spikeWidth / 2, canvas.height - fracLineLenght - perfShapes[0].diameter];
 
-              canvasCtx.beginPath();
+            canvasCtx.beginPath();
 
-              const start: [number, number] = [...bottom];
-              const controlPoint1: [number, number] = [bottom[0] - 10, canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
-              const middle: [number, number] = [bottom[0], canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
-              const controlPoint2: [number, number] = [bottom[0] + 10, canvas.height - fracLineLenght / 4 - perfShapes[0].diameter];
-              const end: [number, number] = [bottom[0], canvas.height - perfShapes[0].diameter];
+            const start: [number, number] = [...bottom];
+            const controlPoint1: [number, number] = [bottom[0] - fracLineHalfWidth, canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
+            const middle: [number, number] = [bottom[0], canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
+            const controlPoint2: [number, number] = [bottom[0] + fracLineHalfWidth, canvas.height - fracLineLenght / 4 - perfShapes[0].diameter];
+            const end: [number, number] = [bottom[0], canvas.height - perfShapes[0].diameter];
 
-              canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
-              canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
-              canvasCtx.stroke();
-            }
+            canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
+            canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
+            canvasCtx.stroke();
           }
         },
         // No visualisation
@@ -836,9 +752,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
             // Perhaps check per loop iteration?
             // How would I do that?
             const start: [number, number] = [...top];
-            const controlPoint1: [number, number] = [top[0] - 10, fracLineLenght / 2 + perfShapes[0].diameter];
+            const controlPoint1: [number, number] = [top[0] - fracLineHalfWidth, fracLineLenght / 2 + perfShapes[0].diameter];
             const middle: [number, number] = [top[0], fracLineLenght / 2 + perfShapes[0].diameter];
-            const controlPoint2: [number, number] = [top[0] + 10, fracLineLenght / 4 + perfShapes[0].diameter];
+            const controlPoint2: [number, number] = [top[0] + fracLineHalfWidth, fracLineLenght / 4 + perfShapes[0].diameter];
             const end: [number, number] = [top[0], perfShapes[0].diameter];
 
             canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
@@ -853,9 +769,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
             canvasCtx.beginPath();
 
             const start: [number, number] = [...bottom];
-            const controlPoint1: [number, number] = [bottom[0] - 10, canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
+            const controlPoint1: [number, number] = [bottom[0] - fracLineHalfWidth, canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
             const middle: [number, number] = [bottom[0], canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
-            const controlPoint2: [number, number] = [bottom[0] + 10, canvas.height - fracLineLenght / 4 - perfShapes[0].diameter];
+            const controlPoint2: [number, number] = [bottom[0] + fracLineHalfWidth, canvas.height - fracLineLenght / 4 - perfShapes[0].diameter];
             const end: [number, number] = [bottom[0], canvas.height - perfShapes[0].diameter];
 
             canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
@@ -868,7 +784,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
           canvas.width = size / 2;
           canvas.height = size;
-          canvasCtx.fillStyle = colors.yellow;
+          canvasCtx.fillStyle = perforationColors.yellow;
           canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
         },
         // Yellow gravel and fracturation lines.
@@ -880,15 +796,12 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
           canvas.width = size / 2;
           canvas.height = size;
-          canvasCtx.fillStyle = colors.yellow;
+          canvasCtx.fillStyle = perforationColors.yellow;
           canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
         },
       },
       perforation.subKind,
     );
-
-    // this.perforationTextureCache = Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
-    // return this.perforationTextureCache;
 
     const notGonnaCacheThePerforationTextureForNow = Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
     return notGonnaCacheThePerforationTextureForNow;
@@ -1112,7 +1025,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return this.cementTextureCache;
   }
 
-  createPerforationShape = (perforation: Perforation, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
+  createPerforationShape = (perforation: Perforation, casings: Casing[], holes: HoleSize[]): PerforationShape[] => {
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     return createComplexRopeSegmentsForPerforation(perforation, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };

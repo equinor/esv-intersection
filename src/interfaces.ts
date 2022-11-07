@@ -4,6 +4,7 @@ import Vector2 from '@equinor/videx-vector2';
 import { ScaleLinear } from 'd3-scale';
 import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
 import { CurveInterpolator } from 'curve-interpolator';
+import { ComplexRopeSegment } from './layers/CustomDisplayObjects/ComplexRope';
 
 interface LayerEvent {
   elm?: HTMLElement;
@@ -119,41 +120,102 @@ export interface Perforation {
   holeId?: string[];
 }
 
-// wellx-welllog ViewModel
-export interface PerforationPacking {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fill: string;
-}
-export interface PerforationSpike {
-  x: number;
-  y: number;
-  scale: { x: number; y: number };
-  d?: string;
-  color: string;
+export type PerforationShape = ComplexRopeSegment;
+
+export const foldPerforationSubKind = <T>(
+  options: {
+    Perforation: (kind: 'Perforation') => T;
+    OpenHole: (kind: 'Open hole') => T;
+    OpenHoleGravelPack: (kind: 'Open hole gravel pack') => T;
+    OpenHoleFracPack: (kind: 'Open hole frac pack') => T;
+    OpenHoleScreen: (kind: 'Open hole screen') => T;
+    CasedHoleGravelPack: (kind: 'Cased hole gravel pack') => T;
+    CasedHoleFracPack: (kind: 'Cased hole frac pack') => T;
+    CasedHoleFracturation: (kind: 'Cased hole fracturation') => T;
+  },
+  subKind: PerforationSubKind,
+) => {
+  switch (subKind) {
+    case 'Perforation':
+      return options.Perforation(subKind);
+
+    case 'Open hole':
+      return options.OpenHole(subKind);
+
+    case 'Open hole gravel pack':
+      return options.OpenHoleGravelPack(subKind);
+
+    case 'Open hole frac pack':
+      return options.OpenHoleFracPack(subKind);
+
+    case 'Open hole screen':
+      return options.OpenHoleScreen(subKind);
+
+    case 'Cased hole fracturation':
+      return options.CasedHoleFracturation(subKind);
+
+    case 'Cased hole frac pack':
+      return options.CasedHoleFracPack(subKind);
+
+    case 'Cased hole gravel pack':
+      return options.CasedHoleGravelPack(subKind);
+
+    default:
+      return assertNever(subKind);
+  }
+};
+
+export function hasGravelPack(perf: Perforation): boolean {
+  return foldPerforationSubKind(
+    {
+      Perforation: () => false,
+      OpenHole: () => false,
+      OpenHoleGravelPack: () => true,
+      OpenHoleFracPack: () => false,
+      OpenHoleScreen: () => false,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => true,
+      CasedHoleFracPack: () => false,
+    },
+    perf.subKind,
+  );
 }
 
-export interface PerforationFracLine {
-  x: number;
-  y: number;
-  scale: { x: number; y: number };
-  color: string;
-}
-export interface PerforationShapeParts {
-  spikes?: PerforationSpike[];
-  packing?: PerforationPacking;
-  frackLines?: PerforationFracLine[];
+export function isSubKindPerforation(perf: Perforation): boolean {
+  return foldPerforationSubKind(
+    {
+      Perforation: () => true,
+      OpenHole: () => false,
+      OpenHoleGravelPack: () => false,
+      OpenHoleFracPack: () => false,
+      OpenHoleScreen: () => false,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => false,
+      CasedHoleFracPack: () => false,
+    },
+    perf.subKind,
+  );
 }
 
-export interface PerforationShape {
-  kind: 'perforation';
-  subKind: PerforationSubKind;
-  id: string;
-  parts: PerforationShapeParts;
-  strokeWidth: number;
+export function isSubKindCasedHoleFracPack(perf: Perforation): boolean {
+  return foldPerforationSubKind(
+    {
+      Perforation: () => false,
+      OpenHole: () => false,
+      OpenHoleGravelPack: () => false,
+      OpenHoleFracPack: () => false,
+      OpenHoleScreen: () => false,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => false,
+      CasedHoleFracPack: () => true,
+    },
+    perf.subKind,
+  );
 }
+
+export const intersect = (a: Perforation, b: Perforation): boolean => {
+  return a.top < b.bottom && a.bottom > b.top;
+};
 
 interface BaseCompletion {
   diameter: number;
