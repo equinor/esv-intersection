@@ -65,7 +65,6 @@ import {
   hasGravelPack,
   intersect,
   isSubKindCasedHoleFracPack,
-  isSubKindPerforation,
 } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
