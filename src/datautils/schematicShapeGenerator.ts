@@ -316,10 +316,6 @@ export const createComplexRopeSegmentsForCementPlug = (
 ): ComplexRopeSegment[] => {
   const { attachedStrings, nonAttachedStrings } = splitByReferencedStrings(plug.referenceIds, casings, completion);
 
-  if (attachedStrings.length === 0) {
-    throw new Error(`Invalid cement plug data, can't find referenced casing/completion for plug with id '${plug.id}'`);
-  }
-
   const { overlappingHoles, overlappingOuterStrings } = findIntersectingItems(plug.start, plug.end, nonAttachedStrings, holes);
   const innerDiameterIntervals = [...attachedStrings, ...overlappingHoles, ...overlappingOuterStrings].map((d) => ({
     start: d.start,
