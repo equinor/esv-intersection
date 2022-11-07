@@ -151,7 +151,7 @@ export const findCementInnerDiameterAtDepth = (
     return getInnerStringDiameter(attachedStringAtDepth);
   }
 
-  // Guarantee an attached diameter
+  // Start from an attached diameter
   const minimumDiameter = attachedStrings.length ? Math.min(...attachedStrings.map((c) => getInnerStringDiameter(c))) : 0;
   const nonAttachedStringAtDepth = nonAttachedStrings
     .sort((a: Casing | Completion, b: Casing | Completion) => getInnerStringDiameter(a) - getInnerStringDiameter(b)) // ascending
@@ -282,15 +282,15 @@ export const createComplexRopeSegmentsForCementSqueeze = (
   const changeDepths = getUniqueDiameterChangeDepths([squeeze.start, squeeze.end], outerDiameterIntervals);
 
   const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
-    if (index === 0) {
+    if (index === list.length - 1) {
       return [];
     }
 
-    const nextDepth = list[index - 1];
+    const nextDepth = list[index + 1];
 
-    const diameter = findCementOuterDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth) * exaggerationFactor;
+    const diameterAtDepth = findCementOuterDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth);
 
-    return [{ top: nextDepth, bottom: depth, diameter }];
+    return [{ top: depth, bottom: nextDepth, diameter: diameterAtDepth * exaggerationFactor }];
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
