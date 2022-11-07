@@ -358,12 +358,41 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const { holeSizes, casings, cements, completion, symbols, pAndA, perforations } = this.data;
     
 
-    // WIP
-    // TODO
-    // The perf spikes should not always start behind a hole
-    // if there is a casing they should start there
-    // will fix
-    perforations.filter(isSubKindPerforation).forEach((perforation) => {
+    const shouldStartAtHoleDiameter = perforations.filter((perf) =>
+      foldPerforationSubKind(
+        {
+          Perforation: () => true,
+          OpenHole: () => false,
+          OpenHoleGravelPack: () => true,
+          OpenHoleFracPack: () => false,
+          OpenHoleScreen: () => true,
+          CasedHoleFracturation: () => false,
+          CasedHoleGravelPack: () => false,
+          CasedHoleFracPack: () => false,
+        },
+        perf.subKind,
+      ),
+    );
+
+    const shouldStartAtCasingDiameter = perforations.filter(
+      (perf) =>
+        !foldPerforationSubKind(
+          {
+            Perforation: () => true,
+            OpenHole: () => false,
+            OpenHoleGravelPack: () => true,
+            OpenHoleFracPack: () => false,
+            OpenHoleScreen: () => true,
+            CasedHoleFracturation: () => false,
+            CasedHoleGravelPack: () => false,
+            CasedHoleFracPack: () => false,
+          },
+          perf.subKind,
+        ),
+    );
+
+    // Øystein: det skal gå ut fra casing når den er på en casing og fra hull når det er en open hole perforering
+    shouldStartAtHoleDiameter.forEach((perforation) => {
       const perfShape = this.createPerforationShape(perforation, casings, holeSizes).map((p) => ({ ...p, diameter: p.diameter * 4 }));
       if (isSubKindPerforation) {
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
@@ -466,23 +495,16 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         }
       });
 
-    // WIP
-    // TODO
-    // The perf spikes should not always start behind a hole
-    // if there is a casing they should start there
-    // will fix
-    perforations
-      .filter((perf) => !isSubKindPerforation(perf))
-      .forEach((perforation) => {
-        const perfShape = this.createPerforationShape(perforation, casings, holeSizes).map((p) => {
-          if (perforation.subKind === 'Open hole frac pack') {
-            return { ...p, diameter: p.diameter * 4 };
-          }
-          return { ...p, diameter: p.diameter };
-        });
-        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
-        this.drawComplexRope(perfShape, this.createPerforationTexture(perforation, perfShape, otherPerforations));
+    shouldStartAtCasingDiameter.forEach((perforation) => {
+      const perfShape = this.createPerforationShape(perforation, casings, holeSizes).map((p) => {
+        if (perforation.subKind === 'Open hole frac pack') {
+          return { ...p, diameter: p.diameter * 4 };
+        }
+        return { ...p, diameter: p.diameter };
       });
+      const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+      this.drawComplexRope(perfShape, this.createPerforationTexture(perforation, perfShape, otherPerforations));
+    });
   }
 
   private updateSymbolCache(symbols: { [key: string]: string }) {
@@ -560,6 +582,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const spikeWidth = 25;
     const amountOfSpikes = canvas.width / spikeWidth;
     const fracLineHalfWidth = 10;
+    const packingOpacity = 0.5;
 
     // how to start the spike at the right diameter position if it has multiple perforationShapes with different diameters?
     // maybe good enough to just render it behind casings or holes?
@@ -679,10 +702,13 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         // Yellow gravel
         OpenHoleGravelPack: () => {
           const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+          canvasCtx.save();
+          canvasCtx.globalAlpha = packingOpacity;
           canvas.width = size / 2;
           canvas.height = size;
           canvasCtx.fillStyle = perforationColors.yellow;
           canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+          canvasCtx.restore();
         },
         // Yellow gravel. Yellow frac lines from hole OD into formation
         OpenHoleFracPack: () => {
@@ -690,11 +716,12 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           canvasCtx.strokeStyle = perforationColors.yellow;
           const fracLineLenght = 25;
 
-          console.log('OPEN HOLE FRAC PACK');
-
           const xy: [number, number] = [0, fracLineLenght + perfShapes[0].diameter];
           const wh: [number, number] = [canvas.width, perfShapes[0].diameter];
+          canvasCtx.save();
+          canvasCtx.globalAlpha = packingOpacity;
           canvasCtx.fillRect(...xy, ...wh);
+          canvasCtx.restore();
 
           for (let i = 0; i < amountOfSpikes; i++) {
             const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
@@ -785,7 +812,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           canvas.width = size / 2;
           canvas.height = size;
           canvasCtx.fillStyle = perforationColors.yellow;
+          canvasCtx.save();
+          canvasCtx.globalAlpha = packingOpacity;
           canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+          canvasCtx.restore();
         },
         // Yellow gravel and fracturation lines.
         // Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
@@ -797,7 +827,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           canvas.width = size / 2;
           canvas.height = size;
           canvasCtx.fillStyle = perforationColors.yellow;
+          canvasCtx.save();
+          canvasCtx.globalAlpha = packingOpacity;
           canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+          canvasCtx.restore();
         },
       },
       perforation.subKind,
