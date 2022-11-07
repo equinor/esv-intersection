@@ -41,6 +41,7 @@ import {
   getPerforationsThatSTartAtCasingDiameter,
   PerforationOptions,
   defaultPerforationOptions,
+  Completion,
 } from './schematicInterfaces';
 import {
   CasingRenderObject,
@@ -58,6 +59,7 @@ import {
   createComplexRopeSegmentsForPerforation,
   createPerforationTexture,
   PerforationShape,
+  createCementSqueezeTexture,
 } from '../datautils/schematicShapeGenerator';
 import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
@@ -344,21 +346,21 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const cementShapes: CementRenderObject[] = cements.map(
       (cement: Cement): CementRenderObject => ({
         kind: 'cement',
-        segments: createComplexRopeSegmentsForCement(cement, casings, holeSizes, exaggerationFactor, this.getZFactorScaledPathForPoints),
-        casingIds: (cement.casingIds || []).filter((id) => id),
+        segments: createComplexRopeSegmentsForCement(cement, casings, completion, holeSizes, exaggerationFactor, this.getZFactorScaledPathForPoints),
+        casingIds: (cement.referenceIds || []).filter((id) => id),
       }),
     );
 
-    const [cementSqueezes, remainingPAndA] = pAndA.reduce(
+    const [cementSqueezes, remainingPAndA] = pAndA.reduce<[CementSqueeze[], Exclude<PAndA, CementSqueeze>[]]>(
       ([squeezes, remaining], current: PAndA) =>
         isCementSqueeze(current) ? [[current, ...squeezes], remaining] : [squeezes, [current, ...remaining]],
-      <[CementSqueeze[], Exclude<PAndA, CementSqueeze>[]]>[[], []],
+      [[], []],
     );
 
     const cementSqueezesShape: CementSqueezeRenderObject[] = cementSqueezes.map((squeeze) => ({
       kind: 'cementSqueeze',
-      segments: this.createCementSqueezeShape(squeeze, casings, holeSizes),
-      casingIds: squeeze.casingIds,
+      segments: this.createCementSqueezeShape(squeeze, casings, completion, holeSizes),
+      casingIds: squeeze.referenceIds,
     }));
 
     this.sortCementAndCasingRenderObjects(casingRenderObjects, cementShapes, cementSqueezesShape).forEach(
@@ -372,7 +374,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         (cementRO: CementRenderObject) =>
           this.internalLayerVisibility.cementLayerId && this.drawComplexRope(cementRO.segments, this.getCementTexture()),
         (cementSqueezesRO: CementSqueezeRenderObject) =>
-          this.internalLayerVisibility.pAndALayerId && this.drawComplexRope(cementSqueezesRO.segments, this.createCementSqueezeTexture()),
+          this.internalLayerVisibility.pAndALayerId && this.drawComplexRope(cementSqueezesRO.segments, this.getCementSqueezeTexture()),
       ),
     );
 
@@ -395,7 +397,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           this.drawSymbolComponent(symbolRenderObject);
         }
         if (isCementPlug(obj)) {
-          this.drawCementPlug(obj, casings, holeSizes);
+          this.drawCementPlug(obj, casings, completion, holeSizes);
         }
       });
 
@@ -425,12 +427,13 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     });
   }
 
-  private drawCementPlug(cementPlug: CementPlug, casings: Casing[], holes: HoleSize[]) {
+  private drawCementPlug(cementPlug: CementPlug, casings: Casing[], completion: Completion[], holes: HoleSize[]) {
     const { exaggerationFactor, cementPlugOptions } = this.options as SchematicLayerOptions<T>;
 
     const cementPlugSegments = createComplexRopeSegmentsForCementPlug(
       cementPlug,
       casings,
+      completion,
       holes,
       exaggerationFactor,
       this.getZFactorScaledPathForPoints,
@@ -440,7 +443,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const { rightPath, leftPath } = cementPlugSegments.reduce(
       (acc, current) => {
         const pathPoints = current.points.map<[number, number]>((p: IPoint) => [p.x, p.y]);
-        const { leftPath, rightPath } = createTubularRenderingObject(current.diameter, pathPoints);
+        const { leftPath, rightPath } = createTubularRenderingObject(cementPlug.id, current.diameter, pathPoints);
 
         return {
           rightPath: [...acc.rightPath, ...rightPath],
@@ -482,9 +485,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     };
   };
 
-  private drawSymbolComponent = (renderObject: SymbolRenderObject): void => {
-    const { pathPoints, referenceDiameter, symbolKey } = renderObject;
-
+  private drawSymbolComponent = ({ pathPoints, referenceDiameter, symbolKey }: SymbolRenderObject): void => {
     const texture = this.getSymbolTexture(symbolKey, referenceDiameter);
     // The rope renders fine in CANVAS/fallback mode
     this.drawSVGRope(
@@ -519,7 +520,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
     const { exaggerationFactor, holeOptions } = this.options as SchematicLayerOptions<T>;
     const diameter = holeObject.diameter * exaggerationFactor;
-    const { rightPath, leftPath, referenceDiameter } = createTubularRenderingObject(diameter, pathPoints);
+    const { rightPath, leftPath, referenceDiameter } = createTubularRenderingObject(holeObject.id, diameter, pathPoints);
 
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       const polygonCoords = makeTubularPolygon(leftPath, rightPath);
@@ -585,9 +586,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     let zIndex = 0;
 
     const { result } = casingRenderObjects.reduce(
-      (acc: InterlaceReducerAcc, casingRenderObject): InterlaceReducerAcc => {
-        const foundCementShape = acc.remainingCement.find((cement) => cement.casingIds.includes(casingRenderObject.casingId));
-        const foundCementSqueezes = acc.remainingCementSqueezes.filter((squeeze) => squeeze.casingIds.includes(casingRenderObject.casingId));
+      (acc: InterlaceReducerAcc, casingRenderObject: CasingRenderObject): InterlaceReducerAcc => {
+        const foundCementShape = acc.remainingCement.find((cement) => cement.casingIds.includes(casingRenderObject.id));
+        const foundCementSqueezes = acc.remainingCementSqueezes.filter((squeeze) => squeeze.casingIds.includes(casingRenderObject.id));
 
         if (foundCementShape) {
           foundCementShape.zIndex = zIndex++;
@@ -670,9 +671,14 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return [...shoeEdge, shoeTip];
   };
 
-  private createCementSqueezeShape = (squeeze: CementSqueeze, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] => {
+  private createCementSqueezeShape = (
+    squeeze: CementSqueeze,
+    casings: Casing[],
+    completion: Completion[],
+    holes: HoleSize[],
+  ): ComplexRopeSegment[] => {
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-    return createComplexRopeSegmentsForCementSqueeze(squeeze, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
+    return createComplexRopeSegmentsForCementSqueeze(squeeze, casings, completion, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };
 
   private getCementTexture(): Texture {
@@ -688,46 +694,20 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return createComplexRopeSegmentsForPerforation(perforation, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
   };
 
-  private createCementSqueezeTexture(): Texture {
-    if (this.cementSqueezeTextureCache) {
-      return this.cementSqueezeTextureCache;
+  private getCementSqueezeTexture(): Texture {
+    if (!this.cementSqueezeTextureCache) {
+      const { cementSqueezeOptions } = this.options as SchematicLayerOptions<T>;
+      this.cementSqueezeTextureCache = createCementSqueezeTexture(cementSqueezeOptions);
     }
-
-    const { cementSqueezeOptions } = this.options as SchematicLayerOptions<T>;
-
-    const canvas = document.createElement('canvas');
-
-    const size = DEFAULT_TEXTURE_SIZE * cementSqueezeOptions.scalingFactor;
-    const lineWidth = cementSqueezeOptions.scalingFactor;
-    canvas.width = size;
-    canvas.height = size;
-    const canvasCtx = canvas.getContext('2d');
-
-    canvasCtx.fillStyle = cementSqueezeOptions.firstColor;
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-    canvasCtx.lineWidth = lineWidth;
-    canvasCtx.fillStyle = cementSqueezeOptions.secondColor;
-    canvasCtx.beginPath();
-
-    canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
-    const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
-    for (let i = -canvas.width; i < canvas.width; i++) {
-      canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
-      canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
-    }
-    canvasCtx.stroke();
-
-    this.cementSqueezeTextureCache = Texture.from(canvas);
-
     return this.cementSqueezeTextureCache;
   }
 
-  private drawScreen({ start, end, diameter }: Screen): void {
+  private drawScreen({ id, start, end, diameter }: Screen): void {
     const { exaggerationFactor, screenOptions } = this.options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
-    const { leftPath, rightPath, referenceDiameter } = createTubularRenderingObject(exaggeratedDiameter, pathPoints);
+    const { leftPath, rightPath, referenceDiameter } = createTubularRenderingObject(id, exaggeratedDiameter, pathPoints);
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
     const texture = this.getScreenTexture();
@@ -743,12 +723,12 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.drawOutline(leftPath, rightPath, convertColor(screenOptions.lineColor), SCREEN_OUTLINE * exaggerationFactor, false);
   }
 
-  private drawTubing({ diameter, start, end }: Tubing): void {
+  private drawTubing({ id, diameter, start, end }: Tubing): void {
     const { exaggerationFactor, tubingOptions } = this.options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
-    const { leftPath, rightPath, referenceDiameter } = createTubularRenderingObject(exaggeratedDiameter, pathPoints);
+    const { leftPath, rightPath, referenceDiameter } = createTubularRenderingObject(id, exaggeratedDiameter, pathPoints);
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
     const texture = this.getTubingTexture(tubingOptions);

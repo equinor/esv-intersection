@@ -16,7 +16,6 @@ export interface HoleSize {
 export interface Casing {
   kind: 'casing';
   id: string;
-  casingId: string;
   diameter: number;
   start: number;
   end: number;
@@ -41,9 +40,12 @@ export const isPAndASymbol = (item: PAndA): item is PAndASymbol => item.kind ===
 export interface CementSqueeze {
   kind: 'cementSqueeze';
   id: string;
-  top: number;
-  bottom: number;
-  casingIds?: string[];
+  start: number;
+  end: number;
+  /**
+   * Referenced Casing and Completion ids
+   */
+  referenceIds: string[];
 }
 
 export const isCementSqueeze = (item: PAndA): item is CementSqueeze => item.kind === 'cementSqueeze';
@@ -51,11 +53,12 @@ export const isCementSqueeze = (item: PAndA): item is CementSqueeze => item.kind
 export interface CementPlug {
   kind: 'cementPlug';
   id: string;
-  top: number;
-  bottom: number;
-  holeId?: string;
-  casingId?: string;
-  secondCasingId?: string;
+  start: number;
+  end: number;
+  /**
+   * Referenced Hole, Casing, Completion ids
+   */
+  referenceIds: string[];
 }
 
 export const isCementPlug = (item: PAndA): item is CementSqueeze => item.kind === 'cementPlug';
@@ -101,7 +104,10 @@ export const foldCompletion =
 export interface Cement {
   kind: 'cement';
   id: string;
-  casingIds?: string[];
+  /**
+   *  Referenced Casing and Completion ids
+   */
+  referenceIds: string[];
   toc: number;
 }
 
@@ -120,8 +126,8 @@ export interface Perforation {
   kind: 'perforation';
   subKind: PerforationSubKind;
   id: string;
-  top: number;
-  bottom: number;
+  start: number;
+  end: number;
   /**
    * is the perforation open or sealed?
    */
@@ -254,7 +260,7 @@ export function isOpenHoleFracPack(perf: Perforation) {
 }
 
 export const intersect = (a: Perforation, b: Perforation): boolean => {
-  return a.top < b.bottom && a.bottom > b.top;
+  return a.start < b.end && a.end > b.start;
 };
 
 export interface SchematicData {
@@ -278,12 +284,12 @@ export interface InternalLayerOptions {
   perforationLayerId: string;
 }
 
-export const defaultInternalLayerOptions = (layerId: string) => ({
+export const defaultInternalLayerOptions = (layerId: string): InternalLayerOptions => ({
   holeLayerId: `${layerId}-hole`,
   casingLayerId: `${layerId}-casing`,
   completionLayerId: `${layerId}-completion`,
-  pAndALayerId: `${layerId}-pAndA`,
   cementLayerId: `${layerId}-cement`,
+  pAndALayerId: `${layerId}-pAndA`,
   perforationLayerId: `${layerId}-perforation`,
 });
 
@@ -336,7 +342,7 @@ export const defaultPerforationOptions: PerforationOptions = {
   scalingFactor: 4,
 };
 
-export const defaultCasingOptions = {
+export const defaultCasingOptions: CasingOptions = {
   solidColor: '#dcdcdc',
   lineColor: '#575757',
   shoeSize: {
@@ -351,7 +357,7 @@ export interface CementOptions {
   scalingFactor: number;
 }
 
-export const defaultCementOptions = {
+export const defaultCementOptions: CementOptions = {
   firstColor: '#c7b9ab',
   secondColor: '#5b5b5b',
   scalingFactor: 4,
@@ -363,9 +369,9 @@ export interface CementSqueezeOptions {
   scalingFactor: number;
 }
 
-export const defaultCementSqueezeOptions = {
-  firstColor: '#8b4513',
-  secondColor: '#8b6713',
+export const defaultCementSqueezeOptions: CementSqueezeOptions = {
+  firstColor: '#8b6713',
+  secondColor: '#000000',
   scalingFactor: 4,
 };
 
@@ -374,7 +380,7 @@ export interface ScreenOptions {
   lineColor: string;
 }
 
-export const defaultScreenOptions = {
+export const defaultScreenOptions: ScreenOptions = {
   scalingFactor: 4,
   lineColor: '#63666a',
 };
@@ -385,7 +391,7 @@ export interface TubingOptions {
   scalingFactor: number;
 }
 
-export const defaultTubingOptions = {
+export const defaultTubingOptions: TubingOptions = {
   scalingFactor: 1,
   innerColor: '#eeeeff',
   outerColor: '#777788',
@@ -397,8 +403,8 @@ export interface CementPlugOptions {
   scalingFactor: number;
 }
 
-export const defaultCementPlugOptions = {
+export const defaultCementPlugOptions: CementPlugOptions = {
   firstColor: '#c7b9ab',
-  secondColor: '#c7b9ab',
+  secondColor: '#000000',
   scalingFactor: 4,
 };
