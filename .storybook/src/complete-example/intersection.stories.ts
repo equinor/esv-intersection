@@ -169,6 +169,7 @@ const renderIntersection = (scaleOptions: any) => {
         diameter: 8.5,
         symbolKey: 'mechanicalPlug',
       },
+      { kind: 'cementPlug' as const, id: 'cement-plug-2', start: 5000, end: 5110, referenceIds: ['casing-07'] },
     ];
 
     const schematicData: SchematicData = {
@@ -239,7 +240,7 @@ const renderIntersection = (scaleOptions: any) => {
       ['Cement', internalLayerIds.cementLayerId],
       ['Completion', internalLayerIds.completionLayerId],
       ['Plug & Abandonment', internalLayerIds.pAndALayerId],
-    ].map(([description, internalLayerId]) => createInternalLayerVisibilityButton(controller, internalLayerId, description))
+    ].map(([description, internalLayerId]) => createInternalLayerVisibilityButton(controller, internalLayerId, description));
 
     let show = true;
     const toggleAxis = createButtonWithCb(
