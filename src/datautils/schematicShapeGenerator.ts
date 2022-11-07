@@ -82,7 +82,7 @@ const findIntersectingItems = (
   };
 };
 
-const getUniqueDiameterChangeDepths = (
+export const getUniqueDiameterChangeDepths = (
   [intervalStart, intervalEnd]: [number, number],
   diameterIntervals: { start: number; end: number }[],
 ): number[] => {
@@ -135,7 +135,7 @@ export const findCementOuterDiameterAtDepth = (
   return defaultCementWidth;
 };
 
-export const findCementInnerDiameterAtDepth = (
+export const findCementPlugInnerDiameterAtDepth = (
   attachedStrings: (Casing | Completion)[],
   nonAttachedStrings: (Casing | Completion)[],
   holes: HoleSize[],
@@ -330,7 +330,7 @@ export const createComplexRopeSegmentsForCementPlug = (
     }
 
     const nextDepth = list[index + 1];
-    const diameterAtDepth = findCementInnerDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth);
+    const diameterAtDepth = findCementPlugInnerDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth);
 
     return [{ top: depth, bottom: nextDepth, diameter: diameterAtDepth * exaggerationFactor }];
   });

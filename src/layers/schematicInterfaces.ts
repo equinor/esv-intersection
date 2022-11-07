@@ -10,7 +10,6 @@ export interface HoleSize {
   diameter: number;
   start: number;
   end: number;
-  innerDiameter?: number;
 }
 
 export interface Casing {
