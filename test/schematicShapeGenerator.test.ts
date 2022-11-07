@@ -67,7 +67,7 @@ describe('getUniqueDiameterChangeDepths', () => {
     expect(SchematicShapeGenerator.getUniqueDiameterChangeDepths(intervals, diameterIntervals)).toStrictEqual(expected);
   });
 
-  it('should return start/end interval if diameter intervals is outside', () => {
+  it('should return start/end interval if diameter intervals is out of range', () => {
     const intervals: [number, number] = [100, 200];
     const diameterIntervals = [
       { start: 50, end: 70 },
@@ -135,5 +135,55 @@ describe('findCementPlugInnerDiameterAtDepth', () => {
     const holes = [TestHelpers.createHole(100, 2000)];
 
     expect(SchematicShapeGenerator.findCementPlugInnerDiameterAtDepth(attached, nonAttached, holes, depth)).toBe(100);
+  });
+});
+
+describe('findCementOuterDiameterAtDepth', () => {
+  it('should return extreme diameter if nothing exists at referenced depth', () => {
+    const depth = 1000;
+
+    expect(SchematicShapeGenerator.findCementOuterDiameterAtDepth([], [], [], depth)).toBe(100);
+  });
+
+  it('should prefer holeSize diameter over extreme diameter for given depth', () => {
+    const depth = 1000;
+    const holes: HoleSize[] = [TestHelpers.createHole(100, 2000, 30)];
+
+    expect(SchematicShapeGenerator.findCementOuterDiameterAtDepth([], [], holes, depth)).toBe(30);
+  });
+
+  it('should prefer smallest string outer diameter for given depth, if nothing is attached', () => {
+    const depth = 1000;
+    const nonAttached: (Casing | Completion)[] = [
+      TestHelpers.createCasing(100, 1500, { innerDiameter: 8, outerDiameter: 9 }),
+      TestHelpers.createCasing(100, 1500, { innerDiameter: 13, outerDiameter: 14 }),
+    ];
+    const holes: HoleSize[] = [TestHelpers.createHole(100, 2000, 30)];
+
+    expect(SchematicShapeGenerator.findCementOuterDiameterAtDepth([], nonAttached, holes, depth)).toBe(8);
+  });
+
+  it('should prefer outer string diameter for given depth greater than attached', () => {
+    const depth = 1000;
+    const attached: (Casing | Completion)[] = [TestHelpers.createCasing(100, 1500, { innerDiameter: 10, outerDiameter: 11 })];
+    const nonAttached: (Casing | Completion)[] = [
+      TestHelpers.createCasing(100, 1500, { innerDiameter: 8, outerDiameter: 9 }),
+      TestHelpers.createCasing(100, 1500, { innerDiameter: 13, outerDiameter: 14 }),
+    ];
+    const holes: HoleSize[] = [TestHelpers.createHole(100, 2000, 30)];
+
+    expect(SchematicShapeGenerator.findCementOuterDiameterAtDepth(attached, nonAttached, holes, depth)).toBe(13);
+  });
+
+  it('should prefer extreme diameter for given depth out of range', () => {
+    const depth = 9000;
+    const attached: (Casing | Completion)[] = [TestHelpers.createCasing(100, 1500, { innerDiameter: 10, outerDiameter: 11 })];
+    const nonAttached: (Casing | Completion)[] = [
+      TestHelpers.createCasing(100, 1500, { innerDiameter: 8, outerDiameter: 9 }),
+      TestHelpers.createCasing(100, 1500, { innerDiameter: 13, outerDiameter: 14 }),
+    ];
+    const holes: HoleSize[] = [TestHelpers.createHole(100, 2000, 30)];
+
+    expect(SchematicShapeGenerator.findCementOuterDiameterAtDepth(attached, nonAttached, holes, depth)).toBe(100);
   });
 });
