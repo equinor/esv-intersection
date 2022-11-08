@@ -2,7 +2,6 @@ import { max } from 'd3-array';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
 import { Graphics, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture, WRAP_MODES } from 'pixi.js';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
-import * as R from 'ramda';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
 import {
   assertNever,
@@ -38,11 +37,11 @@ import {
   defaultTubingOptions,
   defaultInternalLayerOptions,
   Perforation,
-  foldPerforationSubKind,
   PerforationShape,
-  hasGravelPack,
-  intersect,
-  isSubKindCasedHoleFracPack,
+  getPerforationsThatStartAtHoleDiameter,
+  getPerforationsThatSTartAtCasingDiameter,
+  PerforationOptions,
+  defaultPerforationOptions,
 } from './schematicInterfaces';
 import {
   CasingRenderObject,
@@ -58,6 +57,7 @@ import {
   prepareCasingRenderObject,
   createCementPlugTexture,
   createComplexRopeSegmentsForPerforation,
+  createPerforationTexture,
 } from '../datautils/schematicShapeGenerator';
 import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
@@ -109,15 +109,6 @@ const foldInterlacedRenderObjects =
     }
   };
 
-// Perforation
-const perforationColors = {
-  stroke: 'rgba(0, 0, 0, 0.25)',
-  yellow: '#FFFC00',
-  grey: 'gray',
-  red: '#FF5050',
-  transparent: 'rgba(255, 255, 255, 0)',
-};
-
 export interface SchematicLayerOptions<T extends SchematicData> extends LayerOptions<T> {
   exaggerationFactor?: number;
   internalLayerOptions?: InternalLayerOptions;
@@ -128,6 +119,7 @@ export interface SchematicLayerOptions<T extends SchematicData> extends LayerOpt
   screenOptions?: ScreenOptions;
   tubingOptions?: TubingOptions;
   cementPlugOptions?: CementPlugOptions;
+  perforationOptions?: PerforationOptions;
 }
 
 const defaultSchematicLayerOptions = (layerId: string): SchematicLayerOptions<SchematicData> => ({
@@ -140,6 +132,7 @@ const defaultSchematicLayerOptions = (layerId: string): SchematicLayerOptions<Sc
   screenOptions: defaultScreenOptions,
   tubingOptions: defaultTubingOptions,
   cementPlugOptions: defaultCementPlugOptions,
+  perforationOptions: defaultPerforationOptions,
 });
 
 type InternalLayerVisibility = { [K in keyof InternalLayerOptions]: boolean };
@@ -325,38 +318,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     const { holeSizes, casings, cements, completion, symbols, pAndA, perforations } = this.data;
 
-    const shouldStartAtHoleDiameter = perforations.filter((perf) =>
-      foldPerforationSubKind(
-        {
-          Perforation: () => true,
-          OpenHole: () => false,
-          OpenHoleGravelPack: () => true,
-          OpenHoleFracPack: () => false,
-          OpenHoleScreen: () => true,
-          CasedHoleFracturation: () => false,
-          CasedHoleGravelPack: () => false,
-          CasedHoleFracPack: () => false,
-        },
-        perf.subKind,
-      ),
-    );
+    const shouldStartAtHoleDiameter = getPerforationsThatStartAtHoleDiameter(perforations);
 
-    const shouldStartAtCasingDiameter = perforations.filter(
-      (perf) =>
-        !foldPerforationSubKind(
-          {
-            Perforation: () => true,
-            OpenHole: () => false,
-            OpenHoleGravelPack: () => true,
-            OpenHoleFracPack: () => false,
-            OpenHoleScreen: () => true,
-            CasedHoleFracturation: () => false,
-            CasedHoleGravelPack: () => false,
-            CasedHoleFracPack: () => false,
-          },
-          perf.subKind,
-        ),
-    );
+    const shouldStartAtCasingDiameter = getPerforationsThatSTartAtCasingDiameter(perforations);
 
     shouldStartAtHoleDiameter.forEach((perforation) => {
       const perfShape = this.createPerforationShape(perforation, casings, holeSizes).map((p) => ({ ...p, diameter: p.diameter * 4 }));
@@ -507,285 +471,21 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return this.cementPlugTextureCache;
   }
 
-  private createCementPlugShape(plug: CementPlug, casings: Casing[], holes: HoleSize[]): ComplexRopeSegment[] {
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-    return createComplexRopeSegmentsForCementPlug(plug, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
-  }
-
   private createPerforationTexture(perforation: Perforation, perfShapes: PerforationShape[], otherPerforations: Perforation[]): Texture {
     if (this.perforationTextureCache) {
       return this.perforationTextureCache;
     }
 
-    const { cementOptions } = this.options as SchematicLayerOptions<T>;
-    const canvas = document.createElement('canvas');
+    const { cementOptions, perforationOptions } = this.options as SchematicLayerOptions<T>;
 
-    const size = DEFAULT_TEXTURE_SIZE * cementOptions.scalingFactor;
-
-    canvas.width = size / 2;
-    canvas.height = size;
-    const canvasCtx = canvas.getContext('2d');
-
-    canvasCtx.fillStyle = perforationColors.red;
-
-    const spikeWidth = 25;
-    const amountOfSpikes = canvas.width / spikeWidth;
-    const fracLineHalfWidth = 10;
-    const packingOpacity = 0.5;
-
-    // how to start the spike at the right diameter position if it has multiple perforationShapes with different diameters?
-    // maybe good enough to just render it behind casings or holes?
-    // @ooystein
-
-    // https://app.zenhub.com/workspaces/wellx-5f89a0db386bba0014989b28/issues/equinor/wellx-designer/222
-    foldPerforationSubKind(
-      {
-        Perforation: () => {
-          // If a perforation does not overlap with another perforations of type with gravel,
-          // the perforation spikes are either red when open or grey when closed.
-          // Open and closed refers to two fields on a perforation item referencing runs.
-
-          // If a perforation overlaps with another perforation of type with gravel and the perforation is open,
-          // the perforation spikes should be yellow.
-          // If closed the perforation remains grey.
-          const fracLineLenght = 25;
-          const intersectionsWithGravel: Perforation[] = R.pipe(
-            R.filter(hasGravelPack),
-            R.map((gPack) => (intersect(perforation, gPack) ? gPack : null)),
-            R.filter((gPack) => gPack !== null),
-          )(otherPerforations);
-
-          // Cased hole frac pack
-          // Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
-          const intersectionsWithCasedHoleFracPack: Perforation[] = R.pipe(
-            R.filter(isSubKindCasedHoleFracPack),
-            R.map((gPack) => (intersect(perforation, gPack) ? gPack : null)),
-            R.filter((gPack) => gPack !== null),
-          )(otherPerforations);
-
-          let hasFracLines = false;
-
-          if (intersectionsWithGravel.length > 0 || intersectionsWithCasedHoleFracPack.length > 0) {
-            hasFracLines = true;
-            if (perforation.isOpen) {
-              canvasCtx.fillStyle = perforationColors.yellow;
-              canvasCtx.strokeStyle = perforationColors.yellow;
-            } else {
-              canvasCtx.fillStyle = perforationColors.grey;
-              canvasCtx.strokeStyle = perforationColors.grey;
-            }
-          } else {
-            if (perforation.isOpen) {
-              canvasCtx.fillStyle = perforationColors.red;
-              canvasCtx.strokeStyle = perforationColors.red;
-            } else {
-              canvasCtx.fillStyle = perforationColors.grey;
-              canvasCtx.strokeStyle = perforationColors.grey;
-            }
-          }
-
-          for (let i = 0; i < amountOfSpikes; i++) {
-            const left: [number, number] = [i * spikeWidth, canvas.height / 2];
-            const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-            const top: [number, number] = [right[0] - spikeWidth / 2, fracLineLenght];
-
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(...top);
-            canvasCtx.lineTo(...left);
-            canvasCtx.lineTo(...right);
-            canvasCtx.closePath();
-            canvasCtx.fill();
-          }
-
-          for (let i = 0; i < amountOfSpikes; i++) {
-            const left: [number, number] = [i * spikeWidth, canvas.height / 2];
-            const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-            const bottom: [number, number] = [right[0] - spikeWidth / 2, canvas.height - fracLineLenght];
-
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(...left);
-            canvasCtx.lineTo(...bottom);
-            canvasCtx.lineTo(...right);
-            canvasCtx.closePath();
-            canvasCtx.fill();
-          }
-
-          if (hasFracLines) {
-            for (let i = 0; i < amountOfSpikes; i++) {
-              const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-              const top: [number, number] = [right[0] - spikeWidth / 2, fracLineLenght];
-
-              canvasCtx.beginPath();
-
-              const start: [number, number] = [...top];
-              const controlPoint1: [number, number] = [top[0] - fracLineHalfWidth, fracLineLenght / 2];
-              const middle: [number, number] = [top[0], fracLineLenght / 2];
-              const controlPoint2: [number, number] = [top[0] + fracLineHalfWidth, fracLineLenght / 4];
-              const end: [number, number] = [top[0], 0];
-
-              canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
-              canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
-              canvasCtx.stroke();
-            }
-
-            for (let i = 0; i < amountOfSpikes; i++) {
-              const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-              const bottom: [number, number] = [right[0] - spikeWidth / 2, canvas.height - fracLineLenght];
-
-              canvasCtx.beginPath();
-
-              const start: [number, number] = [...bottom];
-              const controlPoint1: [number, number] = [bottom[0] - fracLineHalfWidth, canvas.height - fracLineLenght / 2];
-              const middle: [number, number] = [bottom[0], canvas.height - fracLineLenght / 2];
-              const controlPoint2: [number, number] = [bottom[0] + fracLineHalfWidth, canvas.height - fracLineLenght / 4];
-              const end: [number, number] = [bottom[0], canvas.height];
-
-              canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
-              canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
-              canvasCtx.stroke();
-            }
-          }
-        },
-        // No visualization
-        OpenHole: () => null,
-        // Yellow gravel
-        OpenHoleGravelPack: () => {
-          const size = DEFAULT_TEXTURE_SIZE * cementOptions.scalingFactor;
-          canvasCtx.save();
-          canvasCtx.globalAlpha = packingOpacity;
-          canvas.width = size / 2;
-          canvas.height = size;
-          canvasCtx.fillStyle = perforationColors.yellow;
-          canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-          canvasCtx.restore();
-        },
-        // Yellow gravel. Yellow frac lines from hole OD into formation
-        OpenHoleFracPack: () => {
-          canvasCtx.fillStyle = perforationColors.yellow;
-          canvasCtx.strokeStyle = perforationColors.yellow;
-          const fracLineLenght = 25;
-
-          const xy: [number, number] = [0, fracLineLenght + perfShapes[0].diameter];
-          const wh: [number, number] = [canvas.width, perfShapes[0].diameter];
-          canvasCtx.save();
-          canvasCtx.globalAlpha = packingOpacity;
-          canvasCtx.fillRect(...xy, ...wh);
-          canvasCtx.restore();
-
-          for (let i = 0; i < amountOfSpikes; i++) {
-            const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-            const top: [number, number] = [right[0] - spikeWidth / 2, fracLineLenght + perfShapes[0].diameter];
-
-            canvasCtx.beginPath();
-
-            // TODO
-            // Is it OK to always use perfShape[0].diameter or do I need to change it up along the path?
-            // Perhaps check per loop iteration?
-            // How would I do that?
-            // @ooystein
-            const start: [number, number] = [...top];
-            const controlPoint1: [number, number] = [top[0] - fracLineHalfWidth, fracLineLenght / 2 + perfShapes[0].diameter];
-            const middle: [number, number] = [top[0], fracLineLenght / 2 + perfShapes[0].diameter];
-            const controlPoint2: [number, number] = [top[0] + fracLineHalfWidth, fracLineLenght / 4 + perfShapes[0].diameter];
-            const end: [number, number] = [top[0], perfShapes[0].diameter];
-
-            canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
-            canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
-            canvasCtx.stroke();
-          }
-
-          for (let i = 0; i < amountOfSpikes; i++) {
-            const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-            const bottom: [number, number] = [right[0] - spikeWidth / 2, canvas.height - fracLineLenght - perfShapes[0].diameter];
-
-            canvasCtx.beginPath();
-
-            const start: [number, number] = [...bottom];
-            const controlPoint1: [number, number] = [bottom[0] - fracLineHalfWidth, canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
-            const middle: [number, number] = [bottom[0], canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
-            const controlPoint2: [number, number] = [bottom[0] + fracLineHalfWidth, canvas.height - fracLineLenght / 4 - perfShapes[0].diameter];
-            const end: [number, number] = [bottom[0], canvas.height - perfShapes[0].diameter];
-
-            canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
-            canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
-            canvasCtx.stroke();
-          }
-        },
-        // No visualisation
-        OpenHoleScreen: () => null,
-        // Cased hole fracturation
-        // Yellow fracturation lines from casing OD into formation
-        CasedHoleFracturation: () => {
-          const fracLineLenght = 25;
-          for (let i = 0; i < amountOfSpikes; i++) {
-            const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-            const top: [number, number] = [right[0] - spikeWidth / 2, fracLineLenght + perfShapes[0].diameter];
-
-            canvasCtx.beginPath();
-
-            // TODO
-            // Is it OK to always use perfShape[0].diameter or do I need to change it up along the path?
-            // Perhaps check per loop iteration?
-            // How would I do that?
-            const start: [number, number] = [...top];
-            const controlPoint1: [number, number] = [top[0] - fracLineHalfWidth, fracLineLenght / 2 + perfShapes[0].diameter];
-            const middle: [number, number] = [top[0], fracLineLenght / 2 + perfShapes[0].diameter];
-            const controlPoint2: [number, number] = [top[0] + fracLineHalfWidth, fracLineLenght / 4 + perfShapes[0].diameter];
-            const end: [number, number] = [top[0], perfShapes[0].diameter];
-
-            canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
-            canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
-            canvasCtx.stroke();
-          }
-
-          for (let i = 0; i < amountOfSpikes; i++) {
-            const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-            const bottom: [number, number] = [right[0] - spikeWidth / 2, canvas.height - fracLineLenght - perfShapes[0].diameter];
-
-            canvasCtx.beginPath();
-
-            const start: [number, number] = [...bottom];
-            const controlPoint1: [number, number] = [bottom[0] - fracLineHalfWidth, canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
-            const middle: [number, number] = [bottom[0], canvas.height - fracLineLenght / 2 - perfShapes[0].diameter];
-            const controlPoint2: [number, number] = [bottom[0] + fracLineHalfWidth, canvas.height - fracLineLenght / 4 - perfShapes[0].diameter];
-            const end: [number, number] = [bottom[0], canvas.height - perfShapes[0].diameter];
-
-            canvasCtx.bezierCurveTo(...start, ...controlPoint1, ...middle);
-            canvasCtx.bezierCurveTo(...middle, ...controlPoint2, ...end);
-            canvasCtx.stroke();
-          }
-        },
-        // Yellow gravel. Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
-        CasedHoleGravelPack: () => {
-          const size = DEFAULT_TEXTURE_SIZE * cementOptions.scalingFactor;
-          canvas.width = size / 2;
-          canvas.height = size;
-          canvasCtx.fillStyle = perforationColors.yellow;
-          canvasCtx.save();
-          canvasCtx.globalAlpha = packingOpacity;
-          canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-          canvasCtx.restore();
-        },
-        // Yellow gravel and fracturation lines.
-        // Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
-        // If no perforation of type "perforation" are overlapping, there are no fracturation lines and no spikes.
-        // If a perforation of type "perforation" is overlapping,
-        // the fracturation lines extends from the tip of the perforation spikes into formation.
-        CasedHoleFracPack: () => {
-          const size = DEFAULT_TEXTURE_SIZE * cementOptions.scalingFactor;
-          canvas.width = size / 2;
-          canvas.height = size;
-          canvasCtx.fillStyle = perforationColors.yellow;
-          canvasCtx.save();
-          canvasCtx.globalAlpha = packingOpacity;
-          canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-          canvasCtx.restore();
-        },
-      },
-      perforation.subKind,
+    const notGonnaCacheThePerforationTextureForNow = createPerforationTexture(
+      perforation,
+      perfShapes,
+      otherPerforations,
+      cementOptions,
+      perforationOptions,
     );
 
-    const notGonnaCacheThePerforationTextureForNow = Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
     return notGonnaCacheThePerforationTextureForNow;
   }
 

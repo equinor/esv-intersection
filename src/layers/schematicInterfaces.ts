@@ -172,6 +172,40 @@ export const foldPerforationSubKind = <T>(
   }
 };
 
+export const getPerforationsThatStartAtHoleDiameter = (perforations: Perforation[]) =>
+  perforations.filter((perf) =>
+    foldPerforationSubKind(
+      {
+        Perforation: () => true,
+        OpenHole: () => false,
+        OpenHoleGravelPack: () => true,
+        OpenHoleFracPack: () => false,
+        OpenHoleScreen: () => true,
+        CasedHoleFracturation: () => false,
+        CasedHoleGravelPack: () => false,
+        CasedHoleFracPack: () => false,
+      },
+      perf.subKind,
+    ),
+  );
+
+export const getPerforationsThatSTartAtCasingDiameter = (perforations: Perforation[]) =>
+  perforations.filter((perf) =>
+    foldPerforationSubKind(
+      {
+        Perforation: () => false,
+        OpenHole: () => true,
+        OpenHoleGravelPack: () => false,
+        OpenHoleFracPack: () => true,
+        OpenHoleScreen: () => false,
+        CasedHoleFracturation: () => true,
+        CasedHoleGravelPack: () => true,
+        CasedHoleFracPack: () => true,
+      },
+      perf.subKind,
+    ),
+  );
+
 export function hasGravelPack(perf: Perforation): boolean {
   return foldPerforationSubKind(
     {
@@ -275,6 +309,14 @@ export interface CasingOptions {
   shoeSize: CasingShoeSize;
 }
 
+export interface PerforationOptions {
+  stroke: string;
+  yellow: string;
+  grey: string;
+  red: string;
+  transparent: string;
+}
+
 export const defaultCasingOptions = {
   solidColor: '#dcdcdc',
   lineColor: '#575757',
@@ -340,4 +382,12 @@ export const defaultCementPlugOptions = {
   firstColor: '#c7b9ab',
   secondColor: '#c7b9ab',
   scalingFactor: 4,
+};
+
+export const defaultPerforationOptions: PerforationOptions = {
+  stroke: 'rgba(0, 0, 0, 0.25)',
+  yellow: '#FFFC00',
+  grey: 'gray',
+  red: '#FF5050',
+  transparent: 'rgba(255, 255, 255, 0)',
 };
