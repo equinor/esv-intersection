@@ -15,7 +15,6 @@ import {
 } from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
-import { MDPoint } from '../interfaces';
 
 export interface TubularRenderingObject {
   leftPath: Point[];
@@ -499,7 +498,7 @@ export const createComplexRopeSegmentsForPerforation = (
   casings: Casing[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number, interestPoints: number[]) => MDPoint[],
+  getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
   const { casingIds, top: topOfCement, bottom: bottomOfCement } = perforation;
 
@@ -530,8 +529,8 @@ export const createComplexRopeSegmentsForPerforation = (
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
-    const mdPoints = getPoints(interval.top, interval.bottom, [interval.top, interval.bottom]);
-    const points = mdPoints.map((mdPoint) => new Point(mdPoint.point[0], mdPoint.point[1]));
+    const mdPoints = getPoints(interval.top, interval.bottom);
+    const points = mdPoints.map((mdPoint) => new Point(mdPoint[0], mdPoint[1]));
 
     return {
       diameter: interval.diameter,

@@ -3,7 +3,7 @@ import { scaleLinear, ScaleLinear } from 'd3-scale';
 import { Graphics, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture, WRAP_MODES } from 'pixi.js';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import * as R from 'ramda';
-import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE, SHOE_LENGTH, SHOE_WIDTH } from '../constants';
+import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
 import {
   assertNever,
   Casing,
@@ -37,7 +37,12 @@ import {
   defaultScreenOptions,
   defaultTubingOptions,
   defaultInternalLayerOptions,
-  CasingShoeSize,
+  Perforation,
+  foldPerforationSubKind,
+  PerforationShape,
+  hasGravelPack,
+  intersect,
+  isSubKindCasedHoleFracPack,
 } from './schematicInterfaces';
 import {
   CasingRenderObject,
@@ -52,20 +57,9 @@ import {
   makeTubularPolygon,
   prepareCasingRenderObject,
   createCementPlugTexture,
-  createComplexRopeSegmentsForPerforation
+  createComplexRopeSegmentsForPerforation,
 } from '../datautils/schematicShapeGenerator';
-import {
-  OnUpdateEvent,
-  OnRescaleEvent,
-  OnUnmountEvent,
-  Completion,
-  Perforation,
-  foldPerforationSubKind,
-  PerforationShape,
-  hasGravelPack,
-  intersect,
-  isSubKindCasedHoleFracPack,
-} from '../interfaces';
+import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
 import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
@@ -100,7 +94,6 @@ interface CementSqueezeRenderObject {
 
 type InterlacedRenderObjects = CasingRenderObject | CementRenderObject | CementSqueezeRenderObject;
 
-
 const foldInterlacedRenderObjects =
   <T>(fCasing: (obj: CasingRenderObject) => T, fCement: (obj: CementRenderObject) => T, fCementSqueeze: (obj: CementSqueezeRenderObject) => T) =>
   (renderObject: InterlacedRenderObjects): T => {
@@ -116,19 +109,6 @@ const foldInterlacedRenderObjects =
     }
   };
 
-interface TubularRenderingObject {
-  pathPoints: number[][];
-  polygon: Point[];
-  leftPath: Point[];
-  rightPath: Point[];
-  radius: number;
-}
-  
-const defaultCasingShoeSize: CasingShoeSize = {
-  width: SHOE_WIDTH,
-  length: SHOE_LENGTH,
-};
-  
 // Perforation
 const perforationColors = {
   stroke: 'rgba(0, 0, 0, 0.25)',
@@ -137,17 +117,6 @@ const perforationColors = {
   red: '#FF5050',
   transparent: 'rgba(255, 255, 255, 0)',
 };
-  
-export interface SchematicData {
-  holeSizes: HoleSize[];
-  casings: Casing[];
-  cements: Cement[];
-  completion: Completion[];
-  pAndA: PAndA[];
-  symbols: {
-    [key: string]: string;
-  }
-}
 
 export interface SchematicLayerOptions<T extends SchematicData> extends LayerOptions<T> {
   exaggerationFactor?: number;
@@ -355,7 +324,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     const { holeSizes, casings, cements, completion, symbols, pAndA, perforations } = this.data;
-    
 
     const shouldStartAtHoleDiameter = perforations.filter((perf) =>
       foldPerforationSubKind(
@@ -451,34 +419,19 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
             const symbolRenderObject = this.prepareSymbolRenderObject(obj);
             this.drawSymbolComponent(symbolRenderObject);
           },
-          ),
+        ),
       );
 
-    remainingPAndA.forEach((obj) => {
-      if (obj.kind === 'pAndASymbol') {
-        const symbolRenderObject = this.prepareSymbolRenderObject(obj);
-        this.drawSymbolComponent(symbolRenderObject);
-      }
-      if (obj.kind === 'cementPlug') {
-        const cementPlugSegments = this.createCementPlugShape(obj, casings, holeSizes);
-        this.drawComplexRope(cementPlugSegments, this.createCementPlugTexture());
-
-        const { rightPath, leftPath } = cementPlugSegments.reduce(
-          (acc, current) => {
-            const diameter = current.diameter;
-            const pathPoints = current.points.map((p) => [p.x, p.y]);
-            const normals = createNormals(pathPoints);
-            const rightPath = offsetPoints(pathPoints, normals, diameter / 2);
-            const leftPath = offsetPoints(pathPoints, normals, -diameter / 2);
-
-            return {
-              rightPath: [...acc.rightPath, ...rightPath],
-              leftPath: [...acc.leftPath, ...leftPath],
-            };
-          },
-        ),
-      }
-    });
+    this.internalLayerVisibility.pAndALayerId &&
+      remainingPAndA.forEach((obj) => {
+        if (isPAndASymbol(obj)) {
+          const symbolRenderObject = this.prepareSymbolRenderObject(obj);
+          this.drawSymbolComponent(symbolRenderObject);
+        }
+        if (isCementPlug(obj)) {
+          this.drawCementPlug(obj, casings, holeSizes);
+        }
+      });
 
     this.internalLayerVisibility.pAndALayerId &&
       remainingPAndA.forEach((obj) => {
@@ -564,10 +517,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return this.perforationTextureCache;
     }
 
-    const { cementTextureScalingFactor } = this.options as SchematicLayerOptions<T>;
+    const { cementOptions } = this.options as SchematicLayerOptions<T>;
     const canvas = document.createElement('canvas');
 
-    const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+    const size = DEFAULT_TEXTURE_SIZE * cementOptions.scalingFactor;
 
     canvas.width = size / 2;
     canvas.height = size;
@@ -697,7 +650,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         OpenHole: () => null,
         // Yellow gravel
         OpenHoleGravelPack: () => {
-          const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+          const size = DEFAULT_TEXTURE_SIZE * cementOptions.scalingFactor;
           canvasCtx.save();
           canvasCtx.globalAlpha = packingOpacity;
           canvas.width = size / 2;
@@ -804,7 +757,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         },
         // Yellow gravel. Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
         CasedHoleGravelPack: () => {
-          const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+          const size = DEFAULT_TEXTURE_SIZE * cementOptions.scalingFactor;
           canvas.width = size / 2;
           canvas.height = size;
           canvasCtx.fillStyle = perforationColors.yellow;
@@ -819,7 +772,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         // If a perforation of type "perforation" is overlapping,
         // the fracturation lines extends from the tip of the perforation spikes into formation.
         CasedHoleFracPack: () => {
-          const size = DEFAULT_TEXTURE_SIZE * cementTextureScalingFactor;
+          const size = DEFAULT_TEXTURE_SIZE * cementOptions.scalingFactor;
           canvas.width = size / 2;
           canvas.height = size;
           canvasCtx.fillStyle = perforationColors.yellow;
