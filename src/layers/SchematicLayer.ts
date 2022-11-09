@@ -469,9 +469,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private prepareSymbolRenderObject = (component: CompletionSymbol | PAndASymbol): SymbolRenderObject => {
-    if (component == null) {
-      return;
-    }
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
 
     const exaggeratedDiameter = component.diameter * exaggerationFactor;

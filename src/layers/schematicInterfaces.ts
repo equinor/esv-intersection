@@ -55,7 +55,7 @@ export interface CementPlug {
   start: number;
   end: number;
   /**
-   * Referenced Hole, Casing, Completion ids
+   * Referenced Casing, Completion ids
    */
   referenceIds: string[];
 }
@@ -132,7 +132,7 @@ export interface Perforation {
    */
   isOpen: boolean;
   /**
-   * currently only looking at 'casingids' and not holeIds.
+   * Referenced Casing ids
    */
   referenceIds: string[];
 }

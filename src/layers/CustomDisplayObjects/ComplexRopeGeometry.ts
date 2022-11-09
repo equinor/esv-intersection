@@ -10,7 +10,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
   private segments: ComplexRopeSegment[];
 
   /** Rope texture scale. */
-  private readonly textureScale: number;
+  private readonly textureScale: number; // TODO unused?
 
   /**
    * @param segments - An array of segments with points and diameter to construct this rope.
