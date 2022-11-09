@@ -318,7 +318,25 @@ export interface PerforationOptions {
   grey: string;
   red: string;
   transparent: string;
+  spikeWidth: number;
+  packingOpacity: number;
+  fracLineLength: number;
+  fracLineHalfWidth: number;
+  scalingFactor: number;
 }
+
+export const defaultPerforationOptions: PerforationOptions = {
+  stroke: 'rgba(0, 0, 0, 0.25)',
+  yellow: '#FFFC00',
+  grey: 'gray',
+  red: '#FF5050',
+  transparent: 'rgba(255, 255, 255, 0)',
+  spikeWidth: 25,
+  packingOpacity: 0.5,
+  fracLineHalfWidth: 10,
+  fracLineLength: 25,
+  scalingFactor: 4,
+};
 
 export const defaultCasingOptions = {
   solidColor: '#dcdcdc',
@@ -385,12 +403,4 @@ export const defaultCementPlugOptions = {
   firstColor: '#c7b9ab',
   secondColor: '#c7b9ab',
   scalingFactor: 4,
-};
-
-export const defaultPerforationOptions: PerforationOptions = {
-  stroke: 'rgba(0, 0, 0, 0.25)',
-  yellow: '#FFFC00',
-  grey: 'gray',
-  red: '#FF5050',
-  transparent: 'rgba(255, 255, 255, 0)',
 };

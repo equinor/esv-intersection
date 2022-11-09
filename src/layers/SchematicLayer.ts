@@ -472,8 +472,8 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private createPerforationTexture(perforation: Perforation, perfShapes: PerforationShape[], otherPerforations: Perforation[]): Texture {
-    const { cementOptions, perforationOptions } = this.options as SchematicLayerOptions<T>;
-    return createPerforationTexture(perforation, perfShapes, otherPerforations, cementOptions, perforationOptions);
+    const { perforationOptions } = this.options as SchematicLayerOptions<T>;
+    return createPerforationTexture(perforation, perfShapes, otherPerforations, perforationOptions);
   }
 
   private prepareSymbolRenderObject = (component: CompletionSymbol | PAndASymbol): SymbolRenderObject => {
