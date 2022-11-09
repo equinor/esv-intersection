@@ -12,6 +12,12 @@ export interface HoleSize {
   end: number;
 }
 
+export interface CasingWindow {
+  id: string;
+  start: number;
+  end: number;
+}
+
 export interface Casing {
   kind: 'casing';
   id: string;
@@ -20,6 +26,7 @@ export interface Casing {
   end: number;
   hasShoe: boolean;
   innerDiameter: number;
+  windows: CasingWindow[];
 }
 
 interface SymbolComponent {
@@ -309,11 +316,32 @@ export interface CasingShoeSize {
   length: number;
 }
 
+export interface WindowOptions {
+  dashColor: string;
+  dashLength: number;
+  spaceLength: number;
+}
+
 export interface CasingOptions {
   solidColor: string;
   lineColor: string;
   shoeSize: CasingShoeSize;
+  windowOptions: WindowOptions;
 }
+
+export const defaultCasingOptions: CasingOptions = {
+  solidColor: '#dcdcdc',
+  lineColor: '#575757',
+  shoeSize: {
+    width: SHOE_WIDTH,
+    length: SHOE_LENGTH,
+  },
+  windowOptions: {
+    dashColor: '#dc0000',
+    dashLength: 5,
+    spaceLength: 3,
+  },
+};
 
 export interface PerforationOptions {
   stroke: string;
@@ -339,15 +367,6 @@ export const defaultPerforationOptions: PerforationOptions = {
   fracLineHalfWidth: 10,
   fracLineLength: 25,
   scalingFactor: 4,
-};
-
-export const defaultCasingOptions: CasingOptions = {
-  solidColor: '#dcdcdc',
-  lineColor: '#575757',
-  shoeSize: {
-    width: SHOE_WIDTH,
-    length: SHOE_LENGTH,
-  },
 };
 
 export interface CementOptions {

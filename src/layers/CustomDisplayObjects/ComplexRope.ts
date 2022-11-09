@@ -1,8 +1,8 @@
-import { IPoint, Mesh, MeshMaterial, Renderer, Texture, WRAP_MODES } from 'pixi.js';
+import { Mesh, MeshMaterial, Point, Renderer, Texture, WRAP_MODES } from 'pixi.js';
 import { ComplexRopeGeometry } from './ComplexRopeGeometry';
 
 export type ComplexRopeSegment = {
-  points: IPoint[];
+  points: Point[];
   diameter: number;
 };
 
