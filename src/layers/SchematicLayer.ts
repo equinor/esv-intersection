@@ -1,6 +1,6 @@
 import { max } from 'd3-array';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
-import { Graphics, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture, WRAP_MODES } from 'pixi.js';
+import { Graphics, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
 import {
@@ -472,21 +472,8 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private createPerforationTexture(perforation: Perforation, perfShapes: PerforationShape[], otherPerforations: Perforation[]): Texture {
-    if (this.perforationTextureCache) {
-      return this.perforationTextureCache;
-    }
-
     const { cementOptions, perforationOptions } = this.options as SchematicLayerOptions<T>;
-
-    const notGonnaCacheThePerforationTextureForNow = createPerforationTexture(
-      perforation,
-      perfShapes,
-      otherPerforations,
-      cementOptions,
-      perforationOptions,
-    );
-
-    return notGonnaCacheThePerforationTextureForNow;
+    return createPerforationTexture(perforation, perfShapes, otherPerforations, cementOptions, perforationOptions);
   }
 
   private prepareSymbolRenderObject = (component: CompletionSymbol | PAndASymbol): SymbolRenderObject => {

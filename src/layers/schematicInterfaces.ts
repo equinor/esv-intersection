@@ -122,6 +122,9 @@ export interface Perforation {
   id: string;
   top: number;
   bottom: number;
+  /**
+   * is the perforation open or sealed?
+   */
   isOpen: boolean;
   casingIds: string[];
   holeId?: string[];
