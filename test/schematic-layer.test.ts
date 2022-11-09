@@ -26,6 +26,7 @@ describe('SchematicLayer', () => {
       completion: [],
       pAndA: [],
       symbols: {},
+      perforations: [],
     };
 
     it('should render when reference system is set in constructor', () => {

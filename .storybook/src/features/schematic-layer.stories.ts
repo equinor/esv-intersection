@@ -4,12 +4,14 @@ import {
   PixiRenderApplication,
   SchematicLayerOptions,
   SchematicLayer,
+  Perforation,
+  InternalLayerOptions,
+  SchematicData,
 } from '../../../src';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText, createButtonContainer } from '../utils';
 
 import { getWellborePath, getCasings, getCement, getHolesize, getCompletion, getCementSqueezes } from '../data';
-import { InternalLayerOptions, SchematicData } from '../../../src/control/schematicInterfaces';
 
 const width: number = 700;
 const height: number = 600;
@@ -74,12 +76,28 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           diameter: 8.5,
           symbolKey: 'mechanicalPlug',
         },
-        { kind: 'cementPlug' as const,
-          id: 'cement-plug-2',
-          top: 5000,
-          bottom: 5110,
-          casingId: '7',
-        }
+        { kind: 'cementPlug' as const, id: 'cement-plug-2', top: 5000, bottom: 5110, casingId: '7' },
+      ];
+
+      const perforations: Perforation[] = [
+        {
+          kind: 'perforation',
+          subKind: 'Perforation',
+          id: 'PerforationDemo1',
+          top: 4000,
+          bottom: 4500,
+          isOpen: true,
+          referenceIds: ['casing-07'],
+        },
+        {
+          kind: 'perforation',
+          subKind: 'Cased hole frac pack',
+          id: 'PerforationDemo2',
+          top: 3500,
+          bottom: 4500,
+          isOpen: true,
+          referenceIds: ['casing-07'],
+        },
       ];
 
       const schematicData: SchematicData = {
@@ -89,6 +107,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
         completion: [...completion, ...completionSymbols],
         pAndA: [...pAndASymbols, ...cementSqueezes],
         symbols: { ...CSDSVGs, ...pAndASVGs },
+        perforations,
       };
 
       const internalLayerIds: InternalLayerOptions = {
@@ -97,6 +116,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
         completionLayerId: 'completion-id',
         cementLayerId: 'cement-id',
         pAndALayerId: 'pAndA-id',
+        perforationLayerId: 'perforation-id',
       };
 
       const schematicLayerOptions: SchematicLayerOptions<SchematicData> = {
@@ -123,8 +143,9 @@ export const SchematicLayerUsingHighLevelInterface = () => {
         ['Cement', internalLayerIds.cementLayerId],
         ['Completion', internalLayerIds.completionLayerId],
         ['Plug & Abandonment', internalLayerIds.pAndALayerId],
-      ]
-      btnContainer.append(...internalLayerVisibilityButtons.map(createInternalLayerVisibilityButton(controller)))
+        ['Perforations', internalLayerIds.perforationLayerId],
+      ];
+      btnContainer.append(...internalLayerVisibilityButtons.map(createInternalLayerVisibilityButton(controller)));
     },
   );
 
@@ -137,22 +158,24 @@ export const SchematicLayerUsingHighLevelInterface = () => {
   return root;
 };
 
-const createInternalLayerVisibilityButton = (manager: Controller) => ([title, internalLayerId]: [string, string]) => {
-  const btn = document.createElement('button');
-  btn.innerHTML = `${title}`;
-  btn.setAttribute('style', 'width: 170px;height:32px;margin-top:12px;background: lightblue;');
-  let show = false;
-  btn.onclick = () => {
-    if (show) {
-      manager.showLayer(internalLayerId);
-      btn.style.backgroundColor = 'lightblue';
-      btn.style.color = '';
-    } else {
-      manager.hideLayer(internalLayerId);
-      btn.style.backgroundColor = 'red';
-      btn.style.color = 'white';
-    }
-    show = !show;
+const createInternalLayerVisibilityButton =
+  (manager: Controller) =>
+  ([title, internalLayerId]: [string, string]) => {
+    const btn = document.createElement('button');
+    btn.innerHTML = `${title}`;
+    btn.setAttribute('style', 'width: 170px;height:32px;margin-top:12px;background: lightblue;');
+    let show = false;
+    btn.onclick = () => {
+      if (show) {
+        manager.showLayer(internalLayerId);
+        btn.style.backgroundColor = 'lightblue';
+        btn.style.color = '';
+      } else {
+        manager.hideLayer(internalLayerId);
+        btn.style.backgroundColor = 'red';
+        btn.style.color = 'white';
+      }
+      show = !show;
+    };
+    return btn;
   };
-  return btn;
-};

@@ -36,6 +36,11 @@ import {
   defaultScreenOptions,
   defaultTubingOptions,
   defaultInternalLayerOptions,
+  Perforation,
+  getPerforationsThatStartAtHoleDiameter,
+  getPerforationsThatSTartAtCasingDiameter,
+  PerforationOptions,
+  defaultPerforationOptions,
 } from './schematicInterfaces';
 import {
   CasingRenderObject,
@@ -50,6 +55,9 @@ import {
   makeTubularPolygon,
   prepareCasingRenderObject,
   createCementPlugTexture,
+  createComplexRopeSegmentsForPerforation,
+  createPerforationTexture,
+  PerforationShape,
 } from '../datautils/schematicShapeGenerator';
 import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
@@ -111,6 +119,7 @@ export interface SchematicLayerOptions<T extends SchematicData> extends LayerOpt
   screenOptions?: ScreenOptions;
   tubingOptions?: TubingOptions;
   cementPlugOptions?: CementPlugOptions;
+  perforationOptions?: PerforationOptions;
 }
 
 const defaultSchematicLayerOptions = (layerId: string): SchematicLayerOptions<SchematicData> => ({
@@ -123,6 +132,7 @@ const defaultSchematicLayerOptions = (layerId: string): SchematicLayerOptions<Sc
   screenOptions: defaultScreenOptions,
   tubingOptions: defaultTubingOptions,
   cementPlugOptions: defaultCementPlugOptions,
+  perforationOptions: defaultPerforationOptions,
 });
 
 type InternalLayerVisibility = { [K in keyof InternalLayerOptions]: boolean };
@@ -134,6 +144,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     completionLayerId: true,
     cementLayerId: true,
     pAndALayerId: true,
+    perforationLayerId: true,
   };
 
   private cementTextureCache: Texture;
@@ -305,7 +316,19 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
 
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-    const { holeSizes, casings, cements, completion, symbols, pAndA } = this.data;
+    const { holeSizes, casings, cements, completion, symbols, pAndA, perforations } = this.data;
+
+    const shouldStartAtHoleDiameter = getPerforationsThatStartAtHoleDiameter(perforations);
+
+    const shouldStartAtCasingDiameter = getPerforationsThatSTartAtCasingDiameter(perforations);
+
+    this.internalLayerVisibility.perforationLayerId &&
+      shouldStartAtHoleDiameter.forEach((perforation) => {
+        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
+        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
+      });
 
     this.updateSymbolCache(symbols);
 
@@ -375,6 +398,15 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           this.drawCementPlug(obj, casings, holeSizes);
         }
       });
+
+    this.internalLayerVisibility.perforationLayerId &&
+      shouldStartAtCasingDiameter.forEach((perforation) => {
+        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
+
+        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
+      });
   }
 
   private updateSymbolCache(symbols: { [key: string]: string }) {
@@ -426,6 +458,11 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       this.cementPlugTextureCache = createCementPlugTexture(cementPlugOptions);
     }
     return this.cementPlugTextureCache;
+  }
+
+  private createPerforationTexture(perforation: Perforation, widestPerfShapeDiameter: number, otherPerforations: Perforation[]): Texture {
+    const { perforationOptions } = this.options as SchematicLayerOptions<T>;
+    return createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations, perforationOptions);
   }
 
   private prepareSymbolRenderObject = (component: CompletionSymbol | PAndASymbol): SymbolRenderObject => {
@@ -643,9 +680,13 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       const { cementOptions } = this.options as SchematicLayerOptions<T>;
       this.cementTextureCache = createCementTexture(cementOptions);
     }
-
     return this.cementTextureCache;
   }
+
+  private createPerforationShape = (perforation: Perforation, casings: Casing[], holes: HoleSize[]): PerforationShape[] => {
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+    return createComplexRopeSegmentsForPerforation(perforation, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
+  };
 
   private createCementSqueezeTexture(): Texture {
     if (this.cementSqueezeTextureCache) {
