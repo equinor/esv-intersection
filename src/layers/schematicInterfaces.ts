@@ -1,5 +1,4 @@
 import { SHOE_LENGTH, SHOE_WIDTH } from '../constants';
-import { ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
 
 export function assertNever(x: never): never {
   throw new Error(`Unexpected object: ${JSON.stringify(x)}`);
@@ -106,11 +105,12 @@ export interface Cement {
   toc: number;
 }
 
+/**
+ * 'Open hole' and 'Open hole screen' are not included as they are not visualized and also not included in the ruleset
+ */
 export type PerforationSubKind =
   | 'Perforation'
   | 'Open hole gravel pack'
-  | 'Open hole screen'
-  | 'Open hole'
   | 'Open hole frac pack'
   | 'Cased hole frac pack'
   | 'Cased hole gravel pack'
@@ -126,19 +126,17 @@ export interface Perforation {
    * is the perforation open or sealed?
    */
   isOpen: boolean;
-  casingIds: string[];
-  holeId?: string[];
+  /**
+   * currently only looking at 'casingids' and not holeIds.
+   */
+  referenceIds: string[];
 }
-
-export type PerforationShape = ComplexRopeSegment;
 
 export const foldPerforationSubKind = <T>(
   options: {
     Perforation: (kind: 'Perforation') => T;
-    OpenHole: (kind: 'Open hole') => T;
     OpenHoleGravelPack: (kind: 'Open hole gravel pack') => T;
     OpenHoleFracPack: (kind: 'Open hole frac pack') => T;
-    OpenHoleScreen: (kind: 'Open hole screen') => T;
     CasedHoleGravelPack: (kind: 'Cased hole gravel pack') => T;
     CasedHoleFracPack: (kind: 'Cased hole frac pack') => T;
     CasedHoleFracturation: (kind: 'Cased hole fracturation') => T;
@@ -149,17 +147,11 @@ export const foldPerforationSubKind = <T>(
     case 'Perforation':
       return options.Perforation(subKind);
 
-    case 'Open hole':
-      return options.OpenHole(subKind);
-
     case 'Open hole gravel pack':
       return options.OpenHoleGravelPack(subKind);
 
     case 'Open hole frac pack':
       return options.OpenHoleFracPack(subKind);
-
-    case 'Open hole screen':
-      return options.OpenHoleScreen(subKind);
 
     case 'Cased hole fracturation':
       return options.CasedHoleFracturation(subKind);
@@ -180,10 +172,8 @@ export const getPerforationsThatStartAtHoleDiameter = (perforations: Perforation
     foldPerforationSubKind(
       {
         Perforation: () => true,
-        OpenHole: () => false,
         OpenHoleGravelPack: () => true,
         OpenHoleFracPack: () => false,
-        OpenHoleScreen: () => true,
         CasedHoleFracturation: () => false,
         CasedHoleGravelPack: () => false,
         CasedHoleFracPack: () => false,
@@ -197,10 +187,8 @@ export const getPerforationsThatSTartAtCasingDiameter = (perforations: Perforati
     foldPerforationSubKind(
       {
         Perforation: () => false,
-        OpenHole: () => true,
         OpenHoleGravelPack: () => false,
         OpenHoleFracPack: () => true,
-        OpenHoleScreen: () => false,
         CasedHoleFracturation: () => true,
         CasedHoleGravelPack: () => true,
         CasedHoleFracPack: () => true,
@@ -213,10 +201,8 @@ export function hasGravelPack(perf: Perforation): boolean {
   return foldPerforationSubKind(
     {
       Perforation: () => false,
-      OpenHole: () => false,
       OpenHoleGravelPack: () => true,
       OpenHoleFracPack: () => false,
-      OpenHoleScreen: () => false,
       CasedHoleFracturation: () => false,
       CasedHoleGravelPack: () => true,
       CasedHoleFracPack: () => false,
@@ -229,10 +215,8 @@ export function isSubKindPerforation(perf: Perforation): boolean {
   return foldPerforationSubKind(
     {
       Perforation: () => true,
-      OpenHole: () => false,
       OpenHoleGravelPack: () => false,
       OpenHoleFracPack: () => false,
-      OpenHoleScreen: () => false,
       CasedHoleFracturation: () => false,
       CasedHoleGravelPack: () => false,
       CasedHoleFracPack: () => false,
@@ -245,13 +229,25 @@ export function isSubKindCasedHoleFracPack(perf: Perforation): boolean {
   return foldPerforationSubKind(
     {
       Perforation: () => false,
-      OpenHole: () => false,
       OpenHoleGravelPack: () => false,
       OpenHoleFracPack: () => false,
-      OpenHoleScreen: () => false,
       CasedHoleFracturation: () => false,
       CasedHoleGravelPack: () => false,
       CasedHoleFracPack: () => true,
+    },
+    perf.subKind,
+  );
+}
+
+export function isOpenHoleFracPack(perf: Perforation) {
+  return foldPerforationSubKind(
+    {
+      Perforation: () => false,
+      OpenHoleGravelPack: () => false,
+      OpenHoleFracPack: () => true,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => false,
+      CasedHoleFracPack: () => false,
     },
     perf.subKind,
   );
@@ -279,6 +275,7 @@ export interface InternalLayerOptions {
   completionLayerId: string;
   cementLayerId: string;
   pAndALayerId: string;
+  perforationLayerId: string;
 }
 
 export const defaultInternalLayerOptions = (layerId: string) => ({
@@ -287,6 +284,7 @@ export const defaultInternalLayerOptions = (layerId: string) => ({
   completionLayerId: `${layerId}-completion`,
   pAndALayerId: `${layerId}-pAndA`,
   cementLayerId: `${layerId}-cement`,
+  perforationLayerId: `${layerId}-perforation`,
 });
 
 export interface HoleOptions {

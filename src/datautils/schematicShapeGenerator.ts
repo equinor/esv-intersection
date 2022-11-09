@@ -12,15 +12,18 @@ import {
   ScreenOptions,
   TubingOptions,
   Perforation,
-  PerforationShape,
   PerforationOptions,
   foldPerforationSubKind,
   hasGravelPack,
   intersect,
   isSubKindCasedHoleFracPack,
+  getPerforationsThatStartAtHoleDiameter,
+  isOpenHoleFracPack,
 } from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
+
+export type PerforationShape = ComplexRopeSegment;
 
 export interface TubularRenderingObject {
   leftPath: Point[];
@@ -506,9 +509,9 @@ export const createComplexRopeSegmentsForPerforation = (
   exaggerationFactor: number,
   getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
-  const attachedCasings = perforation.casingIds.map((casingId: string) => casings.find((casing) => casing.casingId === casingId));
+  const attachedCasings = perforation.referenceIds.map((referenceId: string) => casings.find((casing) => casing.id === referenceId));
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement data, cement is missing attached casing');
+    throw new Error('Invalid perforation data, perforation is missing attached casing');
   }
 
   const { outerCasings, overlappingHoles } = findIntersectingItems(perforation.top, perforation.bottom, attachedCasings, casings, holes);
@@ -536,8 +539,13 @@ export const createComplexRopeSegmentsForPerforation = (
     const mdPoints = getPoints(interval.top, interval.bottom);
     const points = mdPoints.map((mdPoint) => new Point(mdPoint[0], mdPoint[1]));
 
+    const diameter =
+      getPerforationsThatStartAtHoleDiameter([perforation]).length === 1 || isOpenHoleFracPack(perforation)
+        ? interval.diameter * 4
+        : interval.diameter;
+
     return {
-      diameter: interval.diameter,
+      diameter,
       points,
     };
   });
@@ -601,6 +609,25 @@ const createFracLines = (
   }
 };
 
+/**
+ *  If a perforation does not overlap with another perforations of type with gravel,
+ * the perforation spikes are either red when open or grey when closed.
+ * Open and closed refers to two fields on a perforation item referencing runs.
+ * If a perforation overlaps with another perforation of type with gravel and the perforation is open,
+ * the perforation spikes should be yellow.
+ * If closed the perforation remains grey.
+ * Cased hole frac pack
+ * Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
+ * Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
+ * If no perforation of type "perforation" are overlapping, there are no fracturation lines and no spikes.
+ * If a perforation of type "perforation" is overlapping,
+ * the fracturation lines extends from the tip of the perforation spikes into formation.
+ * @param perforation
+ * @param otherPerforations
+ * @param widestPerfShapeDiameter
+ * @param perforationOptions
+ * @returns
+ */
 const createSubkindPerforationTexture = (
   perforation: Perforation,
   otherPerforations: Perforation[],
@@ -621,33 +648,15 @@ const createSubkindPerforationTexture = (
 
   const amountOfSpikes = canvas.width / spikeWidth;
 
-  // If a perforation does not overlap with another perforations of type with gravel,
-  // the perforation spikes are either red when open or grey when closed.
-  // Open and closed refers to two fields on a perforation item referencing runs.
+  const intersectionsWithGravel: boolean = otherPerforations.some((perf) => hasGravelPack(perf) && intersect(perforation, perf));
 
-  // If a perforation overlaps with another perforation of type with gravel and the perforation is open,
-  // the perforation spikes should be yellow.
-  // If closed the perforation remains grey.
-
-  const intersectionsWithGravel: Perforation[] = otherPerforations.reduce((acc, current) => {
-    if (hasGravelPack(current) && intersect(perforation, current)) {
-      return [...acc, current];
-    }
-    return acc;
-  }, []);
-
-  // Cased hole frac pack
-  // Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
-  const intersectionsWithCasedHoleFracPack: Perforation[] = otherPerforations.reduce((acc, current) => {
-    if (isSubKindCasedHoleFracPack(current) && intersect(perforation, current)) {
-      return [...acc, current];
-    }
-    return acc;
-  }, []);
+  const intersectionsWithCasedHoleFracPack: boolean = otherPerforations.some(
+    (perf) => isSubKindCasedHoleFracPack(perf) && intersect(perforation, perf),
+  );
 
   let hasFracLines = false;
 
-  if (intersectionsWithGravel.length > 0 || intersectionsWithCasedHoleFracPack.length > 0) {
+  if (intersectionsWithGravel || intersectionsWithCasedHoleFracPack) {
     hasFracLines = true;
     if (perforation.isOpen) {
       canvasCtx.fillStyle = perforationOptions.yellow;
@@ -699,6 +708,11 @@ const createSubkindPerforationTexture = (
   return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
 };
 
+/**
+ * Yellow gravel
+ * @param perforationOptions
+ * @returns
+ */
 const createSubkindOpenHoleGravelPackTexture = (perforationOptions: PerforationOptions) => {
   const canvas = document.createElement('canvas');
 
@@ -715,6 +729,12 @@ const createSubkindOpenHoleGravelPackTexture = (perforationOptions: PerforationO
   return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
 };
 
+/**
+ * Yellow gravel. Yellow frac lines from hole OD into formation
+ * @param widestPerfShapeDiameter
+ * @param perforationOptions
+ * @returns
+ */
 const createSubkindOpenHoleFracPackTexture = (widestPerfShapeDiameter: number, perforationOptions: PerforationOptions) => {
   const canvas = document.createElement('canvas');
 
@@ -739,6 +759,13 @@ const createSubkindOpenHoleFracPackTexture = (widestPerfShapeDiameter: number, p
   return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
 };
 
+/**
+ * Cased hole fracturation
+ * Yellow fracturation lines from casing OD into formation
+ * @param widestPerfShapeDiameter
+ * @param perforationOptions
+ * @returns
+ */
 const createSubkindCasedHoleFracturationTexture = (widestPerfShapeDiameter: number, perforationOptions: PerforationOptions) => {
   const canvas = document.createElement('canvas');
   const size = DEFAULT_TEXTURE_SIZE * perforationOptions.scalingFactor;
@@ -752,6 +779,11 @@ const createSubkindCasedHoleFracturationTexture = (widestPerfShapeDiameter: numb
   return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
 };
 
+/**
+ * Yellow gravel. Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
+ * @param perforationOptions
+ * @returns
+ */
 const createSubkindCasedHoleGravelPackTexture = (perforationOptions: PerforationOptions) => {
   const canvas = document.createElement('canvas');
   const size = DEFAULT_TEXTURE_SIZE * perforationOptions.scalingFactor;
@@ -769,6 +801,12 @@ const createSubkindCasedHoleGravelPackTexture = (perforationOptions: Perforation
   return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
 };
 
+/**
+ *
+ * Yellow gravel and fracturation lines.
+ * @param perforationOptions
+ * @returns
+ */
 const createSubkindCasedHoleFracPack = (perforationOptions: PerforationOptions) => {
   const canvas = document.createElement('canvas');
 
@@ -788,38 +826,18 @@ const createSubkindCasedHoleFracPack = (perforationOptions: PerforationOptions) 
 
 export const createPerforationTexture = (
   perforation: Perforation,
-  perfShapes: PerforationShape[],
+  widestPerfShapeDiameter: number,
   otherPerforations: Perforation[],
   perforationOptions: PerforationOptions,
 ): Texture => {
-  const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
-
   return foldPerforationSubKind(
     {
       Perforation: () => createSubkindPerforationTexture(perforation, otherPerforations, widestPerfShapeDiameter, perforationOptions),
-      // No visualization
-      OpenHole: () => null,
-      // Yellow gravel
       OpenHoleGravelPack: () => createSubkindOpenHoleGravelPackTexture(perforationOptions),
-      // Yellow gravel. Yellow frac lines from hole OD into formation
       OpenHoleFracPack: () => createSubkindOpenHoleFracPackTexture(widestPerfShapeDiameter, perforationOptions),
-      // No visualisation
-      OpenHoleScreen: () => null,
-      // Cased hole fracturation
-      // Yellow fracturation lines from casing OD into formation
       CasedHoleFracturation: () => createSubkindCasedHoleFracturationTexture(widestPerfShapeDiameter, perforationOptions),
-      // Yellow gravel. Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
-      CasedHoleGravelPack: () => {
-        return createSubkindCasedHoleGravelPackTexture(perforationOptions);
-      },
-      // Yellow gravel and fracturation lines.
-      // Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
-      // If no perforation of type "perforation" are overlapping, there are no fracturation lines and no spikes.
-      // If a perforation of type "perforation" is overlapping,
-      // the fracturation lines extends from the tip of the perforation spikes into formation.
-      CasedHoleFracPack: () => {
-        return createSubkindCasedHoleFracPack(perforationOptions);
-      },
+      CasedHoleGravelPack: () => createSubkindCasedHoleGravelPackTexture(perforationOptions),
+      CasedHoleFracPack: () => createSubkindCasedHoleFracPack(perforationOptions),
     },
     perforation.subKind,
   );
