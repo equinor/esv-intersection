@@ -182,7 +182,6 @@ const renderIntersection = (scaleOptions: any) => {
         start: 4000,
         end: 4500,
         isOpen: true,
-        referenceIds: ['casing-07'],
       },
       {
         kind: 'perforation',
@@ -191,7 +190,6 @@ const renderIntersection = (scaleOptions: any) => {
         start: 3500,
         end: 4500,
         isOpen: true,
-        referenceIds: ['casing-07'],
       },
     ];
 

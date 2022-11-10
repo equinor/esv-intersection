@@ -19,7 +19,7 @@ import {
   hasGravelPack,
   intersect,
   isSubKindCasedHoleFracPack,
-  getPerforationsThatStartAtHoleDiameter,
+  shouldPerforationStartAtHoleDiameter,
   isOpenHoleFracPack,
 } from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
@@ -237,26 +237,6 @@ const splitByReferencedStrings = (
     },
     { attachedStrings: [], nonAttachedStrings: [] },
   );
-
-export const perforationDiameterChangeDepths = (
-  perforation: Perforation,
-  diameterIntervals: {
-    start: number;
-    end: number;
-  }[],
-): number[] => {
-  const { start: topOfPerforation, end: bottomOfPerforation } = perforation;
-
-  const diameterChangeDepths = diameterIntervals.flatMap((d) => [d.start, d.end]);
-  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfPerforation && d <= bottomOfPerforation); // trim
-
-  trimmedChangedDepths.push(topOfPerforation);
-  trimmedChangedDepths.push(bottomOfPerforation);
-
-  const uniqDepths = uniq(trimmedChangedDepths);
-
-  return uniqDepths.sort((a: number, b: number) => a - b);
-};
 
 export const createComplexRopeSegmentsForCementSqueeze = (
   squeeze: CementSqueeze,
@@ -538,11 +518,6 @@ export const createComplexRopeSegmentsForPerforation = (
   exaggerationFactor: number,
   getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
-  const attachedCasings = perforation.referenceIds.map((referenceId: string) => casings.find((casing) => casing.id === referenceId));
-  if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid perforation data, perforation is missing attached casing');
-  }
-
   const { overlappingOuterStrings, overlappingHoles } = findIntersectingItems(perforation.start, perforation.end, casings, holes);
 
   const outerDiameterIntervals = [...overlappingOuterStrings, ...overlappingHoles].map((d) => ({
@@ -550,28 +525,25 @@ export const createComplexRopeSegmentsForPerforation = (
     end: d.end,
   }));
 
-  const changeDepths = perforationDiameterChangeDepths(perforation, outerDiameterIntervals);
+  const changeDepths = getUniqueDiameterChangeDepths([perforation.start, perforation.end], outerDiameterIntervals);
 
   const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
-    if (index === 0) {
+    if (index === list.length - 1) {
       return [];
     }
 
-    const nextDepth = list[index - 1];
+    const nextDepth = list[index + 1];
 
-    const diameter = findCementOuterDiameterAtDepth(attachedCasings, overlappingOuterStrings, overlappingHoles, depth) * exaggerationFactor;
+    const diameterAtDepth = findCementOuterDiameterAtDepth([], overlappingOuterStrings, overlappingHoles, depth);
 
-    return [{ top: nextDepth, bottom: depth, diameter }];
+    return [{ top: depth, bottom: nextDepth, diameter: diameterAtDepth * exaggerationFactor }];
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
     const mdPoints = getPoints(interval.top, interval.bottom);
-    const points = mdPoints.map((mdPoint) => new Point(mdPoint[0], mdPoint[1]));
+    const points = mdPoints.map(([x, y]: [number, number]) => new Point(x, y));
 
-    const diameter =
-      getPerforationsThatStartAtHoleDiameter([perforation]).length === 1 || isOpenHoleFracPack(perforation)
-        ? interval.diameter * 4
-        : interval.diameter;
+    const diameter = shouldPerforationStartAtHoleDiameter(perforation) || isOpenHoleFracPack(perforation) ? interval.diameter * 4 : interval.diameter;
 
     return {
       diameter,

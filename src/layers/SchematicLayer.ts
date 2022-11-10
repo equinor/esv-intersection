@@ -37,8 +37,8 @@ import {
   defaultTubingOptions,
   defaultInternalLayerOptions,
   Perforation,
-  getPerforationsThatStartAtHoleDiameter,
-  getPerforationsThatSTartAtCasingDiameter,
+  shouldPerforationStartAtHoleDiameter,
+  shouldPerforationSTartAtCasingDiameter,
   PerforationOptions,
   defaultPerforationOptions,
   Completion,
@@ -320,23 +320,22 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
     const { holeSizes, casings, cements, completion, symbols, pAndA, perforations } = this.data;
 
-    const shouldStartAtHoleDiameter = getPerforationsThatStartAtHoleDiameter(perforations);
+    this.updateSymbolCache(symbols);
 
-    const shouldStartAtCasingDiameter = getPerforationsThatSTartAtCasingDiameter(perforations);
-
-    this.internalLayerVisibility.perforationLayerId &&
-      shouldStartAtHoleDiameter.forEach((perforation) => {
+    if (this.internalLayerVisibility.perforationLayerId) {
+      perforations.filter(shouldPerforationStartAtHoleDiameter).forEach((perforation: Perforation) => {
         const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
         const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
         this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
       });
-
-    this.updateSymbolCache(symbols);
+    }
 
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter);
     this.maxHoleDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) * exaggerationFactor : EXAGGERATED_DIAMETER * exaggerationFactor;
-    this.internalLayerVisibility.holeLayerId && holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
+    if (this.internalLayerVisibility.holeLayerId) {
+      holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
+    }
 
     casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
     const casingRenderObjects: CasingRenderObject[] = casings.map((casing: Casing) =>
@@ -371,14 +370,30 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
             casingRO.hasShoe && this.drawShoe(casingRO.bottom, casingRO.referenceRadius);
           }
         },
-        (cementRO: CementRenderObject) =>
-          this.internalLayerVisibility.cementLayerId && this.drawComplexRope(cementRO.segments, this.getCementTexture()),
-        (cementSqueezesRO: CementSqueezeRenderObject) =>
-          this.internalLayerVisibility.pAndALayerId && this.drawComplexRope(cementSqueezesRO.segments, this.getCementSqueezeTexture()),
+        (cementRO: CementRenderObject) => {
+          if (this.internalLayerVisibility.cementLayerId) {
+            this.drawComplexRope(cementRO.segments, this.getCementTexture());
+          }
+        },
+        (cementSqueezesRO: CementSqueezeRenderObject) => {
+          if (this.internalLayerVisibility.pAndALayerId) {
+            this.drawComplexRope(cementSqueezesRO.segments, this.getCementSqueezeTexture());
+          }
+        },
       ),
     );
 
-    this.internalLayerVisibility.completionLayerId &&
+    if (this.internalLayerVisibility.perforationLayerId) {
+      perforations.filter(shouldPerforationSTartAtCasingDiameter).forEach((perforation: Perforation) => {
+        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
+
+        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
+      });
+    }
+
+    if (this.internalLayerVisibility.completionLayerId) {
       completion.forEach(
         foldCompletion(
           (obj: Screen) => this.drawScreen(obj),
@@ -389,8 +404,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           },
         ),
       );
+    }
 
-    this.internalLayerVisibility.pAndALayerId &&
+    if (this.internalLayerVisibility.pAndALayerId) {
       remainingPAndA.forEach((obj) => {
         if (isPAndASymbol(obj)) {
           const symbolRenderObject = this.prepareSymbolRenderObject(obj);
@@ -400,15 +416,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           this.drawCementPlug(obj, casings, completion, holeSizes);
         }
       });
-
-    this.internalLayerVisibility.perforationLayerId &&
-      shouldStartAtCasingDiameter.forEach((perforation) => {
-        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
-        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
-        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
-
-        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
-      });
+    }
   }
 
   private updateSymbolCache(symbols: { [key: string]: string }) {

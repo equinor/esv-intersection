@@ -131,10 +131,6 @@ export interface Perforation {
    * is the perforation open or sealed?
    */
   isOpen: boolean;
-  /**
-   * Referenced Casing ids
-   */
-  referenceIds: string[];
 }
 
 export const foldPerforationSubKind = <T>(
@@ -172,34 +168,30 @@ export const foldPerforationSubKind = <T>(
   }
 };
 
-export const getPerforationsThatStartAtHoleDiameter = (perforations: Perforation[]) =>
-  perforations.filter((perf) =>
-    foldPerforationSubKind(
-      {
-        Perforation: () => true,
-        OpenHoleGravelPack: () => true,
-        OpenHoleFracPack: () => false,
-        CasedHoleFracturation: () => false,
-        CasedHoleGravelPack: () => false,
-        CasedHoleFracPack: () => false,
-      },
-      perf.subKind,
-    ),
+export const shouldPerforationStartAtHoleDiameter = (perf: Perforation) =>
+  foldPerforationSubKind(
+    {
+      Perforation: () => true,
+      OpenHoleGravelPack: () => true,
+      OpenHoleFracPack: () => false,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => false,
+      CasedHoleFracPack: () => false,
+    },
+    perf.subKind,
   );
 
-export const getPerforationsThatSTartAtCasingDiameter = (perforations: Perforation[]) =>
-  perforations.filter((perf) =>
-    foldPerforationSubKind(
-      {
-        Perforation: () => false,
-        OpenHoleGravelPack: () => false,
-        OpenHoleFracPack: () => true,
-        CasedHoleFracturation: () => true,
-        CasedHoleGravelPack: () => true,
-        CasedHoleFracPack: () => true,
-      },
-      perf.subKind,
-    ),
+export const shouldPerforationSTartAtCasingDiameter = (perf: Perforation) =>
+  foldPerforationSubKind(
+    {
+      Perforation: () => false,
+      OpenHoleGravelPack: () => false,
+      OpenHoleFracPack: () => true,
+      CasedHoleFracturation: () => true,
+      CasedHoleGravelPack: () => true,
+      CasedHoleFracPack: () => true,
+    },
+    perf.subKind,
   );
 
 export function hasGravelPack(perf: Perforation): boolean {

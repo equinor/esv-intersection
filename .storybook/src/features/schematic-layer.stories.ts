@@ -90,7 +90,6 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           start: 4000,
           end: 4500,
           isOpen: true,
-          referenceIds: ['casing-07'],
         },
         {
           kind: 'perforation',
@@ -99,7 +98,6 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           start: 3500,
           end: 4500,
           isOpen: true,
-          referenceIds: ['casing-07'],
         },
       ];
 
