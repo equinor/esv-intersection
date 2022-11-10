@@ -2,19 +2,32 @@
 
 ## TO BE RELEASED
 
+## v3.0.0-beta.2
+
+### Breaking Changes
+- Remove `casingId` from casings. Items referencing that id should rather use the `id` of the casing instead.
+- Rename `casingIds` to `referenceIds` for cement related items, as tubing/screen can be cemented in some cases.
+
+### Changes
+- Adds support for Peforations
+
 ## v3.0.0-beta.0
 ### Breaking Changes
 
 - Many Layers are made generic and type for layers data needs to be specified when extending and using the Layers
 - Pixi Layers (SchematicLayer, GeomodelLayerV2) needs to pass inn a Pixi render context. Class PixiRenderApplication can be used for this
 - HoleSizeLayer, CasingLayer, CementLayer and WellboreBaseComponentLayer are removed, but functionality is retained and improved in new SchematicLayer
+- Removed `any` from type definitions in the library
 - Removed deprecated layer `GeomodelLayer`, in favor of `GeomodelLayerV2`
+- Upgraded peer dependency `pixi.js@6.5.8`
 
 ### Changes
 
 - Data type for for new layer SchematicLayer is based on data for the old layers HoleSizeLayer, CasingLayer and CementLayer, but now requires id and kind specified
-- Removed `any` from type definitions in the library
-- Upgraded peer dependency `pixi.js@6.5.8`
+- Adds support for CementSqueeze
+- Adds support for CementPlug
+- Adds support for Plug & Abandonment symbols
+- Adds support for Completion symbols
 
 ## v2.2.0
 
