@@ -7,6 +7,9 @@ import {
   Perforation,
   InternalLayerOptions,
   SchematicData,
+  PAndASymbol,
+  CementPlug,
+  CompletionSymbol,
 } from '../../../src';
 
 import { createRootContainer, createLayerContainer, createFPSLabel, createHelpText, createButtonContainer } from '../utils';
@@ -35,7 +38,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMCAwSDkwVjEwMEgxMFYwWiIgZmlsbD0iI0Q5RDlEOSIvPgo8cGF0aCBkPSJNMCAyNUgxMFY3NUgwVjI1WiIgZmlsbD0iI0I1QjJCMiIvPgo8cGF0aCBkPSJNNDUgMjVINTVWNzVINDVWMjVaIiBmaWxsPSIjQjVCMkIyIi8+CjxwYXRoIGQ9Ik0yNSA2NUgzMFY4MEgyNVY2NVoiIGZpbGw9IiMzMTMxMzEiLz4KPHBhdGggZD0iTTI1IDQySDMwVjU3SDI1VjQyWiIgZmlsbD0iIzMxMzEzMSIvPgo8cGF0aCBkPSJNMjUgMjFIMzBWMzZIMjVWMjFaIiBmaWxsPSIjMzEzMTMxIi8+CjxwYXRoIGQ9Ik03MCA2NEg3NVY3OUg3MFY2NFoiIGZpbGw9IiMzMTMxMzEiLz4KPHBhdGggZD0iTTcwIDQxSDc1VjU2SDcwVjQxWiIgZmlsbD0iIzMxMzEzMSIvPgo8cGF0aCBkPSJNNzAgMjBINzVWMzVINzBWMjBaIiBmaWxsPSIjMzEzMTMxIi8+CjxwYXRoIGQ9Ik05MCAyNUgxMDBWNzVIOTBWMjVaIiBmaWxsPSIjQjVCMkIyIi8+Cjwvc3ZnPgo=',
       };
 
-      const completionSymbols = [
+      const completionSymbols: CompletionSymbol[] = [
         {
           kind: 'completionSymbol',
           id: 'completion-svg-1',
@@ -68,7 +71,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
       };
 
       const pAndASymbols = [
-        {
+        <PAndASymbol>{
           kind: 'pAndASymbol' as const,
           id: 'mechanical-plug-1',
           start: 5100,
@@ -76,7 +79,7 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           diameter: 8.5,
           symbolKey: 'mechanicalPlug',
         },
-        { kind: 'cementPlug' as const, id: 'cement-plug-2', top: 5000, bottom: 5110, casingId: '7' },
+        <CementPlug>{ kind: 'cementPlug' as const, id: 'cement-plug-2', start: 5000, end: 5110, referenceIds: ['casing-07'] },
       ];
 
       const perforations: Perforation[] = [
@@ -84,8 +87,8 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           kind: 'perforation',
           subKind: 'Perforation',
           id: 'PerforationDemo1',
-          top: 4000,
-          bottom: 4500,
+          start: 4000,
+          end: 4500,
           isOpen: true,
           referenceIds: ['casing-07'],
         },
@@ -93,8 +96,8 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           kind: 'perforation',
           subKind: 'Cased hole frac pack',
           id: 'PerforationDemo2',
-          top: 3500,
-          bottom: 4500,
+          start: 3500,
+          end: 4500,
           isOpen: true,
           referenceIds: ['casing-07'],
         },

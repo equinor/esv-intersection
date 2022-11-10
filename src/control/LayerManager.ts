@@ -137,7 +137,7 @@ export class LayerManager {
   showLayer(layerId: string): LayerManager {
     const layer = this.getLayer(layerId);
     if (!layer) {
-      return;
+      return this;
     }
     layer.setVisibility(true, layerId);
     layer.onRescale(this.zoomPanHandler.currentStateAsEvent());
@@ -147,7 +147,7 @@ export class LayerManager {
   hideLayer(layerId: string): LayerManager {
     const layer = this.getLayer(layerId);
     if (!layer) {
-      return;
+      return this;
     }
     layer.setVisibility(false, layerId);
     layer.onRescale(this.zoomPanHandler.currentStateAsEvent());

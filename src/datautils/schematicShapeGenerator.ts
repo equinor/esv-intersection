@@ -7,6 +7,8 @@ import {
   CementPlug,
   CementPlugOptions,
   CementSqueeze,
+  CementSqueezeOptions,
+  Completion,
   HoleOptions,
   HoleSize,
   ScreenOptions,
@@ -26,6 +28,7 @@ import { createNormals, offsetPoints } from '../utils/vectorUtils';
 export type PerforationShape = ComplexRopeSegment;
 
 export interface TubularRenderingObject {
+  id: string;
   leftPath: Point[];
   rightPath: Point[];
   referenceDiameter: number;
@@ -36,7 +39,6 @@ export interface CasingRenderObject extends TubularRenderingObject {
   kind: 'casing';
   pathPoints: number[][];
   polygon: Point[];
-  casingId: string;
   casingWallWidth: number;
   hasShoe: boolean;
   bottom: number;
@@ -64,59 +66,66 @@ export const overlaps = (top1: number, bottom1: number, top2: number, bottom2: n
 
 export const uniq = <T>(arr: T[]): T[] => Array.from<T>(new Set(arr));
 
-export const findIntersectingItems = (
-  topOfCement: number,
-  bottomOfCement: number,
-  parentCasings: Casing[],
-  casings: Casing[],
+const findIntersectingItems = (
+  start: number,
+  end: number,
+  otherStrings: (Casing | Completion)[],
   holes: HoleSize[],
-): { overlappingHoles: HoleSize[]; outerCasings: Casing[] } => {
-  const overlappingHoles = holes.filter((h: HoleSize) => overlaps(topOfCement, bottomOfCement, h.start, h.end));
+): { overlappingHoles: HoleSize[]; overlappingOuterStrings: (Casing | Completion)[] } => {
+  const overlappingHoles = holes.filter((hole: HoleSize) => overlaps(start, end, hole.start, hole.end));
 
-  const otherCasings = casings.filter((c: Casing) => !parentCasings.includes(c));
-  const overlappingCasings = otherCasings.filter((c: Casing) => overlaps(topOfCement, bottomOfCement, c.start, c.end));
+  const overlappingOuterStrings = otherStrings.filter((casing: Casing | Completion) => overlaps(start, end, casing.start, casing.end));
 
   return {
     overlappingHoles,
-    outerCasings: overlappingCasings,
+    overlappingOuterStrings,
   };
 };
 
-export const cementDiameterChangeDepths = (
-  cement: Cement,
-  bottomOfCement: number,
-  diameterIntervals: {
-    start: number;
-    end: number;
-  }[],
+export const getUniqueDiameterChangeDepths = (
+  [intervalStart, intervalEnd]: [number, number],
+  diameterIntervals: { start: number; end: number }[],
 ): number[] => {
-  const topOfCement = cement.toc;
+  const epsilon = 0.0001;
+  const diameterChangeDepths = diameterIntervals.flatMap(
+    (
+      d, // to find diameter right before/after object
+    ) => [d.start - epsilon, d.start, d.end, d.end + epsilon],
+  );
+  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= intervalStart && d <= intervalEnd); // trim
 
-  const diameterChangeDepths = diameterIntervals.flatMap((d) => [d.start, d.end]);
-  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfCement && d <= bottomOfCement); // trim
-
-  trimmedChangedDepths.push(topOfCement);
-  trimmedChangedDepths.push(bottomOfCement);
+  trimmedChangedDepths.push(intervalStart);
+  trimmedChangedDepths.push(intervalEnd);
 
   const uniqDepths = uniq(trimmedChangedDepths);
-
   return uniqDepths.sort((a: number, b: number) => a - b);
 };
 
-export const findCementOuterDiameterAtDepth = (innerCasing: Casing[], nonAttachedCasings: Casing[], holes: HoleSize[], depth: number): number => {
+const getInnerStringDiameter = (stringType: Casing | Completion): number =>
+  stringType.kind === 'casing' ? stringType.innerDiameter : stringType.diameter;
+
+export const findCementOuterDiameterAtDepth = (
+  attachedStrings: (Casing | Completion)[],
+  nonAttachedStrings: (Casing | Completion)[],
+  holes: HoleSize[],
+  depth: number,
+): number => {
   const defaultCementWidth = 100; // Default to flow cement outside to show error in data
 
-  const innerCasingAtDepth = innerCasing.find((casing) => casing.start <= depth && casing.end >= depth);
-  const innerDiameter = innerCasingAtDepth ? innerCasingAtDepth.diameter : 0;
+  const attachedStringAtDepth = attachedStrings.find(
+    (casingOrCompletion: Casing | Completion) => casingOrCompletion.start <= depth && casingOrCompletion.end >= depth,
+  );
+  const attachedOuterDiameter = attachedStringAtDepth ? attachedStringAtDepth.diameter : 0;
 
-  const outerCasings = nonAttachedCasings.filter((casing) => casing.innerDiameter > innerDiameter);
-  const holeAtDepth = holes.find((hole) => hole.start <= depth && hole.end >= depth && hole.diameter > innerDiameter);
-  const outerCasingAtDepth = outerCasings
-    .sort((a, b) => a.innerDiameter - b.innerDiameter) // ascending
-    .find((casing) => casing.start <= depth && casing.end >= depth && casing.diameter > innerDiameter);
+  const outerCasingAtDepth = nonAttachedStrings
+    .filter((casingOrCompletion: Casing | Completion) => getInnerStringDiameter(casingOrCompletion) > attachedOuterDiameter)
+    .sort((a: Casing | Completion, b: Casing | Completion) => getInnerStringDiameter(a) - getInnerStringDiameter(b)) // ascending
+    .find((casing) => casing.start <= depth && casing.end >= depth);
+
+  const holeAtDepth = holes.find((hole: HoleSize) => hole.start <= depth && hole.end >= depth && hole.diameter > attachedOuterDiameter);
 
   if (outerCasingAtDepth) {
-    return outerCasingAtDepth.innerDiameter;
+    return getInnerStringDiameter(outerCasingAtDepth);
   }
 
   if (holeAtDepth) {
@@ -126,57 +135,79 @@ export const findCementOuterDiameterAtDepth = (innerCasing: Casing[], nonAttache
   return defaultCementWidth;
 };
 
-export const findCementInnerDiameterAtDepth = (innerCasing: Casing[], _nonAttachedCasings: Casing[], holes: HoleSize[], depth: number): number => {
-  const innerCasingAtDepth = innerCasing.find((casing) => casing.start <= depth && casing.end >= depth);
-  const innerDiameter = innerCasingAtDepth ? innerCasingAtDepth.innerDiameter : 0;
+export const findCementPlugInnerDiameterAtDepth = (
+  attachedStrings: (Casing | Completion)[],
+  nonAttachedStrings: (Casing | Completion)[],
+  holes: HoleSize[],
+  depth: number,
+): number => {
+  // Default to flow cement outside to show error in data
+  const defaultCementWidth = 100;
+  const attachedStringAtDepth = attachedStrings
+    .sort((a: Casing | Completion, b: Casing | Completion) => getInnerStringDiameter(a) - getInnerStringDiameter(b)) // ascending
+    .find((casingOrCompletion) => casingOrCompletion.start <= depth && casingOrCompletion.end >= depth);
 
-  const holeAtDepth = holes.find((hole) => hole.start <= depth && hole.end >= depth && hole.diameter > innerDiameter);
-
-  if (innerCasingAtDepth) {
-    return innerDiameter;
+  if (attachedStringAtDepth) {
+    return getInnerStringDiameter(attachedStringAtDepth);
   }
+
+  // Start from an attached diameter
+  const minimumDiameter = attachedStrings.length ? Math.min(...attachedStrings.map((c) => getInnerStringDiameter(c))) : 0;
+  const nonAttachedStringAtDepth = nonAttachedStrings
+    .sort((a: Casing | Completion, b: Casing | Completion) => getInnerStringDiameter(a) - getInnerStringDiameter(b)) // ascending
+    .find(
+      (casingOrCompletion: Casing | Completion) =>
+        casingOrCompletion.start <= depth && casingOrCompletion.end >= depth && minimumDiameter <= getInnerStringDiameter(casingOrCompletion),
+    );
+
+  if (nonAttachedStringAtDepth) {
+    return getInnerStringDiameter(nonAttachedStringAtDepth);
+  }
+
+  const holeAtDepth = holes.find((hole) => hole.start <= depth && hole.end >= depth && hole.diameter);
 
   if (holeAtDepth) {
     return holeAtDepth.diameter;
   }
+
+  return defaultCementWidth;
 };
 
 export const createComplexRopeSegmentsForCement = (
   cement: Cement,
   casings: Casing[],
+  completion: Completion[],
   holes: HoleSize[],
   exaggerationFactor: number,
   getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
-  const casingIds = (cement.casingIds || []).filter((id) => id);
+  const { attachedStrings, nonAttachedStrings } = splitByReferencedStrings(cement.referenceIds, casings, completion);
 
-  const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
-  if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement data, cement is missing attached casing');
+  if (attachedStrings.length === 0) {
+    throw new Error(`Invalid cement data, can't find referenced casing/completion string for cement with id '${cement.id}'`);
   }
 
-  const topOfCement = cement.toc;
-  attachedCasings.sort((a: Casing, b: Casing) => a.end - b.end); // ascending
-  const bottomOfCement = attachedCasings[attachedCasings.length - 1].end;
+  attachedStrings.sort((a: Casing, b: Casing) => a.end - b.end); // ascending
+  const bottomOfCement = attachedStrings[attachedStrings.length - 1].end;
 
-  const { outerCasings, overlappingHoles } = findIntersectingItems(topOfCement, bottomOfCement, attachedCasings, casings, holes);
+  const { overlappingOuterStrings, overlappingHoles } = findIntersectingItems(cement.toc, bottomOfCement, nonAttachedStrings, holes);
 
-  const outerDiameterIntervals = [...outerCasings, ...overlappingHoles].map((d) => ({
+  const outerDiameterIntervals = [...overlappingOuterStrings, ...overlappingHoles].map((d) => ({
     start: d.start,
     end: d.end,
   }));
 
-  const changeDepths = cementDiameterChangeDepths(cement, bottomOfCement, outerDiameterIntervals);
+  const changeDepths = getUniqueDiameterChangeDepths([cement.toc, bottomOfCement], outerDiameterIntervals);
 
   const diameterIntervals = changeDepths.flatMap((depth: number, index: number, list: number[]) => {
-    if (index === 0) {
+    if (index === list.length - 1) {
       return [];
     }
 
-    const nextDepth = list[index - 1];
-    const diameter = findCementOuterDiameterAtDepth(attachedCasings, outerCasings, overlappingHoles, depth) * exaggerationFactor;
+    const nextDepth = list[index + 1];
+    const diameterAtChangeDepth = findCementOuterDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth);
 
-    return [{ top: nextDepth, bottom: depth, diameter }];
+    return [{ top: depth, bottom: nextDepth, diameter: diameterAtChangeDepth * exaggerationFactor }];
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
@@ -192,45 +223,20 @@ export const createComplexRopeSegmentsForCement = (
   return ropeSegments;
 };
 
-export const cementSqueezeDiameterChangeDepths = (
-  squeeze: CementSqueeze,
-  diameterIntervals: {
-    start: number;
-    end: number;
-  }[],
-): number[] => {
-  const { top: topOfCement, bottom: bottomOfCement } = squeeze;
-
-  const diameterChangeDepths = diameterIntervals.flatMap((d) => [d.start, d.end]);
-  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfCement && d <= bottomOfCement); // trim
-
-  trimmedChangedDepths.push(topOfCement);
-  trimmedChangedDepths.push(bottomOfCement);
-
-  const uniqDepths = uniq(trimmedChangedDepths);
-
-  return uniqDepths.sort((a: number, b: number) => a - b);
-};
-
-export const cementPlugDiameterChangeDepths = (
-  plug: CementPlug,
-  diameterIntervals: {
-    start: number;
-    end: number;
-  }[],
-): number[] => {
-  const { top: topOfCement, bottom: bottomOfCement } = plug;
-
-  const diameterChangeDepths = diameterIntervals.flatMap((d) => [d.start, d.end]);
-  const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfCement && d <= bottomOfCement); // trim
-
-  trimmedChangedDepths.push(topOfCement);
-  trimmedChangedDepths.push(bottomOfCement);
-
-  const uniqDepths = uniq(trimmedChangedDepths);
-
-  return uniqDepths.sort((a: number, b: number) => a - b);
-};
+const splitByReferencedStrings = (
+  referenceIds: string[],
+  casings: Casing[],
+  completion: Completion[],
+): { attachedStrings: (Casing | Completion)[]; nonAttachedStrings: (Casing | Completion)[] } =>
+  [...casings, ...completion].reduce(
+    (acc, current) => {
+      if (referenceIds.includes(current.id)) {
+        return { ...acc, attachedStrings: [...acc.attachedStrings, current] };
+      }
+      return { ...acc, nonAttachedStrings: [...acc.nonAttachedStrings, current] };
+    },
+    { attachedStrings: [], nonAttachedStrings: [] },
+  );
 
 export const perforationDiameterChangeDepths = (
   perforation: Perforation,
@@ -239,7 +245,7 @@ export const perforationDiameterChangeDepths = (
     end: number;
   }[],
 ): number[] => {
-  const { top: topOfPerforation, bottom: bottomOfPerforation } = perforation;
+  const { start: topOfPerforation, end: bottomOfPerforation } = perforation;
 
   const diameterChangeDepths = diameterIntervals.flatMap((d) => [d.start, d.end]);
   const trimmedChangedDepths = diameterChangeDepths.filter((d) => d >= topOfPerforation && d <= bottomOfPerforation); // trim
@@ -255,36 +261,36 @@ export const perforationDiameterChangeDepths = (
 export const createComplexRopeSegmentsForCementSqueeze = (
   squeeze: CementSqueeze,
   casings: Casing[],
+  completion: Completion[],
   holes: HoleSize[],
   exaggerationFactor: number,
   getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
-  const { casingIds, top: topOfCement, bottom: bottomOfCement } = squeeze;
+  const { attachedStrings, nonAttachedStrings } = splitByReferencedStrings(squeeze.referenceIds, casings, completion);
 
-  const attachedCasings = casingIds.map((casingId) => casings.find((casing) => casing.casingId === casingId));
-  if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement squeeze data, cement is missing attached casing');
+  if (attachedStrings.length === 0) {
+    throw new Error(`Invalid cement squeeze data, can't find referenced casing/completion for squeeze with id '${squeeze.id}'`);
   }
 
-  const { outerCasings, overlappingHoles } = findIntersectingItems(topOfCement, bottomOfCement, attachedCasings, casings, holes);
+  const { overlappingOuterStrings, overlappingHoles } = findIntersectingItems(squeeze.start, squeeze.end, nonAttachedStrings, holes);
 
-  const outerDiameterIntervals = [...outerCasings, ...overlappingHoles].map((d) => ({
+  const outerDiameterIntervals = [...overlappingOuterStrings, ...overlappingHoles].map((d) => ({
     start: d.start,
     end: d.end,
   }));
 
-  const changeDepths = cementSqueezeDiameterChangeDepths(squeeze, outerDiameterIntervals);
+  const changeDepths = getUniqueDiameterChangeDepths([squeeze.start, squeeze.end], outerDiameterIntervals);
 
   const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
-    if (index === 0) {
+    if (index === list.length - 1) {
       return [];
     }
 
-    const nextDepth = list[index - 1];
+    const nextDepth = list[index + 1];
 
-    const diameter = findCementOuterDiameterAtDepth(attachedCasings, outerCasings, overlappingHoles, depth) * exaggerationFactor;
+    const diameterAtDepth = findCementOuterDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth);
 
-    return [{ top: nextDepth, bottom: depth, diameter }];
+    return [{ top: depth, bottom: nextDepth, diameter: diameterAtDepth * exaggerationFactor }];
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
@@ -303,33 +309,30 @@ export const createComplexRopeSegmentsForCementSqueeze = (
 export const createComplexRopeSegmentsForCementPlug = (
   plug: CementPlug,
   casings: Casing[],
+  completion: Completion[],
   holes: HoleSize[],
   exaggerationFactor: number,
   getPoints: (start: number, end: number) => [number, number][],
 ): ComplexRopeSegment[] => {
-  const { casingId, secondCasingId, top: topOfCementPlug, bottom: bottomOfCementPlug } = plug;
+  const { attachedStrings, nonAttachedStrings } = splitByReferencedStrings(plug.referenceIds, casings, completion);
 
-  const attachedCasings = [casings.find((c) => c.casingId === casingId), casings.find((c) => c.casingId === secondCasingId)].filter((c) => c);
-  if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
-    throw new Error('Invalid cement plug data, cement plug is missing attached casing');
-  }
-  const { overlappingHoles } = findIntersectingItems(topOfCementPlug, bottomOfCementPlug, attachedCasings, casings, holes);
-  const innerDiameterIntervals = [...attachedCasings, ...overlappingHoles].map((d) => ({
+  const { overlappingHoles, overlappingOuterStrings } = findIntersectingItems(plug.start, plug.end, nonAttachedStrings, holes);
+  const innerDiameterIntervals = [...attachedStrings, ...overlappingHoles, ...overlappingOuterStrings].map((d) => ({
     start: d.start,
     end: d.end,
   }));
 
-  const changeDepths = cementPlugDiameterChangeDepths(plug, innerDiameterIntervals);
+  const changeDepths = getUniqueDiameterChangeDepths([plug.start, plug.end], innerDiameterIntervals);
 
   const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
-    if (index === 0) {
+    if (index === list.length - 1) {
       return [];
     }
 
-    const nextDepth = list[index - 1];
-    const diameter = findCementInnerDiameterAtDepth(attachedCasings, attachedCasings, overlappingHoles, depth) * exaggerationFactor;
+    const nextDepth = list[index + 1];
+    const diameterAtDepth = findCementPlugInnerDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth);
 
-    return [{ top: nextDepth, bottom: depth, diameter }];
+    return [{ top: depth, bottom: nextDepth, diameter: diameterAtDepth * exaggerationFactor }];
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
@@ -420,7 +423,7 @@ export const createTubingTexture = ({ innerColor, outerColor, scalingFactor }: T
   return Texture.from(canvas);
 };
 
-export const createCementTexture = ({ firstColor, secondColor, scalingFactor }: CementOptions) => {
+export const createCementTexture = ({ firstColor, secondColor, scalingFactor }: CementOptions): Texture => {
   const canvas = document.createElement('canvas');
 
   const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
@@ -445,7 +448,7 @@ export const createCementTexture = ({ firstColor, secondColor, scalingFactor }: 
   return Texture.from(canvas);
 };
 
-export const createCementPlugTexture = ({ firstColor, secondColor, scalingFactor }: CementPlugOptions) => {
+export const createCementPlugTexture = ({ firstColor, secondColor, scalingFactor }: CementPlugOptions): Texture => {
   const canvas = document.createElement('canvas');
 
   const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
@@ -456,7 +459,7 @@ export const createCementPlugTexture = ({ firstColor, secondColor, scalingFactor
   canvasCtx.fillStyle = firstColor;
   canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
   canvasCtx.lineWidth = scalingFactor;
-  canvasCtx.fillStyle = secondColor;
+  canvasCtx.strokeStyle = secondColor;
   canvasCtx.beginPath();
 
   canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
@@ -470,21 +473,48 @@ export const createCementPlugTexture = ({ firstColor, secondColor, scalingFactor
   return Texture.from(canvas);
 };
 
-export const createTubularRenderingObject = (diameter: number, pathPoints: [number, number][]): TubularRenderingObject => {
+export const createCementSqueezeTexture = ({ firstColor, secondColor, scalingFactor }: CementSqueezeOptions): Texture => {
+  const canvas = document.createElement('canvas');
+
+  const size = DEFAULT_TEXTURE_SIZE * scalingFactor;
+  const lineWidth = scalingFactor;
+  canvas.width = size;
+  canvas.height = size;
+
+  const canvasCtx = canvas.getContext('2d');
+  canvasCtx.lineWidth = lineWidth;
+  canvasCtx.fillStyle = firstColor;
+  canvasCtx.strokeStyle = secondColor;
+
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+  canvasCtx.beginPath();
+
+  canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
+  const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+  for (let i = -canvas.width; i < canvas.width; i++) {
+    canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
+    canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
+  }
+  canvasCtx.stroke();
+
+  return Texture.from(canvas);
+};
+
+export const createTubularRenderingObject = (id: string, diameter: number, pathPoints: [number, number][]): TubularRenderingObject => {
   const radius = diameter / 2;
 
   const normals = createNormals(pathPoints);
   const rightPath = offsetPoints(pathPoints, normals, radius);
   const leftPath = offsetPoints(pathPoints, normals, -radius);
 
-  return { leftPath, rightPath, referenceDiameter: diameter, referenceRadius: radius };
+  return { id, leftPath, rightPath, referenceDiameter: diameter, referenceRadius: radius };
 };
 
 export const prepareCasingRenderObject = (exaggerationFactor: number, casing: Casing, pathPoints: [number, number][]): CasingRenderObject => {
   const exaggeratedDiameter = casing.diameter * exaggerationFactor;
   const exaggeratedInnerDiameter = casing.innerDiameter * exaggerationFactor;
   const exaggeratedInnerRadius = exaggeratedInnerDiameter / 2;
-  const renderObject = createTubularRenderingObject(exaggeratedDiameter, pathPoints);
+  const renderObject = createTubularRenderingObject(casing.id, exaggeratedDiameter, pathPoints);
 
   const casingWallWidth = renderObject.referenceRadius - exaggeratedInnerRadius;
 
@@ -495,7 +525,6 @@ export const prepareCasingRenderObject = (exaggerationFactor: number, casing: Ca
     kind: 'casing',
     pathPoints,
     polygon,
-    casingId: casing.casingId,
     casingWallWidth,
     hasShoe: casing.hasShoe,
     bottom: casing.end,
@@ -514,9 +543,9 @@ export const createComplexRopeSegmentsForPerforation = (
     throw new Error('Invalid perforation data, perforation is missing attached casing');
   }
 
-  const { outerCasings, overlappingHoles } = findIntersectingItems(perforation.top, perforation.bottom, attachedCasings, casings, holes);
+  const { overlappingOuterStrings, overlappingHoles } = findIntersectingItems(perforation.start, perforation.end, casings, holes);
 
-  const outerDiameterIntervals = [...outerCasings, ...overlappingHoles].map((d) => ({
+  const outerDiameterIntervals = [...overlappingOuterStrings, ...overlappingHoles].map((d) => ({
     start: d.start,
     end: d.end,
   }));
@@ -530,7 +559,7 @@ export const createComplexRopeSegmentsForPerforation = (
 
     const nextDepth = list[index - 1];
 
-    const diameter = findCementOuterDiameterAtDepth(attachedCasings, outerCasings, overlappingHoles, depth) * exaggerationFactor;
+    const diameter = findCementOuterDiameterAtDepth(attachedCasings, overlappingOuterStrings, overlappingHoles, depth) * exaggerationFactor;
 
     return [{ top: nextDepth, bottom: depth, diameter }];
   });
