@@ -1,4 +1,3 @@
-import { IntersectionReferenceSystem, Controller } from '../../../src/control';
 import {
   GridLayer,
   WellborepathLayer,
@@ -8,11 +7,6 @@ import {
   SeismicCanvasLayer,
   CalloutCanvasLayer,
   PixiRenderApplication,
-} from '../../../src/layers';
-
-import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
-
-import {
   generateSurfaceData,
   SurfaceData,
   getSeismicInfo,
@@ -20,7 +14,17 @@ import {
   transformFormationData,
   getPicksData,
   getSeismicOptions,
-} from '../../../src/datautils';
+  IntersectionReferenceSystem,
+  Controller,
+  Annotation,
+  SchematicLayer,
+  SchematicLayerOptions,
+  InternalLayerOptions,
+  Perforation,
+  SchematicData,
+} from '../../../src';
+
+import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
 
 //Data
 import { seismicColorMap } from '../exampledata';
@@ -37,8 +41,6 @@ import {
   getCompletion,
   getCementSqueezes,
 } from '../data';
-import { Annotation, SchematicLayer, SchematicLayerOptions } from '../../../src';
-import { InternalLayerOptions, SchematicData } from '../../../src/layers/schematicInterfaces';
 
 export const intersection = () => {
   const xBounds: [number, number] = [0, 1000];
@@ -172,12 +174,34 @@ const renderIntersection = (scaleOptions: any) => {
       { kind: 'cementPlug' as const, id: 'cement-plug-2', start: 5000, end: 5110, referenceIds: ['casing-07'] },
     ];
 
+    const perforations: Perforation[] = [
+      {
+        kind: 'perforation',
+        subKind: 'Perforation',
+        id: 'PerforationDemo1',
+        start: 4000,
+        end: 4500,
+        isOpen: true,
+        referenceIds: ['casing-07'],
+      },
+      {
+        kind: 'perforation',
+        subKind: 'Cased hole frac pack',
+        id: 'PerforationDemo2',
+        start: 3500,
+        end: 4500,
+        isOpen: true,
+        referenceIds: ['casing-07'],
+      },
+    ];
+
     const schematicData: SchematicData = {
       holeSizes,
       cements: cement,
       casings,
       completion: [...completion, ...completionSymbols],
       pAndA: [...pAndASymbols, ...cementSqueezes],
+      perforations,
       symbols: { ...CSDSVGs, ...pAndASVGs },
     };
 
@@ -187,6 +211,7 @@ const renderIntersection = (scaleOptions: any) => {
       completionLayerId: 'completion-id',
       cementLayerId: 'cement-id',
       pAndALayerId: 'pAndA-id',
+      perforationLayerId: 'perforation-id',
     };
 
     const schematicLayerOptions: SchematicLayerOptions<SchematicData> = {
@@ -240,6 +265,7 @@ const renderIntersection = (scaleOptions: any) => {
       ['Cement', internalLayerIds.cementLayerId],
       ['Completion', internalLayerIds.completionLayerId],
       ['Plug & Abandonment', internalLayerIds.pAndALayerId],
+      ['Perforations', internalLayerIds.perforationLayerId],
     ].map(([description, internalLayerId]) => createInternalLayerVisibilityButton(controller, internalLayerId, description));
 
     let show = true;
