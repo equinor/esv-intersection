@@ -1,6 +1,6 @@
 import { max } from 'd3-array';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
-import { Graphics, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { Graphics, groupD8, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
 import {
@@ -502,7 +502,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private getSymbolTexture(symbolKey: string, diameter: number): Texture {
-    return new Texture(this.textureSymbolCacheArray[symbolKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, 2);
+    return new Texture(this.textureSymbolCacheArray[symbolKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, groupD8.MAIN_DIAGONAL);
   }
 
   private drawHoleSize = (holeObject: HoleSize): void => {
