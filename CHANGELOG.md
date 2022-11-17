@@ -2,6 +2,11 @@
 
 ## TO BE RELEASED
 
+## v3.0.0-beta.3
+
+### Changes
+- Fix regression bug on symbol textures where images weren't flipped diagonally
+
 ## v3.0.0-beta.2
 
 ### Breaking Changes
