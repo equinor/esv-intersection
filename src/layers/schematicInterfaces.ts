@@ -312,8 +312,10 @@ export interface PerforationOptions {
   yellow: string;
   grey: string;
   red: string;
+  outline: string;
   transparent: string;
   spikeWidth: number;
+  spikeLength: number;
   packingOpacity: number;
   fracLineLength: number;
   fracLineHalfWidth: number;
@@ -325,8 +327,10 @@ export const defaultPerforationOptions: PerforationOptions = {
   yellow: '#FFFC00',
   grey: 'gray',
   red: '#FF5050',
+  outline: 'black',
   transparent: 'rgba(255, 255, 255, 0)',
   spikeWidth: 25,
+  spikeLength: 50,
   packingOpacity: 0.5,
   fracLineHalfWidth: 10,
   fracLineLength: 25,
