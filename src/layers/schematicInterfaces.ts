@@ -31,7 +31,7 @@ export interface Casing {
   end: number;
   hasShoe: boolean;
   innerDiameter: number;
-  windows: CasingWindow[];
+  windows?: CasingWindow[];
 }
 
 interface SymbolComponent {

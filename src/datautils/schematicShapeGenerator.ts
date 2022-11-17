@@ -509,11 +509,12 @@ const createCasingInterval = (start: number, end: number): CasingInterval => ({ 
 const createCasingWindowInterval = (start: number, end: number): CasingInterval => ({ kind: 'casing-window', start, end });
 
 export const getCasingIntervalsWithWindows = (casing: Casing): CasingInterval[] => {
-  if (!casing.windows.length) {
+  const casingWindows = casing.windows ?? [];
+  if (!casingWindows.length) {
     return [createCasingInterval(casing.start, casing.end)];
   }
 
-  const result = casing.windows.reduce<{ intervals: CasingInterval[]; lastBottom: number }>(
+  const result = casingWindows.reduce<{ intervals: CasingInterval[]; lastBottom: number }>(
     ({ intervals, lastBottom }, currentWindow: CasingWindow, index: number, list: CasingWindow[]) => {
       const startCasingInterval: CasingInterval | null =
         // last bottom before current start?
