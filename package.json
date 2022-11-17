@@ -64,6 +64,7 @@
     "jest-environment-jsdom": "^29.0.3",
     "mock-raf": "^1.0.1",
     "pixi.js": "^6.5.8",
+    "pixi-dashed-line": "^1.4.2",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.79.0",
@@ -92,7 +93,8 @@
     ]
   },
   "peerDependencies": {
-    "pixi.js": "^6.5.8"
+    "pixi.js": "^6.5.8",
+    "pixi-dashed-line": "^1.4.2"
   },
   "dependencies": {
     "@equinor/videx-math": "^1.1.0",
@@ -103,7 +105,6 @@
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
     "d3-shape": "^3.1.0",
-    "d3-zoom": "^3.0.0",
-    "pixi-dashed-line": "^1.4.2"
+    "d3-zoom": "^3.0.0"
   }
 }
