@@ -43,6 +43,7 @@ import {
   PerforationOptions,
   defaultPerforationOptions,
   Completion,
+  OutlineClosure,
 } from './schematicInterfaces';
 import {
   CasingRenderObject,
@@ -284,10 +285,17 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
    * @param rightPath Points for line on right side
    * @param lineColor Color of line
    * @param lineWidth Width of line
-   * @param close If line should close in top and bottom to form a loop
+   * @param outlineClosure If line should be drawn at top and/or bottom of the paths
    * @param lineAlignment alignment of the line to draw, (0 = inner, 0.5 = middle, 1 = outer).
    */
-  protected drawOutline(leftPath: Point[], rightPath: Point[], lineColor: number, lineWidth = 1, close: boolean = false, lineAlignment = 1): void {
+  protected drawOutline(
+    leftPath: Point[],
+    rightPath: Point[],
+    lineColor: number,
+    lineWidth = 1,
+    outlineClosure: OutlineClosure = 'None',
+    lineAlignment = 1,
+  ): void {
     const leftPathReverse = leftPath.map<Point>((d) => d.clone()).reverse();
 
     const startPointRight = rightPath[0];
@@ -298,13 +306,13 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     line.moveTo(startPointRight.x, startPointRight.y);
     rightPath.forEach((p: Point) => line.lineTo(p.x, p.y));
 
-    if (!close) {
+    if (outlineClosure === 'None' || outlineClosure === 'Top') {
       line.moveTo(startPointLeft.x, startPointLeft.y);
     }
 
     leftPathReverse.forEach((p: Point) => line.lineTo(p.x, p.y));
 
-    if (close) {
+    if (outlineClosure === 'TopAndBottom' || outlineClosure === 'Top') {
       line.lineTo(startPointRight.x, startPointRight.y);
     }
 
@@ -364,13 +372,14 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
     const shouldStartAtCasingDiameter = getPerforationsThatSTartAtCasingDiameter(perforations);
 
-    this.internalLayerVisibility.perforationLayerId &&
+    if (this.internalLayerVisibility.perforationLayerId) {
       shouldStartAtHoleDiameter.forEach((perforation) => {
         const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
         const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
         this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
       });
+    }
 
     this.updateSymbolCache(symbols);
 
@@ -381,9 +390,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
 
     casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
-    const casingRenderObjects: CasingRenderObject[] = casings.map((casing: Casing) => {
-      return this.createCasingRenderObject(casing);
-    });
+    const casingRenderObjects: CasingRenderObject[] = casings.map((casing: Casing) => this.createCasingRenderObject(casing));
 
     const cementShapes: CementRenderObject[] = cements.map(
       (cement: Cement): CementRenderObject => ({
@@ -506,7 +513,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       { rightPath: [], leftPath: [] },
     );
     // eslint-disable-next-line no-magic-numbers
-    this.drawOutline(leftPath, rightPath, convertColor('black'), 0.25, true);
+    this.drawOutline(leftPath, rightPath, convertColor('black'), 0.25, 'TopAndBottom');
   }
 
   private createCasingRenderObject(casing: Casing): CasingRenderObject {
@@ -582,7 +589,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       this.drawHoleRope(pathPoints, texture, maxHoleDiameter);
     }
 
-    this.drawOutline(leftPath, rightPath, convertColor(holeOptions.lineColor), HOLE_OUTLINE * exaggerationFactor, false, 0);
+    this.drawOutline(leftPath, rightPath, convertColor(holeOptions.lineColor), HOLE_OUTLINE * exaggerationFactor, 'TopAndBottom', 0);
   };
 
   private drawHoleRope(path: Point[], texture: Texture, maxHoleDiameter: number): void {
@@ -668,12 +675,27 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.addChild(rope);
   }
 
+  private static getOutlineClosureType = (index: number, maxIndex: number): OutlineClosure => {
+    if (index === 0) {
+      if (index === maxIndex) {
+        return 'TopAndBottom';
+      }
+      return 'Top';
+    }
+    if (index === maxIndex) {
+      return 'Bottom';
+    }
+
+    return 'None';
+  };
+
   private drawCasing = (casingRenderObject: CasingRenderObject): void => {
     const { casingOptions } = this.options as SchematicLayerOptions<T>;
     const casingSolidColorNumber = convertColor(casingOptions.solidColor);
     const casingLineColorNumber = convertColor(casingOptions.lineColor);
 
-    casingRenderObject.sections.forEach((section) => {
+    casingRenderObject.sections.forEach((section, index, list) => {
+      const outlineClosureType = SchematicLayer.getOutlineClosureType(index, list.length - 1);
       // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
       if (this.renderType() === RENDERER_TYPE.CANVAS) {
         this.drawBigPolygon(section.polygon, casingSolidColorNumber);
@@ -684,7 +706,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       if (section.kind === 'casing-window') {
         this.drawCasingWindowOutline(section.leftPath, section.rightPath, casingOptions, casingRenderObject.casingWallWidth);
       } else {
-        this.drawOutline(section.leftPath, section.rightPath, casingLineColorNumber, casingRenderObject.casingWallWidth, false);
+        this.drawOutline(section.leftPath, section.rightPath, casingLineColorNumber, casingRenderObject.casingWallWidth, outlineClosureType);
       }
     });
   };
@@ -766,7 +788,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     } else {
       this.drawCompletionRope(pathPoints, texture, exaggeratedDiameter);
     }
-    this.drawOutline(leftPath, rightPath, convertColor(screenOptions.lineColor), SCREEN_OUTLINE * exaggerationFactor, false);
+    this.drawOutline(leftPath, rightPath, convertColor(screenOptions.lineColor), SCREEN_OUTLINE * exaggerationFactor, 'TopAndBottom');
   }
 
   private drawTubing({ diameter, start, end }: Tubing): void {

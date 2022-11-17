@@ -4,6 +4,11 @@ export function assertNever(x: never): never {
   throw new Error(`Unexpected object: ${JSON.stringify(x)}`);
 }
 
+/**
+ * The closure type of the outline
+ */
+export type OutlineClosure = 'None' | 'TopAndBottom' | 'Top' | 'Bottom';
+
 export interface HoleSize {
   kind: 'hole';
   id: string;
