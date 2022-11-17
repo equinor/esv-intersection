@@ -1,5 +1,5 @@
 /* eslint-disable no-magic-numbers */
-import { Casing, Completion, HoleSize } from '../src';
+import { Casing, CasingWindow, Completion, HoleSize } from '../src';
 import * as SchematicShapeGenerator from '../src/datautils/schematicShapeGenerator';
 import * as TestHelpers from './test-helpers';
 
@@ -111,7 +111,7 @@ describe('findCementPlugInnerDiameterAtDepth', () => {
     const attached: (Casing | Completion)[] = [];
     const nonAttached: (Casing | Completion)[] = [
       TestHelpers.createTubing(500, 1500, 7),
-      TestHelpers.createCasing(50, 1900, { innerDiameter: 10, outerDiameter: 12 }),
+      TestHelpers.createCasing(50, 1900, { diameters: { innerDiameter: 10, outerDiameter: 12 } }),
     ];
     const holes: HoleSize[] = [TestHelpers.createHole(100, 2000)];
 
@@ -120,8 +120,11 @@ describe('findCementPlugInnerDiameterAtDepth', () => {
 
   it('should flow to equal or greater diameter outside attached range', () => {
     const depth = 1100;
-    const attached = [TestHelpers.createCasing(500, 1000, { innerDiameter: 7, outerDiameter: 8 })];
-    const nonAttached = [TestHelpers.createTubing(1000, 1500, 5), TestHelpers.createCasing(500, 1500, { innerDiameter: 10, outerDiameter: 11 })];
+    const attached = [TestHelpers.createCasing(500, 1000, { diameters: { innerDiameter: 7, outerDiameter: 8 } })];
+    const nonAttached = [
+      TestHelpers.createTubing(1000, 1500, 5),
+      TestHelpers.createCasing(500, 1500, { diameters: { innerDiameter: 10, outerDiameter: 11 } }),
+    ];
     const holes = [TestHelpers.createHole(100, 2000)];
 
     expect(SchematicShapeGenerator.findCementPlugInnerDiameterAtDepth(attached, nonAttached, holes, depth)).not.toBe(5); // Tubing
@@ -130,8 +133,11 @@ describe('findCementPlugInnerDiameterAtDepth', () => {
 
   it('should flow to extreme diameter if depth is out of range', () => {
     const depth = 9000;
-    const attached = [TestHelpers.createCasing(500, 1000, { innerDiameter: 7, outerDiameter: 8 })];
-    const nonAttached = [TestHelpers.createTubing(1000, 1500, 5), TestHelpers.createCasing(500, 1500, { innerDiameter: 10, outerDiameter: 11 })];
+    const attached = [TestHelpers.createCasing(500, 1000, { diameters: { innerDiameter: 7, outerDiameter: 8 } })];
+    const nonAttached = [
+      TestHelpers.createTubing(1000, 1500, 5),
+      TestHelpers.createCasing(500, 1500, { diameters: { innerDiameter: 10, outerDiameter: 11 } }),
+    ];
     const holes = [TestHelpers.createHole(100, 2000)];
 
     expect(SchematicShapeGenerator.findCementPlugInnerDiameterAtDepth(attached, nonAttached, holes, depth)).toBe(100);
@@ -155,8 +161,8 @@ describe('findCementOuterDiameterAtDepth', () => {
   it('should prefer smallest string outer diameter for given depth, if nothing is attached', () => {
     const depth = 1000;
     const nonAttached: (Casing | Completion)[] = [
-      TestHelpers.createCasing(100, 1500, { innerDiameter: 8, outerDiameter: 9 }),
-      TestHelpers.createCasing(100, 1500, { innerDiameter: 13, outerDiameter: 14 }),
+      TestHelpers.createCasing(100, 1500, { diameters: { innerDiameter: 8, outerDiameter: 9 } }),
+      TestHelpers.createCasing(100, 1500, { diameters: { innerDiameter: 13, outerDiameter: 14 } }),
     ];
     const holes: HoleSize[] = [TestHelpers.createHole(100, 2000, 30)];
 
@@ -165,10 +171,10 @@ describe('findCementOuterDiameterAtDepth', () => {
 
   it('should prefer outer string diameter for given depth greater than attached', () => {
     const depth = 1000;
-    const attached: (Casing | Completion)[] = [TestHelpers.createCasing(100, 1500, { innerDiameter: 10, outerDiameter: 11 })];
+    const attached: (Casing | Completion)[] = [TestHelpers.createCasing(100, 1500, { diameters: { innerDiameter: 10, outerDiameter: 11 } })];
     const nonAttached: (Casing | Completion)[] = [
-      TestHelpers.createCasing(100, 1500, { innerDiameter: 8, outerDiameter: 9 }),
-      TestHelpers.createCasing(100, 1500, { innerDiameter: 13, outerDiameter: 14 }),
+      TestHelpers.createCasing(100, 1500, { diameters: { innerDiameter: 8, outerDiameter: 9 } }),
+      TestHelpers.createCasing(100, 1500, { diameters: { innerDiameter: 13, outerDiameter: 14 } }),
     ];
     const holes: HoleSize[] = [TestHelpers.createHole(100, 2000, 30)];
 
@@ -177,13 +183,76 @@ describe('findCementOuterDiameterAtDepth', () => {
 
   it('should prefer extreme diameter for given depth out of range', () => {
     const depth = 9000;
-    const attached: (Casing | Completion)[] = [TestHelpers.createCasing(100, 1500, { innerDiameter: 10, outerDiameter: 11 })];
+    const attached: (Casing | Completion)[] = [TestHelpers.createCasing(100, 1500, { diameters: { innerDiameter: 10, outerDiameter: 11 } })];
     const nonAttached: (Casing | Completion)[] = [
-      TestHelpers.createCasing(100, 1500, { innerDiameter: 8, outerDiameter: 9 }),
-      TestHelpers.createCasing(100, 1500, { innerDiameter: 13, outerDiameter: 14 }),
+      TestHelpers.createCasing(100, 1500, { diameters: { innerDiameter: 8, outerDiameter: 9 } }),
+      TestHelpers.createCasing(100, 1500, { diameters: { innerDiameter: 13, outerDiameter: 14 } }),
     ];
     const holes: HoleSize[] = [TestHelpers.createHole(100, 2000, 30)];
 
     expect(SchematicShapeGenerator.findCementOuterDiameterAtDepth(attached, nonAttached, holes, depth)).toBe(100);
+  });
+});
+
+describe('getCasingIntervalsWithWindows()', () => {
+  it('should return one interval if there is no casing windows', () => {
+    const casing: Casing = TestHelpers.createCasing(100, 1500);
+
+    const expectedIntervals = [{ kind: 'casing', start: casing.start, end: casing.end }];
+
+    expect(SchematicShapeGenerator.getCasingIntervalsWithWindows(casing)).toStrictEqual(expectedIntervals);
+  });
+
+  it('should return one clamped interval of casing-window if the attached window overlaps the casing', () => {
+    const [casingStart, casingEnd] = [100, 1500];
+
+    const window: CasingWindow = { id: TestHelpers.generateId('casing-window'), start: casingStart - 50, end: casingEnd + 50 };
+    const casing: Casing = TestHelpers.createCasing(casingStart, casingEnd, { windows: [window] });
+
+    const expectedIntervals = [{ kind: 'casing-window', start: casingStart, end: casingEnd }];
+
+    expect(SchematicShapeGenerator.getCasingIntervalsWithWindows(casing)).toStrictEqual(expectedIntervals);
+  });
+
+  it('should return one clamped interval if the attached window covers the casing', () => {
+    const [casingStart, casingEnd] = [100, 1500];
+
+    const window: CasingWindow = { id: TestHelpers.generateId('casing-window'), start: casingStart - 50, end: casingEnd + 50 };
+    const casing: Casing = TestHelpers.createCasing(casingStart, casingEnd, { windows: [window] });
+
+    const expectedIntervals = [{ kind: 'casing-window', start: casingStart, end: casingEnd }];
+
+    expect(SchematicShapeGenerator.getCasingIntervalsWithWindows(casing)).toStrictEqual(expectedIntervals);
+  });
+
+  it('should return two casing and one window interval for one window within casing range', () => {
+    const [casingStart, casingEnd] = [100, 1500];
+
+    const window: CasingWindow = { id: TestHelpers.generateId('casing-window'), start: casingStart + 50, end: casingEnd - 50 };
+    const casing: Casing = TestHelpers.createCasing(casingStart, casingEnd, { windows: [window] });
+
+    const expectedIntervals = [
+      { kind: 'casing', start: casing.start, end: window.start },
+      { kind: 'casing-window', start: window.start, end: window.end },
+      { kind: 'casing', start: window.end, end: casing.end },
+    ];
+
+    expect(SchematicShapeGenerator.getCasingIntervalsWithWindows(casing)).toStrictEqual(expectedIntervals);
+  });
+
+  it('should return one casing and two window interval for tow windows overlapping top/bottom of casing', () => {
+    const [casingStart, casingEnd] = [100, 1500];
+
+    const firstWindow: CasingWindow = TestHelpers.createCasingWindow(casingStart - 100, casingStart + 50);
+    const secondWindow: CasingWindow = TestHelpers.createCasingWindow(casingEnd - 50, casingEnd + 100);
+    const casing: Casing = TestHelpers.createCasing(casingStart, casingEnd, { windows: [firstWindow, secondWindow] });
+
+    const expectedIntervals = [
+      { kind: 'casing-window', start: casingStart, end: casingStart + 50 },
+      { kind: 'casing', start: casingStart + 50, end: casingEnd - 50 },
+      { kind: 'casing-window', start: casingEnd - 50, end: casingEnd },
+    ];
+
+    expect(SchematicShapeGenerator.getCasingIntervalsWithWindows(casing)).toStrictEqual(expectedIntervals);
   });
 });

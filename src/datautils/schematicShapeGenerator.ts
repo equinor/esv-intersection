@@ -2,6 +2,7 @@ import { IPoint, Point, Texture, WRAP_MODES } from 'pixi.js';
 import { DEFAULT_TEXTURE_SIZE } from '../constants';
 import {
   Casing,
+  CasingWindow,
   Cement,
   CementOptions,
   CementPlug,
@@ -28,21 +29,26 @@ import { createNormals, offsetPoints } from '../utils/vectorUtils';
 export type PerforationShape = ComplexRopeSegment;
 
 export interface TubularRenderingObject {
-  id: string;
   leftPath: Point[];
   rightPath: Point[];
-  referenceDiameter: number;
-  referenceRadius: number;
 }
 
-export interface CasingRenderObject extends TubularRenderingObject {
+export interface CasingRenderObject {
+  id: string;
   kind: 'casing';
-  pathPoints: number[][];
-  polygon: Point[];
+  referenceDiameter: number;
+  referenceRadius: number;
   casingWallWidth: number;
   hasShoe: boolean;
   bottom: number;
   zIndex?: number;
+  sections: {
+    kind: 'casing' | 'casing-window';
+    leftPath: Point[];
+    rightPath: Point[];
+    pathPoints: Point[];
+    polygon: IPoint[];
+  }[];
 }
 
 export const getEndLines = (
@@ -179,7 +185,7 @@ export const createComplexRopeSegmentsForCement = (
   completion: Completion[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number) => [number, number][],
+  getPoints: (start: number, end: number) => Point[],
 ): ComplexRopeSegment[] => {
   const { attachedStrings, nonAttachedStrings } = splitByReferencedStrings(cement.referenceIds, casings, completion);
 
@@ -210,15 +216,10 @@ export const createComplexRopeSegmentsForCement = (
     return [{ top: depth, bottom: nextDepth, diameter: diameterAtChangeDepth * exaggerationFactor }];
   });
 
-  const ropeSegments = diameterIntervals.map((interval) => {
-    const segmentPoints = getPoints(interval.top, interval.bottom);
-    const points = segmentPoints.map(([x, y]) => new Point(x, y));
-
-    return {
-      diameter: interval.diameter,
-      points,
-    };
-  });
+  const ropeSegments = diameterIntervals.map((interval) => ({
+    diameter: interval.diameter,
+    points: getPoints(interval.top, interval.bottom),
+  }));
 
   return ropeSegments;
 };
@@ -264,7 +265,7 @@ export const createComplexRopeSegmentsForCementSqueeze = (
   completion: Completion[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number) => [number, number][],
+  getPoints: (start: number, end: number) => Point[],
 ): ComplexRopeSegment[] => {
   const { attachedStrings, nonAttachedStrings } = splitByReferencedStrings(squeeze.referenceIds, casings, completion);
 
@@ -293,15 +294,10 @@ export const createComplexRopeSegmentsForCementSqueeze = (
     return [{ top: depth, bottom: nextDepth, diameter: diameterAtDepth * exaggerationFactor }];
   });
 
-  const ropeSegments = diameterIntervals.map((interval) => {
-    const segmentPoints = getPoints(interval.top, interval.bottom);
-    const points = segmentPoints.map(([x, y]) => new Point(x, y));
-
-    return {
-      diameter: interval.diameter,
-      points,
-    };
-  });
+  const ropeSegments = diameterIntervals.map((interval) => ({
+    diameter: interval.diameter,
+    points: getPoints(interval.top, interval.bottom),
+  }));
 
   return ropeSegments;
 };
@@ -312,7 +308,7 @@ export const createComplexRopeSegmentsForCementPlug = (
   completion: Completion[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number) => [number, number][],
+  getPoints: (start: number, end: number) => Point[],
 ): ComplexRopeSegment[] => {
   const { attachedStrings, nonAttachedStrings } = splitByReferencedStrings(plug.referenceIds, casings, completion);
 
@@ -335,15 +331,10 @@ export const createComplexRopeSegmentsForCementPlug = (
     return [{ top: depth, bottom: nextDepth, diameter: diameterAtDepth * exaggerationFactor }];
   });
 
-  const ropeSegments = diameterIntervals.map((interval) => {
-    const mdPoints = getPoints(interval.top, interval.bottom);
-    const points = mdPoints.map(([x, y]) => new Point(x, y));
-
-    return {
-      diameter: interval.diameter,
-      points,
-    };
-  });
+  const ropeSegments = diameterIntervals.map((interval) => ({
+    diameter: interval.diameter,
+    points: getPoints(interval.top, interval.bottom),
+  }));
 
   return ropeSegments;
 };
@@ -500,31 +491,84 @@ export const createCementSqueezeTexture = ({ firstColor, secondColor, scalingFac
   return Texture.from(canvas);
 };
 
-export const createTubularRenderingObject = (id: string, diameter: number, pathPoints: [number, number][]): TubularRenderingObject => {
-  const radius = diameter / 2;
-
+export const createTubularRenderingObject = (radius: number, pathPoints: IPoint[]): TubularRenderingObject => {
   const normals = createNormals(pathPoints);
   const rightPath = offsetPoints(pathPoints, normals, radius);
   const leftPath = offsetPoints(pathPoints, normals, -radius);
 
-  return { id, leftPath, rightPath, referenceDiameter: diameter, referenceRadius: radius };
+  return { leftPath, rightPath };
 };
 
-export const prepareCasingRenderObject = (exaggerationFactor: number, casing: Casing, pathPoints: [number, number][]): CasingRenderObject => {
+export type CasingInterval = {
+  kind: 'casing' | 'casing-window';
+  start: number;
+  end: number;
+};
+
+const createCasingInterval = (start: number, end: number): CasingInterval => ({ kind: 'casing', start, end });
+const createCasingWindowInterval = (start: number, end: number): CasingInterval => ({ kind: 'casing-window', start, end });
+
+export const getCasingIntervalsWithWindows = (casing: Casing): CasingInterval[] => {
+  const casingWindows = casing.windows ?? [];
+  if (!casingWindows.length) {
+    return [createCasingInterval(casing.start, casing.end)];
+  }
+
+  const result = casingWindows.reduce<{ intervals: CasingInterval[]; lastBottom: number }>(
+    ({ intervals, lastBottom }, currentWindow: CasingWindow, index: number, list: CasingWindow[]) => {
+      const startCasingInterval: CasingInterval | null =
+        // last bottom before current start?
+        lastBottom < currentWindow.start ? createCasingInterval(lastBottom, currentWindow.start) : null;
+
+      const updatedLastBottom = startCasingInterval ? startCasingInterval.end : lastBottom;
+
+      const windowStart = Math.max(updatedLastBottom, currentWindow.start);
+      const windowEnd = Math.min(casing.end, currentWindow.end);
+      const windowInterval: CasingInterval = createCasingWindowInterval(windowStart, windowEnd);
+
+      const nextLastBottom = windowEnd;
+
+      const isLastWindow = index === list.length - 1;
+      const endCasingInterval: CasingInterval | null =
+        isLastWindow &&
+        // still room for a casing interval?
+        nextLastBottom < casing.end
+          ? createCasingInterval(nextLastBottom, casing.end)
+          : null;
+
+      const newIntervals: CasingInterval[] = [startCasingInterval, windowInterval, endCasingInterval].filter((i) => i);
+
+      return { intervals: [...intervals, ...newIntervals], lastBottom: nextLastBottom };
+    },
+    { intervals: [], lastBottom: casing.start },
+  );
+
+  return result.intervals;
+};
+
+export const prepareCasingRenderObject = (
+  exaggerationFactor: number,
+  casing: Casing,
+  getPathPoints: (start: number, end: number) => Point[],
+): CasingRenderObject => {
   const exaggeratedDiameter = casing.diameter * exaggerationFactor;
+  const exaggeratedRadius = exaggeratedDiameter / 2;
   const exaggeratedInnerDiameter = casing.innerDiameter * exaggerationFactor;
   const exaggeratedInnerRadius = exaggeratedInnerDiameter / 2;
-  const renderObject = createTubularRenderingObject(casing.id, exaggeratedDiameter, pathPoints);
+  const casingWallWidth = exaggeratedRadius - exaggeratedInnerRadius;
 
-  const casingWallWidth = renderObject.referenceRadius - exaggeratedInnerRadius;
-
-  const polygon = makeTubularPolygon(renderObject.leftPath, renderObject.rightPath);
+  const sections = getCasingIntervalsWithWindows(casing).map((casingInterval: CasingInterval) => {
+    const pathPoints = getPathPoints(casingInterval.start, casingInterval.end);
+    const { leftPath, rightPath } = createTubularRenderingObject(exaggeratedRadius, pathPoints);
+    return { kind: casingInterval.kind, leftPath, rightPath, pathPoints, polygon: makeTubularPolygon(leftPath, rightPath) };
+  });
 
   return {
-    ...renderObject,
     kind: 'casing',
-    pathPoints,
-    polygon,
+    id: casing.id,
+    referenceDiameter: exaggeratedDiameter,
+    referenceRadius: exaggeratedRadius,
+    sections,
     casingWallWidth,
     hasShoe: casing.hasShoe,
     bottom: casing.end,
@@ -536,7 +580,7 @@ export const createComplexRopeSegmentsForPerforation = (
   casings: Casing[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  getPoints: (start: number, end: number) => [number, number][],
+  getPoints: (start: number, end: number) => Point[],
 ): ComplexRopeSegment[] => {
   const attachedCasings = perforation.referenceIds.map((referenceId: string) => casings.find((casing) => casing.id === referenceId));
   if (attachedCasings.length === 0 || attachedCasings.includes(undefined)) {
@@ -565,8 +609,7 @@ export const createComplexRopeSegmentsForPerforation = (
   });
 
   const ropeSegments = diameterIntervals.map((interval) => {
-    const mdPoints = getPoints(interval.top, interval.bottom);
-    const points = mdPoints.map((mdPoint) => new Point(mdPoint[0], mdPoint[1]));
+    const points = getPoints(interval.top, interval.bottom);
 
     const diameter =
       getPerforationsThatStartAtHoleDiameter([perforation]).length === 1 || isOpenHoleFracPack(perforation)

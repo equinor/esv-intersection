@@ -1,6 +1,7 @@
 import { max } from 'd3-array';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
 import { Graphics, groupD8, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { DashLine } from 'pixi-dashed-line';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
 import {
@@ -42,6 +43,7 @@ import {
   PerforationOptions,
   defaultPerforationOptions,
   Completion,
+  OutlineClosure,
 } from './schematicInterfaces';
 import {
   CasingRenderObject,
@@ -75,7 +77,7 @@ interface ScalingFactors {
 }
 
 interface SymbolRenderObject {
-  pathPoints: number[][];
+  pathPoints: Point[];
   referenceDiameter: number;
   symbolKey: string;
 }
@@ -156,8 +158,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   private screenTextureCache: Texture;
   private tubingTextureCache: Texture;
   private textureSymbolCacheArray: { [key: string]: Texture };
-
-  private maxHoleDiameter: number;
 
   protected scalingFactors: ScalingFactors = {
     height: 600,
@@ -245,14 +245,14 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return Math.abs(this.scalingFactors.height / (baseDomain[1] - baseDomain[0]));
   }
 
-  protected getZFactorScaledPathForPoints = (start: number, end: number): [number, number][] => {
+  protected getZFactorScaledPathForPoints = (start: number, end: number): Point[] => {
     const y = (y: number): number => y * this.scalingFactors.zFactor;
 
     const path = this.referenceSystem.getCurtainPath(start, end, true);
-    return path.map((p) => [p.point[0], y(p.point[1])]);
+    return path.map((p) => new Point(p.point[0], y(p.point[1])));
   };
 
-  protected drawBigPolygon = (coords: Point[], color = 0x000000) => {
+  protected drawBigPolygon = (coords: IPoint[], color = 0x000000) => {
     const polygon = new Graphics();
     polygon.beginFill(color);
     polygon.drawPolygon(coords);
@@ -285,10 +285,17 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
    * @param rightPath Points for line on right side
    * @param lineColor Color of line
    * @param lineWidth Width of line
-   * @param close If line should close in top and bottom to form a loop
+   * @param outlineClosure If line should be drawn at top and/or bottom of the paths
    * @param lineAlignment alignment of the line to draw, (0 = inner, 0.5 = middle, 1 = outer).
    */
-  protected drawOutline(leftPath: Point[], rightPath: Point[], lineColor: number, lineWidth = 1, close: boolean = false, lineAlignment = 1): void {
+  protected drawOutline(
+    leftPath: Point[],
+    rightPath: Point[],
+    lineColor: number,
+    lineWidth = 1,
+    outlineClosure: OutlineClosure = 'None',
+    lineAlignment = 1,
+  ): void {
     const leftPathReverse = leftPath.map<Point>((d) => d.clone()).reverse();
 
     const startPointRight = rightPath[0];
@@ -299,17 +306,58 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     line.moveTo(startPointRight.x, startPointRight.y);
     rightPath.forEach((p: Point) => line.lineTo(p.x, p.y));
 
-    if (!close) {
+    if (outlineClosure === 'None' || outlineClosure === 'Top') {
       line.moveTo(startPointLeft.x, startPointLeft.y);
     }
 
     leftPathReverse.forEach((p: Point) => line.lineTo(p.x, p.y));
 
-    if (close) {
+    if (outlineClosure === 'TopAndBottom' || outlineClosure === 'Top') {
       line.lineTo(startPointRight.x, startPointRight.y);
     }
 
     this.addChild(line);
+  }
+
+  /**
+   * Uses a dashed outline on one side to represent casing window
+   * The casing window should be visualized at the upper side of the wellbore path
+   * @param leftPath Points for line on left side
+   * @param pointPath Points for line on right side
+   * @param lineColor Color of line
+   * @param lineWidth Width of line
+   * @param lineAlignment alignment of the line to draw, (0 = inner, 0.5 = middle, 1 = outer).
+   */
+  protected drawCasingWindowOutline(
+    leftPath: Point[],
+    rightPath: Point[],
+    { lineColor, windowOptions }: CasingOptions,
+    lineWidth = 1,
+    lineAlignment = 0,
+  ): void {
+    const rightPathReverse = rightPath.map<Point>((d) => d.clone()).reverse();
+
+    const startPointRight = rightPathReverse[0];
+
+    const graphics = new Graphics();
+    graphics.lineStyle(lineWidth, convertColor(lineColor), undefined, lineAlignment);
+    graphics.moveTo(startPointRight.x, startPointRight.y);
+    rightPathReverse.forEach((p: Point) => graphics.lineTo(p.x, p.y));
+
+    const dashedLine = new DashLine(graphics, {
+      dash: [windowOptions.dashLength, windowOptions.spaceLength], // eslint-disable-line no-magic-numbers
+      width: lineWidth,
+      color: convertColor(windowOptions.dashColor),
+      alignment: lineAlignment,
+    });
+
+    const startPointLeft = leftPath[0];
+    dashedLine.moveTo(startPointLeft.x, startPointLeft.y);
+    leftPath.forEach((currentPoint: Point) => {
+      dashedLine.lineTo(currentPoint.x, currentPoint.y);
+    });
+
+    this.addChild(graphics);
   }
 
   public preRender(): void {
@@ -324,24 +372,25 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
     const shouldStartAtCasingDiameter = getPerforationsThatSTartAtCasingDiameter(perforations);
 
-    this.internalLayerVisibility.perforationLayerId &&
+    if (this.internalLayerVisibility.perforationLayerId) {
       shouldStartAtHoleDiameter.forEach((perforation) => {
         const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
         const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
         this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
       });
+    }
 
     this.updateSymbolCache(symbols);
 
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter);
-    this.maxHoleDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) * exaggerationFactor : EXAGGERATED_DIAMETER * exaggerationFactor;
-    this.internalLayerVisibility.holeLayerId && holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(hole));
+    const maxHoleDiameter = holeSizes.length > 0 ? max(holeSizes, (d) => d.diameter) * exaggerationFactor : EXAGGERATED_DIAMETER * exaggerationFactor;
+    if (this.internalLayerVisibility.holeLayerId) {
+      holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(maxHoleDiameter, hole));
+    }
 
     casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
-    const casingRenderObjects: CasingRenderObject[] = casings.map((casing: Casing) =>
-      prepareCasingRenderObject(exaggerationFactor, casing, this.getZFactorScaledPathForPoints(casing.start, casing.end)),
-    );
+    const casingRenderObjects: CasingRenderObject[] = casings.map((casing: Casing) => this.createCasingRenderObject(casing));
 
     const cementShapes: CementRenderObject[] = cements.map(
       (cement: Cement): CementRenderObject => ({
@@ -368,17 +417,26 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         (casingRO: CasingRenderObject) => {
           if (this.internalLayerVisibility.casingLayerId) {
             this.drawCasing(casingRO);
-            casingRO.hasShoe && this.drawShoe(casingRO.bottom, casingRO.referenceRadius);
+
+            if (casingRO.hasShoe) {
+              this.drawShoe(casingRO.bottom, casingRO.referenceRadius);
+            }
           }
         },
-        (cementRO: CementRenderObject) =>
-          this.internalLayerVisibility.cementLayerId && this.drawComplexRope(cementRO.segments, this.getCementTexture()),
-        (cementSqueezesRO: CementSqueezeRenderObject) =>
-          this.internalLayerVisibility.pAndALayerId && this.drawComplexRope(cementSqueezesRO.segments, this.getCementSqueezeTexture()),
+        (cementRO: CementRenderObject) => {
+          if (this.internalLayerVisibility.cementLayerId) {
+            this.drawComplexRope(cementRO.segments, this.getCementTexture());
+          }
+        },
+        (cementSqueezesRO: CementSqueezeRenderObject) => {
+          if (this.internalLayerVisibility.pAndALayerId) {
+            this.drawComplexRope(cementSqueezesRO.segments, this.getCementSqueezeTexture());
+          }
+        },
       ),
     );
 
-    this.internalLayerVisibility.completionLayerId &&
+    if (this.internalLayerVisibility.completionLayerId) {
       completion.forEach(
         foldCompletion(
           (obj: Screen) => this.drawScreen(obj),
@@ -389,8 +447,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           },
         ),
       );
+    }
 
-    this.internalLayerVisibility.pAndALayerId &&
+    if (this.internalLayerVisibility.pAndALayerId) {
       remainingPAndA.forEach((obj) => {
         if (isPAndASymbol(obj)) {
           const symbolRenderObject = this.prepareSymbolRenderObject(obj);
@@ -400,8 +459,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           this.drawCementPlug(obj, casings, completion, holeSizes);
         }
       });
+    }
 
-    this.internalLayerVisibility.perforationLayerId &&
+    if (this.internalLayerVisibility.perforationLayerId) {
       shouldStartAtCasingDiameter.forEach((perforation) => {
         const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
@@ -409,6 +469,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
         this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
       });
+    }
   }
 
   private updateSymbolCache(symbols: { [key: string]: string }) {
@@ -440,10 +501,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     );
     this.drawComplexRope(cementPlugSegments, this.getCementPlugTexture(cementPlugOptions));
 
-    const { rightPath, leftPath } = cementPlugSegments.reduce(
+    const { rightPath, leftPath } = cementPlugSegments.reduce<{ rightPath: Point[]; leftPath: Point[] }>(
       (acc, current) => {
-        const pathPoints = current.points.map<[number, number]>((p: IPoint) => [p.x, p.y]);
-        const { leftPath, rightPath } = createTubularRenderingObject(cementPlug.id, current.diameter, pathPoints);
+        const { leftPath, rightPath } = createTubularRenderingObject(current.diameter / 2, current.points);
 
         return {
           rightPath: [...acc.rightPath, ...rightPath],
@@ -453,7 +513,12 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       { rightPath: [], leftPath: [] },
     );
     // eslint-disable-next-line no-magic-numbers
-    this.drawOutline(leftPath, rightPath, convertColor('black'), 0.25, true);
+    this.drawOutline(leftPath, rightPath, convertColor('black'), 0.25, 'TopAndBottom');
+  }
+
+  private createCasingRenderObject(casing: Casing): CasingRenderObject {
+    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+    return prepareCasingRenderObject(exaggerationFactor, casing, this.getZFactorScaledPathForPoints);
   }
 
   private getCementPlugTexture(cementPlugOptions: CementPlugOptions): Texture {
@@ -485,10 +550,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   private drawSymbolComponent = ({ pathPoints, referenceDiameter, symbolKey }: SymbolRenderObject): void => {
     const texture = this.getSymbolTexture(symbolKey, referenceDiameter);
     // The rope renders fine in CANVAS/fallback mode
-    this.drawSVGRope(
-      pathPoints.map((p) => new Point(p[0], p[1])),
-      texture,
-    );
+    this.drawSVGRope(pathPoints, texture);
   };
 
   private drawSVGRope(path: Point[], texture: Texture): void {
@@ -505,7 +567,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return new Texture(this.textureSymbolCacheArray[symbolKey].baseTexture, null, new Rectangle(0, 0, 0, diameter), null, groupD8.MAIN_DIAGONAL);
   }
 
-  private drawHoleSize = (holeObject: HoleSize): void => {
+  private drawHoleSize = (maxHoleDiameter: number, holeObject: HoleSize): void => {
     if (holeObject == null) {
       return;
     }
@@ -516,39 +578,36 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
 
     const { exaggerationFactor, holeOptions } = this.options as SchematicLayerOptions<T>;
-    const diameter = holeObject.diameter * exaggerationFactor;
-    const { rightPath, leftPath, referenceDiameter } = createTubularRenderingObject(holeObject.id, diameter, pathPoints);
+    const exaggeratedDiameter = holeObject.diameter * exaggerationFactor;
+    const { rightPath, leftPath } = createTubularRenderingObject(exaggeratedDiameter / 2, pathPoints);
 
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       const polygonCoords = makeTubularPolygon(leftPath, rightPath);
       this.drawBigPolygon(polygonCoords, convertColor(holeOptions.firstColor));
     } else {
-      const texture = this.getHoleTexture(holeOptions, referenceDiameter);
-      this.drawHoleRope(
-        pathPoints.map((p) => new Point(p[0], p[1])),
-        texture,
-      );
+      const texture = this.getHoleTexture(holeOptions, exaggeratedDiameter, maxHoleDiameter);
+      this.drawHoleRope(pathPoints, texture, maxHoleDiameter);
     }
 
-    this.drawOutline(leftPath, rightPath, convertColor(holeOptions.lineColor), HOLE_OUTLINE * exaggerationFactor, false, 0);
+    this.drawOutline(leftPath, rightPath, convertColor(holeOptions.lineColor), HOLE_OUTLINE * exaggerationFactor, 'TopAndBottom', 0);
   };
 
-  private drawHoleRope(path: Point[], texture: Texture): void {
+  private drawHoleRope(path: Point[], texture: Texture, maxHoleDiameter: number): void {
     if (path.length === 0) {
       return null;
     }
 
-    const rope: SimpleRope = new SimpleRope(texture, path, this.maxHoleDiameter / DEFAULT_TEXTURE_SIZE);
+    const rope: SimpleRope = new SimpleRope(texture, path, maxHoleDiameter / DEFAULT_TEXTURE_SIZE);
 
     this.addChild(rope);
   }
 
-  private getHoleTexture(holeOptions: HoleOptions, diameter: number): Texture {
+  private getHoleTexture(holeOptions: HoleOptions, diameter: number, maxHoleDiameter: number): Texture {
     const size = DEFAULT_TEXTURE_SIZE;
     const height = size;
     const width = size;
 
-    const textureDiameter = (diameter / this.maxHoleDiameter) * size;
+    const textureDiameter = (diameter / maxHoleDiameter) * size;
 
     if (!this.holeTextureCache) {
       this.holeTextureCache = createHoleBaseTexture(holeOptions, width, height);
@@ -616,24 +675,40 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.addChild(rope);
   }
 
-  private drawCasing = (casingRenderObject: CasingRenderObject): void => {
-    const { casingOptions } = this.options as SchematicLayerOptions<T>;
-    const { pathPoints, polygon, leftPath, rightPath, referenceDiameter, casingWallWidth } = casingRenderObject;
-    const casingSolidColorNumber = convertColor(casingOptions.solidColor);
-
-    // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
-    if (this.renderType() === RENDERER_TYPE.CANVAS) {
-      this.drawBigPolygon(polygon, casingSolidColorNumber);
-    } else {
-      const texture = this.createCasingTexture(referenceDiameter);
-      this.drawRope(
-        pathPoints.map((p) => new Point(p[0], p[1])),
-        texture,
-        casingSolidColorNumber,
-      );
+  private static getOutlineClosureType = (index: number, maxIndex: number): OutlineClosure => {
+    if (index === 0) {
+      if (index === maxIndex) {
+        return 'TopAndBottom';
+      }
+      return 'Top';
+    }
+    if (index === maxIndex) {
+      return 'Bottom';
     }
 
-    this.drawOutline(leftPath, rightPath, convertColor(casingOptions.lineColor), casingWallWidth, true);
+    return 'None';
+  };
+
+  private drawCasing = (casingRenderObject: CasingRenderObject): void => {
+    const { casingOptions } = this.options as SchematicLayerOptions<T>;
+    const casingSolidColorNumber = convertColor(casingOptions.solidColor);
+    const casingLineColorNumber = convertColor(casingOptions.lineColor);
+
+    casingRenderObject.sections.forEach((section, index, list) => {
+      const outlineClosureType = SchematicLayer.getOutlineClosureType(index, list.length - 1);
+      // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
+      if (this.renderType() === RENDERER_TYPE.CANVAS) {
+        this.drawBigPolygon(section.polygon, casingSolidColorNumber);
+      } else {
+        const texture = this.createCasingTexture(casingRenderObject.referenceDiameter);
+        this.drawRope(section.pathPoints, texture, casingSolidColorNumber);
+      }
+      if (section.kind === 'casing-window') {
+        this.drawCasingWindowOutline(section.leftPath, section.rightPath, casingOptions, casingRenderObject.casingWallWidth);
+      } else {
+        this.drawOutline(section.leftPath, section.rightPath, casingLineColorNumber, casingRenderObject.casingWallWidth, outlineClosureType);
+      }
+    });
   };
 
   private createCasingTexture(diameter: number): Texture {
@@ -699,44 +774,36 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return this.cementSqueezeTextureCache;
   }
 
-  private drawScreen({ id, start, end, diameter }: Screen): void {
+  private drawScreen({ start, end, diameter }: Screen): void {
     const { exaggerationFactor, screenOptions } = this.options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
-    const { leftPath, rightPath, referenceDiameter } = createTubularRenderingObject(id, exaggeratedDiameter, pathPoints);
+    const { leftPath, rightPath } = createTubularRenderingObject(exaggeratedDiameter / 2, pathPoints);
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
     const texture = this.getScreenTexture();
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigTexturedPolygon(polygon, texture);
     } else {
-      this.drawCompletionRope(
-        pathPoints.map((p) => new Point(p[0], p[1])),
-        texture,
-        referenceDiameter,
-      );
+      this.drawCompletionRope(pathPoints, texture, exaggeratedDiameter);
     }
-    this.drawOutline(leftPath, rightPath, convertColor(screenOptions.lineColor), SCREEN_OUTLINE * exaggerationFactor, false);
+    this.drawOutline(leftPath, rightPath, convertColor(screenOptions.lineColor), SCREEN_OUTLINE * exaggerationFactor, 'TopAndBottom');
   }
 
-  private drawTubing({ id, diameter, start, end }: Tubing): void {
+  private drawTubing({ diameter, start, end }: Tubing): void {
     const { exaggerationFactor, tubingOptions } = this.options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
-    const { leftPath, rightPath, referenceDiameter } = createTubularRenderingObject(id, exaggeratedDiameter, pathPoints);
+    const { leftPath, rightPath } = createTubularRenderingObject(exaggeratedDiameter / 2, pathPoints);
     const polygon = makeTubularPolygon(leftPath, rightPath);
 
     const texture = this.getTubingTexture(tubingOptions);
     if (this.renderType() === RENDERER_TYPE.CANVAS) {
       this.drawBigTexturedPolygon(polygon, texture);
     } else {
-      this.drawCompletionRope(
-        pathPoints.map((p) => new Point(p[0], p[1])),
-        texture,
-        referenceDiameter,
-      );
+      this.drawCompletionRope(pathPoints, texture, exaggeratedDiameter);
     }
   }
 
