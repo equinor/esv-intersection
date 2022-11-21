@@ -328,32 +328,29 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
    * @param lineWidth Width of line
    * @param lineAlignment alignment of the line to draw, (0 = inner, 0.5 = middle, 1 = outer).
    */
-  protected drawCasingWindowOutline(
-    leftPath: Point[],
-    rightPath: Point[],
-    { lineColor, windowOptions }: CasingOptions,
-    lineWidth = 1,
-    lineAlignment = 0,
-  ): void {
-    const rightPathReverse = rightPath.map<Point>((d) => d.clone()).reverse();
-
-    const startPointRight = rightPathReverse[0];
+  protected drawCasingWindowOutline(leftPath: Point[], rightPath: Point[], { lineColor, windowOptions }: CasingOptions, lineWidth = 1): void {
+    // Correct the dashed path. Should always be displayed on the upper side of the wellbore path.
+    const flippedPaths = !!this.referenceSystem?.options?.calculateDisplacementFromBottom;
+    const [linePath, dashedPath] = flippedPaths ? [leftPath, rightPath] : [rightPath, leftPath];
+    const [dashedAlignment, solidAlignment] = flippedPaths ? [1, 0] : [0, 1];
 
     const graphics = new Graphics();
-    graphics.lineStyle(lineWidth, convertColor(lineColor), undefined, lineAlignment);
-    graphics.moveTo(startPointRight.x, startPointRight.y);
-    rightPathReverse.forEach((p: Point) => graphics.lineTo(p.x, p.y));
+    graphics.lineStyle(lineWidth, convertColor(lineColor), undefined, solidAlignment);
+
+    const startPointLinePath = linePath[0];
+    graphics.moveTo(startPointLinePath.x, startPointLinePath.y);
+    linePath.forEach((p: Point) => graphics.lineTo(p.x, p.y));
 
     const dashedLine = new DashLine(graphics, {
-      dash: [windowOptions.dashLength, windowOptions.spaceLength], // eslint-disable-line no-magic-numbers
-      width: lineWidth,
+      dash: [windowOptions.dashLength, windowOptions.spaceLength],
       color: convertColor(windowOptions.dashColor),
-      alignment: lineAlignment,
+      width: lineWidth,
+      alignment: dashedAlignment,
     });
 
-    const startPointLeft = leftPath[0];
-    dashedLine.moveTo(startPointLeft.x, startPointLeft.y);
-    leftPath.forEach((currentPoint: Point) => {
+    const startPointDashedPath = dashedPath[0];
+    dashedLine.moveTo(startPointDashedPath.x, startPointDashedPath.y);
+    dashedPath.forEach((currentPoint: Point) => {
       dashedLine.lineTo(currentPoint.x, currentPoint.y);
     });
 
