@@ -70,6 +70,8 @@ export const makeTubularPolygon = (rightPath: Point[], leftPath: Point[]): Point
 
 export const overlaps = (top1: number, bottom1: number, top2: number, bottom2: number): boolean => top1 <= bottom2 && top2 <= bottom1;
 
+export const strictlyOverlaps = (top1: number, bottom1: number, top2: number, bottom2: number): boolean => top1 < bottom2 && top2 < bottom1;
+
 export const uniq = <T>(arr: T[]): T[] => Array.from<T>(new Set(arr));
 
 const findIntersectingItems = (
@@ -509,39 +511,40 @@ const createCasingInterval = (start: number, end: number): CasingInterval => ({ 
 const createCasingWindowInterval = (start: number, end: number): CasingInterval => ({ kind: 'casing-window', start, end });
 
 export const getCasingIntervalsWithWindows = (casing: Casing): CasingInterval[] => {
-  const casingWindows = casing.windows ?? [];
-  if (!casingWindows.length) {
+  const result = (casing.windows || [])
+    .filter((cw: CasingWindow) => strictlyOverlaps(casing.start, casing.end, cw.start, cw.end))
+    .reduce<{ intervals: CasingInterval[]; lastBottom: number }>(
+      ({ intervals, lastBottom }, currentWindow: CasingWindow, index: number, list: CasingWindow[]) => {
+        const startCasingInterval: CasingInterval | null =
+          // last bottom before current start?
+          lastBottom < currentWindow.start ? createCasingInterval(lastBottom, currentWindow.start) : null;
+
+        const updatedLastBottom = startCasingInterval ? startCasingInterval.end : lastBottom;
+
+        const windowStart = Math.max(updatedLastBottom, currentWindow.start);
+        const windowEnd = Math.min(casing.end, currentWindow.end);
+        const windowInterval: CasingInterval = createCasingWindowInterval(windowStart, windowEnd);
+
+        const nextLastBottom = windowEnd;
+
+        const isLastWindow = index === list.length - 1;
+        const endCasingInterval: CasingInterval | null =
+          isLastWindow &&
+          // still room for a casing interval?
+          nextLastBottom < casing.end
+            ? createCasingInterval(nextLastBottom, casing.end)
+            : null;
+
+        const newIntervals: CasingInterval[] = [startCasingInterval, windowInterval, endCasingInterval].filter((i) => i);
+
+        return { intervals: [...intervals, ...newIntervals], lastBottom: nextLastBottom };
+      },
+      { intervals: [], lastBottom: casing.start },
+    );
+
+  if (!result.intervals.length) {
     return [createCasingInterval(casing.start, casing.end)];
   }
-
-  const result = casingWindows.reduce<{ intervals: CasingInterval[]; lastBottom: number }>(
-    ({ intervals, lastBottom }, currentWindow: CasingWindow, index: number, list: CasingWindow[]) => {
-      const startCasingInterval: CasingInterval | null =
-        // last bottom before current start?
-        lastBottom < currentWindow.start ? createCasingInterval(lastBottom, currentWindow.start) : null;
-
-      const updatedLastBottom = startCasingInterval ? startCasingInterval.end : lastBottom;
-
-      const windowStart = Math.max(updatedLastBottom, currentWindow.start);
-      const windowEnd = Math.min(casing.end, currentWindow.end);
-      const windowInterval: CasingInterval = createCasingWindowInterval(windowStart, windowEnd);
-
-      const nextLastBottom = windowEnd;
-
-      const isLastWindow = index === list.length - 1;
-      const endCasingInterval: CasingInterval | null =
-        isLastWindow &&
-        // still room for a casing interval?
-        nextLastBottom < casing.end
-          ? createCasingInterval(nextLastBottom, casing.end)
-          : null;
-
-      const newIntervals: CasingInterval[] = [startCasingInterval, windowInterval, endCasingInterval].filter((i) => i);
-
-      return { intervals: [...intervals, ...newIntervals], lastBottom: nextLastBottom };
-    },
-    { intervals: [], lastBottom: casing.start },
-  );
 
   return result.intervals;
 };

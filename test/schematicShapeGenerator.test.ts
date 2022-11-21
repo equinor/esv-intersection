@@ -240,7 +240,7 @@ describe('getCasingIntervalsWithWindows()', () => {
     expect(SchematicShapeGenerator.getCasingIntervalsWithWindows(casing)).toStrictEqual(expectedIntervals);
   });
 
-  it('should return one casing and two window interval for tow windows overlapping top/bottom of casing', () => {
+  it('should return one casing and two window interval for two windows overlapping top/bottom of casing', () => {
     const [casingStart, casingEnd] = [100, 1500];
 
     const firstWindow: CasingWindow = TestHelpers.createCasingWindow(casingStart - 100, casingStart + 50);
@@ -252,6 +252,19 @@ describe('getCasingIntervalsWithWindows()', () => {
       { kind: 'casing', start: casingStart + 50, end: casingEnd - 50 },
       { kind: 'casing-window', start: casingEnd - 50, end: casingEnd },
     ];
+
+    expect(SchematicShapeGenerator.getCasingIntervalsWithWindows(casing)).toStrictEqual(expectedIntervals);
+  });
+
+  // needs to be atleast one meter in difference within the casing interval
+  it('should return one casing interval for windows not strictly overlapping the casing', () => {
+    const [casingStart, casingEnd] = [100, 1500];
+
+    const firstWindow: CasingWindow = TestHelpers.createCasingWindow(casingStart - 100, casingStart);
+    const secondWindow: CasingWindow = TestHelpers.createCasingWindow(casingEnd, casingEnd + 100);
+    const casing: Casing = TestHelpers.createCasing(casingStart, casingEnd, { windows: [firstWindow, secondWindow] });
+
+    const expectedIntervals = [{ kind: 'casing', start: casingStart, end: casingEnd }];
 
     expect(SchematicShapeGenerator.getCasingIntervalsWithWindows(casing)).toStrictEqual(expectedIntervals);
   });
