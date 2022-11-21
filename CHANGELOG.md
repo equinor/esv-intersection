@@ -5,8 +5,7 @@
 ## v3.0.0-beta.4
 
 ### Changes
-- Have casing window intervals be strictly within the casing interval to be included on the casing
-- Adjust casing window visualization when displacement is calculated from the bottom
+- Add support for casing windows
 
 ## v3.0.0-beta.3
 
