@@ -16,9 +16,10 @@ import {
   Perforation,
   PerforationOptions,
   foldPerforationSubKind,
-  hasGravelPack,
+  hasFracLines,
   intersect,
   isSubKindCasedHoleFracPack,
+  isSubKindPerforation,
 } from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
@@ -542,7 +543,7 @@ export const createComplexRopeSegmentsForPerforation = (
     const mdPoints = getPoints(interval.top, interval.bottom);
     const points = mdPoints.map(([x, y]: [number, number]) => new Point(x, y));
 
-    const diameter = interval.diameter; // + perforationOptions.spikeLength + perforationOptions.fracLineLength;
+    const diameter = interval.diameter + perforationOptions.spikeLength + perforationOptions.fracLineLength;
 
     return {
       diameter,
@@ -560,55 +561,47 @@ const createFracLines = (
   perforationOptions: PerforationOptions,
   startAt: 'diameter' | 'spike',
 ) => {
-  const { spikeWidth, fracLineHalfWidth, fracLineLength } = perforationOptions;
+  const { spikeWidth, fracLineHalfWidth, fracLineLength, spikeLength } = perforationOptions;
 
   const amountOfSpikes = canvas.width / spikeWidth;
 
   const drawFracLines = () => {
+    const diameter = widestPerfShapeDiameter - perforationOptions.fracLineLength;
+
+    const offsetX = startAt === 'diameter' ? 0 : spikeWidth / 2;
+    const offsetY = startAt === 'diameter' ? 0 : spikeLength + fracLineLength / 2;
+
     for (let i = 0; i < amountOfSpikes; i++) {
-      const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-      const top: [number, number] =
-        startAt === 'diameter' ? [right[0] - spikeWidth / 2, fracLineLength + widestPerfShapeDiameter] : [right[0] - spikeWidth / 2, fracLineLength];
+      const bottom: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2 + diameter / 2];
 
       ctx.beginPath();
 
-      const start: [number, number] = [...top];
-      const controlPoint1: [number, number] = [
-        top[0] - fracLineHalfWidth,
-        fracLineLength / 2 + (startAt === 'diameter' ? widestPerfShapeDiameter : 0),
-      ];
-      const middle: [number, number] = [top[0], fracLineLength / 2 + (startAt === 'diameter' ? widestPerfShapeDiameter : 0)];
+      const start: [number, number] = [bottom[0] + offsetX, bottom[1] + offsetY];
+      const controlPoint1: [number, number] = [bottom[0] + offsetX + fracLineHalfWidth, bottom[1] + fracLineLength / 4 + offsetY];
+      const middle: [number, number] = [bottom[0] + offsetX, bottom[1] + fracLineLength / 2 + offsetY];
       const controlPoint2: [number, number] = [
-        top[0] + fracLineHalfWidth,
-        fracLineLength / 4 + (startAt === 'diameter' ? widestPerfShapeDiameter : 0),
+        bottom[0] + offsetX - fracLineHalfWidth,
+        bottom[1] + fracLineLength / 2 + fracLineLength / 4 + offsetY,
       ];
-      const end: [number, number] = [top[0], startAt === 'diameter' ? widestPerfShapeDiameter : 0];
+      const end: [number, number] = [bottom[0] + offsetX, bottom[1] + fracLineLength + offsetY];
 
       ctx.bezierCurveTo(...start, ...controlPoint1, ...middle);
       ctx.bezierCurveTo(...middle, ...controlPoint2, ...end);
-      // ctx.fillStyle = perforationOptions.outline;
+      ctx.stroke();
     }
 
     for (let i = 0; i < amountOfSpikes; i++) {
-      const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2];
-      const bottom: [number, number] = [
-        right[0] - spikeWidth / 2,
-        canvas.height - fracLineLength - (startAt === 'diameter' ? widestPerfShapeDiameter : 0),
-      ];
+      const bottom: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2 - diameter / 2];
 
       ctx.beginPath();
 
-      const start: [number, number] = [...bottom];
-      const controlPoint1: [number, number] = [
-        bottom[0] - fracLineHalfWidth,
-        canvas.height - fracLineLength / 2 - (startAt === 'diameter' ? widestPerfShapeDiameter : 0),
-      ];
-      const middle: [number, number] = [bottom[0], canvas.height - fracLineLength / 2 - (startAt === 'diameter' ? widestPerfShapeDiameter : 0)];
-      const controlPoint2: [number, number] = [
-        bottom[0] + fracLineHalfWidth,
-        canvas.height - fracLineLength / 4 - (startAt === 'diameter' ? widestPerfShapeDiameter : 0),
-      ];
-      const end: [number, number] = [bottom[0], canvas.height - (startAt === 'diameter' ? widestPerfShapeDiameter : 0)];
+      const b: [number, number] = [bottom[0] + offsetX, bottom[1] - offsetY];
+
+      const start: [number, number] = [...b];
+      const controlPoint1: [number, number] = [b[0] + fracLineHalfWidth, b[1] - fracLineLength / 4];
+      const middle: [number, number] = [b[0], b[1] - fracLineLength / 2];
+      const controlPoint2: [number, number] = [b[0] - fracLineHalfWidth, b[1] - fracLineLength / 2 - fracLineLength / 4];
+      const end: [number, number] = [b[0], b[1] - fracLineLength];
 
       ctx.bezierCurveTo(...start, ...controlPoint1, ...middle);
       ctx.bezierCurveTo(...middle, ...controlPoint2, ...end);
@@ -636,6 +629,9 @@ const createFracLines = (
  * Cased hole frac pack
  * Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
  * Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
+ * NOTE ABOUT CASED HOLE FRAC PACK
+ * WE RENDER IT ONTO THE PERFORATION TEXTURE
+ * THEREFORE THE COMMENT BELOW IS PART OF THE Cased hole frac pack logic:
  * If no perforation of type "perforation" are overlapping, there are no fracturation lines and no spikes.
  * If a perforation of type "perforation" is overlapping,
  * the fracturation lines extends from the tip of the perforation spikes into formation.
@@ -661,25 +657,19 @@ const createSubkindPerforationTexture = (
 
   canvasCtx.fillStyle = perforationOptions.red;
 
-  const { spikeWidth, spikeLength, fracLineLength } = perforationOptions;
+  const { spikeWidth } = perforationOptions;
 
   const amountOfSpikes = canvas.width / spikeWidth;
 
-  const intersectionsWithGravel: boolean = otherPerforations.some((perf) => hasGravelPack(perf) && intersect(perforation, perf));
+  const intersectionsWithGravel: boolean = otherPerforations.some((perf) => hasFracLines(perf) && intersect(perforation, perf));
 
   const intersectionsWithCasedHoleFracPack: boolean = otherPerforations.some(
     (perf) => isSubKindCasedHoleFracPack(perf) && intersect(perforation, perf),
   );
 
-  canvasCtx.save();
-  canvasCtx.globalAlpha = 0x0000ff;
-  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-  canvasCtx.restore();
+  const drawFracLines = intersectionsWithGravel || intersectionsWithCasedHoleFracPack;
 
-  let hasFracLines = false;
-
-  if (intersectionsWithGravel || intersectionsWithCasedHoleFracPack) {
-    hasFracLines = true;
+  if (drawFracLines) {
     if (perforation.isOpen) {
       canvasCtx.fillStyle = perforationOptions.yellow;
       canvasCtx.strokeStyle = perforationOptions.yellow;
@@ -697,20 +687,19 @@ const createSubkindPerforationTexture = (
     }
   }
 
-  const offsetY = spikeLength + fracLineLength + widestPerfShapeDiameter;
-
-  if (hasFracLines) {
+  if (drawFracLines) {
     createFracLines(canvas, canvasCtx, widestPerfShapeDiameter, perforationOptions, 'spike');
   }
 
   canvasCtx.strokeStyle = perforationOptions.outline;
 
-  const diameter = widestPerfShapeDiameter; // - perforationOptions.spikeLength + perforationOptions.fracLineLength;
-
   for (let i = 0; i < amountOfSpikes; i++) {
-    const left: [number, number] = [i * spikeWidth, canvas.height / 2 + diameter / 2];
-    const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2 + diameter / 2];
-    const top: [number, number] = [right[0] - spikeWidth / 2, canvas.height / 2 + diameter / 2 + spikeLength + fracLineLength];
+    const left: [number, number] = [i * spikeWidth, canvas.height / 2 + widestPerfShapeDiameter / 2 - perforationOptions.fracLineLength];
+    const right: [number, number] = [
+      i * spikeWidth + spikeWidth,
+      canvas.height / 2 + widestPerfShapeDiameter / 2 - perforationOptions.fracLineLength,
+    ];
+    const top: [number, number] = [right[0] - spikeWidth / 2, canvas.height / 2 + widestPerfShapeDiameter / 2 + perforationOptions.spikeLength];
 
     canvasCtx.beginPath();
     canvasCtx.moveTo(...top);
@@ -721,22 +710,26 @@ const createSubkindPerforationTexture = (
 
     canvasCtx.lineWidth = 1;
     canvasCtx.stroke();
-
-    canvasCtx.strokeRect(i * spikeWidth, canvas.height / 2 + diameter / 2, spikeWidth, spikeLength);
   }
 
-  // for (let i = 0; i < amountOfSpikes; i++) {
-  //   const left: [number, number] = [i * spikeWidth, canvas.height / 2 + widestPerfShapeDiameter];
-  //   const right: [number, number] = [i * spikeWidth + spikeWidth, canvas.height / 2 + widestPerfShapeDiameter];
-  //   const bottom: [number, number] = [right[0] - spikeWidth / 2, canvas.height - fracLineLength];
+  for (let i = 0; i < amountOfSpikes; i++) {
+    const left: [number, number] = [i * spikeWidth, canvas.height / 2 - widestPerfShapeDiameter / 2 + perforationOptions.fracLineLength];
+    const right: [number, number] = [
+      i * spikeWidth + spikeWidth,
+      canvas.height / 2 - widestPerfShapeDiameter / 2 + perforationOptions.fracLineLength,
+    ];
+    const top: [number, number] = [right[0] - spikeWidth / 2, canvas.height / 2 - widestPerfShapeDiameter];
 
-  //   canvasCtx.beginPath();
-  //   canvasCtx.moveTo(...left);
-  //   canvasCtx.lineTo(...bottom);
-  //   canvasCtx.lineTo(...right);
-  //   canvasCtx.closePath();
-  //   canvasCtx.fill();
-  // }
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(...top);
+    canvasCtx.lineTo(...left);
+    canvasCtx.lineTo(...right);
+    canvasCtx.closePath();
+    canvasCtx.fill();
+
+    canvasCtx.lineWidth = 1;
+    canvasCtx.stroke();
+  }
 
   const texture = new Texture(
     Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP }).baseTexture,
@@ -753,29 +746,7 @@ const createSubkindPerforationTexture = (
  * @param perforationOptions
  * @returns
  */
-const createSubkindOpenHoleGravelPackTexture = (perforationOptions: PerforationOptions) => {
-  const canvas = document.createElement('canvas');
-
-  const size = DEFAULT_TEXTURE_SIZE * perforationOptions.scalingFactor;
-  const canvasCtx = canvas.getContext('2d');
-
-  canvasCtx.save();
-  canvasCtx.globalAlpha = perforationOptions.packingOpacity;
-  canvas.width = size / 2;
-  canvas.height = size;
-  canvasCtx.fillStyle = perforationOptions.yellow;
-  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-  canvasCtx.restore();
-  return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
-};
-
-/**
- * Yellow gravel. Yellow frac lines from hole OD into formation
- * @param widestPerfShapeDiameter
- * @param perforationOptions
- * @returns
- */
-const createSubkindOpenHoleFracPackTexture = (widestPerfShapeDiameter: number, perforationOptions: PerforationOptions) => {
+const createSubkindOpenHoleGravelPackTexture = (perforationOptions: PerforationOptions, widestPerfShapeDiameter: number) => {
   const canvas = document.createElement('canvas');
 
   const size = DEFAULT_TEXTURE_SIZE * perforationOptions.scalingFactor;
@@ -786,35 +757,98 @@ const createSubkindOpenHoleFracPackTexture = (widestPerfShapeDiameter: number, p
   canvasCtx.fillStyle = perforationOptions.yellow;
   canvasCtx.strokeStyle = perforationOptions.yellow;
 
-  const { fracLineLength, packingOpacity } = perforationOptions;
+  const { packingOpacity } = perforationOptions;
 
-  const xy: [number, number] = [0, fracLineLength + widestPerfShapeDiameter];
-  const wh: [number, number] = [canvas.width, widestPerfShapeDiameter];
+  canvasCtx.fillStyle = perforationOptions.yellow;
+
+  const diameter = widestPerfShapeDiameter - perforationOptions.fracLineLength;
+
+  const xy: [number, number] = [0, canvas.height / 2 - diameter / 2];
+  const wh: [number, number] = [canvas.width, diameter];
   canvasCtx.save();
   canvasCtx.globalAlpha = packingOpacity;
   canvasCtx.fillRect(...xy, ...wh);
   canvasCtx.restore();
 
-  createFracLines(canvas, canvasCtx, widestPerfShapeDiameter, perforationOptions, 'diameter');
-  return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
+  const texture = new Texture(
+    Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP }).baseTexture,
+    null,
+    new Rectangle(0, 0, canvas.width, canvas.height),
+    null,
+    groupD8.MIRROR_HORIZONTAL,
+  );
+  return texture;
+};
+
+/**
+ * Yellow gravel. Yellow frac lines from hole OD into formation
+ * (if overlapping a subKind Perforation then the frac lines start at the perforation spikes)
+ * @param widestPerfShapeDiameter
+ * @param perforationOptions
+ * @returns
+ */
+const createSubkindOpenHoleFracPackTexture = (
+  perforation: Perforation,
+  otherPerforations: Perforation[],
+  widestPerfShapeDiameter: number,
+  perforationOptions: PerforationOptions,
+) => {
+  const canvas = document.createElement('canvas');
+
+  const size = DEFAULT_TEXTURE_SIZE * perforationOptions.scalingFactor;
+  canvas.width = size / 2;
+  canvas.height = size;
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = perforationOptions.yellow;
+  canvasCtx.strokeStyle = perforationOptions.yellow;
+
+  const { /*fracLineLength,*/ packingOpacity } = perforationOptions;
+
+  canvasCtx.fillStyle = perforationOptions.yellow;
+
+  const diameter = widestPerfShapeDiameter - perforationOptions.fracLineLength;
+
+  const xy: [number, number] = [0, canvas.height / 2 - diameter / 2];
+  const wh: [number, number] = [canvas.width, diameter];
+  canvasCtx.save();
+  canvasCtx.globalAlpha = packingOpacity;
+  canvasCtx.fillRect(...xy, ...wh);
+  canvasCtx.restore();
+
+  const noIntersectionsWithSubkindPerforation: boolean = otherPerforations.some(
+    (perf) => isSubKindPerforation(perf) && !intersect(perforation, perf),
+  );
+
+  if (noIntersectionsWithSubkindPerforation) {
+    createFracLines(canvas, canvasCtx, widestPerfShapeDiameter, perforationOptions, 'diameter');
+  }
+
+  const texture = new Texture(
+    Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP }).baseTexture,
+    null,
+    new Rectangle(0, 0, canvas.width, canvas.height),
+    null,
+    groupD8.MIRROR_HORIZONTAL,
+  );
+  return texture;
 };
 
 /**
  * Cased hole fracturation
  * Yellow fracturation lines from casing OD into formation
+ * If no perforation of type "perforation" are overlapping, there are no fracturation lines and no spikes.
+ * If a perforation of type "perforation" is overlapping,
+ * the fracturation lines extends from the tip of the perforation spikes into formation.
  * @param widestPerfShapeDiameter
  * @param perforationOptions
  * @returns
  */
-const createSubkindCasedHoleFracturationTexture = (widestPerfShapeDiameter: number, perforationOptions: PerforationOptions) => {
+const createSubkindCasedHoleFracturationTexture = (perforationOptions: PerforationOptions) => {
   const canvas = document.createElement('canvas');
   const size = DEFAULT_TEXTURE_SIZE * perforationOptions.scalingFactor;
   canvas.width = size / 2;
   canvas.height = size;
-  const canvasCtx = canvas.getContext('2d');
-  canvasCtx.fillStyle = perforationOptions.yellow;
-  canvasCtx.strokeStyle = perforationOptions.yellow;
-  createFracLines(canvas, canvasCtx, widestPerfShapeDiameter, perforationOptions, 'diameter');
 
   return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
 };
@@ -824,21 +858,38 @@ const createSubkindCasedHoleFracturationTexture = (widestPerfShapeDiameter: numb
  * @param perforationOptions
  * @returns
  */
-const createSubkindCasedHoleGravelPackTexture = (perforationOptions: PerforationOptions) => {
+const createSubkindCasedHoleGravelPackTexture = (perforationOptions: PerforationOptions, widestPerfShapeDiameter: number) => {
   const canvas = document.createElement('canvas');
+
   const size = DEFAULT_TEXTURE_SIZE * perforationOptions.scalingFactor;
   canvas.width = size / 2;
   canvas.height = size;
-
   const canvasCtx = canvas.getContext('2d');
 
   canvasCtx.fillStyle = perforationOptions.yellow;
+  canvasCtx.strokeStyle = perforationOptions.yellow;
+
+  const { packingOpacity } = perforationOptions;
+
+  canvasCtx.fillStyle = perforationOptions.yellow;
+
+  const diameter = widestPerfShapeDiameter - perforationOptions.fracLineLength;
+
+  const xy: [number, number] = [0, canvas.height / 2 - diameter / 2];
+  const wh: [number, number] = [canvas.width, diameter];
   canvasCtx.save();
-  canvasCtx.globalAlpha = perforationOptions.packingOpacity;
-  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+  canvasCtx.globalAlpha = packingOpacity;
+  canvasCtx.fillRect(...xy, ...wh);
   canvasCtx.restore();
 
-  return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
+  const texture = new Texture(
+    Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP }).baseTexture,
+    null,
+    new Rectangle(0, 0, canvas.width, canvas.height),
+    null,
+    groupD8.MIRROR_HORIZONTAL,
+  );
+  return texture;
 };
 
 /**
@@ -847,21 +898,13 @@ const createSubkindCasedHoleGravelPackTexture = (perforationOptions: Perforation
  * @param perforationOptions
  * @returns
  */
-const createSubkindCasedHoleFracPackTexture = (perforationOptions: PerforationOptions, widestPerfShapeDiameter: number) => {
-  const canvas = document.createElement('canvas');
-
-  const size = DEFAULT_TEXTURE_SIZE; // * perforationOptions.scalingFactor;
-
-  canvas.width = size / 2;
-  canvas.height = size;
-  const canvasCtx = canvas.getContext('2d');
-
-  canvasCtx.fillStyle = perforationOptions.yellow;
-  canvasCtx.save();
-  canvasCtx.globalAlpha = perforationOptions.packingOpacity;
-  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-  canvasCtx.restore();
-  return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
+const createSubkindCasedHoleFracPackTexture = (
+  perforation: Perforation,
+  otherPerforations: Perforation[],
+  widestPerfShapeDiameter: number,
+  perforationOptions: PerforationOptions,
+) => {
+  return createSubkindOpenHoleFracPackTexture(perforation, otherPerforations, widestPerfShapeDiameter, perforationOptions);
 };
 
 export const createPerforationTexture = (
@@ -873,11 +916,11 @@ export const createPerforationTexture = (
   return foldPerforationSubKind(
     {
       Perforation: () => createSubkindPerforationTexture(perforation, otherPerforations, widestPerfShapeDiameter, perforationOptions),
-      OpenHoleGravelPack: () => createSubkindOpenHoleGravelPackTexture(perforationOptions),
-      OpenHoleFracPack: () => createSubkindOpenHoleFracPackTexture(widestPerfShapeDiameter, perforationOptions),
-      CasedHoleFracturation: () => createSubkindCasedHoleFracturationTexture(widestPerfShapeDiameter, perforationOptions),
-      CasedHoleGravelPack: () => createSubkindCasedHoleGravelPackTexture(perforationOptions),
-      CasedHoleFracPack: () => createSubkindCasedHoleFracPackTexture(perforationOptions, widestPerfShapeDiameter),
+      OpenHoleGravelPack: () => createSubkindOpenHoleGravelPackTexture(perforationOptions, widestPerfShapeDiameter),
+      OpenHoleFracPack: () => createSubkindOpenHoleFracPackTexture(perforation, otherPerforations, widestPerfShapeDiameter, perforationOptions),
+      CasedHoleFracturation: () => createSubkindCasedHoleFracturationTexture(perforationOptions),
+      CasedHoleGravelPack: () => createSubkindCasedHoleGravelPackTexture(perforationOptions, widestPerfShapeDiameter),
+      CasedHoleFracPack: () => createSubkindCasedHoleFracPackTexture(perforation, otherPerforations, widestPerfShapeDiameter, perforationOptions),
     },
     perforation.subKind,
   );

@@ -181,7 +181,7 @@ export const shouldPerforationStartAtHoleDiameter = (perf: Perforation) =>
     perf.subKind,
   );
 
-export const shouldPerforationSTartAtCasingDiameter = (perf: Perforation) =>
+export const shouldPerforationStartAtCasingDiameter = (perf: Perforation) =>
   foldPerforationSubKind(
     {
       Perforation: () => false,
@@ -193,6 +193,20 @@ export const shouldPerforationSTartAtCasingDiameter = (perf: Perforation) =>
     },
     perf.subKind,
   );
+
+export function hasFracLines(perf: Perforation): boolean {
+  return foldPerforationSubKind(
+    {
+      Perforation: () => false,
+      OpenHoleGravelPack: () => false,
+      OpenHoleFracPack: () => true,
+      CasedHoleFracturation: () => true,
+      CasedHoleGravelPack: () => true,
+      CasedHoleFracPack: () => true,
+    },
+    perf.subKind,
+  );
+}
 
 export function hasGravelPack(perf: Perforation): boolean {
   return foldPerforationSubKind(

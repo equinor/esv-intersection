@@ -38,7 +38,7 @@ import {
   defaultInternalLayerOptions,
   Perforation,
   shouldPerforationStartAtHoleDiameter,
-  shouldPerforationSTartAtCasingDiameter,
+  shouldPerforationStartAtCasingDiameter,
   PerforationOptions,
   defaultPerforationOptions,
   Completion,
@@ -409,11 +409,8 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
 
     if (this.internalLayerVisibility.perforationLayerId) {
-      perforations.filter(shouldPerforationSTartAtCasingDiameter).forEach((perforation: Perforation) => {
-        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes).map((n) => {
-          return { ...n, diameter: casings[0].diameter };
-        });
-        console.log({ casing0Diameter: casings[0].diameter });
+      perforations.filter(shouldPerforationStartAtCasingDiameter).forEach((perforation: Perforation) => {
+        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
         const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
 
@@ -616,11 +613,24 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return result.filter((item) => item !== undefined).sort((a, b) => a.zIndex - b.zIndex);
   }
 
-  private drawComplexRope(intervals: ComplexRopeSegment[], texture: Texture): void {
+  /**
+   *
+   * @param intervals
+   * @param texture
+   * optionally fetch the exaggerationFactor from a different options prop
+   * options.perforationOptions for example
+   * @param getExaggerationFactor
+   * @returns
+   */
+  private drawComplexRope(
+    intervals: ComplexRopeSegment[],
+    texture: Texture,
+    getExaggerationFactor = (options: SchematicLayerOptions<T>) => options.exaggerationFactor,
+  ): void {
     if (intervals.length === 0) {
       return null;
     }
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
+    const exaggerationFactor = getExaggerationFactor(this.options as SchematicLayerOptions<T>);
 
     const rope = new ComplexRope(texture, intervals, exaggerationFactor);
 
