@@ -1,8 +1,8 @@
-import { Point } from 'pixi.js';
+import { IPoint, Point } from 'pixi.js';
 import Vector2 from '@equinor/videx-vector2';
 
-export const pointToVector = (p: Point): Vector2 => new Vector2(p.x, p.y);
-export const pointToArray = (p: Point): [number, number] => [p.x, p.y];
+export const pointToVector = (p: IPoint): Vector2 => new Vector2(p.x, p.y);
+export const pointToArray = (p: IPoint): [number, number] => [p.x, p.y];
 export const vectorToPoint = (v: Vector2): Point => new Point(v[0], v[1]);
 export const vectorToArray = (v: Vector2): [number, number] => [v[0], v[1]];
 export const arrayToPoint = (a: number[]): Point => new Point(a[0], a[1]);
@@ -27,7 +27,7 @@ export const convertToUnitVector = (p: Point): Point => {
   return vectorToPoint(pointToVector(p).normalize());
 };
 
-export const createNormals = (points: number[][]): Vector2[] => {
+export const createNormals = (points: IPoint[]): Vector2[] => {
   if (points.length < 2) {
     return [new Vector2(0)];
   }
@@ -36,8 +36,8 @@ export const createNormals = (points: number[][]): Vector2[] => {
 
   return points.map((_coord, i, list) => {
     if (i < list.length - 1) {
-      const p = arrayToVector(list[i]);
-      const q = arrayToVector(list[i + 1]);
+      const p = pointToVector(list[i]);
+      const q = pointToVector(list[i + 1]);
       const np = q.sub(p);
       const rotate = np.rotate90();
       n = rotate.normalized();
@@ -50,12 +50,12 @@ export const createNormals = (points: number[][]): Vector2[] => {
 };
 
 // TODO check if this can be simplified and return Vector/number[]
-export const offsetPoint = (point: number[], vector: Vector2, offset: number): Point => {
-  const p = arrayToVector(point);
+export const offsetPoint = (point: IPoint, vector: Vector2, offset: number): Point => {
+  const p = pointToVector(point);
   return vectorToPoint(p.add(vector.scale(offset)));
 };
 
-export const offsetPoints = (points: number[][], vectors: Vector2[], offset: number): Point[] => {
+export const offsetPoints = (points: IPoint[], vectors: Vector2[], offset: number): Point[] => {
   if (points.length !== vectors.length) {
     throw new Error('Number of vectors does not match number of points');
   }

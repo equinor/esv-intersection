@@ -185,7 +185,7 @@ const renderIntersection = (scaleOptions: any) => {
       },
       {
         kind: 'perforation',
-        subKind: 'Cased hole frac pack',
+        subKind: 'Open hole frac pack',
         id: 'PerforationDemo2',
         start: 3500,
         end: 4500,

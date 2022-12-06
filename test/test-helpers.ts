@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers */
 import { scaleLinear } from 'd3-scale';
 import { zoomIdentity } from 'd3-zoom';
-import { Casing, CementPlug, HoleSize, OnRescaleEvent, Tubing } from '../src';
+import { Casing, CasingWindow, CementPlug, HoleSize, OnRescaleEvent, Tubing } from '../src';
 
 export function rescaleEventStub(): OnRescaleEvent {
   const xBounds = [0, 1000] as [number, number];
@@ -33,19 +33,29 @@ export const createCementPlug = (start: number, end: number, referenceIds?: stri
   referenceIds: referenceIds ?? [],
 });
 
+export const createCasingWindow = (start: number, end: number): CasingWindow => ({
+  id: generateId('casing-window'),
+  start,
+  end,
+});
+
 export const createCasing = (
   start: number,
   end: number,
-  diameters?: { innerDiameter: number; outerDiameter: number },
-  hasShoe?: boolean,
+  options?: {
+    diameters?: { innerDiameter: number; outerDiameter: number };
+    hasShoe?: boolean;
+    windows?: CasingWindow[];
+  },
 ): Casing => ({
   kind: 'casing',
   id: generateId('casing'),
-  innerDiameter: diameters?.innerDiameter ?? 6,
-  diameter: diameters?.outerDiameter ?? 7,
+  innerDiameter: options?.diameters?.innerDiameter ?? 6,
+  diameter: options?.diameters?.outerDiameter ?? 7,
   start,
   end,
-  hasShoe: hasShoe ?? false,
+  hasShoe: options?.hasShoe ?? false,
+  windows: options?.windows ?? [],
 });
 
 export const createHole = (start: number, end: number, diameter?: number): HoleSize => ({

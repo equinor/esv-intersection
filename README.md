@@ -11,7 +11,6 @@ Part of the [Equinor Subsurface Visualization project](https://github.com/equino
 - **Documentation (latest)**: https://equinor.github.io/esv-intersection/
 - **Storybook (latest)**: https://equinor.github.io/esv-intersection/storybook/latest
 - **Storybook (nightly)**: https://equinor.github.io/esv-intersection/storybook/master
-- **React/typescript example**: https://github.com/equinor/react-intersection-example
 
 ## Getting started
 
