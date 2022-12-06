@@ -131,6 +131,33 @@ export const findCementOuterDiameterAtDepth = (
 
   const holeAtDepth = holes.find((hole: HoleSize) => hole.start <= depth && hole.end >= depth && hole.diameter > attachedOuterDiameter);
 
+  console.log({ outerCasingAtDepth });
+
+  if (outerCasingAtDepth) {
+    const innerStringDiameter = getInnerStringDiameter(outerCasingAtDepth);
+    console.log({ innerStringDiameter });
+    return innerStringDiameter;
+  }
+
+  if (holeAtDepth) {
+    return holeAtDepth.diameter;
+  }
+
+  return defaultCementWidth;
+};
+
+export const findPerforationOuterDiameterAtDepth = (nonAttachedStrings: (Casing | Completion)[], holes: HoleSize[], depth: number): number => {
+  console.log('findPerforationOuterDiameterAtDepth');
+  const defaultCementWidth = 100; // Default to flow cement outside to show error in data
+
+  const outerCasingAtDepth = nonAttachedStrings
+    .sort((a: Casing | Completion, b: Casing | Completion) => b.diameter - a.diameter) // descending
+    .find((casing) => casing.start <= depth && casing.end >= depth);
+
+  const holeAtDepth = holes.find((hole: HoleSize) => hole.start <= depth && hole.end >= depth);
+
+  console.log({ outerCasingAtDepth });
+
   if (outerCasingAtDepth) {
     return getInnerStringDiameter(outerCasingAtDepth);
   }
@@ -565,6 +592,7 @@ export const createComplexRopeSegmentsForPerforation = (
   perforationOptions: PerforationOptions,
   getPoints: (start: number, end: number) => Point[],
 ): ComplexRopeSegment[] => {
+  console.log({ perforation, casings, holes });
   const { overlappingOuterStrings, overlappingHoles } = findIntersectingItems(perforation.start, perforation.end, casings, holes);
 
   const outerDiameterIntervals = [...overlappingOuterStrings, ...overlappingHoles].map((d) => ({
@@ -574,6 +602,8 @@ export const createComplexRopeSegmentsForPerforation = (
 
   const changeDepths = getUniqueDiameterChangeDepths([perforation.start, perforation.end], outerDiameterIntervals);
 
+  console.log({ changeDepths });
+
   const diameterIntervals = changeDepths.flatMap((depth, index, list) => {
     if (index === list.length - 1) {
       return [];
@@ -581,7 +611,7 @@ export const createComplexRopeSegmentsForPerforation = (
 
     const nextDepth = list[index + 1];
 
-    const diameterAtDepth = findCementOuterDiameterAtDepth([], overlappingOuterStrings, overlappingHoles, depth);
+    const diameterAtDepth = findPerforationOuterDiameterAtDepth(overlappingOuterStrings, overlappingHoles, depth);
 
     return [{ top: depth, bottom: nextDepth, diameter: diameterAtDepth * exaggerationFactor }];
   });
@@ -852,10 +882,6 @@ const createSubkindOpenHoleFracPackTexture = (
   const { /*fracLineLength,*/ packingOpacity } = perforationOptions;
 
   canvasCtx.fillStyle = perforationOptions.yellow;
-
-  const diameter = widestPerfShapeDiameter; // - perforationOptions.fracLineLength;
-
-  console.log('Hello, world!');
 
   const xy: [number, number] = [0, 0];
   const wh: [number, number] = [canvas.width, canvas.height];
