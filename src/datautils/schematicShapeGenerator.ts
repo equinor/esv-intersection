@@ -589,7 +589,7 @@ export const createComplexRopeSegmentsForPerforation = (
   const ropeSegments = diameterIntervals.map((interval) => {
     const points = getPoints(interval.top, interval.bottom);
 
-    const diameter = interval.diameter + perforationOptions.spikeLength + perforationOptions.fracLineLength;
+    const diameter = interval.diameter; // + perforationOptions.spikeLength + perforationOptions.fracLineLength;
 
     return {
       diameter,
@@ -853,10 +853,12 @@ const createSubkindOpenHoleFracPackTexture = (
 
   canvasCtx.fillStyle = perforationOptions.yellow;
 
-  const diameter = widestPerfShapeDiameter - perforationOptions.fracLineLength;
+  const diameter = widestPerfShapeDiameter; // - perforationOptions.fracLineLength;
 
-  const xy: [number, number] = [0, canvas.height / 2 - diameter / 2];
-  const wh: [number, number] = [canvas.width, diameter];
+  console.log('Hello, world!');
+
+  const xy: [number, number] = [0, 0];
+  const wh: [number, number] = [canvas.width, canvas.height];
   canvasCtx.save();
   canvasCtx.globalAlpha = packingOpacity;
   canvasCtx.fillRect(...xy, ...wh);
