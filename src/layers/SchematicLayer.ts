@@ -420,6 +420,25 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       ),
     );
 
+    if (this.internalLayerVisibility.perforationLayerId) {
+      perforations.filter(shouldPerforationStartAtHoleDiameter).forEach((perforation: Perforation) => {
+        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
+        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
+      });
+    }
+
+    if (this.internalLayerVisibility.perforationLayerId) {
+      perforations.filter(shouldPerforationStartAtCasingDiameter).forEach((perforation: Perforation) => {
+        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
+
+        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
+      });
+    }
+
     if (this.internalLayerVisibility.completionLayerId) {
       completion.forEach(
         foldCompletion(
@@ -442,25 +461,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         if (isCementPlug(obj)) {
           this.drawCementPlug(obj, casings, completion, holeSizes);
         }
-      });
-    }
-
-    if (this.internalLayerVisibility.perforationLayerId) {
-      perforations.filter(shouldPerforationStartAtHoleDiameter).forEach((perforation: Perforation) => {
-        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
-        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
-        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
-        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
-      });
-    }
-
-    if (this.internalLayerVisibility.perforationLayerId) {
-      perforations.filter(shouldPerforationStartAtCasingDiameter).forEach((perforation: Perforation) => {
-        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
-        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
-        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
-
-        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
       });
     }
   }
