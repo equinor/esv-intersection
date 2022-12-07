@@ -44,6 +44,9 @@ import {
   defaultPerforationOptions,
   Completion,
   OutlineClosure,
+  hasPacking,
+  hasFracLines,
+  hasSpikes,
 } from './schematicInterfaces';
 import {
   CasingRenderObject,
@@ -59,9 +62,10 @@ import {
   prepareCasingRenderObject,
   createCementPlugTexture,
   createComplexRopeSegmentsForPerforation,
-  createPerforationTexture,
+  createPerforationPackingTexture,
   PerforationShape,
   createCementSqueezeTexture,
+  createPerforationFracLineTexture,
 } from '../datautils/schematicShapeGenerator';
 import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
@@ -421,25 +425,71 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     );
 
     if (this.internalLayerVisibility.perforationLayerId) {
-      perforations.filter(shouldPerforationStartAtHoleDiameter).forEach((perforation: Perforation) => {
-        console.log('?');
+      const { perforationOptions } = this.options as SchematicLayerOptions<T>;
+      const { spikeLength, fracLineLength } = perforationOptions;
+
+      const packings = perforations.filter(hasPacking);
+      const fracLines = perforations.filter(hasFracLines);
+      // const spikes = perforations.filter(hasSpikes);
+
+      packings.forEach((perforation) => {
         const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
-        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
-        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
-      });
-    }
+        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } = perfShapes.reduce(
+          (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
+            if (!dict[ps.diameter]) {
+              dict[ps.diameter] = [];
+            }
 
-    if (this.internalLayerVisibility.perforationLayerId) {
-      perforations.filter(shouldPerforationStartAtCasingDiameter).forEach((perforation: Perforation) => {
-        console.log('!');
+            dict[ps.diameter] = [...dict[ps.diameter], ps];
+
+            return dict;
+          },
+          {},
+        );
+        Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
+          this.drawComplexRope(
+            perfShapesWithSameDiameter,
+            this.createPerforationPackingTexture(perforation, perfShapesWithSameDiameter[0].diameter, otherPerforations, perforationOptions),
+          );
+        });
+      });
+
+      fracLines.forEach((perforation) => {
         const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
-        console.log({ perfShapes });
-        const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
+        const thiccPerfShapes = perfShapes.map((ps) => ({ ...ps, diameter: ps.diameter * 3 }));
+        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } = thiccPerfShapes.reduce(
+          (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
+            if (!dict[ps.diameter]) {
+              dict[ps.diameter] = [];
+            }
 
-        this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
+            dict[ps.diameter] = [...dict[ps.diameter], ps];
+
+            return dict;
+          },
+          {},
+        );
+        Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
+          this.drawComplexRope(
+            perfShapesWithSameDiameter,
+            this.createPerforationFracLineTexture(perforation, perfShapesWithSameDiameter[0].diameter, otherPerforations, perforationOptions),
+          );
+        });
       });
+
+      // spikes.forEach((perforation) => {
+      //   const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+      //   const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+      //   const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
+      //   const extraWideDiameter = widestPerfShapeDiameter + perforationOptions.spikeLength;
+      //   const thiccPerfShapes = perfShapes.map((ps) => ({ ...ps, diameter: ps.diameter + extraWideDiameter }));
+      //   this.drawComplexRope(
+      //     thiccPerfShapes,
+      //     this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations, perforationOptions),
+      //   );
+      // });
     }
 
     if (this.internalLayerVisibility.completionLayerId) {
@@ -465,6 +515,77 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           this.drawCementPlug(obj, casings, completion, holeSizes);
         }
       });
+    }
+
+    // TODO
+    // REMOVE THIS DUPLICATE
+    // ONLY USED FOR DEBUGGING
+    if (this.internalLayerVisibility.perforationLayerId) {
+      const { perforationOptions } = this.options as SchematicLayerOptions<T>;
+      const { spikeLength, fracLineLength } = perforationOptions;
+
+      const packings = perforations.filter(hasPacking);
+      const fracLines = perforations.filter(hasFracLines);
+      // const spikes = perforations.filter(hasSpikes);
+
+      packings.forEach((perforation) => {
+        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } = perfShapes.reduce(
+          (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
+            if (!dict[ps.diameter]) {
+              dict[ps.diameter] = [];
+            }
+
+            dict[ps.diameter] = [...dict[ps.diameter], ps];
+
+            return dict;
+          },
+          {},
+        );
+        Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
+          this.drawComplexRope(
+            perfShapesWithSameDiameter,
+            this.createPerforationPackingTexture(perforation, perfShapesWithSameDiameter[0].diameter, otherPerforations, perforationOptions),
+          );
+        });
+      });
+
+      fracLines.forEach((perforation) => {
+        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+        const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+        const thiccPerfShapes = perfShapes.map((ps) => ({ ...ps, diameter: ps.diameter * 3 }));
+        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } = thiccPerfShapes.reduce(
+          (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
+            if (!dict[ps.diameter]) {
+              dict[ps.diameter] = [];
+            }
+
+            dict[ps.diameter] = [...dict[ps.diameter], ps];
+
+            return dict;
+          },
+          {},
+        );
+        Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
+          this.drawComplexRope(
+            perfShapesWithSameDiameter,
+            this.createPerforationFracLineTexture(perforation, perfShapesWithSameDiameter[0].diameter, otherPerforations, perforationOptions),
+          );
+        });
+      });
+
+      // spikes.forEach((perforation) => {
+      //   const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+      //   const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
+      //   const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
+      //   const extraWideDiameter = widestPerfShapeDiameter + perforationOptions.spikeLength;
+      //   const thiccPerfShapes = perfShapes.map((ps) => ({ ...ps, diameter: ps.diameter + extraWideDiameter }));
+      //   this.drawComplexRope(
+      //     thiccPerfShapes,
+      //     this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations, perforationOptions),
+      //   );
+      // });
     }
   }
 
@@ -524,9 +645,22 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return this.cementPlugTextureCache;
   }
 
-  private createPerforationTexture(perforation: Perforation, widestPerfShapeDiameter: number, otherPerforations: Perforation[]): Texture {
-    const { perforationOptions } = this.options as SchematicLayerOptions<T>;
-    return createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations, perforationOptions);
+  private createPerforationPackingTexture(
+    perforation: Perforation,
+    perfShapeDiameter: number,
+    otherPerforations: Perforation[],
+    perforationOptions: PerforationOptions,
+  ): Texture {
+    return createPerforationPackingTexture(perforation, perfShapeDiameter, otherPerforations, perforationOptions);
+  }
+
+  private createPerforationFracLineTexture(
+    perforation: Perforation,
+    perfShapeDiameter: number,
+    otherPerforations: Perforation[],
+    perforationOptions: PerforationOptions,
+  ): Texture {
+    return createPerforationFracLineTexture(perforation, otherPerforations, perfShapeDiameter, perforationOptions);
   }
 
   private prepareSymbolRenderObject = (component: CompletionSymbol | PAndASymbol): SymbolRenderObject => {

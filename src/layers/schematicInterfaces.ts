@@ -206,6 +206,19 @@ export const shouldPerforationStartAtCasingDiameter = (perf: Perforation) =>
     perf.subKind,
   );
 
+export const hasPacking = (perf: Perforation): boolean =>
+  foldPerforationSubKind(
+    {
+      Perforation: () => false,
+      OpenHoleGravelPack: () => true,
+      OpenHoleFracPack: () => true,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => true,
+      CasedHoleFracPack: () => true,
+    },
+    perf.subKind,
+  );
+
 export function hasFracLines(perf: Perforation): boolean {
   return foldPerforationSubKind(
     {
@@ -215,6 +228,20 @@ export function hasFracLines(perf: Perforation): boolean {
       CasedHoleFracturation: () => true,
       CasedHoleGravelPack: () => true,
       CasedHoleFracPack: () => true,
+    },
+    perf.subKind,
+  );
+}
+
+export function hasSpikes(perf: Perforation): boolean {
+  return foldPerforationSubKind(
+    {
+      Perforation: () => true,
+      OpenHoleGravelPack: () => false,
+      OpenHoleFracPack: () => false,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => false,
+      CasedHoleFracPack: () => false,
     },
     perf.subKind,
   );
@@ -365,7 +392,7 @@ export interface PerforationOptions {
   spikeLength: number;
   packingOpacity: number;
   fracLineLength: number;
-  fracLineHalfWidth: number;
+  fracLineCurve: number;
   scalingFactor: number;
 }
 
@@ -379,9 +406,9 @@ export const defaultPerforationOptions: PerforationOptions = {
   spikeWidth: 25,
   spikeLength: 50,
   packingOpacity: 0.5,
-  fracLineHalfWidth: 10,
+  fracLineCurve: 20,
   fracLineLength: 25,
-  scalingFactor: 4,
+  scalingFactor: 25,
 };
 
 export interface CementOptions {
