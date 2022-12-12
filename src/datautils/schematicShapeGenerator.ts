@@ -628,16 +628,16 @@ const createFracLines = (
   perforationOptions: PerforationOptions,
   startAt: 'diameter' | 'spike',
 ) => {
-  const { spikeWidth, fracLineCurve } = perforationOptions;
+  const { /*spikeWidth*/ fracLineCurve } = perforationOptions;
 
-  const amountOfSpikes = canvas.width / spikeWidth;
-
+  const amountOfSpikes = 10; // canvas.width / spikeWidth;
+  const spikeWidth = canvas.width / 10;
   ctx.strokeStyle = '#000';
 
   const diameter = (thiccPerfShapeDiameter / 3) * perforationOptions.scalingFactor;
 
   ctx.lineWidth = 1; // Math.ceil(0.25 * perforationOptions.scalingFactor);
-  const fracLineLength = diameter / 2;
+  const fracLineLength = diameter / 4;
   const spikeLength = diameter / 2;
   const offsetX = 0;
   const offsetY = spikeLength;
@@ -653,15 +653,15 @@ const createFracLines = (
 
   const drawFracLines = () => {
     for (let i = 0; i < amountOfSpikes; i++) {
-      const bottom: [number, number] = [i * spikeWidth + spikeWidth + offsetX + spikeWidth / 2, canvas.height / 2 - fracLineLength - offsetY];
+      const bottom: [number, number] = [i * spikeWidth + offsetX + spikeWidth / 2, canvas.height / 2 - fracLineLength - offsetY - fracLineLength];
 
       ctx.beginPath();
 
       const start: [number, number] = [...bottom];
-      const controlPoint1: [number, number] = [bottom[0] - fracLineCurve * 4, bottom[1] - fracLineLength / 4];
+      const controlPoint1: [number, number] = [bottom[0] - fracLineCurve * 2, bottom[1] - fracLineLength / 4];
       const middle: [number, number] = [bottom[0], bottom[1] - fracLineLength / 2];
 
-      const controlPoint2: [number, number] = [bottom[0] + fracLineCurve * 4, bottom[1] - fracLineLength / 2 - fracLineLength / 4];
+      const controlPoint2: [number, number] = [bottom[0] + fracLineCurve * 2, bottom[1] - fracLineLength / 2 - fracLineLength / 4];
       const end: [number, number] = [bottom[0], bottom[1] - fracLineLength];
 
       ctx.bezierCurveTo(...start, ...controlPoint1, ...middle);
@@ -676,10 +676,10 @@ const createFracLines = (
       ctx.beginPath();
 
       const start: [number, number] = [...bottom];
-      const controlPoint1: [number, number] = [bottom[0] - fracLineCurve * 4, bottom[1] + fracLineLength / 4];
+      const controlPoint1: [number, number] = [bottom[0] - fracLineCurve * 2, bottom[1] + fracLineLength / 4];
       const middle: [number, number] = [bottom[0], bottom[1] + fracLineLength / 2];
 
-      const controlPoint2: [number, number] = [bottom[0] + fracLineCurve * 4, bottom[1] + fracLineLength / 2 + fracLineLength / 4];
+      const controlPoint2: [number, number] = [bottom[0] + fracLineCurve * 2, bottom[1] + fracLineLength / 2 + fracLineLength / 4];
       const end: [number, number] = [bottom[0], bottom[1] + fracLineLength];
 
       ctx.bezierCurveTo(...start, ...controlPoint1, ...middle);
@@ -695,7 +695,7 @@ const createFracLines = (
   // CURRENTLY HERE TO TEST IF THIS APPROACH IS VIABLE
 
   // left spikes
-  for (let i = 0; i < amountOfSpikes; i++) {
+  for (let i = 0; i <= amountOfSpikes; i++) {
     const left: [number, number] = [i * spikeWidth + offsetX, canvas.height / 2 - diameter / 2];
     const bottom: [number, number] = [left[0] - spikeWidth / 2, left[1] - spikeLength];
     const right: [number, number] = [left[0] - spikeWidth, left[1]];
@@ -712,7 +712,7 @@ const createFracLines = (
   }
 
   // right spikes
-  for (let i = 0; i < amountOfSpikes; i++) {
+  for (let i = 0; i <= amountOfSpikes; i++) {
     const left: [number, number] = [i * spikeWidth + offsetX, canvas.height / 2 + diameter / 2];
     const bottom: [number, number] = [left[0] - spikeWidth / 2, left[1] + spikeLength];
     const right: [number, number] = [left[0] - spikeWidth, left[1]];
@@ -1126,13 +1126,11 @@ const createSubkindCasedHoleFracPackTexture = (
 const createFracLineTexture = (
   perforation: Perforation,
   otherPerforations: Perforation[],
-  perfShapeDiameter: number,
+  perfShape: ComplexRopeSegment,
   perforationOptions: PerforationOptions,
 ) => {
   const canvas = document.createElement('canvas');
-
-  console.log(`SCALING FACTOR: ${perforationOptions.scalingFactor}`);
-
+  const perfShapeDiameter = perfShape.diameter;
   const size = perfShapeDiameter * perforationOptions.scalingFactor;
   canvas.width = size / 2;
   canvas.height = size;
@@ -1142,10 +1140,10 @@ const createFracLineTexture = (
 
   const xy: [number, number] = [0, 0];
   const wh: [number, number] = [canvas.width, canvas.height];
-  canvasCtx.save();
-  canvasCtx.globalAlpha = 0.25;
-  canvasCtx.fillRect(...xy, ...wh);
-  canvasCtx.restore();
+  // canvasCtx.save();
+  // canvasCtx.globalAlpha = 0.25;
+  canvasCtx.strokeRect(...xy, ...wh);
+  // canvasCtx.restore();
 
   canvasCtx.fillStyle = perforationOptions.yellow;
   canvasCtx.strokeStyle = perforationOptions.yellow;
@@ -1190,7 +1188,7 @@ export const createPerforationPackingTexture = (
 export const createPerforationFracLineTexture = (
   perforation: Perforation,
   otherPerforations: Perforation[],
-  perfShapeDiameter: number,
+  perfShape: ComplexRopeSegment,
   perforationOptions: PerforationOptions,
 ): Texture => {
   return foldPerforationSubKind(
@@ -1202,7 +1200,7 @@ export const createPerforationFracLineTexture = (
       // createPackingTexture(perforation, otherPerforations, widestPerfShapeDiameter, perforationOptions),
       CasedHoleFracturation: () => errorTexture(), // createSubkindCasedHoleFracturationTexture(perforationOptions),
       CasedHoleGravelPack: () => errorTexture(), // createSubkindCasedHoleGravelPackTexture(perforationOptions, widestPerfShapeDiameter),
-      CasedHoleFracPack: () => createFracLineTexture(perforation, otherPerforations, perfShapeDiameter, perforationOptions),
+      CasedHoleFracPack: () => createFracLineTexture(perforation, otherPerforations, perfShape, perforationOptions),
     },
     perforation.subKind,
   );

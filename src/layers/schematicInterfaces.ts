@@ -403,10 +403,10 @@ export const defaultPerforationOptions: PerforationOptions = {
   red: '#FF5050',
   outline: 'black',
   transparent: 'rgba(255, 255, 255, 0)',
-  spikeWidth: 25,
+  spikeWidth: 50,
   spikeLength: 50,
   packingOpacity: 0.5,
-  fracLineCurve: 20,
+  fracLineCurve: 10,
   fracLineLength: 25,
   scalingFactor: 25,
 };
