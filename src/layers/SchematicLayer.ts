@@ -427,7 +427,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     );
 
     this.perforationRopeAndTextureReferences.forEach(({ rope, texture }) => {
-      this.container.removeChild(rope);
+      // this.container.removeChild(rope);
       rope.destroy({
         children: true,
         texture: true,
