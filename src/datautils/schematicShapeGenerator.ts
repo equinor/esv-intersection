@@ -626,12 +626,10 @@ export const createComplexRopeSegmentsForPerforation = (
 };
 
 const drawPacking = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, perforationOptions: PerforationOptions) => {
-  ctx.fillStyle = perforationOptions.yellow;
-  ctx.strokeStyle = perforationOptions.yellow;
+  const { packingOpacity, yellow } = perforationOptions;
 
-  const { packingOpacity } = perforationOptions;
-
-  ctx.fillStyle = perforationOptions.yellow;
+  ctx.fillStyle = yellow;
+  ctx.strokeStyle = yellow;
 
   const xy: [number, number] = [0, 0];
   const wh: [number, number] = [canvas.width, canvas.height];
@@ -789,7 +787,10 @@ const errorTexture = (errorMessage = 'Error!', existingContext?: { canvas: HTMLC
   return texture;
 };
 
-const createCanvas = (perfShape: ComplexRopeSegment, options: PerforationOptions): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } => {
+const createPerforationCanvas = (
+  perfShape: ComplexRopeSegment,
+  options: PerforationOptions,
+): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } => {
   const canvas = document.createElement('canvas');
   const perfShapeDiameter = perfShape.diameter;
   const size = perfShapeDiameter * options.scalingFactor;
@@ -800,7 +801,7 @@ const createCanvas = (perfShape: ComplexRopeSegment, options: PerforationOptions
   return { canvas, ctx };
 };
 
-const createTexture = (canvas: HTMLCanvasElement) => {
+const createPerforationTexture = (canvas: HTMLCanvasElement) => {
   const texture = new Texture(
     Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP }).baseTexture,
     null,
@@ -836,7 +837,7 @@ const createSubkindPerforationTexture = {
     otherPerforations: Perforation[],
     perforationOptions: PerforationOptions,
   ): Texture => {
-    const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
+    const { canvas, ctx } = createPerforationCanvas(perfShape, perforationOptions);
 
     const intersectionsWithCasedHoleGravel: boolean = otherPerforations.some(
       (perf) => isSubkindCasedHoleGravelPack(perf) && intersect(perforation, perf),
@@ -872,7 +873,7 @@ const createSubkindPerforationTexture = {
       drawFracLines(canvas, ctx, perfShape.diameter, perforationOptions, 'spike');
     }
 
-    return createTexture(canvas);
+    return createPerforationTexture(canvas);
   },
 };
 
@@ -883,9 +884,9 @@ const createSubkindPerforationTexture = {
 const createSubkindCasedHoleFracturationTexture = {
   packing: () => errorTexture(),
   fracLines: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions): Texture => {
-    const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
+    const { canvas, ctx } = createPerforationCanvas(perfShape, perforationOptions);
     drawFracLines(canvas, ctx, perfShape.diameter, perforationOptions, 'diameter');
-    return createTexture(canvas);
+    return createPerforationTexture(canvas);
   },
   spikes: () => errorTexture(),
 };
@@ -899,16 +900,16 @@ const createSubkindCasedHoleFracturationTexture = {
  */
 const createSubkindCasedHoleFracPackTexture = {
   packing: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions): Texture => {
-    const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
+    const { canvas, ctx } = createPerforationCanvas(perfShape, perforationOptions);
     drawPacking(canvas, ctx, perforationOptions);
-    return createTexture(canvas);
+    return createPerforationTexture(canvas);
   },
   fracLines: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions) => {
-    const { canvas } = createCanvas(perfShape, perforationOptions);
+    const { canvas } = createPerforationCanvas(perfShape, perforationOptions);
     // const noIntersectionsWithSubkindPerforation: boolean = otherPerforations.some(
     //   (perf) => isSubKindPerforation(perf) && !intersect(perforation, perf),
     // );
-    return createTexture(canvas);
+    return createPerforationTexture(canvas);
   },
   spikes: () => errorTexture(),
 };
@@ -919,9 +920,9 @@ const createSubkindCasedHoleFracPackTexture = {
  */
 const createSubkindCasedHoleGravelPackTexture = {
   packing: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions): Texture => {
-    const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
+    const { canvas, ctx } = createPerforationCanvas(perfShape, perforationOptions);
     drawPacking(canvas, ctx, perforationOptions);
-    return createTexture(canvas);
+    return createPerforationTexture(canvas);
   },
   fracLines: () => errorTexture(),
   spikes: () => errorTexture(),
@@ -933,9 +934,9 @@ const createSubkindCasedHoleGravelPackTexture = {
  */
 const createSubkindOpenHoleGravelPackTexture = {
   packing: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions) => {
-    const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
+    const { canvas, ctx } = createPerforationCanvas(perfShape, perforationOptions);
     drawPacking(canvas, ctx, perforationOptions);
-    return createTexture(canvas);
+    return createPerforationTexture(canvas);
   },
   fracLines: () => errorTexture(),
   spikes: () => errorTexture(),
@@ -948,14 +949,14 @@ const createSubkindOpenHoleGravelPackTexture = {
 const createSubkindOpenHoleFracPackTexture = {
   packing: (perforation: Perforation, perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions) => {
     console.log({ perforation });
-    const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
+    const { canvas, ctx } = createPerforationCanvas(perfShape, perforationOptions);
     drawPacking(canvas, ctx, perforationOptions);
-    return createTexture(canvas);
+    return createPerforationTexture(canvas);
   },
   fracLines: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions): Texture => {
-    const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
+    const { canvas, ctx } = createPerforationCanvas(perfShape, perforationOptions);
     drawFracLines(canvas, ctx, perfShape.diameter, perforationOptions, 'diameter');
-    return createTexture(canvas);
+    return createPerforationTexture(canvas);
   },
   spikes: () => errorTexture(),
 };
