@@ -226,7 +226,7 @@ export function hasFracLines(perf: Perforation): boolean {
       OpenHoleGravelPack: () => false,
       OpenHoleFracPack: () => true,
       CasedHoleFracturation: () => true,
-      CasedHoleGravelPack: () => true,
+      CasedHoleGravelPack: () => false,
       CasedHoleFracPack: () => true,
     },
     perf.subKind,
@@ -247,11 +247,11 @@ export function hasSpikes(perf: Perforation): boolean {
   );
 }
 
-export function hasGravelPack(perf: Perforation): boolean {
+export function isSubkindCasedHoleGravelPack(perf: Perforation): boolean {
   return foldPerforationSubKind(
     {
       Perforation: () => false,
-      OpenHoleGravelPack: () => true,
+      OpenHoleGravelPack: () => false,
       OpenHoleFracPack: () => false,
       CasedHoleFracturation: () => false,
       CasedHoleGravelPack: () => true,
