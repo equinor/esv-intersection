@@ -906,9 +906,6 @@ const createSubkindCasedHoleFracPackTexture = {
   },
   fracLines: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions) => {
     const { canvas } = createPerforationCanvas(perfShape, perforationOptions);
-    // const noIntersectionsWithSubkindPerforation: boolean = otherPerforations.some(
-    //   (perf) => isSubKindPerforation(perf) && !intersect(perforation, perf),
-    // );
     return createPerforationTexture(canvas);
   },
   spikes: () => errorTexture(),
