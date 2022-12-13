@@ -661,7 +661,7 @@ const drawFracLines = (
   const { fracLineCurve } = perforationOptions;
 
   const amountOfSpikes = 10;
-  const spikeWidth = canvas.width / 10;
+  const spikeWidth = canvas.width / amountOfSpikes;
   ctx.strokeStyle = '#000';
 
   const diameter = (thiccPerfShapeDiameter / 3) * perforationOptions.scalingFactor;
@@ -729,8 +729,8 @@ const drawSpikes = (
   thiccPerfShapeDiameter: number,
   perforationOptions: PerforationOptions,
 ) => {
-  const amountOfSpikes = 10; // canvas.width / spikeWidth;
-  const spikeWidth = canvas.width / 10;
+  const amountOfSpikes = 10;
+  const spikeWidth = canvas.width / amountOfSpikes;
   ctx.strokeStyle = perforationOptions.outline;
 
   const diameter = (thiccPerfShapeDiameter / 3) * perforationOptions.scalingFactor;
