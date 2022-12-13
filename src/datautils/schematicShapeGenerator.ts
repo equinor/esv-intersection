@@ -149,7 +149,7 @@ export const findPerforationOuterDiameterAtDepth = (
   depth: number,
   perforationSubKind: PerforationSubKind,
 ): number => {
-  const defaultCementWidth = 100; // Default to flow cement outside to show error in data
+  const defaultPerforationWidth = 100; // Default to flow perforation outside to show error in data
 
   const outerCasingAtDepth = nonAttachedStrings
     .sort((a: Casing | Completion, b: Casing | Completion) => b.diameter - a.diameter) // descending
@@ -165,7 +165,7 @@ export const findPerforationOuterDiameterAtDepth = (
     return holeAtDepth.diameter;
   }
 
-  return defaultCementWidth;
+  return defaultPerforationWidth;
 };
 
 export const findCementPlugInnerDiameterAtDepth = (
@@ -583,14 +583,11 @@ export const prepareCasingRenderObject = (
   };
 };
 
-// PERFORATION
-
 export const createComplexRopeSegmentsForPerforation = (
   perforation: Perforation,
   casings: Casing[],
   holes: HoleSize[],
   exaggerationFactor: number,
-  _perforationOptions: PerforationOptions,
   getPoints: (start: number, end: number) => Point[],
 ): ComplexRopeSegment[] => {
   const { overlappingOuterStrings, overlappingHoles } = findIntersectingItems(perforation.start, perforation.end, casings, holes);
@@ -628,20 +625,13 @@ export const createComplexRopeSegmentsForPerforation = (
   return ropeSegments;
 };
 
-const drawPacking = (
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
-  _perfShape: ComplexRopeSegment,
-  perforationOptions: PerforationOptions,
-) => {
+const drawPacking = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, perforationOptions: PerforationOptions) => {
   ctx.fillStyle = perforationOptions.yellow;
   ctx.strokeStyle = perforationOptions.yellow;
 
   const { packingOpacity } = perforationOptions;
 
   ctx.fillStyle = perforationOptions.yellow;
-
-  // const diameter = perfShape.diameter - perforationOptions.fracLineLength;
 
   const xy: [number, number] = [0, 0];
   const wh: [number, number] = [canvas.width, canvas.height];
@@ -654,7 +644,7 @@ const drawPacking = (
 const drawFracLines = (
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
-  thiccPerfShapeDiameter: number,
+  extendedPerfShapeDiameter: number,
   perforationOptions: PerforationOptions,
   startAt: 'diameter' | 'spike',
 ) => {
@@ -663,7 +653,7 @@ const drawFracLines = (
   const amountOfSpikes = 10;
   const spikeWidth = canvas.width / amountOfSpikes;
 
-  const diameter = (thiccPerfShapeDiameter / 3) * perforationOptions.scalingFactor;
+  const diameter = (extendedPerfShapeDiameter / 3) * perforationOptions.scalingFactor;
 
   const fracLineLength = diameter / 4;
   const spikeLength = diameter / 2;
@@ -724,14 +714,14 @@ const drawFracLines = (
 const drawSpikes = (
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
-  thiccPerfShapeDiameter: number,
+  extendedPerfShapeDiameter: number,
   perforationOptions: PerforationOptions,
 ) => {
   const amountOfSpikes = 10;
   const spikeWidth = canvas.width / amountOfSpikes;
   ctx.strokeStyle = perforationOptions.outline;
 
-  const diameter = (thiccPerfShapeDiameter / 3) * perforationOptions.scalingFactor;
+  const diameter = (extendedPerfShapeDiameter / 3) * perforationOptions.scalingFactor;
 
   ctx.lineWidth = 1;
   const spikeLength = diameter / 2;
@@ -910,7 +900,7 @@ const createSubkindCasedHoleFracturationTexture = {
 const createSubkindCasedHoleFracPackTexture = {
   packing: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions): Texture => {
     const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
-    drawPacking(canvas, ctx, perfShape, perforationOptions);
+    drawPacking(canvas, ctx, perforationOptions);
     return createTexture(canvas);
   },
   fracLines: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions) => {
@@ -930,7 +920,7 @@ const createSubkindCasedHoleFracPackTexture = {
 const createSubkindCasedHoleGravelPackTexture = {
   packing: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions): Texture => {
     const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
-    drawPacking(canvas, ctx, perfShape, perforationOptions);
+    drawPacking(canvas, ctx, perforationOptions);
     return createTexture(canvas);
   },
   fracLines: () => errorTexture(),
@@ -944,7 +934,7 @@ const createSubkindCasedHoleGravelPackTexture = {
 const createSubkindOpenHoleGravelPackTexture = {
   packing: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions) => {
     const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
-    drawPacking(canvas, ctx, perfShape, perforationOptions);
+    drawPacking(canvas, ctx, perforationOptions);
     return createTexture(canvas);
   },
   fracLines: () => errorTexture(),
@@ -959,7 +949,7 @@ const createSubkindOpenHoleFracPackTexture = {
   packing: (perforation: Perforation, perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions) => {
     console.log({ perforation });
     const { canvas, ctx } = createCanvas(perfShape, perforationOptions);
-    drawPacking(canvas, ctx, perfShape, perforationOptions);
+    drawPacking(canvas, ctx, perforationOptions);
     return createTexture(canvas);
   },
   fracLines: (perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions): Texture => {
@@ -973,7 +963,6 @@ const createSubkindOpenHoleFracPackTexture = {
 export const createPerforationPackingTexture = (
   perforation: Perforation,
   perfShape: ComplexRopeSegment,
-  _otherPerforations: Perforation[],
   perforationOptions: PerforationOptions,
 ): Texture => {
   return foldPerforationSubKind(
@@ -991,7 +980,6 @@ export const createPerforationPackingTexture = (
 
 export const createPerforationFracLineTexture = (
   perforation: Perforation,
-  _otherPerforations: Perforation[],
   perfShape: ComplexRopeSegment,
   perforationOptions: PerforationOptions,
 ): Texture => {
