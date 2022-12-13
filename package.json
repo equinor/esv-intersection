@@ -16,7 +16,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "rollup -c",
+    "build": "rollup -c --bundleConfigAsCjs",
     "prepub": "npm run build",
     "pub": "npm publish --access=public",
     "prepub-beta": "npm run build",

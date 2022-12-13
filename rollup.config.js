@@ -1,7 +1,5 @@
 import typescript from 'rollup-plugin-typescript2'
-import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
-import commonjs from '@rollup/plugin-commonjs';
 
 import pkg from './package.json' assert { type: "json" };
 
@@ -23,8 +21,6 @@ export default [
     ],
     plugins: [
       typescript(),
-      resolve(),
-      commonjs(),
       terser({
         mangle: false,
       }),
@@ -39,9 +35,7 @@ export default [
       format: 'umd',
     },
     plugins: [
-      resolve({ browser: true }),
       typescript(),
-      commonjs(),
       terser({
         mangle: false,
       }),
