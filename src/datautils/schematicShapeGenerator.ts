@@ -662,18 +662,16 @@ const drawFracLines = (
 
   const amountOfSpikes = 10;
   const spikeWidth = canvas.width / amountOfSpikes;
-  ctx.strokeStyle = '#000';
 
   const diameter = (thiccPerfShapeDiameter / 3) * perforationOptions.scalingFactor;
 
-  ctx.lineWidth = 1; // Math.ceil(0.25 * perforationOptions.scalingFactor);
   const fracLineLength = diameter / 4;
   const spikeLength = diameter / 2;
   const offsetX = 0;
   const offsetY = startAt === 'diameter' ? 0 : spikeLength;
 
   const fracLines = () => {
-    for (let i = 0; i < amountOfSpikes; i++) {
+    for (let i = -1; i < amountOfSpikes; i++) {
       const bottom: [number, number] = [i * spikeWidth + offsetX + spikeWidth / 2, canvas.height / 2 - fracLineLength - offsetY - fracLineLength];
 
       ctx.beginPath();
@@ -691,7 +689,7 @@ const drawFracLines = (
       ctx.stroke();
     }
 
-    for (let i = 0; i < amountOfSpikes; i++) {
+    for (let i = -1; i < amountOfSpikes; i++) {
       const bottom: [number, number] = [i * spikeWidth + spikeWidth + offsetX + spikeWidth / 2, canvas.height / 2 + diameter / 2 + offsetY];
 
       ctx.beginPath();
