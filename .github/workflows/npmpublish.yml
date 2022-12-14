@@ -8,12 +8,20 @@ jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
+          cache: 'npm'
           registry-url: 'https://registry.npmjs.org/'
-      - run: npm ci
-      - run: npm run pub
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Publish package to NPM
+        run: npm run pub
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

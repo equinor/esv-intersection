@@ -7,31 +7,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/checkout@v3
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: .npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          cache: 'npm'
       - name: Node version
         run: node --version
       - name: NPM version
         run: npm --version
       - name: Install dependencies
         run: |
-          npm ci --cache .npm --prefer-offline
+          npm ci --prefer-offline
       - name: Cache base files
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ./*
-            .npm
           key: ${{ github.sha }}
   lint:
     name: Lint
@@ -39,11 +32,10 @@ jobs:
     needs: setup
     steps:
       - name: Get files
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ./*
-            .npm
           key: ${{ github.sha }}
       - name: Run linting
         run: npm run lint
@@ -53,11 +45,10 @@ jobs:
     needs: setup
     steps:
       - name: Get files
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ./*
-            .npm
           key: ${{ github.sha }}
       - name: Run tests
         run: npm run test
@@ -67,11 +58,10 @@ jobs:
     needs: setup
     steps:
       - name: Get files
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ./*
-            .npm
           key: ${{ github.sha }}
       - name: Build library
         run: npm run build
