@@ -7,7 +7,7 @@ import { ScaleLinear } from 'd3-scale';
 export type ReferenceLineType = 'wavy' | 'dashed' | 'solid';
 
 export type ReferenceLine = {
-  text: string;
+  text?: string;
   lineType: ReferenceLineType;
   color: string;
   depth: number;
@@ -76,7 +76,9 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     ctx.lineTo(canvas.width, y);
     ctx.stroke();
     ctx.restore();
-    this.drawText(ctx, dashed, ctx.canvas.width, y);
+    if (dashed) {
+      this.drawText(ctx, dashed, ctx.canvas.width, y);
+    }
   }
 
   private drawSolid(solid: ReferenceLine) {
@@ -92,7 +94,9 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     ctx.lineTo(canvas.width, y);
     ctx.stroke();
     ctx.restore();
-    this.drawText(ctx, solid, ctx.canvas.width, y);
+    if (solid) {
+      this.drawText(ctx, solid, ctx.canvas.width, y);
+    }
   }
 
   private drawWavy(wavy: ReferenceLine): void {
@@ -116,7 +120,9 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
       ctx.stroke();
     }
     ctx.restore();
-    this.drawText(ctx, wavy, ctx.canvas.width, y);
+    if (wavy) {
+      this.drawText(ctx, wavy, ctx.canvas.width, y);
+    }
   }
 
   private drawText(ctx: CanvasRenderingContext2D, refLine: ReferenceLine, x: number, y: number) {
