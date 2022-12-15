@@ -13,4 +13,4 @@ export * from './ImageCanvasLayer';
 export * from './SchematicLayer';
 export * from './SeismicCanvasLayer';
 export * from './WellborePathLayer';
-export * from './SeaAndRKBLayer';
+export * from './ReferenceLineLayer';
