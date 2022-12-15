@@ -228,7 +228,6 @@ const renderIntersection = (scaleOptions: any) => {
 
     const seaAndRKBLayerOptions = defaultSeaAndRKBLayerOptions;
     const seaAndRKBLayer = new SeaAndRKBLayer('sea-and-rkb-layer', seaAndRKBLayerOptions);
-    //
 
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
@@ -262,6 +261,7 @@ const renderIntersection = (scaleOptions: any) => {
     const btnWellbore = createButton(controller, wellboreLayer, 'Wellbore');
     const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model');
     const btnSchematic = createButton(controller, schematicLayer, 'Schematic');
+    const btnSeaAndRKB = createButton(controller, seaAndRKBLayer, 'SeaAndRKB');
     const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
     const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
     const btnPicks = createButton(controller, calloutLayer, 'Picks');
@@ -329,6 +329,7 @@ const renderIntersection = (scaleOptions: any) => {
     btnToggleContainer.appendChild(btnGeomodelLabels);
     btnToggleContainer.appendChild(btnSeismic);
     btnToggleContainer.appendChild(btnSchematic);
+    btnToggleContainer.appendChild(btnSeaAndRKB);
     btnToggleContainer.appendChild(btnPicks);
     btnToggleContainer.appendChild(toggleAxis);
     btnAdjustSizeContainer.appendChild(btnLarger);
