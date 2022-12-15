@@ -22,8 +22,8 @@ import {
   InternalLayerOptions,
   Perforation,
   SchematicData,
-  SeaAndRKBLayer,
-  defaultSeaAndRKBLayerOptions,
+  ReferenceLine,
+  ReferenceLineLayer,
 } from '../../../src';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
@@ -225,8 +225,12 @@ const renderIntersection = (scaleOptions: any) => {
 
     const schematicLayer = new SchematicLayer(pixiContext2, 'schematic-webgl-layer', schematicLayerOptions);
 
-    const seaAndRKBLayerOptions = defaultSeaAndRKBLayerOptions;
-    const seaAndRKBLayer = new SeaAndRKBLayer('sea-and-rkb-layer', seaAndRKBLayerOptions);
+    const seaAndRKBLayerData: ReferenceLine[] = [
+      { text: 'RKB', lineType: 'dashed', color: 'black', depth: 0 },
+      { text: 'MSL', lineType: 'wavy', color: 'blue', depth: 30 },
+      { text: 'Seabed', lineType: 'solid', color: 'slategray', depth: 91.1, lineWidth: 2 },
+    ];
+    const seaAndRKBLayer = new ReferenceLineLayer('sea-and-rkb-layer', { data: seaAndRKBLayerData });
 
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
