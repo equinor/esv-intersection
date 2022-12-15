@@ -9,19 +9,23 @@ jobs:
   deploy-docs-n-storybook:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v3
       with:
         submodules: true
         persist-credentials: false
-    - uses: actions/setup-node@v2
+
+    - name: Setup Nodejs
+      uses: actions/setup-node@v3
       with:
         node-version: '16'
+        cache: 'npm'
 
     - name: Info
       run: echo "Running on branch $(basename ${{ github.ref }})"
 
     - name: Install dependencies
-      run:  npm install --production=false
+      run:  npm ci --prefer-offline
 
     - name: Create build dir
       run: mkdir docs_out
@@ -36,7 +40,7 @@ jobs:
       run:  npx build-storybook -c .storybook -o docs_out/storybook/$(basename ${{ github.ref }})
 
     - name: Publish GH pages
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      uses: JamesIves/github-pages-deploy-action@releases/v4
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH: gh-pages  # The branch the action should deploy to.
