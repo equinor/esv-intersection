@@ -205,7 +205,6 @@ const renderIntersection = (scaleOptions: any) => {
       pAndA: [...pAndASymbols, ...cementSqueezes],
       perforations,
       symbols: { ...CSDSVGs, ...pAndASVGs },
-      visualMarkers: [{ kind: 'Dashed', depth: 250 }],
     };
 
     const internalLayerIds: InternalLayerOptions = {
