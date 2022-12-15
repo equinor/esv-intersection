@@ -3,6 +3,28 @@ import { CanvasLayer } from './base';
 import { assertNever } from './schematicInterfaces';
 import { OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 
+export type SeaAndRKBLineType = 'wavy' | 'dashed' | 'solid';
+
+export type SeaAndRKBReferenceLine = {
+  kind: 'RKB' | 'MSL' | 'Seabed';
+  lineType: SeaAndRKBLineType;
+  color: string;
+  depth: number;
+  lineWidth?: number;
+};
+
+export type SeaAndRKBLayerOptions = {
+  referenceLines: SeaAndRKBReferenceLine[];
+};
+
+export const defaultSeaAndRKBLayerOptions: SeaAndRKBLayerOptions = {
+  referenceLines: [
+    { kind: 'MSL', lineType: 'wavy', color: 'blue', depth: 0 },
+    { kind: 'RKB', lineType: 'dashed', color: 'black', depth: 30 },
+    { kind: 'Seabed', lineType: 'solid', color: 'slategray', depth: 100, lineWidth: 2 },
+  ],
+};
+
 const foldReferenceLineKind = <T>(
   options: {
     Seabed: (seabed: SeaAndRKBReferenceLine) => T;
@@ -49,28 +71,6 @@ const foldLineType = <T>(
   }
 };
 
-type SeaAndRKBLineType = 'wavy' | 'dashed' | 'solid';
-
-export type SeaAndRKBReferenceLine = {
-  kind: 'RKB' | 'MSL' | 'Seabed';
-  lineType: SeaAndRKBLineType;
-  color: string;
-  depth: number;
-  lineWidth?: number;
-};
-
-export type SeaAndRKBLayerOptions = {
-  referenceLines: SeaAndRKBReferenceLine[];
-};
-
-export const defaultSeaAndRKBLayerOptions: SeaAndRKBLayerOptions = {
-  referenceLines: [
-    { kind: 'MSL', lineType: 'wavy', color: 'blue', depth: 0 },
-    { kind: 'RKB', lineType: 'dashed', color: 'black', depth: 30 },
-    { kind: 'Seabed', lineType: 'solid', color: 'slategray', depth: 100, lineWidth: 2 },
-  ],
-};
-
 export class SeaAndRKBLayer<T> extends CanvasLayer<T> {
   rescaleEvent: OnRescaleEvent | null = null;
 
@@ -92,9 +92,7 @@ export class SeaAndRKBLayer<T> extends CanvasLayer<T> {
 
   onUpdate(event: OnUpdateEvent<T>) {
     super.onUpdate(event);
-
     this.clearCanvas();
-
     this.render();
   }
 
