@@ -62,6 +62,7 @@ import {
   createPerforationTexture,
   PerforationShape,
   createCementSqueezeTexture,
+  createReferenceLineTexture,
 } from '../datautils/schematicShapeGenerator';
 import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
@@ -463,10 +464,21 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
         const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
-
         this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
       });
     }
+
+    // console.log('visual markers:', this.data.visualMarkers);
+    // if (this.data.visualMarkers) {
+    //   const { visualMarkers } = this.data;
+    //   visualMarkers.forEach((visualMarker) => {
+    //     console.log('hole sizes:', holeSizes);
+    //     const pathPoints = this.getZFactorScaledPathForPoints(visualMarker.depth - 10, visualMarker.depth);
+    //     const texture = createReferenceLineTexture();
+    //     const segment: ComplexRopeSegment = { points: pathPoints, diameter: 10000 };
+    //     const sprite = this.drawComplexRope([segment], texture);
+    //   });
+    // }
   }
 
   private updateSymbolCache(symbols: { [key: string]: string }) {

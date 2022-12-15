@@ -22,6 +22,8 @@ import {
   InternalLayerOptions,
   Perforation,
   SchematicData,
+  SeaAndRKBLayer,
+  defaultSeaAndRKBLayerOptions,
 } from '../../../src';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
@@ -203,6 +205,7 @@ const renderIntersection = (scaleOptions: any) => {
       pAndA: [...pAndASymbols, ...cementSqueezes],
       perforations,
       symbols: { ...CSDSVGs, ...pAndASVGs },
+      visualMarkers: [{ kind: 'Dashed', depth: 250 }],
     };
 
     const internalLayerIds: InternalLayerOptions = {
@@ -223,9 +226,13 @@ const renderIntersection = (scaleOptions: any) => {
 
     const schematicLayer = new SchematicLayer(pixiContext2, 'schematic-webgl-layer', schematicLayerOptions);
 
+    const seaAndRKBLayerOptions = defaultSeaAndRKBLayerOptions;
+    const seaAndRKBLayer = new SeaAndRKBLayer('sea-and-rkb-layer', seaAndRKBLayerOptions);
+    //
+
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
-    const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, schematicLayer, calloutLayer];
+    const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, schematicLayer, seaAndRKBLayer, calloutLayer];
 
     const opts = {
       scaleOptions,

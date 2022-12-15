@@ -917,3 +917,18 @@ export const createPerforationTexture = (
     perforation.subKind,
   );
 };
+
+// RKB, MSL, Seabed
+export const createReferenceLineTexture = () => {
+  const canvas = document.createElement('canvas');
+  const size = DEFAULT_TEXTURE_SIZE * 1;
+  canvas.width = size / 2;
+  canvas.height = size;
+
+  const canvasCtx = canvas.getContext('2d');
+
+  canvasCtx.fillStyle = '#ff00ff';
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+  return Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP });
+};

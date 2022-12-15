@@ -274,6 +274,13 @@ export const intersect = (a: Perforation, b: Perforation): boolean => {
   return a.start < b.end && a.end > b.start;
 };
 
+export type VisualMarker = {
+  kind: 'Dashed' | 'Wavy';
+  depth: number;
+  topLabel?: string;
+  bottomLabel?: string;
+};
+
 export interface SchematicData {
   holeSizes: HoleSize[];
   casings: Casing[];
@@ -284,6 +291,7 @@ export interface SchematicData {
     [key: string]: string;
   };
   perforations: Perforation[];
+  visualMarkers: VisualMarker[];
 }
 
 export interface InternalLayerOptions {
