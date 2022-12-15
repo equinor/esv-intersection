@@ -463,7 +463,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const otherPerforations = perforations.filter((p) => p.id !== perforation.id);
         const widestPerfShapeDiameter = perfShapes.reduce((widest, perfShape) => (perfShape.diameter > widest ? perfShape.diameter : widest), 0);
-
         this.drawComplexRope(perfShapes, this.createPerforationTexture(perforation, widestPerfShapeDiameter, otherPerforations));
       });
     }
