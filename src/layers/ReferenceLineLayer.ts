@@ -76,7 +76,7 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     ctx.lineTo(canvas.width, y);
     ctx.stroke();
     ctx.restore();
-    if (dashed) {
+    if (dashed.text) {
       this.drawText(ctx, dashed, ctx.canvas.width, y);
     }
   }
@@ -94,7 +94,7 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     ctx.lineTo(canvas.width, y);
     ctx.stroke();
     ctx.restore();
-    if (solid) {
+    if (solid.text) {
       this.drawText(ctx, solid, ctx.canvas.width, y);
     }
   }
@@ -120,7 +120,7 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
       ctx.stroke();
     }
     ctx.restore();
-    if (wavy) {
+    if (wavy.text) {
       this.drawText(ctx, wavy, ctx.canvas.width, y);
     }
   }
