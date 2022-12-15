@@ -62,7 +62,6 @@ import {
   createPerforationTexture,
   PerforationShape,
   createCementSqueezeTexture,
-  createReferenceLineTexture,
 } from '../datautils/schematicShapeGenerator';
 import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
