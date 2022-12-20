@@ -132,8 +132,7 @@ export const findCementOuterDiameterAtDepth = (
   const holeAtDepth = holes.find((hole: HoleSize) => hole.start <= depth && hole.end >= depth && hole.diameter > attachedOuterDiameter);
 
   if (outerCasingAtDepth) {
-    const innerStringDiameter = getInnerStringDiameter(outerCasingAtDepth);
-    return innerStringDiameter;
+    return getInnerStringDiameter(outerCasingAtDepth);
   }
 
   if (holeAtDepth) {
