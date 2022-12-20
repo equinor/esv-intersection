@@ -2,6 +2,15 @@
 
 ## TO BE RELEASED
 
+## v3.0.0-beta.5
+
+### Feature
+ - Reference lines, with example for RKB, MSL and Seabed
+
+### Chores
+ - Update dependencies
+ - Update workflows actions to latest versions
+
 ## v3.0.0-beta.4
 
 ### Changes
