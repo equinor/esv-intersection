@@ -66,7 +66,7 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
   private drawDashed(dashed: ReferenceLine) {
     const { ctx } = this;
     const { canvas } = this;
-    const y = this.yScale(-dashed.depth);
+    const y = this.yScale(dashed.depth);
     ctx.save();
     ctx.strokeStyle = dashed.color;
     this.setCtxLineStyle(ctx, dashed);
@@ -100,12 +100,12 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
   }
 
   private drawWavy(wavy: ReferenceLine): void {
-    const a = 4;
-    const b = 2.5;
-    const c = 500;
+    const factor = 4;
+    const min = 2.5;
+    const max = 500;
     const { ctx } = this;
     const { canvas } = this;
-    const waveHeight = calcSize(a, b, c, this.yScale);
+    const waveHeight = calcSize(factor, min, max, this.yScale);
     const wavePeriod = waveHeight * 2;
     const y = this.yScale(wavy.depth) - waveHeight;
     const steps = Math.ceil(canvas.width / wavePeriod) + 1;
