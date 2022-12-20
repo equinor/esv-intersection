@@ -22,6 +22,8 @@ import {
   InternalLayerOptions,
   Perforation,
   SchematicData,
+  ReferenceLine,
+  ReferenceLineLayer,
 } from '../../../src';
 
 import { createButtonContainer, createFPSLabel, createLayerContainer, createRootContainer, createHelpText } from '../utils';
@@ -221,9 +223,16 @@ const renderIntersection = (scaleOptions: any) => {
 
     const schematicLayer = new SchematicLayer(pixiContext2, 'schematic-webgl-layer', schematicLayerOptions);
 
+    const seaAndRKBLayerData: ReferenceLine[] = [
+      { text: 'RKB', lineType: 'dashed', color: 'black', depth: 0 },
+      { text: 'MSL', lineType: 'wavy', color: 'blue', depth: 30 },
+      { text: 'Seabed', lineType: 'solid', color: 'slategray', depth: 91.1, lineWidth: 2 },
+    ];
+    const seaAndRKBLayer = new ReferenceLineLayer('sea-and-rkb-layer', { data: seaAndRKBLayerData });
+
     const calloutLayer = new CalloutCanvasLayer<Annotation[]>('callout', { order: 100, data: picksData, referenceSystem });
 
-    const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, schematicLayer, calloutLayer];
+    const layers = [gridLayer, geomodelLayer, wellboreLayer, geomodelLabelsLayer, seismicLayer, schematicLayer, seaAndRKBLayer, calloutLayer];
 
     const opts = {
       scaleOptions,
@@ -253,6 +262,7 @@ const renderIntersection = (scaleOptions: any) => {
     const btnWellbore = createButton(controller, wellboreLayer, 'Wellbore');
     const btnGeomodel = createButton(controller, geomodelLayer, 'Geo model');
     const btnSchematic = createButton(controller, schematicLayer, 'Schematic');
+    const btnSeaAndRKB = createButton(controller, seaAndRKBLayer, 'SeaAndRKB');
     const btnGeomodelLabels = createButton(controller, geomodelLabelsLayer, 'Geo model labels');
     const btnSeismic = createButton(controller, seismicLayer, 'Seismic');
     const btnPicks = createButton(controller, calloutLayer, 'Picks');
@@ -320,6 +330,7 @@ const renderIntersection = (scaleOptions: any) => {
     btnToggleContainer.appendChild(btnGeomodelLabels);
     btnToggleContainer.appendChild(btnSeismic);
     btnToggleContainer.appendChild(btnSchematic);
+    btnToggleContainer.appendChild(btnSeaAndRKB);
     btnToggleContainer.appendChild(btnPicks);
     btnToggleContainer.appendChild(toggleAxis);
     btnAdjustSizeContainer.appendChild(btnLarger);

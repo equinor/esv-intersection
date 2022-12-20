@@ -1,31 +1,26 @@
-import typescript from 'rollup-plugin-typescript2';
-import resolve from 'rollup-plugin-node-resolve';
-import { terser } from 'rollup-plugin-terser';
-import commonjs from 'rollup-plugin-commonjs';
+import typescript from 'rollup-plugin-typescript2'
+import terser from '@rollup/plugin-terser';
 
-import pkg from './package.json';
+import pkg from './package.json' assert { type: "json" };
+
+const peerDeps = Object.keys(pkg.peerDependencies || {})
 
 export default [
   {
     input: 'src/index.ts',
+    external: peerDeps,
     output: [
       {
-        file: pkg.main,
+        file: pkg.exports.require,
         format: 'cjs',
       },
       {
-        file: pkg.module,
+        file: pkg.exports.import,
         format: 'esm',
       },
     ],
-    external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
     plugins: [
-      typescript({
-        // eslint-disable-next-line global-require
-        typescript: require('typescript'),
-      }),
-      resolve(),
-      commonjs(),
+      typescript(),
       terser({
         mangle: false,
       }),
@@ -33,18 +28,14 @@ export default [
   },
   {
     input: 'src/index.ts',
+    external: peerDeps,
     output: {
-      name: 'Vector2',
-      file: pkg.browser,
+      name: 'Esv-intersection',
+      file: pkg.exports.browser,
       format: 'umd',
     },
     plugins: [
-      resolve(),
-      typescript({
-        // eslint-disable-next-line global-require
-        typescript: require('typescript'),
-      }),
-      commonjs(),
+      typescript(),
       terser({
         mangle: false,
       }),
