@@ -2,6 +2,11 @@
 
 ## TO BE RELEASED
 
+## v3.0.0-beta.6
+
+### Feature
+ - Update perforation rendering
+
 ## v3.0.0-beta.5
 
 ### Feature
