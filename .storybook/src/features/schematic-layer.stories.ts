@@ -90,16 +90,14 @@ export const SchematicLayerUsingHighLevelInterface = () => {
           start: 4000,
           end: 4500,
           isOpen: true,
-          referenceIds: ['casing-07'],
         },
         {
           kind: 'perforation',
-          subKind: 'Cased hole frac pack',
+          subKind: 'Open hole frac pack',
           id: 'PerforationDemo2',
           start: 3500,
           end: 4500,
           isOpen: true,
-          referenceIds: ['casing-07'],
         },
       ];
 

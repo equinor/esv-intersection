@@ -143,10 +143,6 @@ export interface Perforation {
    * is the perforation open or sealed?
    */
   isOpen: boolean;
-  /**
-   * Referenced Casing ids
-   */
-  referenceIds: string[];
 }
 
 export const foldPerforationSubKind = <T>(
@@ -184,41 +180,78 @@ export const foldPerforationSubKind = <T>(
   }
 };
 
-export const getPerforationsThatStartAtHoleDiameter = (perforations: Perforation[]) =>
-  perforations.filter((perf) =>
-    foldPerforationSubKind(
-      {
-        Perforation: () => true,
-        OpenHoleGravelPack: () => true,
-        OpenHoleFracPack: () => false,
-        CasedHoleFracturation: () => false,
-        CasedHoleGravelPack: () => false,
-        CasedHoleFracPack: () => false,
-      },
-      perf.subKind,
-    ),
+export const shouldPerforationStartAtHoleDiameter = (perf: Perforation) =>
+  foldPerforationSubKind(
+    {
+      Perforation: () => true,
+      OpenHoleGravelPack: () => true,
+      OpenHoleFracPack: () => false,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => false,
+      CasedHoleFracPack: () => false,
+    },
+    perf.subKind,
   );
 
-export const getPerforationsThatSTartAtCasingDiameter = (perforations: Perforation[]) =>
-  perforations.filter((perf) =>
-    foldPerforationSubKind(
-      {
-        Perforation: () => false,
-        OpenHoleGravelPack: () => false,
-        OpenHoleFracPack: () => true,
-        CasedHoleFracturation: () => true,
-        CasedHoleGravelPack: () => true,
-        CasedHoleFracPack: () => true,
-      },
-      perf.subKind,
-    ),
+export const shouldPerforationStartAtCasingDiameter = (perf: Perforation) =>
+  foldPerforationSubKind(
+    {
+      Perforation: () => false,
+      OpenHoleGravelPack: () => false,
+      OpenHoleFracPack: () => true,
+      CasedHoleFracturation: () => true,
+      CasedHoleGravelPack: () => true,
+      CasedHoleFracPack: () => true,
+    },
+    perf.subKind,
   );
 
-export function hasGravelPack(perf: Perforation): boolean {
-  return foldPerforationSubKind(
+export const hasPacking = (perf: Perforation): boolean =>
+  foldPerforationSubKind(
     {
       Perforation: () => false,
       OpenHoleGravelPack: () => true,
+      OpenHoleFracPack: () => true,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => true,
+      CasedHoleFracPack: () => true,
+    },
+    perf.subKind,
+  );
+
+export function hasFracLines(perf: Perforation): boolean {
+  return foldPerforationSubKind(
+    {
+      Perforation: () => false,
+      OpenHoleGravelPack: () => false,
+      OpenHoleFracPack: () => true,
+      CasedHoleFracturation: () => true,
+      CasedHoleGravelPack: () => false,
+      CasedHoleFracPack: () => true,
+    },
+    perf.subKind,
+  );
+}
+
+export function hasSpikes(perf: Perforation): boolean {
+  return foldPerforationSubKind(
+    {
+      Perforation: () => true,
+      OpenHoleGravelPack: () => false,
+      OpenHoleFracPack: () => false,
+      CasedHoleFracturation: () => false,
+      CasedHoleGravelPack: () => false,
+      CasedHoleFracPack: () => false,
+    },
+    perf.subKind,
+  );
+}
+
+export function isSubkindCasedHoleGravelPack(perf: Perforation): boolean {
+  return foldPerforationSubKind(
+    {
+      Perforation: () => false,
+      OpenHoleGravelPack: () => false,
       OpenHoleFracPack: () => false,
       CasedHoleFracturation: () => false,
       CasedHoleGravelPack: () => true,
@@ -353,11 +386,13 @@ export interface PerforationOptions {
   yellow: string;
   grey: string;
   red: string;
+  outline: string;
   transparent: string;
   spikeWidth: number;
+  spikeLength: number;
   packingOpacity: number;
   fracLineLength: number;
-  fracLineHalfWidth: number;
+  fracLineCurve: number;
   scalingFactor: number;
 }
 
@@ -366,12 +401,14 @@ export const defaultPerforationOptions: PerforationOptions = {
   yellow: '#FFFC00',
   grey: 'gray',
   red: '#FF5050',
+  outline: 'black',
   transparent: 'rgba(255, 255, 255, 0)',
-  spikeWidth: 25,
+  spikeWidth: 50,
+  spikeLength: 50,
   packingOpacity: 0.5,
-  fracLineHalfWidth: 10,
+  fracLineCurve: 10,
   fracLineLength: 25,
-  scalingFactor: 4,
+  scalingFactor: 25,
 };
 
 export interface CementOptions {
