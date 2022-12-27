@@ -1,6 +1,4 @@
 [![npm version](https://badge.fury.io/js/%40equinor%2Fesv-intersection.svg)](https://badge.fury.io/js/%40equinor%2Fesv-intersection)
-![Publish Package](https://github.com/equinor/esv-intersection/workflows/Publish%20Package/badge.svg)
-![Unit tests](https://github.com/equinor/esv-intersection/workflows/Unit%20tests/badge.svg)
 # ESV Intersection component
 A reusable component to create intersection visualizations for wells
 
@@ -8,9 +6,9 @@ Part of the [Equinor Subsurface Visualization project](https://github.com/equino
 
 - **Repository**: https://github.com/equinor/esv-intersection
 - **NPM Package**: https://www.npmjs.com/package/@equinor/esv-intersection
-- **Documentation (latest)**: https://equinor.github.io/esv-intersection/
-- **Storybook (latest)**: https://equinor.github.io/esv-intersection/storybook/latest
-- **Storybook (nightly)**: https://equinor.github.io/esv-intersection/storybook/master
+- **Documentation**: https://equinor.github.io/esv-intersection/
+- **Storybook (latest release)**: https://equinor.github.io/esv-intersection/storybook/latest
+- **Storybook (master branch)**: https://equinor.github.io/esv-intersection/storybook/master
 
 ## Getting started
 
@@ -57,15 +55,13 @@ For more examples, check out our stories in our online [storybook](https://equin
   - Linting and unit tests run automatically on Github Actions
   
 
-## Development methodology
-- The project is maintained by the [VidEx team](https://github.com/orgs/equinor/teams/viz) (Software Innovation Stavanger) and the [Heap Purple team](https://github.com/orgs/equinor/teams/heap-purple) (Software Innovation Bergen)
-- The maintainers meet once a month to discuss the direction of the project, and possible development activities
-- Development is currently limited to critical bug fixes. New features could be requested by opening a dedicated issue or, even better, by opening a [Pull Requests](CONTRIBUTION.md)
-- Development relies on a _project board_ hosted on github (https://github.com/equinor/intersection/projects/1)
+## Development
+- The project is maintained by the [VidEx team](https://github.com/orgs/equinor/teams/viz) and the [Heap Purple team](https://github.com/orgs/equinor/teams/heap-purple)
+- New features could be requested by opening a dedicated issue or, even better, by opening a [Pull Requests](CONTRIBUTION.md)
 
 
 ## Support
-If you are an equinor employee, the easiest way to get in touch with the maintainers is through the #esv-intersection channel on Slack.
+If you are an Equinor employee, the easiest way to get in touch with the maintainers is through the #esv-intersection channel on Slack.
 
 Otherwise, Github issues are the main communication channel with the maintainers. If you have a bug report, a feature request, or need some help using the component, simply [create an issue in the repository](https://github.com/equinor/esv-intersection/issues) and one of the maintainers will pick it up. Before creating an issue, please have a look at the following guidelines. Also keep in mind that creating [Pull Requests](CONTRIBUTION.md) is the preferred way to contribute to the project. 
 
