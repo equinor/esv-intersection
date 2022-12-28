@@ -4,9 +4,9 @@
   "description": "Intersection component package with testing and automatic documentation.",
   "type": "module",
   "exports": {
-    "import": "./dist/index.esm.js",
-    "require": "./dist/index.js",
-    "browser": "./dist/index.umd.js"
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs",
+    "browser": "./dist/index.umd.cjs"
   },
   "files": [
     "dist/*",
@@ -16,7 +16,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "rollup -c --bundleConfigAsCjs",
+    "build": "vite build",
     "prepub": "npm run build",
     "pub": "npm publish --access=public",
     "prepub-beta": "npm run build",
@@ -80,7 +80,9 @@
     "storybook-dark-mode": "^2.0.4",
     "tslib": "^2.4.1",
     "typedoc": "^0.23.22",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "vite": "^3.2.5",
+    "vite-plugin-dts": "^1.7.1"
   },
   "jest": {
     "setupFiles": [
