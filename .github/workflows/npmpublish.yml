@@ -61,7 +61,7 @@ jobs:
         run: npm run docs
 
       - name: Generate storybook
-        run:  npx build-storybook -c .storybook -o docs_out/storybook/latest
+        run:  npm run storybook build -c .storybook -o docs_out/storybook/latest
 
       - name: Publish GH pages
         uses: JamesIves/github-pages-deploy-action@releases/v4

@@ -328,3 +328,8 @@ export const ZoomWithGridAndAxis = () => {
 
   return root;
 };
+
+export default {
+  title: 'ESV Intersection/Features/Zoom',
+  component: ZoomWithTestLayer
+}

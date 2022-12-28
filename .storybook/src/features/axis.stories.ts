@@ -55,3 +55,8 @@ export const AxisUsingHighLevelInterface = () => {
 
   return root;
 };
+
+export default {
+  title: 'ESV Intersection/Features/Axis',
+  component: AxisUsingLowLevelInterface
+}

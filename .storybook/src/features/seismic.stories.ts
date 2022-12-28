@@ -43,3 +43,8 @@ export const SeismicUsingLowLevelInterface = () => {
 
   return root;
 };
+
+export default {
+  title: 'ESV Intersection/Features/Seismic',
+  component: SeismicUsingLowLevelInterface
+}

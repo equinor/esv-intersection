@@ -52,7 +52,7 @@ export const getPicks = (): Promise<any[]> => {
   return Promise.resolve(picks);
 };
 
-export const getCementSqueezes = (): Promise<typeof cementSqueezes[]> => {
+export const getCementSqueezes = (): Promise<any[]> => {
   return Promise.resolve(cementSqueezes)
 }
 

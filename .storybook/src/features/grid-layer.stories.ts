@@ -52,3 +52,8 @@ export const GridUsingHighLevelInterface = () => {
 
   return root;
 };
+
+export default {
+  title: 'ESV Intersection/Features/Grid',
+  component: GridUsingLowLevelInterface
+}
