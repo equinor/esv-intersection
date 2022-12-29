@@ -68,7 +68,7 @@
     "jest-environment-jsdom": "^29.3.1",
     "mock-raf": "^1.0.1",
     "pixi-dashed-line": "^1.4.2",
-    "pixi.js": "^6.5.8",
+    "pixi.js": "^7.0.5",
     "prettier": "^2.8.1",
     "rimraf": "^3.0.2",
     "storybook": "^7.0.0-beta.15",
@@ -96,7 +96,7 @@
   },
   "peerDependencies": {
     "pixi-dashed-line": "^1.4.2",
-    "pixi.js": "^6.5.8"
+    "pixi.js": "^7.0.5"
   },
   "dependencies": {
     "@equinor/videx-math": "^1.1.0",
