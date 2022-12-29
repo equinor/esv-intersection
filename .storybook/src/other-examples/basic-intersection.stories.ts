@@ -18,3 +18,8 @@ export const BasicSetup = () => {
   root.appendChild(container);
   return root;
 };
+
+export default {
+  title: 'ESV Intersection/Other examples',
+  component: BasicSetup
+}

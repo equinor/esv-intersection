@@ -64,3 +64,9 @@ export const WellborepathUsingHighLevelInterface = () => {
 
   return root;
 };
+
+
+export default {
+  title: 'ESV Intersection/Features/Wellborepath',
+  component: WellborepathUsingLowLevelInterface
+}

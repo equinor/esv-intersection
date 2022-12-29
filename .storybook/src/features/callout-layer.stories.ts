@@ -74,3 +74,8 @@ export const CalloutUsingHighLevelInterface = () => {
 
   return root;
 }
+
+export default {
+  title: 'ESV Intersection/Features/Callout',
+  component: CalloutUsingLowLevelInterface
+}

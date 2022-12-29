@@ -943,8 +943,7 @@ const createSubkindOpenHoleGravelPackTexture = {
  * Yellow gravel. Yellow frac lines from hole OD into formation
  */
 const createSubkindOpenHoleFracPackTexture = {
-  packing: (perforation: Perforation, perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions) => {
-    console.log({ perforation });
+  packing: (_perforation: Perforation, perfShape: ComplexRopeSegment, perforationOptions: PerforationOptions) => {
     const { canvas, ctx } = createPerforationCanvas(perfShape, perforationOptions);
     drawPacking(canvas, ctx, perforationOptions);
     return createPerforationTexture(canvas);

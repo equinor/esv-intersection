@@ -71,15 +71,20 @@ export const SchematicLayerUsingHighLevelInterface = () => {
       };
 
       const pAndASymbols = [
-        <PAndASymbol>{
+        {
           kind: 'pAndASymbol' as const,
           id: 'mechanical-plug-1',
           start: 5100,
           end: 5110,
           diameter: 8.5,
           symbolKey: 'mechanicalPlug',
-        },
-        <CementPlug>{ kind: 'cementPlug' as const, id: 'cement-plug-2', start: 5000, end: 5110, referenceIds: ['casing-07'] },
+        } as PAndASymbol,
+        { 
+          kind: 'cementPlug' as const, 
+          id: 'cement-plug-2', 
+          start: 5000, end: 5110, 
+          referenceIds: ['casing-07'] 
+        } as CementPlug,
       ];
 
       const perforations: Perforation[] = [
@@ -180,3 +185,9 @@ const createInternalLayerVisibilityButton =
     };
     return btn;
   };
+
+
+export default {
+  title: 'ESV Intersection/Features/Schematic',
+  component: SchematicLayerUsingHighLevelInterface
+}
