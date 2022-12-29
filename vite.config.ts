@@ -12,7 +12,19 @@ export default defineConfig({
       entry: 'src/index.ts',
       formats: ['es', 'cjs', 'umd'],
       name: 'esvintersection',
-      fileName: 'index',
+      fileName: (format) => {
+        const fileName = 'index'
+        switch(format) {
+          case 'es':
+            return `${fileName}.mjs`
+          case 'cjs':
+            return `${fileName}.cjs`
+          case 'umd':
+            return `${fileName}.umd.js`
+          default:
+            return `${fileName}.js`
+        }
+      },
     },
     rollupOptions: {
       external: getPeerDeps(pkg),

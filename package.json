@@ -4,9 +4,9 @@
   "description": "Intersection component package with testing and automatic documentation.",
   "type": "module",
   "exports": {
-    "import": "./dist/index.js",
+    "import": "./dist/index.mjs",
     "require": "./dist/index.cjs",
-    "browser": "./dist/index.umd.cjs"
+    "browser": "./dist/index.umd.js"
   },
   "files": [
     "dist/*",
