@@ -32,7 +32,6 @@ export default defineConfig({
         sourcemap: true,
         globals: {
           'pixi.js': 'PIXI',
-          'pixi-dashed-line': 'pixiDashedLine',
         },
       },
     },

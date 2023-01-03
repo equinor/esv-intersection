@@ -1,7 +1,7 @@
 import { max } from 'd3-array';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
 import { Graphics, groupD8, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
-import { DashLine } from 'pixi-dashed-line';
+import { DashLine } from '../vendor/pixi-dashed-line';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
 import {
