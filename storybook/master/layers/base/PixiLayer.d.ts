@@ -1,9 +1,9 @@
-import { AbstractRenderer, Application, Container, DisplayObject, IRendererOptionsAuto, RENDERER_TYPE } from 'pixi.js';
+import { IRenderer, Application, Container, DisplayObject, IRendererOptionsAuto, RENDERER_TYPE } from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 export declare class PixiRenderApplication {
     stage: Container;
-    renderer: AbstractRenderer;
+    renderer: IRenderer<HTMLCanvasElement>;
     constructor(pixiRenderOptions?: IRendererOptionsAuto);
     destroy(): void;
     get view(): HTMLCanvasElement;
@@ -13,7 +13,7 @@ export declare abstract class PixiLayer<T> extends Layer<T> {
     private pixiViewContainer;
     private ctx;
     private container;
-    constructor(ctx: Application | PixiRenderApplication, id?: string, options?: LayerOptions<T>);
+    constructor(ctx: Application<HTMLCanvasElement> | PixiRenderApplication, id?: string, options?: LayerOptions<T>);
     render(): void;
     addChild(child: DisplayObject): void;
     clearLayer(): void;
