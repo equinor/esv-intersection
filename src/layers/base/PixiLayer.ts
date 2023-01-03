@@ -1,4 +1,4 @@
-import { AbstractRenderer, Application, autoDetectRenderer, Container, DisplayObject, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
+import { IRenderer, Application, autoDetectRenderer, Container, DisplayObject, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
@@ -11,7 +11,7 @@ import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 export class PixiRenderApplication {
   stage: Container;
 
-  renderer: AbstractRenderer;
+  renderer: IRenderer<HTMLCanvasElement>;
 
   constructor(pixiRenderOptions?: IRendererOptionsAuto) {
     const options = {
@@ -24,7 +24,7 @@ export class PixiRenderApplication {
       preserveDrawingBuffer: true,
       ...pixiRenderOptions,
     };
-    this.renderer = autoDetectRenderer(options);
+    this.renderer = autoDetectRenderer<HTMLCanvasElement>(options);
     this.stage = new Container();
   }
 
@@ -68,7 +68,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
   private ctx: PixiRenderApplication;
   private container: Container;
 
-  constructor(ctx: Application | PixiRenderApplication, id?: string, options?: LayerOptions<T>) {
+  constructor(ctx: Application<HTMLCanvasElement> | PixiRenderApplication, id?: string, options?: LayerOptions<T>) {
     super(id, options);
 
     this.ctx = ctx;
