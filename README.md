@@ -46,7 +46,7 @@ For more examples, check out our stories in our online [storybook](https://equin
 
 - **Compiler**: [Typescript](https://www.npmjs.com/package/typescript)
 - **Module bundler**: [Rollup](https://www.npmjs.com/package/rollup)
-- **Testing**: [Jest](https://www.npmjs.com/package/jest)
+- **Testing**: [Vitest](https://vitest.dev/)
 - **Documentation**: [TypeDoc](https://www.npmjs.com/package/typedoc)
 - **Code compressor**: [Terser](https://www.npmjs.com/package/terser)
 - **Miscellaneous**:

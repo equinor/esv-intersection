@@ -1,6 +1,7 @@
 /* eslint-disable no-magic-numbers */
-import createMockRaf from 'mock-raf';
+import { describe, expect, it, beforeEach, afterEach, vi, SpyInstance } from 'vitest';
 import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
+import createMockRaf from 'mock-raf';
 import { CalloutCanvasLayer, IntersectionReferenceSystem } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
 
@@ -15,11 +16,11 @@ describe('CalloutCanvasLayer', () => {
 
   const mockRaf = createMockRaf();
 
-  let mockRequestAnimationFrame: jest.SpyInstance<number, [callback: FrameRequestCallback]>;
+  let mockRequestAnimationFrame: SpyInstance<[callback: FrameRequestCallback], number>;
 
   beforeEach(() => {
     elm = document.createElement('div');
-    mockRequestAnimationFrame = jest.spyOn(window, 'requestAnimationFrame');
+    mockRequestAnimationFrame = vi.spyOn(window, 'requestAnimationFrame');
     mockRequestAnimationFrame.mockImplementation(mockRaf.raf);
   });
 

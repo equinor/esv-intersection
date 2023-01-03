@@ -139,7 +139,7 @@ Compiles the code found within the src-folder. Build is outputted to a new dist-
 
 
 ### Creating tests
-All tests are defined within the test-folder. Jest naming convention is to place tests for `SOMESCRIPT.ts` in a single file `SOMESCRIPT.test.ts`.
+All tests are defined within the test-folder. Naming convention is to place tests for `SOMESCRIPT.ts` in a single file `SOMESCRIPT.test.ts`.
 
 
 ### Running tests

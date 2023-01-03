@@ -1,4 +1,5 @@
 /* eslint-disable no-magic-numbers */
+import { describe, expect, it } from 'vitest';
 import { Casing, CasingWindow, Completion, HoleSize } from '../src';
 import * as SchematicShapeGenerator from '../src/datautils/schematicShapeGenerator';
 import * as TestHelpers from './test-helpers';

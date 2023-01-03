@@ -1,3 +1,4 @@
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { HTMLLayer } from '../src';
 
 class htmlLayer<T> extends HTMLLayer<T> {}

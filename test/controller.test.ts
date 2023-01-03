@@ -1,3 +1,4 @@
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { Controller, GridLayer } from '../src';
 
 describe('Controller', () => {
