@@ -1,5 +1,6 @@
 /* eslint-disable no-magic-numbers */
 import { describe, expect, it, beforeEach, afterEach, vi, SpyInstance } from 'vitest';
+import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
 import createMockRaf from 'mock-raf';
 import { CalloutCanvasLayer, IntersectionReferenceSystem } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
@@ -46,8 +47,6 @@ describe('CalloutCanvasLayer', () => {
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       layer.ctx.__clearEvents();
 
       // Act
@@ -55,10 +54,8 @@ describe('CalloutCanvasLayer', () => {
       mockRaf.step();
 
       // Assert
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
-      const fillTextCalls = events.filter((call) => call.type === 'fillText');
+      const fillTextCalls = events.filter((call: CanvasRenderingContext2DEvent) => call.type === 'fillText');
       expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -71,8 +68,6 @@ describe('CalloutCanvasLayer', () => {
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       layer.ctx.__clearEvents();
 
       // Act
@@ -80,10 +75,8 @@ describe('CalloutCanvasLayer', () => {
       mockRaf.step();
 
       // Assert
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
-      const fillTextCalls = events.filter((call) => call.type === 'fillText');
+      const fillTextCalls = events.filter((call: CanvasRenderingContext2DEvent) => call.type === 'fillText');
       expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -94,8 +87,6 @@ describe('CalloutCanvasLayer', () => {
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       layer.ctx.__clearEvents();
 
       // Act
