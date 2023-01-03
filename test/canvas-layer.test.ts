@@ -1,3 +1,4 @@
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { GridLayer } from '../src/index';
 
 describe('Canvas', () => {

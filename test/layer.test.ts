@@ -1,3 +1,4 @@
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { Layer, OnUpdateEvent } from '../src';
 
 class TestLayer extends Layer<string> {

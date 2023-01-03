@@ -1,4 +1,5 @@
 /* eslint-disable no-magic-numbers */
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { SchematicData } from '../src/layers/schematicInterfaces';
 import { SchematicLayer, SchematicLayerOptions, IntersectionReferenceSystem, PixiRenderApplication } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
@@ -40,7 +41,7 @@ describe('SchematicLayer', () => {
       layer.onMount({ elm });
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
-      jest.spyOn(layer, 'addChild');
+      vi.spyOn(layer, 'addChild');
 
       // Act
       layer.data = data;
@@ -58,7 +59,7 @@ describe('SchematicLayer', () => {
       layer.onMount({ elm });
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
-      jest.spyOn(layer, 'addChild');
+      vi.spyOn(layer, 'addChild');
 
       // Act
       layer.data = data;
@@ -74,7 +75,7 @@ describe('SchematicLayer', () => {
       layer.onMount({ elm });
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
-      jest.spyOn(layer, 'addChild');
+      vi.spyOn(layer, 'addChild');
 
       // Act
       // Assert
