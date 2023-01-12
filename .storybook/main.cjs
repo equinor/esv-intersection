@@ -5,8 +5,10 @@ module.exports = {
   framework: {
     name: '@storybook/html-vite',
     options: {
-      rollupOptions: {
-        cache: false
+      build: {
+        rollupOptions: {
+          cache: false
+        }
       }
     }
   },
