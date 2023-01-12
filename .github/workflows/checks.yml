@@ -83,7 +83,6 @@ jobs:
         run: node --version
       - name: NPM version
         run: npm --version
-      - name: Install dependencies
       - name: Build storybook
         run: |
           echo $NODE_OPTIONS
