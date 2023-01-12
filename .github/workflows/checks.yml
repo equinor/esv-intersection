@@ -73,6 +73,25 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup
     steps:
+      - name: Increase Swap
+        run: |
+          echo "Memory and swap:"
+          free -h
+          echo
+          swapon --show
+          echo
+          export SWAP_FILE=$(swapon --show=NAME | tail -n 1)
+          sudo swapoff $SWAP_FILE
+          sudo rm $SWAP_FILE
+          sudo fallocate -l 2G $SWAP_FILE
+          sudo chmod 600 $SWAP_FILE
+          sudo mkswap $SWAP_FILE
+          sudo swapon $SWAP_FILE
+          echo "Memory and swap:"
+          free -h
+          echo
+          swapon --show
+          echo
       - name: Get files
         uses: actions/cache@v3
         with:
