@@ -59,7 +59,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-storybook": "^0.6.10",
     "mock-raf": "^1.0.1",
-    "pixi.js": "^7.0.5",
+    "pixi.js": "^7.1.0",
     "prettier": "^2.8.2",
     "rimraf": "^3.0.2",
     "storybook": "^7.0.0-beta.25",
@@ -73,7 +73,7 @@
     "vitest-canvas-mock": "^0.2.2"
   },
   "peerDependencies": {
-    "pixi.js": "^7.0.5"
+    "pixi.js": "^7.1.0"
   },
   "dependencies": {
     "@equinor/videx-math": "^1.1.0",
