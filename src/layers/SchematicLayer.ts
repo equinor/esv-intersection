@@ -263,12 +263,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.addChild(polygon);
   };
 
-  protected drawBigTexturedPolygon = (coords: Point[], t: Texture): Graphics => {
-    const polygon = new Graphics().beginTextureFill({ texture: t }).drawPolygon(coords).endFill();
-    this.addChild(polygon);
-    return polygon;
-  };
-
   protected drawRope(path: Point[], texture: Texture, tint?: number): void {
     if (path.length === 0) {
       return null;
