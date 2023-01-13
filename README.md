@@ -45,15 +45,14 @@ For more examples, check out our stories in our online [storybook](https://equin
 ## Technical choices
 
 - **Compiler**: [Typescript](https://www.npmjs.com/package/typescript)
-- **Module bundler**: [Rollup](https://www.npmjs.com/package/rollup)
+- **Module bundler**: [Vite](https://www.npmjs.com/package/vite)
 - **Testing**: [Vitest](https://vitest.dev/)
 - **Documentation**: [TypeDoc](https://www.npmjs.com/package/typedoc)
-- **Code compressor**: [Terser](https://www.npmjs.com/package/terser)
 - **Miscellaneous**:
   - Architecture: A container component that holds several layers, specialized for the type of data and visualization they address (analogous to the VidEx-map component https://github.com/equinor/videx-map)
   - Browser support: Target Edge, Chrome, Firefox, Safari
   - Linting and unit tests run automatically on Github Actions
-  
+
 
 ## Development
 - The project is maintained by the [VidEx team](https://github.com/orgs/equinor/teams/viz) and the [Heap Purple team](https://github.com/orgs/equinor/teams/heap-purple)
@@ -63,7 +62,7 @@ For more examples, check out our stories in our online [storybook](https://equin
 ## Support
 If you are an Equinor employee, the easiest way to get in touch with the maintainers is through the #esv-intersection channel on Slack.
 
-Otherwise, Github issues are the main communication channel with the maintainers. If you have a bug report, a feature request, or need some help using the component, simply [create an issue in the repository](https://github.com/equinor/esv-intersection/issues) and one of the maintainers will pick it up. Before creating an issue, please have a look at the following guidelines. Also keep in mind that creating [Pull Requests](CONTRIBUTION.md) is the preferred way to contribute to the project. 
+Otherwise, Github issues are the main communication channel with the maintainers. If you have a bug report, a feature request, or need some help using the component, simply [create an issue in the repository](https://github.com/equinor/esv-intersection/issues) and one of the maintainers will pick it up. Before creating an issue, please have a look at the following guidelines. Also keep in mind that creating [Pull Requests](CONTRIBUTION.md) is the preferred way to contribute to the project.
 
 ### Help needed
 Describe your use case in details, make sure to include the version of the component you are using, and relevant software that are part of your pipeline (eg, Chrome/Firefox/Safari, Node, npm, …), including their version as well
