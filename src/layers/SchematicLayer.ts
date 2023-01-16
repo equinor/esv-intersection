@@ -1,6 +1,6 @@
 import { max } from 'd3-array';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
-import { Graphics, groupD8, IPoint, Point, Rectangle, RENDERER_TYPE, SimpleRope, Texture } from 'pixi.js';
+import { Graphics, groupD8, IPoint, Point, Rectangle, SimpleRope, Texture } from 'pixi.js';
 import { DashLine } from '../vendor/pixi-dashed-line';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
@@ -56,7 +56,6 @@ import {
   createScreenTexture,
   createTubingTexture,
   createTubularRenderingObject,
-  makeTubularPolygon,
   prepareCasingRenderObject,
   createCementPlugTexture,
   createComplexRopeSegmentsForPerforation,
@@ -262,12 +261,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     polygon.endFill();
 
     this.addChild(polygon);
-  };
-
-  protected drawBigTexturedPolygon = (coords: Point[], t: Texture): Graphics => {
-    const polygon = new Graphics().beginTextureFill({ texture: t }).drawPolygon(coords).endFill();
-    this.addChild(polygon);
-    return polygon;
   };
 
   protected drawRope(path: Point[], texture: Texture, tint?: number): void {
@@ -632,14 +625,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const { exaggerationFactor, holeOptions } = this.options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = holeObject.diameter * exaggerationFactor;
     const { rightPath, leftPath } = createTubularRenderingObject(exaggeratedDiameter / 2, pathPoints);
+    const texture = this.getHoleTexture(holeOptions, exaggeratedDiameter, maxHoleDiameter);
 
-    if (this.renderType() === RENDERER_TYPE.CANVAS) {
-      const polygonCoords = makeTubularPolygon(leftPath, rightPath);
-      this.drawBigPolygon(polygonCoords, convertColor(holeOptions.firstColor));
-    } else {
-      const texture = this.getHoleTexture(holeOptions, exaggeratedDiameter, maxHoleDiameter);
-      this.drawHoleRope(pathPoints, texture, maxHoleDiameter);
-    }
+    this.drawHoleRope(pathPoints, texture, maxHoleDiameter);
 
     this.drawOutline(leftPath, rightPath, convertColor(holeOptions.lineColor), HOLE_OUTLINE * exaggerationFactor, 'TopAndBottom', 0);
   };
@@ -759,13 +747,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
     casingRenderObject.sections.forEach((section, index, list) => {
       const outlineClosureType = SchematicLayer.getOutlineClosureType(index, list.length - 1);
-      // Pixi.js-legacy handles SimpleRope and advanced render methods poorly
-      if (this.renderType() === RENDERER_TYPE.CANVAS) {
-        this.drawBigPolygon(section.polygon, casingSolidColorNumber);
-      } else {
-        const texture = this.createCasingTexture(casingRenderObject.referenceDiameter);
-        this.drawRope(section.pathPoints, texture, casingSolidColorNumber);
-      }
+
+      const texture = this.createCasingTexture(casingRenderObject.referenceDiameter);
+      this.drawRope(section.pathPoints, texture, casingSolidColorNumber);
+
       if (section.kind === 'casing-window') {
         this.drawCasingWindowOutline(section.leftPath, section.rightPath, casingOptions, casingRenderObject.casingWallWidth);
       } else {
@@ -843,14 +828,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
     const { leftPath, rightPath } = createTubularRenderingObject(exaggeratedDiameter / 2, pathPoints);
-    const polygon = makeTubularPolygon(leftPath, rightPath);
 
     const texture = this.getScreenTexture();
-    if (this.renderType() === RENDERER_TYPE.CANVAS) {
-      this.drawBigTexturedPolygon(polygon, texture);
-    } else {
-      this.drawCompletionRope(pathPoints, texture, exaggeratedDiameter);
-    }
+
+    this.drawCompletionRope(pathPoints, texture, exaggeratedDiameter);
     this.drawOutline(leftPath, rightPath, convertColor(screenOptions.lineColor), SCREEN_OUTLINE * exaggerationFactor, 'TopAndBottom');
   }
 
@@ -859,15 +840,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
-    const { leftPath, rightPath } = createTubularRenderingObject(exaggeratedDiameter / 2, pathPoints);
-    const polygon = makeTubularPolygon(leftPath, rightPath);
-
     const texture = this.getTubingTexture(tubingOptions);
-    if (this.renderType() === RENDERER_TYPE.CANVAS) {
-      this.drawBigTexturedPolygon(polygon, texture);
-    } else {
-      this.drawCompletionRope(pathPoints, texture, exaggeratedDiameter);
-    }
+
+    this.drawCompletionRope(pathPoints, texture, exaggeratedDiameter);
   }
 
   private getTubingTexture(tubingOptions: TubingOptions): Texture {

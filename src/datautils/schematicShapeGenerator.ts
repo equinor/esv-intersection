@@ -46,7 +46,6 @@ export interface CasingRenderObject {
     leftPath: Point[];
     rightPath: Point[];
     pathPoints: Point[];
-    polygon: IPoint[];
   }[];
 }
 
@@ -61,10 +60,6 @@ export const getEndLines = (
     top: [rightPath[0], leftPath[0]],
     bottom: [rightPath[rightPath.length - 1], leftPath[leftPath.length - 1]],
   };
-};
-
-export const makeTubularPolygon = (rightPath: Point[], leftPath: Point[]): Point[] => {
-  return [...leftPath, ...rightPath.map<Point>((d) => d.clone()).reverse()];
 };
 
 export const overlaps = (top1: number, bottom1: number, top2: number, bottom2: number): boolean => top1 <= bottom2 && top2 <= bottom1;
@@ -567,7 +562,7 @@ export const prepareCasingRenderObject = (
   const sections = getCasingIntervalsWithWindows(casing).map((casingInterval: CasingInterval) => {
     const pathPoints = getPathPoints(casingInterval.start, casingInterval.end);
     const { leftPath, rightPath } = createTubularRenderingObject(exaggeratedRadius, pathPoints);
-    return { kind: casingInterval.kind, leftPath, rightPath, pathPoints, polygon: makeTubularPolygon(leftPath, rightPath) };
+    return { kind: casingInterval.kind, leftPath, rightPath, pathPoints };
   });
 
   return {
