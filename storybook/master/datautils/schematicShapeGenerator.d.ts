@@ -20,14 +20,12 @@ export interface CasingRenderObject {
         leftPath: Point[];
         rightPath: Point[];
         pathPoints: Point[];
-        polygon: IPoint[];
     }[];
 }
 export declare const getEndLines: (rightPath: IPoint[], leftPath: IPoint[]) => {
     top: IPoint[];
     bottom: IPoint[];
 };
-export declare const makeTubularPolygon: (rightPath: Point[], leftPath: Point[]) => Point[];
 export declare const overlaps: (top1: number, bottom1: number, top2: number, bottom2: number) => boolean;
 export declare const strictlyOverlaps: (top1: number, bottom1: number, top2: number, bottom2: number) => boolean;
 export declare const uniq: <T>(arr: T[]) => T[];
