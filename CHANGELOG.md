@@ -2,6 +2,36 @@
 
 ## TO BE RELEASED
 
+## v3.0.0
+
+### Feature
+- Update perforation rendering
+- Add layer for reference lines, with example for RKB, MSL and Seabed
+- Add support for casing windows
+- Adds support for Perforations
+- Adds support for CementSqueeze
+- Adds support for CementPlug
+- Adds support for Plug & Abandonment symbols
+- Adds support for Completion symbols
+
+### Chores
+- Update dependencies
+- Update workflow actions to latest versions
+
+### Fix
+- Fix regression bug on symbol textures where images weren't flipped diagonally
+
+### Breaking Changes
+- Remove `casingId` from casings. Items referencing that id should rather use the `id` of the casing instead.
+- Rename `casingIds` to `referenceIds` for cement related items, as tubing/screen can be cemented in some cases.
+- Many Layers are made generic and type for layers data needs to be specified when extending and using the Layers
+- Pixi Layers (SchematicLayer, GeomodelLayerV2) needs to pass inn a Pixi render context. Class PixiRenderApplication can be used for this
+- HoleSizeLayer, CasingLayer, CementLayer and WellboreBaseComponentLayer are removed, but functionality is retained and improved in new SchematicLayer
+- Data type for for new layer SchematicLayer is based on data for the old layers HoleSizeLayer, CasingLayer and CementLayer, but now requires id and kind specified
+- Removed `any` from type definitions in the library
+- Removed deprecated layer `GeomodelLayer`, in favor of `GeomodelLayerV2`
+- Upgraded peer dependency `pixi.js@7.1.0`
+
 ## v3.0.0-beta.6
 
 ### Feature

@@ -62,6 +62,8 @@ jobs:
 
       - name: Generate storybook
         run: npx storybook build -c .storybook -o docs_out/storybook/latest
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Publish GH pages
         uses: JamesIves/github-pages-deploy-action@releases/v4
