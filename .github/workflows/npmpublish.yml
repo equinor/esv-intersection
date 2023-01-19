@@ -45,10 +45,11 @@ jobs:
           node-version: '18'
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org/'
-          token: ${{secrets.npm_token}}
 
       - name: Publish package to NPM
         run: npm run pub
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-docs:
     runs-on: ubuntu-latest
