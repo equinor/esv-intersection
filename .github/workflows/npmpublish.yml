@@ -39,10 +39,17 @@ jobs:
             ./*
           key: ${{ github.sha }}
 
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org/'
+          token: ${{secrets.npm_token}}
+
       - name: Publish package to NPM
         run: npm run pub
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+
   publish-docs:
     runs-on: ubuntu-latest
     needs: setup
@@ -53,6 +60,13 @@ jobs:
           path: |
             ./*
           key: ${{ github.sha }}
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org/'
 
       - name: Create docs build dir
         run: mkdir docs_out
