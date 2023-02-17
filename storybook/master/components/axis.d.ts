@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { ScaleLinear } from 'd3-scale';
 import { OnResizeEvent, OnRescaleEvent } from '../interfaces';
-export declare type Options = {
+export type Options = {
     offsetX: number;
     offsetY: number;
     visible: boolean;

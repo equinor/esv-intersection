@@ -1,5 +1,5 @@
 import { Annotation } from '../interfaces';
-declare type Pick = {
+type Pick = {
     pickIdentifier?: string;
     confidence: string | null;
     depthReferencePoint: string;
@@ -7,10 +7,10 @@ declare type Pick = {
     mdUnit: string;
     tvd: number;
 };
-declare type PickWithId = {
+type PickWithId = {
     identifier: string;
 } & Pick;
-declare type Unit = {
+type Unit = {
     identifier: string;
     top: string;
     base: string;
@@ -23,7 +23,7 @@ declare type Unit = {
     lithologyType: number;
     stratUnitParent: number;
 };
-declare type UnitDto = {
+type UnitDto = {
     unitName: string;
     topSurface: string;
     baseSurface: string;
@@ -38,8 +38,8 @@ declare type UnitDto = {
     lithType: number;
     parent: number;
 };
-declare type PickAndUnit = PickWithId & UnitDto;
-declare type PairedPickAndUnit = {
+type PickAndUnit = PickWithId & UnitDto;
+type PairedPickAndUnit = {
     name: string;
     mdEntry: number;
     tvdEntry: number;

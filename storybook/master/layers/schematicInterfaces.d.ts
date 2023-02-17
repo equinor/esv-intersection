@@ -2,7 +2,7 @@ export declare function assertNever(x: never): never;
 /**
  * The closure type of the outline
  */
-export declare type OutlineClosure = 'None' | 'TopAndBottom' | 'Top' | 'Bottom';
+export type OutlineClosure = 'None' | 'TopAndBottom' | 'Top' | 'Bottom';
 export interface HoleSize {
     kind: 'hole';
     id: string;
@@ -58,7 +58,7 @@ export interface CementPlug {
     referenceIds: string[];
 }
 export declare const isCementPlug: (item: PAndA) => item is CementSqueeze;
-export declare type PAndA = PAndASymbol | CementSqueeze | CementPlug;
+export type PAndA = PAndASymbol | CementSqueeze | CementPlug;
 interface BaseCompletion {
     id: string;
     diameter: number;
@@ -75,7 +75,7 @@ export interface CompletionSymbol extends BaseCompletion {
     kind: 'completionSymbol';
     symbolKey: string;
 }
-export declare type Completion = Tubing | Screen | CompletionSymbol;
+export type Completion = Tubing | Screen | CompletionSymbol;
 export declare const foldCompletion: <T>(fScreen: (obj: Screen) => T, fTubing: (obj: Tubing) => T, fSymbol: (obj: CompletionSymbol) => T) => (completion: Completion) => T;
 export interface Cement {
     kind: 'cement';
@@ -89,7 +89,7 @@ export interface Cement {
 /**
  * 'Open hole' and 'Open hole screen' are not included as they are not visualized and also not included in the ruleset
  */
-export declare type PerforationSubKind = 'Perforation' | 'Open hole gravel pack' | 'Open hole frac pack' | 'Cased hole frac pack' | 'Cased hole gravel pack' | 'Cased hole fracturation';
+export type PerforationSubKind = 'Perforation' | 'Open hole gravel pack' | 'Open hole frac pack' | 'Cased hole frac pack' | 'Cased hole gravel pack' | 'Cased hole fracturation';
 export interface Perforation {
     kind: 'perforation';
     subKind: PerforationSubKind;

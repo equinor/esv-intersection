@@ -2,11 +2,11 @@ import { ScaleLinear } from 'd3-scale';
 import { CanvasLayer } from './base/CanvasLayer';
 import { OnUpdateEvent, Annotation, OnRescaleEvent, BoundingBox } from '../interfaces';
 import { LayerOptions } from './base/Layer';
-export declare type Point = {
+export type Point = {
     x: number;
     y: number;
 };
-export declare type Callout = {
+export type Callout = {
     title: string;
     label: string;
     color: string;

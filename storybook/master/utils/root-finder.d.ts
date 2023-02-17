@@ -1,4 +1,4 @@
-declare type fx = (n: number) => number;
+type fx = (n: number) => number;
 export declare class RootFinder {
     /**
      * Find root using newthons method

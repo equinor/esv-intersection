@@ -1,5 +1,5 @@
 import { Mesh, IPoint, Renderer, Texture } from 'pixi.js';
-export declare type ComplexRopeSegment = {
+export type ComplexRopeSegment = {
     points: IPoint[];
     diameter: number;
 };

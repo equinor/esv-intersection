@@ -75,7 +75,7 @@ export interface Trajectory {
     points: number[][];
     offset: number;
 }
-export declare type BoundingBox = {
+export type BoundingBox = {
     x: number;
     y: number;
     width: number;
