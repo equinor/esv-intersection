@@ -21,6 +21,7 @@ import {
   isSubKindCasedHoleFracPack,
   isSubkindCasedHoleGravelPack,
   PerforationSubKind,
+  isSubKindCasedHoleFracturation,
 } from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 import { createNormals, offsetPoints } from '../utils/vectorUtils';
@@ -806,6 +807,10 @@ const createPerforationTexture = (canvas: HTMLCanvasElement) => {
   return texture;
 };
 
+const compareIntersectingPerforationsBy =
+  (targetPerf: Perforation, comparedPerforations: Perforation[]) => (compareFunc: (comparedPerf: Perforation) => boolean) =>
+    comparedPerforations.some((perf) => compareFunc(perf) && intersect(targetPerf, perf));
+
 /**
  * @Perforation
  * If a perforation does not overlap with another perforations of type with gravel,
@@ -821,6 +826,9 @@ const createPerforationTexture = (canvas: HTMLCanvasElement) => {
  *
  * Cased Hole Gravel Pack:
  * Yellow gravel. Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
+ *
+ * Cased Hole Fracturation:
+ * Makes perforations of type "Perforation" yellow if overlapping and perforation are open.
  */
 const createSubkindPerforationTexture = {
   packing: () => errorTexture(),
@@ -833,32 +841,24 @@ const createSubkindPerforationTexture = {
   ): Texture => {
     const { canvas, ctx } = createPerforationCanvas(perfShape, perforationOptions);
 
-    const intersectionsWithCasedHoleGravel: boolean = otherPerforations.some(
-      (perf) => isSubkindCasedHoleGravelPack(perf) && intersect(perforation, perf),
-    );
+    const compareBy = compareIntersectingPerforationsBy(perforation, otherPerforations);
 
-    const intersectionsWithCasedHoleFracPack: boolean = otherPerforations.some(
-      (perf) => isSubKindCasedHoleFracPack(perf) && intersect(perforation, perf),
-    );
+    const intersectionsWithCasedHoleGravel: boolean = compareBy(isSubkindCasedHoleGravelPack);
 
-    const shouldDrawFracLines = intersectionsWithCasedHoleGravel || intersectionsWithCasedHoleFracPack;
+    const intersectsWithCasedHoleFracturation: boolean = compareBy(isSubKindCasedHoleFracturation);
 
-    if (shouldDrawFracLines) {
-      if (perforation.isOpen) {
-        ctx.fillStyle = perforationOptions.yellow;
-        ctx.strokeStyle = perforationOptions.yellow;
-      } else {
-        ctx.fillStyle = perforationOptions.grey;
-        ctx.strokeStyle = perforationOptions.grey;
-      }
+    const intersectionsWithCasedHoleFracPack: boolean = compareBy(isSubKindCasedHoleFracPack);
+
+    const intersectsWithPerforation = intersectionsWithCasedHoleGravel || intersectsWithCasedHoleFracturation || intersectionsWithCasedHoleFracPack;
+
+    const openPerforationSpikeColor = intersectsWithPerforation ? perforationOptions.yellow : perforationOptions.red;
+
+    if (perforation.isOpen) {
+      ctx.fillStyle = openPerforationSpikeColor;
+      ctx.strokeStyle = openPerforationSpikeColor;
     } else {
-      if (perforation.isOpen) {
-        ctx.fillStyle = perforationOptions.red;
-        ctx.strokeStyle = perforationOptions.red;
-      } else {
-        ctx.fillStyle = perforationOptions.grey;
-        ctx.strokeStyle = perforationOptions.grey;
-      }
+      ctx.fillStyle = perforationOptions.grey;
+      ctx.strokeStyle = perforationOptions.grey;
     }
 
     drawSpikes(canvas, ctx, perfShape.diameter, perforationOptions);

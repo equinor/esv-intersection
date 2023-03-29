@@ -452,27 +452,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         });
       });
 
-      fracLines.forEach((perforation) => {
-        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
-        const thiccPerfShapes = perfShapes.map((ps) => ({ ...ps, diameter: ps.diameter * 3 }));
-        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } = thiccPerfShapes.reduce(
-          (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
-            if (!dict[ps.diameter]) {
-              dict[ps.diameter] = [];
-            }
-            dict[ps.diameter] = [...dict[ps.diameter], ps];
-            return dict;
-          },
-          {},
-        );
-        Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
-          perfShapesWithSameDiameter.forEach((perfShape) => {
-            const texture = createPerforationFracLineTexture(perforation, perfShape, perforationOptions);
-            const rope = this.drawComplexRope([perfShape], texture);
-            this.perforationRopeAndTextureReferences.push({ rope, texture });
-          });
-        });
-      });
       spikes.forEach((perforation) => {
         const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
         const thiccPerfShapes = perfShapes.map((ps) => ({ ...ps, diameter: ps.diameter * 3 }));
@@ -489,6 +468,28 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
         Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
           perfShapesWithSameDiameter.forEach((perfShape) => {
             const texture = createPerforationSpikeTexture(perforation, perforations, perfShape, perforationOptions);
+            const rope = this.drawComplexRope([perfShape], texture);
+            this.perforationRopeAndTextureReferences.push({ rope, texture });
+          });
+        });
+      });
+
+      fracLines.forEach((perforation) => {
+        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
+        const thiccPerfShapes = perfShapes.map((ps) => ({ ...ps, diameter: ps.diameter * 3 }));
+        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } = thiccPerfShapes.reduce(
+          (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
+            if (!dict[ps.diameter]) {
+              dict[ps.diameter] = [];
+            }
+            dict[ps.diameter] = [...dict[ps.diameter], ps];
+            return dict;
+          },
+          {},
+        );
+        Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
+          perfShapesWithSameDiameter.forEach((perfShape) => {
+            const texture = createPerforationFracLineTexture(perforation, perfShape, perforationOptions);
             const rope = this.drawComplexRope([perfShape], texture);
             this.perforationRopeAndTextureReferences.push({ rope, texture });
           });

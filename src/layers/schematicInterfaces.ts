@@ -303,6 +303,8 @@ export function isOpenHoleFracPack(perf: Perforation) {
   );
 }
 
+export const isSubKindCasedHoleFracturation = (perf: Perforation): boolean => perf.subKind === 'Cased hole fracturation';
+
 export const intersect = (a: Perforation, b: Perforation): boolean => {
   return a.start < b.end && a.end > b.start;
 };
