@@ -2,7 +2,7 @@ import { SurfaceData, SurfaceLine } from '../datautils';
 import { OnUpdateEvent, OnRescaleEvent } from '../interfaces';
 import { LayerOptions } from './base';
 import { CanvasLayer } from './base/CanvasLayer';
-declare type SurfacePaths = {
+type SurfacePaths = {
     color: string;
     path: Path2D;
 };

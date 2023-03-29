@@ -1,7 +1,7 @@
 import { IPoint, Point, Texture } from 'pixi.js';
 import { Casing, Cement, CementOptions, CementPlug, CementPlugOptions, CementSqueeze, CementSqueezeOptions, Completion, HoleOptions, HoleSize, ScreenOptions, TubingOptions, Perforation, PerforationOptions, PerforationSubKind } from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
-export declare type PerforationShape = ComplexRopeSegment;
+export type PerforationShape = ComplexRopeSegment;
 export interface TubularRenderingObject {
     leftPath: Point[];
     rightPath: Point[];
@@ -46,7 +46,7 @@ export declare const createCementTexture: ({ firstColor, secondColor, scalingFac
 export declare const createCementPlugTexture: ({ firstColor, secondColor, scalingFactor }: CementPlugOptions) => Texture;
 export declare const createCementSqueezeTexture: ({ firstColor, secondColor, scalingFactor }: CementSqueezeOptions) => Texture;
 export declare const createTubularRenderingObject: (radius: number, pathPoints: IPoint[]) => TubularRenderingObject;
-export declare type CasingInterval = {
+export type CasingInterval = {
     kind: 'casing' | 'casing-window';
     start: number;
     end: number;

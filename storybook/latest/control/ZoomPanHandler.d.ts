@@ -2,7 +2,7 @@ import { Selection } from 'd3-selection';
 import { ScaleLinear } from 'd3-scale';
 import { ZoomBehavior, ZoomTransform } from 'd3-zoom';
 import { ZoomAndPanOptions, OnRescaleEvent } from '../interfaces';
-export declare type RescaleFunction = (event: OnRescaleEvent) => void;
+export type RescaleFunction = (event: OnRescaleEvent) => void;
 /**
  * Handle zoom and pan for intersection layers
  */

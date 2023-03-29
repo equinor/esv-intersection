@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 /** Define the dash: [dash length, gap size, dash size, gap size, ...] */
-export declare type Dashes = number[];
+export type Dashes = number[];
 export interface DashLineOptions {
     dash?: Dashes;
     width?: number;

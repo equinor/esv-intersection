@@ -1,5 +1,5 @@
 import { SeismicCanvasDataOptions } from '../layers/SeismicCanvasLayer';
-export declare type SeismicInfo = {
+export type SeismicInfo = {
     minX: number;
     maxX: number;
     minTvdMsl: number;

@@ -1,5 +1,5 @@
 import { Vector } from 'curve-interpolator/dist/src/interfaces';
-declare type fx = (n: number) => Vector;
+type fx = (n: number) => Vector;
 export declare class ArcLength {
     /**
      * Calculate using an adaptive bisect method

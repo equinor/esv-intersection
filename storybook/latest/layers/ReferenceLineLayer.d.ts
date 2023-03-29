@@ -1,8 +1,8 @@
 import { CanvasLayer, LayerOptions } from './base';
 import { OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 import { ScaleLinear } from 'd3-scale';
-export declare type ReferenceLineType = 'wavy' | 'dashed' | 'solid';
-export declare type ReferenceLine = {
+export type ReferenceLineType = 'wavy' | 'dashed' | 'solid';
+export type ReferenceLine = {
     text?: string;
     lineType: ReferenceLineType;
     color: string;
