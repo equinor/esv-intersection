@@ -577,11 +577,11 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const [dx1, dx2] = xScale.domain();
     const [dy1, dy2] = yScale.domain();
 
-    let top = referenceSystem.interpolators.curtain.lookup(dy1, 1, 0) as number[][];
+    let top = referenceSystem.interpolators.curtain.getIntersects(dy1, 1, 0) as number[][];
     if (top.length === 0) {
       top = [referenceSystem.interpolators.curtain.getPointAt(0.0) as number[]];
     }
-    let bottom = referenceSystem.interpolators.curtain.lookup(dy2, 1, 0) as number[][];
+    let bottom = referenceSystem.interpolators.curtain.getIntersects(dy2, 1, 0) as number[][];
     if (bottom.length === 0) {
       bottom = [referenceSystem.interpolators.curtain.getPointAt(1.0) as number[]];
     }

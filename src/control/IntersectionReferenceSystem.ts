@@ -195,7 +195,7 @@ export class IntersectionReferenceSystem {
       return length + (displacementFromStart - this.displacement);
     }
 
-    const ls = this.interpolators.curtain.lookupPositions(displacementFromStart, 0, 1);
+    const ls = this.interpolators.curtain.getIntersectsAsPositions(displacementFromStart, 0, 1);
     if (ls && ls.length) {
       return ls[0] * length + this._offset;
     }

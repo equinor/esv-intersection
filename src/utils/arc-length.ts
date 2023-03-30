@@ -1,5 +1,5 @@
 import Vector2 from '@equinor/videx-vector2';
-import { Vector } from 'curve-interpolator/dist/src/interfaces';
+import { Vector } from 'curve-interpolator/dist/src/core/interfaces';
 
 type fx = (n: number) => Vector;
 

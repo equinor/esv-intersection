@@ -1,7 +1,7 @@
 import Vector2 from '@equinor/videx-vector2';
 import { clamp } from '@equinor/videx-math';
 import { CurveInterpolator } from 'curve-interpolator';
-import { Vector } from 'curve-interpolator/dist/src/interfaces';
+import { Vector } from 'curve-interpolator/dist/src/core/interfaces';
 import { CurveInterpolatorOptions } from 'curve-interpolator/dist/src/curve-interpolator';
 
 import { RootFinder } from '../utils/root-finder';
