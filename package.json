@@ -61,7 +61,7 @@
     "mock-raf": "^1.0.1",
     "pixi.js": "^7.2.3",
     "prettier": "^2.8.7",
-    "rimraf": "^4.4.1",
+    "rimraf": "^5.0.0",
     "storybook": "^7.0.0-rc.10",
     "storybook-dark-mode": "^2.1.1",
     "tslib": "^2.5.0",
