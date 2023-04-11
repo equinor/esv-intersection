@@ -1,5 +1,5 @@
 import { CurveInterpolator } from 'curve-interpolator';
-import { Vector } from 'curve-interpolator/dist/src/interfaces';
+import { Vector } from 'curve-interpolator/dist/src/core/interfaces';
 import { CurveInterpolatorOptions } from 'curve-interpolator/dist/src/curve-interpolator';
 export declare class ExtendedCurveInterpolator extends CurveInterpolator {
     arcLengthLookup: number[];
