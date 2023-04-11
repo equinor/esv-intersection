@@ -63,7 +63,7 @@
     "prettier": "^2.8.7",
     "rimraf": "^5.0.0",
     "storybook": "^7.0.0-rc.10",
-    "storybook-dark-mode": "^2.1.1",
+    "storybook-dark-mode": "^3.0.0",
     "tslib": "^2.5.0",
     "typedoc": "^0.23.28",
     "typescript": "^5.0.2",
