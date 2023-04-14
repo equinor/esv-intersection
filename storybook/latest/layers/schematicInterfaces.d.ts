@@ -118,6 +118,7 @@ export declare function isSubkindCasedHoleGravelPack(perf: Perforation): boolean
 export declare function isSubKindPerforation(perf: Perforation): boolean;
 export declare function isSubKindCasedHoleFracPack(perf: Perforation): boolean;
 export declare function isOpenHoleFracPack(perf: Perforation): boolean;
+export declare const isSubKindCasedHoleFracturation: (perf: Perforation) => boolean;
 export declare const intersect: (a: Perforation, b: Perforation) => boolean;
 export interface SchematicData {
     holeSizes: HoleSize[];

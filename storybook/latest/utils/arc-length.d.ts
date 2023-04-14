@@ -1,4 +1,4 @@
-import { Vector } from 'curve-interpolator/dist/src/interfaces';
+import { Vector } from 'curve-interpolator/dist/src/core/interfaces';
 type fx = (n: number) => Vector;
 export declare class ArcLength {
     /**
