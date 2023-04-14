@@ -653,6 +653,8 @@ const drawFracLines = (
   const offsetX = 0;
   const offsetY = startAt === 'diameter' ? 0 : spikeLength;
 
+  ctx.globalAlpha = perforationOptions.packingOpacity;
+
   const fracLines = () => {
     for (let i = -1; i < amountOfSpikes; i++) {
       const bottom: [number, number] = [i * spikeWidth + offsetX + spikeWidth / 2, canvas.height / 2 - fracLineLength - offsetY - fracLineLength];
@@ -694,7 +696,6 @@ const drawFracLines = (
   ctx.strokeStyle = perforationOptions.yellow;
   ctx.lineWidth = 6;
   ctx.save();
-  ctx.globalAlpha = perforationOptions.packingOpacity;
   fracLines();
   ctx.restore();
   ctx.lineWidth = 1;
@@ -710,7 +711,7 @@ const drawSpikes = (
   extendedPerfShapeDiameter: number,
   perforationOptions: PerforationOptions,
 ) => {
-  const amountOfSpikes = 10;
+  const amountOfSpikes = 4;
   const spikeWidth = canvas.width / amountOfSpikes;
   ctx.strokeStyle = perforationOptions.outline;
 
@@ -718,11 +719,10 @@ const drawSpikes = (
 
   ctx.lineWidth = 1;
   const spikeLength = diameter / 2;
-  const offsetX = 0;
 
   // left spikes
   for (let i = 0; i <= amountOfSpikes; i++) {
-    const left: [number, number] = [i * spikeWidth + offsetX, canvas.height / 2 - diameter / 2];
+    const left: [number, number] = [i * spikeWidth, canvas.height / 2 - diameter / 2];
     const bottom: [number, number] = [left[0] - spikeWidth / 2, left[1] - spikeLength];
     const right: [number, number] = [left[0] - spikeWidth, left[1]];
 
@@ -738,7 +738,7 @@ const drawSpikes = (
 
   // right spikes
   for (let i = 0; i <= amountOfSpikes; i++) {
-    const left: [number, number] = [i * spikeWidth + offsetX, canvas.height / 2 + diameter / 2];
+    const left: [number, number] = [i * spikeWidth, canvas.height / 2 + diameter / 2];
     const bottom: [number, number] = [left[0] - spikeWidth / 2, left[1] + spikeLength];
     const right: [number, number] = [left[0] - spikeWidth, left[1]];
 
@@ -853,6 +853,7 @@ const createSubkindPerforationTexture = {
 
     const openPerforationSpikeColor = intersectsWithPerforation ? perforationOptions.yellow : perforationOptions.red;
 
+    ctx.globalAlpha = perforationOptions.packingOpacity;
     if (perforation.isOpen) {
       ctx.fillStyle = openPerforationSpikeColor;
       ctx.strokeStyle = openPerforationSpikeColor;

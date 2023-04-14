@@ -407,7 +407,7 @@ export const defaultPerforationOptions: PerforationOptions = {
   transparent: 'rgba(255, 255, 255, 0)',
   spikeWidth: 50,
   spikeLength: 50,
-  packingOpacity: 0.5,
+  packingOpacity: 0.7,
   fracLineCurve: 10,
   fracLineLength: 25,
   scalingFactor: 25,
