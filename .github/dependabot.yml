@@ -4,6 +4,7 @@ updates:
     directory: "/" 
     open-pull-requests-limit: 10
     versioning-strategy: increase
+    rebase-strategy: 'disabled'
     schedule:
       interval: 'weekly'
       day: 'monday'
