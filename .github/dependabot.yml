@@ -2,6 +2,7 @@ version: 2
 updates:
   - package-ecosystem: "npm" 
     directory: "/" 
+    open-pull-requests-limit: 25
     versioning-strategy: increase
     rebase-strategy: 'disabled'
     schedule:
