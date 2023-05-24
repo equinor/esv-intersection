@@ -22,11 +22,11 @@ export const SeismicUsingLowLevelInterface = () => {
 
     seismicLayer.onMount({ ...ev });
     const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
-    const seismicInfo = getSeismicInfo(seismic, trajectory)
+    const seismicInfo = getSeismicInfo(seismic, trajectory);
     generateSeismicSliceImage(seismic, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
       seismicLayer.data = {
         image: seismicImage,
-        options: getSeismicOptions(seismicInfo)
+        options: getSeismicOptions(seismicInfo),
       };
     });
 
@@ -46,5 +46,5 @@ export const SeismicUsingLowLevelInterface = () => {
 
 export default {
   title: 'ESV Intersection/Features/Seismic',
-  component: SeismicUsingLowLevelInterface
-}
+  component: SeismicUsingLowLevelInterface,
+};

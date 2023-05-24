@@ -279,7 +279,11 @@ export const ZoomWithGridAndAxis = () => {
   const marginXAxis = 40;
   const marginYAxis = 30;
 
-  const mainGroup = (select(container).append('svg').attr('height', `${height}px`).attr('width', `${width}px`).style('position', 'absolute') as unknown) as Selection<SVGElement, unknown, null, undefined>;
+  const mainGroup = select(container)
+    .append('svg')
+    .attr('height', `${height}px`)
+    .attr('width', `${width}px`)
+    .style('position', 'absolute') as unknown as Selection<SVGElement, unknown, null, undefined>;
 
   const showLabels = true;
 
@@ -331,5 +335,5 @@ export const ZoomWithGridAndAxis = () => {
 
 export default {
   title: 'ESV Intersection/Features/Zoom',
-  component: ZoomWithTestLayer
-}
+  component: ZoomWithTestLayer,
+};

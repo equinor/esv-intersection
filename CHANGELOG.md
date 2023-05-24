@@ -5,6 +5,7 @@
 ## v3.0.0
 
 ### Feature
+
 - Update perforation rendering
 - Add layer for reference lines, with example for RKB, MSL and Seabed
 - Add support for casing windows
@@ -15,13 +16,16 @@
 - Adds support for Completion symbols
 
 ### Chores
+
 - Update dependencies
 - Update workflow actions to latest versions
 
 ### Fix
+
 - Fix regression bug on symbol textures where images weren't flipped diagonally
 
 ### Breaking Changes
+
 - Remove `casingId` from casings. Items referencing that id should rather use the `id` of the casing instead.
 - Rename `casingIds` to `referenceIds` for cement related items, as tubing/screen can be cemented in some cases.
 - Many Layers are made generic and type for layers data needs to be specified when extending and using the Layers
@@ -35,37 +39,45 @@
 ## v3.0.0-beta.6
 
 ### Feature
- - Update perforation rendering
+
+- Update perforation rendering
 
 ## v3.0.0-beta.5
 
 ### Feature
- - Reference lines, with example for RKB, MSL and Seabed
+
+- Reference lines, with example for RKB, MSL and Seabed
 
 ### Chores
- - Update dependencies
- - Update workflows actions to latest versions
+
+- Update dependencies
+- Update workflows actions to latest versions
 
 ## v3.0.0-beta.4
 
 ### Changes
+
 - Add support for casing windows
 
 ## v3.0.0-beta.3
 
 ### Changes
+
 - Fix regression bug on symbol textures where images weren't flipped diagonally
 
 ## v3.0.0-beta.2
 
 ### Breaking Changes
+
 - Remove `casingId` from casings. Items referencing that id should rather use the `id` of the casing instead.
 - Rename `casingIds` to `referenceIds` for cement related items, as tubing/screen can be cemented in some cases.
 
 ### Changes
+
 - Adds support for Peforations
 
 ## v3.0.0-beta.0
+
 ### Breaking Changes
 
 - Many Layers are made generic and type for layers data needs to be specified when extending and using the Layers

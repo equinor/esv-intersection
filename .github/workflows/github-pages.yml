@@ -3,42 +3,42 @@ name: Deploy Storybook
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   deploy-docs-n-storybook:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        submodules: true
-        persist-credentials: false
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          persist-credentials: false
 
-    - name: Setup Nodejs
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
 
-    - name: Info
-      run: echo "Running on branch ${{ github.ref_name }}"
+      - name: Info
+        run: echo "Running on branch ${{ github.ref_name }}"
 
-    - name: Install dependencies
-      run:  npm ci --prefer-offline
+      - name: Install dependencies
+        run: npm ci --prefer-offline
 
-    - name: Create build dir
-      run: mkdir docs_out
+      - name: Create build dir
+        run: mkdir docs_out
 
-    - name: Generate storybook
-      run: npx storybook build -c .storybook -o docs_out/storybook/${{ github.ref_name }}
-      env:
-        NODE_OPTIONS: --max-old-space-size=4096
+      - name: Generate storybook
+        run: npx storybook build -c .storybook -o docs_out/storybook/${{ github.ref_name }}
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
-    - name: Publish GH pages
-      uses: JamesIves/github-pages-deploy-action@releases/v4
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages                                  # The branch the action should deploy to
-        FOLDER: docs_out/storybook/${{ github.ref_name }} # The folder the action should deploy
-        TARGET-FOLDER: storybook/${{ github.ref_name }}  # The destination folder to deploy to
+      - name: Publish GH pages
+        uses: JamesIves/github-pages-deploy-action@releases/v4
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to
+          FOLDER: docs_out/storybook/${{ github.ref_name }} # The folder the action should deploy
+          TARGET-FOLDER: storybook/${{ github.ref_name }} # The destination folder to deploy to

@@ -38,7 +38,11 @@ export const CalloutUsingLowLevelInterface = () => {
     zoompanHandler.setViewport(1500, 1500, 3000);
   });
 
-  root.appendChild(createHelpText('Low level interface for creating and displaying a callout layer. We have also added a wellbore path to show the picks along its path. This layer is made using canvas.'));
+  root.appendChild(
+    createHelpText(
+      'Low level interface for creating and displaying a callout layer. We have also added a wellbore path to show the picks along its path. This layer is made using canvas.',
+    ),
+  );
   root.appendChild(container);
   root.appendChild(createFPSLabel());
 
@@ -68,14 +72,18 @@ export const CalloutUsingHighLevelInterface = () => {
     controller.setViewport(1500, 1500, 3000);
   });
 
-  root.appendChild(createHelpText('High level interface for creating and displaying a callout layer. We have also added a wellbore path to show the picks along its path. This layer is made using canvas.'));
+  root.appendChild(
+    createHelpText(
+      'High level interface for creating and displaying a callout layer. We have also added a wellbore path to show the picks along its path. This layer is made using canvas.',
+    ),
+  );
   root.appendChild(container);
   root.appendChild(createFPSLabel());
 
   return root;
-}
+};
 
 export default {
   title: 'ESV Intersection/Features/Callout',
-  component: CalloutUsingLowLevelInterface
-}
+  component: CalloutUsingLowLevelInterface,
+};

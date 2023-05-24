@@ -11,7 +11,11 @@ export const AxisUsingLowLevelInterface = () => {
   const root = createRootContainer(width);
   const container = createLayerContainer(width, height);
 
-  const mainGroup = (select(container).append('svg').attr('height', `${height}px`).attr('width', `${width}px`).style('background-color', '#eee') as unknown) as Selection<SVGElement, unknown, null, undefined>;
+  const mainGroup = select(container)
+    .append('svg')
+    .attr('height', `${height}px`)
+    .attr('width', `${width}px`)
+    .style('background-color', '#eee') as unknown as Selection<SVGElement, unknown, null, undefined>;
   const showLabels = true;
 
   const xLabel = 'x';
@@ -58,5 +62,5 @@ export const AxisUsingHighLevelInterface = () => {
 
 export default {
   title: 'ESV Intersection/Features/Axis',
-  component: AxisUsingLowLevelInterface
-}
+  component: AxisUsingLowLevelInterface,
+};

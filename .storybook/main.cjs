@@ -4,6 +4,6 @@ module.exports = {
   staticDirs: ['../public'],
   framework: {
     name: '@storybook/html-vite',
-    options: {}
+    options: {},
   },
 };

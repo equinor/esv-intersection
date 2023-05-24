@@ -455,5 +455,5 @@ function createButtonWithCb(label: string, cb: any, initialStyle = '') {
 
 export default {
   title: 'ESV Intersection/Complete example',
-  component: intersection
-}
+  component: intersection,
+};
