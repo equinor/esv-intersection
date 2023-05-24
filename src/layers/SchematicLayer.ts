@@ -718,9 +718,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     if (intervals.length === 0) {
       return null;
     }
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-
-    const rope = new ComplexRope(texture, intervals, exaggerationFactor);
+    const rope = new ComplexRope(texture, intervals);
 
     this.addChild(rope);
 

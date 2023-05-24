@@ -9,22 +9,16 @@ export class ComplexRopeGeometry extends MeshGeometry {
   /** An array of segments with points and diameter that determine the rope. */
   private segments: ComplexRopeSegment[];
 
-  /** Rope texture scale. */
-  private readonly textureScale: number; // TODO unused?
-
   /**
    * @param segments - An array of segments with points and diameter to construct this rope.
-   * @param textureScale - scaling factor for repeated texture. To create a tiling rope
-   *     set baseTexture.wrapMode to PIXI.WRAP_MODES.REPEAT and use a power of two texture.
    */
-  constructor(segments: ComplexRopeSegment[], textureScale = 0) {
+  constructor(segments: ComplexRopeSegment[]) {
     const pointCount = sum(segments, (segment) => segment.points.length);
 
     // eslint-disable-next-line no-magic-numbers
     super(new Float32Array(pointCount * 4), new Float32Array(pointCount * 4), new Uint16Array((pointCount - 1) * 6));
 
     this.segments = segments;
-    this.textureScale = textureScale;
 
     this.build();
   }
