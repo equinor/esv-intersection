@@ -40,12 +40,12 @@ export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T>
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent<T>): void {
+  override onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.render();
   }
 
-  onRescale(event: OnRescaleEvent): void {
+  override onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     if (!this.elm) {
       return;

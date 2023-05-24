@@ -24,7 +24,7 @@ export class UniformTextureStretchRope extends Mesh {
     this.autoUpdate = true;
   }
 
-  _render(renderer: Renderer): void {
+  override _render(renderer: Renderer): void {
     const geometry: UniformTextureStretchRopeGeometry = this.geometry as UniformTextureStretchRopeGeometry;
 
     // TODO: Possible optimiztion here

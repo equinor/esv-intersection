@@ -25,7 +25,7 @@ export abstract class CanvasLayer<T> extends Layer<T> {
     }
   }
 
-  setVisibility(visible: boolean): void {
+  override setVisibility(visible: boolean): void {
     super.setVisibility(visible);
     if (this.canvas) {
       this.updateStyle(visible);
@@ -42,13 +42,13 @@ export abstract class CanvasLayer<T> extends Layer<T> {
     );
   }
 
-  onMount(event: OnMountEvent): void {
+  override onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm } = event;
     const width = event.width || parseInt(elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH;
     const height = event.height || parseInt(elm.getAttribute('height'), 10) || DEFAULT_LAYER_HEIGHT;
     this.elm = elm;
-    let canvas;
+    let canvas: HTMLCanvasElement;
     if (!this.canvas) {
       canvas = document.createElement('canvas');
       this.canvas = canvas;
@@ -62,13 +62,13 @@ export abstract class CanvasLayer<T> extends Layer<T> {
     this.ctx = this.canvas.getContext('2d');
   }
 
-  onUnmount(): void {
+  override onUnmount(): void {
     super.onUnmount();
     this.canvas.remove();
     this.canvas = null;
   }
 
-  onResize(event: OnResizeEvent): void {
+  override onResize(event: OnResizeEvent): void {
     const { ctx } = this;
     const { width, height } = event;
 
@@ -76,7 +76,7 @@ export abstract class CanvasLayer<T> extends Layer<T> {
     ctx.canvas.setAttribute('height', `${height}px`);
   }
 
-  onUpdate(event: OnUpdateEvent<T>): void {
+  override onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
   }
 

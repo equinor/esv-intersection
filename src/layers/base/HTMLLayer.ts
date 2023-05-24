@@ -6,7 +6,7 @@ import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 export abstract class HTMLLayer<T> extends Layer<T> {
   elm: Selection<HTMLElement, unknown, null, undefined>;
 
-  onMount(event: OnMountEvent): void {
+  override onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm } = event;
     const width = event.width || parseInt(elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH;
@@ -28,13 +28,13 @@ export abstract class HTMLLayer<T> extends Layer<T> {
       .style('z-index', this.order);
   }
 
-  onUnmount(): void {
+  override onUnmount(): void {
     super.onUnmount();
     this.elm.remove();
     this.elm = null;
   }
 
-  onResize(event: OnResizeEvent): void {
+  override onResize(event: OnResizeEvent): void {
     if (!this.elm) {
       return;
     }
@@ -42,7 +42,7 @@ export abstract class HTMLLayer<T> extends Layer<T> {
     this.elm.style('height', `${event.height}px`).style('width', `${event.width}px`);
   }
 
-  setVisibility(visible: boolean): void {
+  override setVisibility(visible: boolean): void {
     super.setVisibility(visible);
     if (this.elm) {
       this.elm.attr('visibility', visible ? 'visible' : 'hidden');

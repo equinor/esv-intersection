@@ -23,7 +23,7 @@
     "pub-beta": "npm publish --tag=beta --access=public",
     "lint:eslint": "eslint --ext .js,.jsx,.ts,.tsx src test",
     "lint:tsc": "tsc",
-    "lint": "run-s lint:eslint lint:tsc",
+    "lint": "run-p lint:tsc lint:eslint",
     "test": "tsc --project tsconfig.test.json && vitest",
     "test:watch": "vitest --watch",
     "predocs": "rimraf docs_out",
