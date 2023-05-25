@@ -49,7 +49,7 @@ export interface SurfaceLine {
  */
 export interface SurfaceArea {
     id?: string;
-    label: string;
+    label?: string;
     color: number | string;
     data: number[][];
     exclude?: boolean;

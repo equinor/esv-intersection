@@ -34,7 +34,7 @@ export declare class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLa
     render(): void;
     drawAreaLabels(): void;
     drawLineLabels(): void;
-    drawAreaLabel: (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea, surfaces: SurfaceArea[], i: number) => void;
+    drawAreaLabel: (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea | null, surfaces: SurfaceArea[], i: number) => void;
     drawLineLabel: (s: SurfaceLine) => void;
     colorToCSSColor(color: number | string): string;
     calcPos(data: number[][], offset: number, count: number, step: number, topLimit?: number, bottomLimit?: number, alternativeSurfaceData?: number[][], surfaces?: SurfaceArea[] | null, currentSurfaceIndex?: number): Vector2;
