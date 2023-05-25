@@ -102,7 +102,6 @@ function generateGroupAreas(groups: MappedGroup[], trajectory: number[][]): Surf
     const next: MappedGroup | null = i + 1 < groups.length ? groups[i + 1] : null;
     return {
       id: g.id,
-      label: g.label,
       color: convertColor(g.color),
       data: trajectory.map((p: number[], j: number) => [p[0], g.top[j], next ? next.top[j] : null]),
     };
