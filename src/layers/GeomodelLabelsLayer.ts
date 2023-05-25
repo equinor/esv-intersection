@@ -142,10 +142,6 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
         return acc;
       }, null);
 
-      if (!topmostSurfaceNotDrawnYet) {
-        return;
-      }
-
       this.drawAreaLabel(s, topmostSurfaceNotDrawnYet, array, i);
     });
   }
@@ -154,7 +150,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     this.data.lines.filter((surfaceLine: SurfaceLine) => surfaceLine.label).forEach((surfaceLine: SurfaceLine) => this.drawLineLabel(surfaceLine));
   }
 
-  drawAreaLabel = (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea, surfaces: SurfaceArea[], i: number): void => {
+  drawAreaLabel = (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea | null, surfaces: SurfaceArea[], i: number): void => {
     const { data } = surfaceArea;
     const { ctx, maxFontSizeInWorldCoordinates, isXFlipped } = this;
     const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
