@@ -65,7 +65,7 @@
     "storybook": "^7.0.7",
     "storybook-dark-mode": "^3.0.0",
     "tslib": "^2.5.0",
-    "typedoc": "^0.24.6",
+    "typedoc": "^0.24.7",
     "typescript": "^5.0.2",
     "vite": "^4.3.4",
     "vite-plugin-dts": "^2.3.0",
