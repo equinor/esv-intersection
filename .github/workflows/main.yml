@@ -36,7 +36,6 @@ jobs:
 
   maybe_publish_package:
     needs: build_and_test
-    if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/release.yml
 
   deploy_docs:

@@ -28,7 +28,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky install",
-    "release": "npm run build && changeset publish"
+    "release": "cat .npmrc && npm run build"
   },
   "lint-staged": {
     "*": "prettier --write --ignore-unknown"
