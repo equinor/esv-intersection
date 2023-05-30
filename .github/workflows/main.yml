@@ -33,6 +33,10 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
+  code_ql:
+    needs: build_and_test
+    uses: ./.github/workflows/codeql-analysis.yml
+
   maybe_publish_package:
     needs: build_and_test
     if: github.ref == 'refs/heads/master'
