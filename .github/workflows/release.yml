@@ -17,6 +17,7 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
           node-version: '18'
           registry-url: 'https://registry.npmjs.org/'
+          scope: '@equinor'
       - run: npm ci --prefer-offline
 
       - name: Create a Release Pull Request or Publish to Registry
