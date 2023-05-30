@@ -6,7 +6,6 @@ on:
         default: 'master'
         required: false
         type: string
-concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   deploy-docs-n-storybook:
