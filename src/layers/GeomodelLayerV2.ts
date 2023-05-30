@@ -94,11 +94,12 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
 
     let penDown = false;
     for (let i = 0; i < d.length; i++) {
-      if (d[i][1]) {
+      const lineData = d[i];
+      if (lineData && lineData[1] && lineData[0]) {
         if (penDown) {
-          g.lineTo(d[i][0], d[i][1]);
+          g.lineTo(lineData[0], lineData[1]);
         } else {
-          g.moveTo(d[i][0], d[i][1]);
+          g.moveTo(lineData[0], lineData[1]);
           penDown = true;
         }
       } else {
