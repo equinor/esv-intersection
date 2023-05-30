@@ -74,7 +74,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     this.render();
   }
 
-  onUpdate(event: OnUpdateEvent<T>): void {
+  override onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
 
     this.callouts = undefined;
@@ -82,7 +82,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     this.render();
   }
 
-  onRescale(event: OnRescaleEvent): void {
+  override onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     const isPanning = this.rescaleEvent && this.rescaleEvent.xRatio === event.xRatio;
     this.rescaleEvent = event;

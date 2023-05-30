@@ -247,5 +247,5 @@ export const GeoModelCanvasUsingHighLevelInterface = () => {
 
 export default {
   title: 'ESV Intersection/Features/Geo Model',
-  component: GeoModelUsingLowLevelInterface
-}
+  component: GeoModelUsingLowLevelInterface,
+};

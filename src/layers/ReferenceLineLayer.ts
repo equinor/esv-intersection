@@ -45,17 +45,17 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
   yScale: ScaleLinear<number, number, never> | null = null;
   xScale: ScaleLinear<number, number, never> | null = null;
 
-  onMount(event: OnMountEvent) {
+  override onMount(event: OnMountEvent) {
     super.onMount(event);
   }
 
-  onUpdate(event: OnUpdateEvent<ReferenceLine[]>) {
+  override onUpdate(event: OnUpdateEvent<ReferenceLine[]>) {
     super.onUpdate(event);
     this.clearCanvas();
     this.render();
   }
 
-  onRescale(event: OnRescaleEvent) {
+  override onRescale(event: OnRescaleEvent) {
     super.onRescale(event);
     this.yScale = event.yScale;
     this.xScale = event.xScale;

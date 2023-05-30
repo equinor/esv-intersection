@@ -14,11 +14,11 @@ export type SeismicCanvasData = {
 };
 
 export class SeismicCanvasLayer extends CanvasLayer<SeismicCanvasData> {
-  onMount(event: OnMountEvent): void {
+  override onMount(event: OnMountEvent): void {
     super.onMount(event);
   }
 
-  onUpdate(event: OnUpdateEvent<SeismicCanvasData>): void {
+  override onUpdate(event: OnUpdateEvent<SeismicCanvasData>): void {
     super.onUpdate(event);
 
     this.clearCanvas();
@@ -26,7 +26,7 @@ export class SeismicCanvasLayer extends CanvasLayer<SeismicCanvasData> {
     this.render();
   }
 
-  onRescale(event: OnRescaleEvent): void {
+  override onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     this.setTransform(event);
     this.render();

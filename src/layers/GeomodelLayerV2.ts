@@ -9,7 +9,7 @@ const DEFAULT_Y_BOTTOM = 10000;
 export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
   private isPreRendered: boolean = false;
 
-  onRescale(event: OnRescaleEvent): void {
+  override onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
 
     if (!this.isPreRendered) {
@@ -20,7 +20,7 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     this.render();
   }
 
-  onUpdate(event: OnUpdateEvent<T>): void {
+  override onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
 
     this.isPreRendered = false;

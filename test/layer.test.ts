@@ -13,12 +13,12 @@ class TestLayer extends Layer<string> {
   }
   testString: string = '';
   updateWasCalled: boolean = false;
-  setData(data: string) {
+  override setData(data: string) {
     super.setData(data);
     this.testString = data;
   }
 
-  onUpdate(_event: OnUpdateEvent<string>) {
+  override onUpdate(_event: OnUpdateEvent<string>) {
     this.updateWasCalled = true;
   }
 }

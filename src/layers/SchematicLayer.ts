@@ -176,7 +176,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     };
   }
 
-  public onUnmount(event?: OnUnmountEvent): void {
+  public override onUnmount(event?: OnUnmountEvent): void {
     super.onUnmount(event);
     this.scalingFactors = null;
     this.cementTextureCache = null;
@@ -188,7 +188,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.internalLayerVisibility = null;
   }
 
-  public onUpdate(event: OnUpdateEvent<T>): void {
+  public override onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.clearLayer();
     this.preRender();
@@ -718,9 +718,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     if (intervals.length === 0) {
       return null;
     }
-    const { exaggerationFactor } = this.options as SchematicLayerOptions<T>;
-
-    const rope = new ComplexRope(texture, intervals, exaggerationFactor);
+    const rope = new ComplexRope(texture, intervals);
 
     this.addChild(rope);
 

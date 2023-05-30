@@ -14,7 +14,7 @@ export const WellborepathUsingLowLevelInterface = () => {
   getWellborePath().then((data) => {
     const referenceSystem = new IntersectionReferenceSystem(data);
 
-    const options: WellborepathLayerOptions<[number,number][]> = {
+    const options: WellborepathLayerOptions<[number, number][]> = {
       order: 1,
       strokeWidth: '2px',
       stroke: 'black',
@@ -45,7 +45,7 @@ export const WellborepathUsingHighLevelInterface = () => {
   getWellborePath().then((data) => {
     const referenceSystem = new IntersectionReferenceSystem(data);
 
-    const options: WellborepathLayerOptions<[number,number][]> = {
+    const options: WellborepathLayerOptions<[number, number][]> = {
       order: 1,
       strokeWidth: '2px',
       stroke: 'black',
@@ -65,8 +65,7 @@ export const WellborepathUsingHighLevelInterface = () => {
   return root;
 };
 
-
 export default {
   title: 'ESV Intersection/Features/Wellborepath',
-  component: WellborepathUsingLowLevelInterface
-}
+  component: WellborepathUsingLowLevelInterface,
+};

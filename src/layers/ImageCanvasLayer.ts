@@ -17,20 +17,20 @@ export type OnImageLayerRescaleEvent<T> = OnImageLayerUpdateEvent<T> & OnRescale
 export class ImageLayer<T> extends CanvasLayer<T> {
   img: HTMLImageElement;
 
-  onMount(event: OnMountEvent): void {
+  override onMount(event: OnMountEvent): void {
     super.onMount(event);
     const img = document.createElement('img');
     this.img = img;
     this.isLoading = true;
   }
 
-  onUpdate(event: OnImageLayerUpdateEvent<T>): void {
+  override onUpdate(event: OnImageLayerUpdateEvent<T>): void {
     super.onUpdate(event);
     this.img.src = event.url;
     this.render(event);
   }
 
-  onRescale(event: OnImageLayerRescaleEvent<T>): void {
+  override onRescale(event: OnImageLayerRescaleEvent<T>): void {
     super.onRescale(event);
     this.setTransform(event);
     this.render(event);

@@ -53,8 +53,8 @@ export const getPicks = (): Promise<any[]> => {
 };
 
 export const getCementSqueezes = (): Promise<any[]> => {
-  return Promise.resolve(cementSqueezes)
-}
+  return Promise.resolve(cementSqueezes);
+};
 
 // Nothing for mock
-export const fetchData = async (fileName: string) => { };
+export const fetchData = async (fileName: string) => {};

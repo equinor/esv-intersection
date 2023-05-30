@@ -29,7 +29,7 @@ export class FixedWidthSimpleRope extends Mesh {
     this.autoUpdate = true;
   }
 
-  _render(renderer: Renderer): void {
+  override _render(renderer: Renderer): void {
     const geometry: RopeGeometry = this.geometry as RopeGeometry;
 
     if (this.autoUpdate) {

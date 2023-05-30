@@ -48,11 +48,11 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     this.generateSurfacesWithAvgDepth = this.generateSurfacesWithAvgDepth.bind(this);
   }
 
-  get options(): GeomodelLayerLabelsOptions<T> {
+  override get options(): GeomodelLayerLabelsOptions<T> {
     return this._options;
   }
 
-  setData(data: T): void {
+  override setData(data: T): void {
     super.setData(data);
     this.areasWithAvgTopDepth = null;
   }
@@ -90,16 +90,16 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     }, []);
   }
 
-  onMount(event: OnMountEvent): void {
+  override onMount(event: OnMountEvent): void {
     super.onMount(event);
   }
 
-  onUpdate(event: OnUpdateEvent<T>): void {
+  override onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.render();
   }
 
-  onRescale(event: OnRescaleEvent): void {
+  override onRescale(event: OnRescaleEvent): void {
     this.rescaleEvent = event;
     this.updateXFlipped();
     this.resetTransform();
@@ -192,7 +192,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     }
 
     // Find edge where to draw
-    let startPos;
+    let startPos: number;
     const portionOfLabelLengthUsedForPosCalc = 0.07;
     if (isLabelsOnLeftSide) {
       startPos = isXFlipped ? Math.min(surfaceAreaLeftEdge, leftEdge) : Math.max(surfaceAreaLeftEdge, leftEdge);
@@ -301,7 +301,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges();
 
     // Find edge where to draw
-    let startPos;
+    let startPos: number;
     const steps = 5;
     if (isLabelsOnLeftSide) {
       startPos = isXFlipped ? Math.max(surfaceAreaRightEdge, rightEdge) : Math.min(surfaceAreaRightEdge, rightEdge);
@@ -458,7 +458,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   ): number {
     const angles: number[] = [];
     const tmpVec = Vector2.zero.mutable;
-    let vecAtEnd;
+    let vecAtEnd: Vector2;
     for (let i = 0; i <= count; i++) {
       const x = offset + i * step;
       const topY = findSampleAtPos(top, x, topLimit, bottomLimit);

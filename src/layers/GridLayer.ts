@@ -41,12 +41,12 @@ export class GridLayer<T> extends CanvasLayer<T> {
     this.render = this.render.bind(this);
   }
 
-  onUpdate(event: OnGridLayerUpdateEvent<T>): void {
+  override onUpdate(event: OnGridLayerUpdateEvent<T>): void {
     super.onUpdate(event);
     this.render(event);
   }
 
-  onRescale(event: OnRescaleEvent): void {
+  override onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
     this.render(event);
   }

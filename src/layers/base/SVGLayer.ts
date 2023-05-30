@@ -6,7 +6,7 @@ import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 export abstract class SVGLayer<T> extends Layer<T> {
   elm: Selection<SVGElement, unknown, null, undefined>;
 
-  onMount(event: OnMountEvent): void {
+  override onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm } = event;
     const width = event.width || parseInt(elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH;
@@ -21,13 +21,13 @@ export abstract class SVGLayer<T> extends Layer<T> {
     this.elm.style('position', 'absolute').style('pointer-events', interactive).style('opacity', this.opacity).style('z-index', this.order);
   }
 
-  onUnmount(): void {
+  override onUnmount(): void {
     super.onUnmount();
     this.elm.remove();
     this.elm = null;
   }
 
-  onResize(event: OnResizeEvent): void {
+  override onResize(event: OnResizeEvent): void {
     if (!this.elm) {
       return;
     }
@@ -35,7 +35,7 @@ export abstract class SVGLayer<T> extends Layer<T> {
     this.elm.attr('height', event.height).attr('width', event.width);
   }
 
-  setVisibility(visible: boolean): void {
+  override setVisibility(visible: boolean): void {
     super.setVisibility(visible);
     if (this.elm) {
       this.elm.attr('visibility', visible ? 'visible' : 'hidden');

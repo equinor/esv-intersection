@@ -1,28 +1,29 @@
-import { defineConfig } from 'vite'
-import dts from 'vite-plugin-dts'
+import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
-import pkg from './package.json'
+import pkg from './package.json';
 
-export const getPeerDeps = pkg => Object.keys(pkg.peerDependencies || {})
+export const getPeerDeps = (pkg) => Object.keys(pkg.peerDependencies || {});
 
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
+    sourcemap: true,
     lib: {
       entry: 'src/index.ts',
       formats: ['es', 'cjs', 'umd'],
       name: 'esvintersection',
       fileName: (format) => {
-        const fileName = 'index'
-        switch(format) {
+        const fileName = 'index';
+        switch (format) {
           case 'es':
-            return `${fileName}.mjs`
+            return `${fileName}.mjs`;
           case 'cjs':
-            return `${fileName}.cjs`
+            return `${fileName}.cjs`;
           case 'umd':
-            return `${fileName}.umd.js`
+            return `${fileName}.umd.js`;
           default:
-            return `${fileName}.js`
+            return `${fileName}.js`;
         }
       },
     },
@@ -36,5 +37,9 @@ export default defineConfig({
       },
     },
   },
-  plugins: [dts()], // Generates typescript d.ts files with tsc
-})
+  plugins: [
+    dts({
+      tsConfigFilePath: './src/tsconfig.json',
+    }),
+  ], // Generates typescript d.ts files with tsc
+});

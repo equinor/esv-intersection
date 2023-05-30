@@ -19,10 +19,9 @@ export class ComplexRope extends Mesh {
   /**
    * @param texture - The texture to use on the rope.
    * @param segments - An array of segments with points and diaeter to construct this rope.
-   * @param {number} textureScale - Optional. Adjust interval of repeated texture
    */
-  constructor(texture: Texture, segments: ComplexRopeSegment[], textureScale = 0) {
-    const ropeGeometry = new ComplexRopeGeometry(segments, textureScale);
+  constructor(texture: Texture, segments: ComplexRopeSegment[]) {
+    const ropeGeometry = new ComplexRopeGeometry(segments);
     const meshMaterial = new MeshMaterial(texture);
 
     // attempt to set UV wrapping, will fail on non-power of two textures
@@ -33,7 +32,7 @@ export class ComplexRope extends Mesh {
     this.autoUpdate = true;
   }
 
-  _render(renderer: Renderer): void {
+  override _render(renderer: Renderer): void {
     const geometry: ComplexRopeGeometry = this.geometry as ComplexRopeGeometry;
 
     if (this.autoUpdate) {

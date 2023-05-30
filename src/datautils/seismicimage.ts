@@ -97,9 +97,9 @@ export async function generateSeismicSliceImage(
     seismicMin?: number;
     seismicMax?: number;
   },
-): Promise<ImageBitmap> {
+): Promise<ImageBitmap | undefined> {
   if (!(data && data.datapoints && data.datapoints.length > 0)) {
-    return;
+    return undefined;
   }
   const { datapoints: dp } = data;
 
@@ -136,13 +136,13 @@ export async function generateSeismicSliceImage(
 
   const step = (length / width) * (options?.isLeftToRight ? -1 : 1);
 
-  let val1;
-  let val2;
-  let val;
-  let i;
+  let val1: number;
+  let val2: number;
+  let val: number;
+  let i: number;
   let col: number[];
   const black = [0, 0, 0];
-  let opacity;
+  let opacity: number;
 
   for (let x = 0; x < width; x++) {
     offset = x * 4;

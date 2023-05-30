@@ -148,7 +148,7 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
     return this.getPointAt(t);
   }
 
-  getPointAt(t: number): Vector {
+  override getPointAt(t: number): Vector {
     const tl = clamp(t, 0, 1);
     return super.getPointAt(tl);
   }

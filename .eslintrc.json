@@ -1,5 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
+  "root": true,
   "plugins": ["@typescript-eslint/eslint-plugin", "prettier"],
   "env": {
     "es6": true,
@@ -10,11 +11,6 @@
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
-  },
-  "parserOptions": {
-    "ecmaVersion": 2018,
-    "sourceType": "module",
-    "project": "./tsconfig.test.json"
   },
   "rules": {
     "prettier/prettier": "error",

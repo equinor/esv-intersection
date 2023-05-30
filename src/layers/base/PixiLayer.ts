@@ -92,7 +92,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
     });
   }
 
-  onMount(event: OnMountEvent) {
+  override onMount(event: OnMountEvent) {
     super.onMount(event);
 
     this.pixiViewContainer = this.element.querySelector('#webgl-layer');
@@ -110,7 +110,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
     }
   }
 
-  onUnmount(event?: OnUnmountEvent) {
+  override onUnmount(event?: OnUnmountEvent) {
     super.onUnmount(event);
 
     this.clearLayer();
@@ -120,12 +120,12 @@ export abstract class PixiLayer<T> extends Layer<T> {
     this.pixiViewContainer = undefined;
   }
 
-  onResize(event: OnResizeEvent): void {
+  override onResize(event: OnResizeEvent): void {
     super.onResize(event);
     this.ctx.renderer.resize(event.width, event.height);
   }
 
-  onRescale(event: OnRescaleEvent): void {
+  override onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);
 
     const flippedX = event.xBounds[0] > event.xBounds[1];
@@ -159,7 +159,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
     this.pixiViewContainer.setAttribute('style', styles);
   }
 
-  setVisibility(visible: boolean, layerId?: string): void {
+  override setVisibility(visible: boolean, layerId?: string): void {
     super.setVisibility(visible, layerId);
     if (this.pixiViewContainer) {
       this.updateStyle(visible);

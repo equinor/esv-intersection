@@ -21,5 +21,5 @@ export const BasicSetup = () => {
 
 export default {
   title: 'ESV Intersection/Other examples',
-  component: BasicSetup
-}
+  component: BasicSetup,
+};

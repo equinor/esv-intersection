@@ -30,13 +30,13 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
     this.updatePaths = this.updatePaths.bind(this);
   }
 
-  onUpdate(event: OnUpdateEvent<T>): void {
+  override onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
     this.updatePaths();
     this.render();
   }
 
-  onRescale(event: OnRescaleEvent): void {
+  override onRescale(event: OnRescaleEvent): void {
     this.rescaleEvent = event;
     this.setTransform(this.rescaleEvent);
     this.render();

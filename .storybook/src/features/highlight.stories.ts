@@ -182,8 +182,7 @@ const createSlider = (cb: any, opts: any) => {
   return slider;
 };
 
-
 export default {
   title: 'ESV Intersection/Features/Highlight',
-  component: HighlightWellborepath
-}
+  component: HighlightWellborepath,
+};

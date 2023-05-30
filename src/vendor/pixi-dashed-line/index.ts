@@ -57,9 +57,6 @@ export class DashLine {
   /** desired scale of line */
   scale = 1;
 
-  // sanity check to ensure the lineStyle is still in use
-  private activeTexture: PIXI.Texture;
-
   private start: PIXI.Point;
 
   private dashSize: number;
@@ -106,7 +103,6 @@ export class DashLine {
         texture,
         alignment: options.alignment,
       });
-      this.activeTexture = texture;
     } else {
       this.graphics.lineStyle({
         width: options.width * options.scale,
@@ -359,7 +355,7 @@ export class DashLine {
   }
 
   // creates or uses cached texture
-  private static getTexture(options: DashLineOptions, dashSize: number): PIXI.Texture {
+  private static getTexture(options: DashLineOptions, dashSize: number): PIXI.Texture | undefined {
     const key = options.dash.toString();
     if (DashLine.dashTextureCache[key]) {
       return DashLine.dashTextureCache[key];
@@ -370,7 +366,7 @@ export class DashLine {
     const context = canvas.getContext('2d');
     if (!context) {
       console.warn('Did not get context from canvas');
-      return;
+      return undefined;
     }
     context.strokeStyle = 'white';
     context.globalAlpha = options.alpha;

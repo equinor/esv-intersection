@@ -1,18 +1,4 @@
 {
-  "compilerOptions": {
-    "declaration": true,
-    "declarationDir": "./dist",
-    "module": "es6",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "outDir": "./dist",
-    "target": "es5",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "lib": ["es5", "DOM", "ES2019.array"],
-    "skipLibCheck": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "files": [],
+  "references": [{ "path": "test" }, { "path": "src" }]
 }
