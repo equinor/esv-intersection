@@ -1,41 +1,4 @@
 {
-  "compilerOptions": {
-    /* Type-Checking */
-    /*"strict": true,*/
-    "allowUnusedLabels": false,
-    "allowUnreachableCode": false,
-    /*"exactOptionalPropertyTypes": true,*/
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "forceConsistentCasingInFileNames": true,
-    "checkJs": true,
-    "allowJs": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    /* Other */
-
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false,
-    "declaration": true,
-    "declarationDir": "dist",
-    "declarationMap": true,
-    "module": "es6",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "target": "es5",
-    "allowSyntheticDefaultImports": true,
-    "isolatedModules": true,
-    "lib": ["es5", "DOM", "ES2019.array"],
-    "outDir": "./dist",
-    "composite": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "files": [],
+  "references": [{ "path": "test" }, { "path": "src" }]
 }

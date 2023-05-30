@@ -1,5 +1,7 @@
 /// <reference types="vitest" />
 import { mergeConfig } from 'vite';
+import dts from 'vite-plugin-dts';
+
 import { defineConfig, configDefaults } from 'vitest/config';
 import viteConfig from './vite.config';
 
@@ -14,5 +16,10 @@ export default mergeConfig(
         inline: ['vitest-canvas-mock'],
       },
     },
+    plugins: [
+      dts({
+        tsConfigFilePath: './test/tsconfig.json',
+      }),
+    ], // Generates typescript d.ts files with tsc
   }),
 );

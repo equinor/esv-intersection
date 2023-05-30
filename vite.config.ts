@@ -8,6 +8,7 @@ export const getPeerDeps = (pkg) => Object.keys(pkg.peerDependencies || {});
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
+    sourcemap: true,
     lib: {
       entry: 'src/index.ts',
       formats: ['es', 'cjs', 'umd'],
@@ -36,5 +37,9 @@ export default defineConfig({
       },
     },
   },
-  plugins: [dts()], // Generates typescript d.ts files with tsc
+  plugins: [
+    dts({
+      tsConfigFilePath: './src/tsconfig.json',
+    }),
+  ], // Generates typescript d.ts files with tsc
 });
