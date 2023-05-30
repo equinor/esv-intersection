@@ -29,9 +29,6 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build
-      - run: npm run build-storybook
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
 
   code_ql:
     needs: build_and_test
