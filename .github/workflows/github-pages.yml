@@ -1,44 +1,39 @@
-name: Deploy Storybook
-
+name: Deploy Documentation
 on:
-  workflow_dispatch:
-  push:
-    branches: [master]
+  workflow_call:
+    inputs:
+      version_to_deploy:
+        default: 'master'
+        required: false
+        type: string
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   deploy-docs-n-storybook:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           submodules: true
           persist-credentials: false
+      - run: echo "Running on branch ${{ github.ref_name }}..."
 
-      - name: Setup Nodejs
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '18'
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+          node-version: '18'
+      - run: npm ci --prefer-offline
 
-      - name: Info
-        run: echo "Running on branch ${{ github.ref_name }}"
-
-      - name: Install dependencies
-        run: npm ci --prefer-offline
-
-      - name: Create build dir
-        run: mkdir docs_out
-
-      - name: Generate storybook
-        run: npx storybook build -c .storybook -o docs_out/storybook/${{ github.ref_name }}
+      - run: npm run build
+      - run: mkdir docs_out
+      - run: npx storybook build -c .storybook -o docs_out/storybook/${{ ${{ inputs.version_to_deploy }} }}
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Publish GH pages
-        uses: JamesIves/github-pages-deploy-action@releases/v4
+      - uses: JamesIves/github-pages-deploy-action@releases/v4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to
-          FOLDER: docs_out/storybook/${{ github.ref_name }} # The folder the action should deploy
-          TARGET-FOLDER: storybook/${{ github.ref_name }} # The destination folder to deploy to
+          FOLDER: docs_out/storybook/${{ inputs.version_to_deploy }} # The folder the action should deploy
+          TARGET-FOLDER: storybook/${{ inputs.version_to_deploy }} # The destination folder to deploy to

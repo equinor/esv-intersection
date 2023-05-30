@@ -1,0 +1,44 @@
+name: CI
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build_and_test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          persist-credentials: false
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - run: node --version
+      - run: npm --version
+      - run: npm ci --prefer-offline
+
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+      - run: npm run build-storybook
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+  maybe_publish_package:
+    needs: build_and_test
+    if: github.ref == 'refs/heads/master'
+    uses: ./.github/workflows/release.yml
+
+  deploy_docs:
+    needs: build_and_test
+    if: github.ref == 'refs/heads/master'
+    uses: ./.github/workflows/github-pages.yml

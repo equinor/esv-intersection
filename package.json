@@ -17,10 +17,6 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "vite build",
-    "prepub": "npm run build",
-    "pub": "npm publish --access=public",
-    "prepub-beta": "npm run build",
-    "pub-beta": "npm publish --tag=beta --access=public",
     "lint:eslint": "eslint --ext .js,.jsx,.ts,.tsx src test",
     "lint:tsc": "tsc -b",
     "lint": "run-p lint:tsc lint:eslint",
@@ -31,7 +27,8 @@
     "postdocs": "copyfiles images/* docs_out && copyfiles .nojekyll docs_out",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "npm run build && changeset publish"
   },
   "lint-staged": {
     "*": "prettier --write --ignore-unknown"
@@ -52,6 +49,7 @@
   },
   "homepage": "https://github.com/equinor/esv-intersection#readme",
   "devDependencies": {
+    "@changesets/cli": "^2.26.1",
     "@storybook/addon-storysource": "^7.0.7",
     "@storybook/html-vite": "^7.0.7",
     "@types/d3": "^7.4.0",
