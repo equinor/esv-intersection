@@ -26,7 +26,7 @@ jobs:
 
       - run: npm run build
       - run: mkdir docs_out
-      - run: npx storybook build -c .storybook -o docs_out/storybook/${{ ${{ inputs.version_to_deploy }} }}
+      - run: npx storybook build -c .storybook -o docs_out/storybook/${{ inputs.version_to_deploy }}
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
