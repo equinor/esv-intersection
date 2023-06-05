@@ -8,6 +8,9 @@
     "require": "./dist/index.cjs",
     "browser": "./dist/index.umd.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist/*",
     "src/*",
@@ -28,6 +31,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky install",
+    "version": "changeset version",
     "release": "npm run build && changeset publish"
   },
   "lint-staged": {
