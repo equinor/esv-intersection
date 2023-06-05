@@ -9,7 +9,8 @@
     "browser": "./dist/index.umd.js"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "files": [
     "dist/*",
@@ -31,7 +32,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky install",
-    "version": "changeset version",
+    "version": "changeset version && npm install --package-lock-only",
     "release": "npm run build && changeset publish"
   },
   "lint-staged": {

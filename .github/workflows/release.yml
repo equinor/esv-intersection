@@ -19,6 +19,16 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci --prefer-offline
 
+      - run: |
+          set -ex
+          git config color.status always
+          env
+          hostname
+          whoami
+          node --version
+          npm --version
+          cat ~/.npmrc || true
+
       - name: Create a Release Pull Request or Publish to Registry
         id: changesets
         uses: changesets/action@v1
@@ -29,6 +39,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - run: |
+          set -ex
+          git config color.status always
+          env
+          hostname
+          whoami
+          node --version
+          npm --version
+          cat ~/.npmrc || true
 
       - name: Publish Released Documentation
         if: steps.changesets.outputs.published == 'true'
