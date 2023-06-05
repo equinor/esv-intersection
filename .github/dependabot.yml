@@ -1,12 +1,8 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/" 
-    open-pull-requests-limit: 25
+  - package-ecosystem: 'npm'
+    directory: '/'
+    open-pull-requests-limit: 50
     versioning-strategy: increase
-    rebase-strategy: 'disabled'
     schedule:
-      interval: 'monthly'
-      day: 'monday'
-      time: '06:00'
-      timezone: 'Europe/Oslo'
+      interval: 'weekly'
