@@ -1,5 +1,9 @@
 name: Release/Publish
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
@@ -16,18 +20,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
           node-version: '18'
-          registry-url: 'https://registry.npmjs.org'
       - run: npm ci --prefer-offline
-
-      - run: |
-          set -ex
-          git config color.status always
-          env
-          hostname
-          whoami
-          node --version
-          npm --version
-          cat ~/.npmrc || true
 
       - name: Create a Release Pull Request or Publish to Registry
         id: changesets
@@ -38,17 +31,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - run: |
-          set -ex
-          git config color.status always
-          env
-          hostname
-          whoami
-          node --version
-          npm --version
-          cat ~/.npmrc || true
 
       - name: Publish Released Documentation
         if: steps.changesets.outputs.published == 'true'

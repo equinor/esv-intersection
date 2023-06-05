@@ -38,6 +38,8 @@ jobs:
     needs: build_and_test
     if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/release.yml
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   deploy_docs:
     needs: build_and_test
