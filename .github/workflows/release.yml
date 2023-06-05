@@ -10,6 +10,8 @@ jobs:
   release_or_publish_package:
     name: Release & Publish to NPM Registry
     runs-on: ubuntu-latest
+    outputs:
+      was_published: ${{ steps.changesets.outputs.published  }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -32,8 +34,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish Released Documentation
-        if: steps.changesets.outputs.published == 'true'
-        uses: ./.github/workflows/github-pages.yml
-        with:
-          version_to_deploy: 'latest'
+  publish_released_docs:
+    needs: release_or_publish_package
+    if: needs.release_or_publish_package.outputs.was_published == 'true'
+    uses: ./.github/workflows/github-pages.yml
+    with:
+      version_to_deploy: 'latest'
