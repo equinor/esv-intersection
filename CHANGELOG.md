@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.6
+
+### Patch Changes
+
+- 776ec1f: chore(deps-dev): bump typedoc from 0.24.6 to 0.24.8
+- 49abbad: chore(deps-dev): bump vitest from 0.30.1 to 0.31.4
+- 06eab8f: chore(deps): bump d3-array from 3.2.3 to 3.2.4
+
 ## 3.0.5
 
 ### Patch Changes
