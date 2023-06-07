@@ -24,7 +24,7 @@ jobs:
           node-version: '18'
       - run: npm ci --prefer-offline
 
-      - name: Create a Release Pull Request or Publish to Registry
+      - name: Create a Release PR or Publish to NPM Registry
         id: changesets
         uses: changesets/action@v1
         with:
@@ -33,6 +33,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@equinor'
+
+      - name: Create a Release PR or Publish to Github Registry
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: npm run version
+          publish: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish_released_docs:
     needs: release_or_publish_package
