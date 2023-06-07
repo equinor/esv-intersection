@@ -43,7 +43,6 @@ jobs:
           scope: '@equinor'
 
       - name: Create a Release PR or Publish to Github Registry
-        id: changesets
         uses: changesets/action@v1
         with:
           version: npm run version
