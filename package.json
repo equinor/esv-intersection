@@ -29,7 +29,8 @@
     "build-storybook": "storybook build",
     "prepare": "husky install",
     "version": "changeset version && npm install --package-lock-only",
-    "release": "npm run build && changeset publish"
+    "release:npm": "npm run build && changeset publish",
+    "release:github": "npm run build && changeset publish --no-git-tag"
   },
   "lint-staged": {
     "*": "prettier --write --ignore-unknown"
