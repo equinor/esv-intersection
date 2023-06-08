@@ -9,6 +9,7 @@ export default mergeConfig(
   viteConfig,
   defineConfig({
     test: {
+      include: ['(src|test)/**/__tests__/**/*.?(c|m)[jt]s?(x)', '(src|test)/**/?(*.){test,spec}.?(c|m)[jt]s?(x)'],
       environment: 'jsdom',
       watch: false,
       setupFiles: ['./__mocks__/pixi.js.ts', '__mocks__/canvas.ts'],
