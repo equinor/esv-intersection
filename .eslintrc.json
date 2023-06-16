@@ -13,27 +13,8 @@
     "SharedArrayBuffer": "readonly"
   },
   "rules": {
-    "prettier/prettier": "error",
-
-    "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/no-inferrable-types": "off",
-    "@typescript-eslint/no-unused-vars": ["error", { "args": "all", "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/no-use-before-define": "off",
-
-    "curly": "error",
-    "no-continue": "off",
-    "no-plusplus": "off",
-    "no-param-reassign": "off",
-    "object-curly-newline": "off",
-    "no-underscore-dangle": "off",
-    "quotes": ["error", "single"],
-    "import/prefer-default-export": "off",
-    "max-len": ["error", { "code": 150 }],
-    "comma-dangle": ["error", "always-multiline"],
-    "eqeqeq": ["error", "always", { "null": "ignore" }],
-    "no-magic-numbers": ["error", { "ignore": [-1, 0, 0.5, 1, 2, 3, 4, 8, 16, 100, 255, 1000], "ignoreDefaultValues": true }],
-    "newline-per-chained-call": ["off", { "ignoreChainWithDepth": 1 }],
-    "no-warning-comments": [0, { "terms": ["todo", "fixme"], "location": "start" }]
+    "@typescript-eslint/ban-ts-comment": "warn",
+    "@typescript-eslint/no-namespace": "warn",
+    "@typescript-eslint/no-unused-vars": ["error", { "args": "all", "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }]
   }
 }
