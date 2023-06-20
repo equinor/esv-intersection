@@ -38,7 +38,7 @@ export declare function generateSeismicSliceImage(data: {
     datapoints: number[][];
     yAxisValues: number[];
 }, trajectory: number[][], colormap: string[], options?: {
-    isLeftToRight: true;
+    isLeftToRight: boolean;
     seismicRange?: number;
     seismicMin?: number;
     seismicMax?: number;
