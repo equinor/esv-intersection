@@ -1,3 +1,4 @@
+// @ts-nocheck
 // https://github.com/davidfig/pixi-dashed-line
 //
 // Copyright 2021 David Figatner
