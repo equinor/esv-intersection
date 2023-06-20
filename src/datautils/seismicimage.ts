@@ -132,7 +132,7 @@ export async function generateSeismicSliceImage(
   let offset = 0;
   const colorFactor = (colorTableSize - 1) / domain.difference;
 
-  let pos = options?.isLeftToRight == null ? trajectory[0][0] : trajectory[trajectory.length - 1][0];
+  let pos = options?.isLeftToRight ? trajectory[0][0] : trajectory[trajectory.length - 1][0];
 
   const step = (length / width) * (options?.isLeftToRight ? -1 : 1);
 
