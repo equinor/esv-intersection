@@ -91,12 +91,12 @@ export async function generateSeismicSliceImage(
   data: { datapoints: number[][]; yAxisValues: number[] },
   trajectory: number[][],
   colormap: string[],
-  options?: {
-    isLeftToRight: true;
+  options: {
+    isLeftToRight: boolean;
     seismicRange?: number;
     seismicMin?: number;
     seismicMax?: number;
-  },
+  } = { isLeftToRight: true },
 ): Promise<ImageBitmap | undefined> {
   if (!(data && data.datapoints && data.datapoints.length > 0)) {
     return undefined;
@@ -132,7 +132,7 @@ export async function generateSeismicSliceImage(
   let offset = 0;
   const colorFactor = (colorTableSize - 1) / domain.difference;
 
-  let pos = options?.isLeftToRight ? trajectory[0][0] : trajectory[trajectory.length - 1][0];
+  let pos = options?.isLeftToRight == null ? trajectory[0][0] : trajectory[trajectory.length - 1][0];
 
   const step = (length / width) * (options?.isLeftToRight ? -1 : 1);
 
