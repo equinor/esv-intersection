@@ -55,14 +55,14 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
     const total = points.length; // - 1;
 
     let totalLength = 0;
-    let prevPoint = points[0];
+    let prevPoint = points[0]!;
 
     for (let i = 0; i < total; i++) {
-      const dx = prevPoint.x - points[i].x;
-      const dy = prevPoint.y - points[i].y;
+      const dx = prevPoint.x - points[i]?.x!;
+      const dy = prevPoint.y - points[i]?.y!;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      prevPoint = points[i];
+      prevPoint = points[i]!;
       totalLength += distance;
     }
 
@@ -75,18 +75,18 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
     uvs[3] = 1;
 
     let amount = 0;
-    let prev = points[0];
+    let prev = points[0]!;
 
     for (let i = 0; i < total; i++) {
       // time to do some smart drawing!
       const index = i * 4;
 
       // calculate pixel distance from previous point
-      const dx = prev.x - points[i].x;
-      const dy = prev.y - points[i].y;
+      const dx = prev.x - points[i]?.x!;
+      const dy = prev.y - points[i]?.y!;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      prev = points[i];
+      prev = points[i]!;
 
       // strech texture on distance/length instead of point/points.length to get a more correct strech
       amount += distance / totalLength;
@@ -127,20 +127,20 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
       return;
     }
 
-    let lastPoint = points[0];
+    let lastPoint = points[0]!;
     let nextPoint;
     let perpX = 0;
     let perpY = 0;
 
-    const vertices = this.buffers[0].data;
+    const vertices = this.buffers[0]?.data!;
     const total = points.length;
 
     for (let i = 0; i < total; i++) {
-      const point = points[i];
+      const point = points[i]!;
       const index = i * 4;
 
       if (i < points.length - 1) {
-        nextPoint = points[i + 1];
+        nextPoint = points[i + 1]!;
       } else {
         nextPoint = point;
       }
@@ -165,7 +165,7 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
       lastPoint = point;
     }
 
-    this.buffers[0].update();
+    this.buffers[0]?.update();
   }
 
   public update(): void {
