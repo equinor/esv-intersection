@@ -9,9 +9,9 @@ import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 // The plugin we are trying to avoid:
 // https://github.com/pixijs/pixijs/blob/dev/packages/ticker/src/TickerPlugin.ts
 export class PixiRenderApplication {
-  stage: Container;
+  stage: Container | undefined;
 
-  renderer: IRenderer<HTMLCanvasElement>;
+  renderer: IRenderer<HTMLCanvasElement> | undefined;
 
   constructor(pixiRenderOptions?: IRendererOptionsAuto) {
     const options = {
@@ -29,15 +29,15 @@ export class PixiRenderApplication {
   }
 
   destroy() {
-    this.stage.destroy({
+    this.stage?.destroy({
       children: true,
       texture: true,
       baseTexture: true,
     });
-    this.stage = null;
+    this.stage = undefined;
 
     // Get renderType and clContext before we destroy the renderer
-    const renderType = this.renderer.type;
+    const renderType = this.renderer?.type;
     const glContext = this.renderer instanceof Renderer ? this.renderer?.gl : undefined;
 
     /**
@@ -50,21 +50,23 @@ export class PixiRenderApplication {
       glContext?.getExtension('WEBGL_lose_context')?.loseContext();
     }
 
-    this.renderer.destroy(true);
-    this.renderer = null;
+    this.renderer?.destroy(true);
+    this.renderer = undefined;
   }
 
   get view() {
-    return this.renderer.view;
+    return this.renderer?.view;
   }
 
   render() {
-    this.renderer.render(this.stage);
+    if (this.stage != null) {
+      this.renderer?.render(this.stage);
+    }
   }
 }
 
 export abstract class PixiLayer<T> extends Layer<T> {
-  private pixiViewContainer: HTMLElement;
+  private pixiViewContainer: HTMLElement | undefined;
   private ctx: PixiRenderApplication;
   private container: Container;
 
@@ -74,7 +76,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
     this.ctx = ctx;
 
     this.container = new Container();
-    this.ctx.stage.addChild(this.container);
+    this.ctx.stage?.addChild(this.container);
   }
 
   render(): void {
@@ -95,16 +97,18 @@ export abstract class PixiLayer<T> extends Layer<T> {
   override onMount(event: OnMountEvent) {
     super.onMount(event);
 
-    this.pixiViewContainer = this.element.querySelector('#webgl-layer');
+    this.pixiViewContainer = this.element?.querySelector('#webgl-layer') ?? undefined;
 
     if (!this.pixiViewContainer) {
       this.pixiViewContainer = document.createElement('div');
       this.pixiViewContainer.setAttribute('id', `${this.id}`);
       this.pixiViewContainer.setAttribute('class', 'webgl-layer');
 
-      this.pixiViewContainer.appendChild(this.ctx.view);
+      if (this.ctx.view != null) {
+        this.pixiViewContainer.appendChild(this.ctx.view);
+      }
 
-      this.element.appendChild(this.pixiViewContainer);
+      this.element?.appendChild(this.pixiViewContainer);
 
       this.updateStyle();
     }
@@ -114,15 +118,15 @@ export abstract class PixiLayer<T> extends Layer<T> {
     super.onUnmount(event);
 
     this.clearLayer();
-    this.ctx.stage.removeChild(this.container);
+    this.ctx.stage?.removeChild(this.container);
     this.container.destroy();
-    this.pixiViewContainer.remove();
+    this.pixiViewContainer?.remove();
     this.pixiViewContainer = undefined;
   }
 
   override onResize(event: OnResizeEvent): void {
     super.onResize(event);
-    this.ctx.renderer.resize(event.width, event.height);
+    this.ctx.renderer?.resize(event.width, event.height);
   }
 
   override onRescale(event: OnRescaleEvent): void {
@@ -156,7 +160,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
       .map((pair) => pair.join(':'))
       .join(';');
 
-    this.pixiViewContainer.setAttribute('style', styles);
+    this.pixiViewContainer?.setAttribute('style', styles);
   }
 
   override setVisibility(visible: boolean, layerId?: string): void {
@@ -184,7 +188,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
     }
   }
 
-  renderType(): RENDERER_TYPE {
-    return this.ctx.renderer.type;
+  renderType(): RENDERER_TYPE | undefined {
+    return this.ctx.renderer?.type;
   }
 }

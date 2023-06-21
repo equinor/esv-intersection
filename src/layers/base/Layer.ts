@@ -26,10 +26,10 @@ export abstract class Layer<T> {
   private _order: number;
   protected _options: LayerOptions<T>;
   private loading: boolean;
-  private _element?: HTMLElement;
+  private _element: HTMLElement | undefined;
   private _opacity: number;
-  private _referenceSystem?: IntersectionReferenceSystem = null;
-  private _data?: T;
+  private _referenceSystem: IntersectionReferenceSystem | undefined;
+  private _data: T | undefined;
   private _visible: boolean;
   private _interactive: boolean = false;
 
@@ -41,7 +41,7 @@ export abstract class Layer<T> {
       ...opts,
     };
     this.loading = false;
-    this._element = null;
+    this._element = undefined;
     this._opacity = opts.layerOpacity || 1;
     this._visible = true;
     this._interactive = opts.interactive || false;
@@ -49,7 +49,7 @@ export abstract class Layer<T> {
     if (options && options.data) {
       this.setData(options.data);
     }
-    this._referenceSystem = options && options.referenceSystem;
+    this._referenceSystem = options?.referenceSystem;
 
     this.onMount = this.onMount.bind(this);
     this.onUnmount = this.onUnmount.bind(this);
@@ -65,7 +65,7 @@ export abstract class Layer<T> {
     return this._id;
   }
 
-  get element(): HTMLElement {
+  get element(): HTMLElement | undefined {
     return this._element;
   }
 
@@ -112,19 +112,19 @@ export abstract class Layer<T> {
     return this._interactive;
   }
 
-  get referenceSystem(): IntersectionReferenceSystem {
+  get referenceSystem(): IntersectionReferenceSystem | undefined {
     return this._referenceSystem;
   }
 
-  set referenceSystem(referenceSystem: IntersectionReferenceSystem) {
+  set referenceSystem(referenceSystem: IntersectionReferenceSystem | undefined) {
     this._referenceSystem = referenceSystem;
   }
 
-  get data(): T {
+  get data(): T | undefined {
     return this.getData();
   }
 
-  set data(data: T) {
+  set data(data: T | undefined) {
     this.setData(data);
   }
 
@@ -132,14 +132,14 @@ export abstract class Layer<T> {
     return this._visible;
   }
 
-  getData(): T {
+  getData(): T | undefined {
     return this._data;
   }
 
-  setData(data: T): void {
+  setData(data: T | undefined): void {
     this._data = data;
     // should not be called when there is no visual element to work with
-    if (this.element) {
+    if (this.element && data != null) {
       this.onUpdate({ data });
     }
   }
@@ -149,9 +149,9 @@ export abstract class Layer<T> {
    * @param includeReferenceSystem - (optional) if true also removes reference system, default is true
    */
   clearData(includeReferenceSystem: boolean = true): void {
-    this._data = null;
+    this._data = undefined;
     if (includeReferenceSystem) {
-      this.referenceSystem = null;
+      this.referenceSystem = undefined;
     }
     this.onUpdate({});
   }
@@ -168,7 +168,7 @@ export abstract class Layer<T> {
   }
 
   onUnmount(event?: OnUnmountEvent): void {
-    if (this._options.onUnmount) {
+    if (this._options.onUnmount && event != null) {
       this._options.onUnmount(event, this);
     }
   }

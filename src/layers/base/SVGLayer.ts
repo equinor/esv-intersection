@@ -4,13 +4,13 @@ import { OnMountEvent, OnResizeEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class SVGLayer<T> extends Layer<T> {
-  elm: Selection<SVGElement, unknown, null, undefined>;
+  elm: Selection<SVGSVGElement, unknown, null, undefined> | undefined;
 
   override onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm } = event;
-    const width = event.width || parseInt(elm.getAttribute('width'), 10) || DEFAULT_LAYER_WIDTH;
-    const height = event.height || parseInt(elm.getAttribute('height'), 10) || DEFAULT_LAYER_HEIGHT;
+    const width = event.width || parseInt(elm.getAttribute('width') ?? '', 10) || DEFAULT_LAYER_WIDTH;
+    const height = event.height || parseInt(elm.getAttribute('height') ?? '', 10) || DEFAULT_LAYER_HEIGHT;
     if (!this.elm) {
       this.elm = select(elm).append('svg');
       this.elm.attr('id', `${this.id}`);
@@ -23,8 +23,8 @@ export abstract class SVGLayer<T> extends Layer<T> {
 
   override onUnmount(): void {
     super.onUnmount();
-    this.elm.remove();
-    this.elm = null;
+    this.elm?.remove();
+    this.elm = undefined;
   }
 
   override onResize(event: OnResizeEvent): void {
