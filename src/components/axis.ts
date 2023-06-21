@@ -10,7 +10,7 @@ export type Options = {
 };
 
 export class Axis {
-  private mainGroup: Selection<SVGElement, unknown, null, undefined>;
+  private mainGroup: Selection<SVGSVGElement, unknown, null, undefined>;
   private _scaleX: ScaleLinear<number, number>;
   private _scaleY: ScaleLinear<number, number>;
   private _showLabels = true;
@@ -23,14 +23,7 @@ export class Axis {
   private _flipY = false;
   private visible: boolean = true;
 
-  constructor(
-    mainGroup: Selection<SVGElement, unknown, null, undefined>,
-    showLabels = true,
-    labelXDesc: string,
-    labelYDesc: string,
-    unitOfMeasure: string,
-    options?: Options,
-  ) {
+  constructor(mainGroup: Axis['mainGroup'], showLabels = true, labelXDesc: string, labelYDesc: string, unitOfMeasure: string, options?: Options) {
     this.mainGroup = mainGroup;
     this._showLabels = showLabels;
     this._labelXDesc = labelXDesc;

@@ -11,10 +11,10 @@ export class BinarySearch {
     while (i > il && i < ih) {
       const v = values[i];
       const v1 = values[i + 1];
-      if (v <= searchValue && v1 >= searchValue) {
+      if (v != null && v1 != null && v <= searchValue && v1 >= searchValue) {
         return i;
       }
-      if (searchValue < v) {
+      if (v != null && searchValue < v) {
         ih = i;
       } else {
         il = i;

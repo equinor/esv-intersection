@@ -18,8 +18,8 @@ export interface ControllerOptions {
 }
 
 interface OverlayEvent<T> {
-  target?: Element;
-  source: Element;
+  target: Element | undefined;
+  source: Element | undefined;
   caller: T;
 }
 

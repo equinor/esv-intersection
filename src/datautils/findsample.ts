@@ -47,15 +47,16 @@ export function findIndexOfSample(data: number[][], pos: number): number {
   return index;
 }
 
-export function findSampleAtPos(data: number[][], pos: number, topLimit: number = null, bottomLimit: number = null): number {
-  let y: number = null;
+export function findSampleAtPos(data: number[][], pos: number, topLimit = 0, bottomLimit = 0): number {
+  let y = 0;
   const index = findIndexOfSample(data, pos);
   if (index !== -1) {
-    const v1 = data[index][1];
-    const v2 = data[index + 1][1];
-    if (v2 && v2) {
-      const x1 = data[index][0];
-      const x2 = data[index + 1][0];
+    const v1 = data[index]?.[1];
+    const v2 = data[index + 1]?.[1];
+
+    if (v1 && v2) {
+      const x1 = data[index]?.[0] ?? 0;
+      const x2 = data[index + 1]?.[0] ?? 0;
       const span = x2 - x1;
       const d = pos - x1;
       const f = d / span;
