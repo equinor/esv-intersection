@@ -1,5 +1,5 @@
 import { axisRight, axisBottom } from 'd3-axis';
-import { BaseType, Selection } from 'd3-selection';
+import { Selection } from 'd3-selection';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
 import { OnResizeEvent, OnRescaleEvent } from '../interfaces';
 
@@ -44,12 +44,12 @@ export class Axis {
     this._scaleY = scaleLinear().domain([0, 1]).range([0, 1]);
   }
 
-  private renderLabelx(): Selection<BaseType, unknown, null, undefined> {
+  private renderLabelx(): Selection<SVGTextElement, unknown, null, undefined> {
     const { _labelXDesc: labelXDesc, _unitOfMeasure: unitOfMeasure, _showLabels, _scaleX: scaleX } = this;
     const [, width] = scaleX.range();
     const gx = this.renderGx();
 
-    let labelx = gx.select('text.axis-labelx');
+    let labelx: Selection<SVGTextElement, unknown, null, undefined> = gx.select('text.axis-labelx');
     if (_showLabels) {
       if (labelx.empty()) {
         labelx = gx
@@ -64,16 +64,16 @@ export class Axis {
     } else {
       labelx.remove();
     }
-    labelx.attr('transform', `translate(${width / 2},-4)`);
+    labelx.attr('transform', `translate(${width! / 2},-4)`);
     return labelx;
   }
 
-  private renderLabely(): Selection<BaseType, unknown, null, undefined> {
+  private renderLabely(): Selection<SVGTextElement, unknown, null, undefined> {
     const { _labelYDesc: labelYDesc, _unitOfMeasure: unitOfMeasure, _showLabels, _scaleY } = this;
     const [, height] = _scaleY.range();
     const gy = this.renderGy();
 
-    let labely = gy.select('text.axis-labely');
+    let labely: Selection<SVGTextElement, unknown, null, undefined> = gy.select('text.axis-labely');
     if (_showLabels) {
       if (labely.empty()) {
         labely = gy
@@ -85,16 +85,16 @@ export class Axis {
           .style('font-size', '10px')
           .text(`${labelYDesc} (${unitOfMeasure})`);
       }
-      labely.attr('transform', `translate(-10,${height / 2})rotate(90)`);
+      labely.attr('transform', `translate(-10,${height! / 2})rotate(90)`);
     } else {
       labely.remove();
     }
     return labely;
   }
 
-  private renderGy(): Selection<BaseType, unknown, null, undefined> {
+  private renderGy(): Selection<SVGGElement, unknown, null, undefined> {
     const { _scaleX, _scaleY } = this;
-    const yAxis = axisRight(_scaleY) as (selection: Selection<SVGSVGElement, unknown, null, undefined>) => void;
+    const yAxis = axisRight(_scaleY) as (selection: Selection<SVGGElement, unknown, null, undefined>, ...args: any[]) => void;
     const [, width] = _scaleX.range();
     const gy = this.createOrGet('y-axis');
     gy.call(yAxis);
@@ -103,9 +103,9 @@ export class Axis {
     return gy;
   }
 
-  private renderGx(): Selection<BaseType, unknown, null, undefined> {
+  private renderGx(): Selection<SVGGElement, unknown, null, undefined> {
     const { _scaleX, _scaleY } = this;
-    const xAxis = axisBottom(_scaleX) as (selection: Selection<SVGSVGElement, unknown, null, undefined>) => void;
+    const xAxis = axisBottom(_scaleX) as (selection: Selection<SVGGElement, unknown, null, undefined>, ...args: any[]) => void;
     const [, height] = _scaleY.range();
 
     const gx = this.createOrGet('x-axis');
@@ -114,9 +114,9 @@ export class Axis {
     return gx;
   }
 
-  private createOrGet = (name: string): Selection<BaseType, unknown, null, undefined> => {
+  private createOrGet = (name: string): Selection<SVGGElement, unknown, null, undefined> => {
     const { mainGroup } = this;
-    let res = mainGroup.select(`g.${name}`);
+    let res: Selection<SVGGElement, unknown, null, undefined> = mainGroup.select(`g.${name}`);
     if (res.empty()) {
       res = mainGroup.append('g').attr('class', name);
     }
@@ -135,8 +135,8 @@ export class Axis {
   onRescale(event: OnRescaleEvent): void {
     const { _scaleX, _scaleY, offsetX, offsetY } = this;
     const { xScale, yScale } = event;
-    const xBounds = xScale.domain();
-    const yBounds = yScale.domain();
+    const xBounds = xScale.domain() as [number, number];
+    const yBounds = yScale.domain() as [number, number];
 
     const xRange = xScale.range();
     const yRange = yScale.range();
@@ -166,7 +166,7 @@ export class Axis {
 
   flipX(flipX: boolean): Axis {
     this._flipX = flipX;
-    const domain = this._scaleX.domain();
+    const domain = this._scaleX.domain() as [number, number];
     const flip = flipX ? -1 : 1;
     this._scaleX.domain([flip * domain[0], flip * domain[1]]);
     return this;
@@ -174,7 +174,7 @@ export class Axis {
 
   flipY(flipY: boolean): Axis {
     this._flipY = flipY;
-    const domain = this._scaleY.domain();
+    const domain = this._scaleY.domain() as [number, number];
     const flip = flipY ? -1 : 1;
     this._scaleY.domain([flip * domain[0], flip * domain[1]]);
     return this;
