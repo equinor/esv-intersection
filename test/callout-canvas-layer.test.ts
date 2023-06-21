@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import { describe, expect, it, beforeEach, afterEach, vi, SpyInstance } from 'vitest';
 import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
 import createMockRaf from 'mock-raf';

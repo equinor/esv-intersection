@@ -119,9 +119,9 @@ describe('callout', () => {
       const overlap: GraphicObject[] = [];
 
       for (let i = 0; i < arr.length; i++) {
-        const eli = arr[i];
+        const eli = arr[i]!;
         for (let j = 0; j < arr.length; j++) {
-          const elj = arr[j];
+          const elj = arr[j]!;
           if (i !== j) {
             const overlapping = checkForOverlap(eli, elj);
             if (overlapping) {
@@ -181,9 +181,9 @@ describe('callout', () => {
       const overlap: GraphicObjectWithId[] = [];
 
       for (let i = 0; i < arr.length; i++) {
-        const eli = arr[i];
+        const eli = arr[i]!;
         for (let j = 0; j < arr.length; j++) {
-          const elj = arr[j];
+          const elj = arr[j]!;
           if (i !== j) {
             const overlapping = checkForOverlap(eli, elj);
             if (overlapping) {

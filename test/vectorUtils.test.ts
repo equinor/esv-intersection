@@ -14,9 +14,9 @@ describe('vectorUtils', () => {
 
     it('should return a 0 vector for list of only 1 point', () => {
       const normals = createNormals([new Point(1, 1)]);
-      expect(normals[0].x).toEqual(0);
-      expect(normals[0].y).toEqual(0);
-      expect(normals[0].magnitude).toEqual(0);
+      expect(normals[0]?.x).toEqual(0);
+      expect(normals[0]?.y).toEqual(0);
+      expect(normals[0]?.magnitude).toEqual(0);
     });
 
     it('should create a normal for each point', () => {
@@ -30,13 +30,13 @@ describe('vectorUtils', () => {
     it('should calculate vectors', () => {
       const normals = createNormals(points);
       const normal45 = new Vector2(-0.70710678118, 0.70710678118);
-      expect(normals[0].x).toBeCloseTo(normal45.x, 10);
-      expect(normals[0].y).toBeCloseTo(normal45.y, 10);
+      expect(normals[0]?.x).toBeCloseTo(normal45.x, 10);
+      expect(normals[0]?.y).toBeCloseTo(normal45.y, 10);
     });
 
     it('should be normalized', () => {
       const normals = createNormals(points);
-      expect(normals[0].magnitude).toBeCloseTo(1, 10);
+      expect(normals[0]?.magnitude).toBeCloseTo(1, 10);
     });
   });
 
