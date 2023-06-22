@@ -136,15 +136,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     this.renderText(label, x, y, fontSize, color);
   };
 
-  private renderText(
-    title: string,
-    x: number,
-    y: number,
-    fontSize: number,
-    color: string,
-    font: string = 'arial',
-    fontStyle: string = 'normal',
-  ): void {
+  private renderText(title: string, x: number, y: number, fontSize: number, color: string, font = 'arial', fontStyle = 'normal'): void {
     const { ctx } = this;
     if (ctx != null) {
       ctx.font = `${fontStyle} ${fontSize}px ${font}`;
@@ -153,7 +145,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     }
   }
 
-  private renderPoint(x: number, y: number, radius: number = 3): void {
+  private renderPoint(x: number, y: number, radius = 3): void {
     const { ctx } = this;
 
     if (ctx != null) {
@@ -175,7 +167,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     this.renderLine(x, y, width, dotX, dotY, color, placeLeft);
   }
 
-  private renderLine = (x: number, y: number, width: number, dotX: number, dotY: number, color: string, placeLeft: boolean = true): void => {
+  private renderLine = (x: number, y: number, width: number, dotX: number, dotY: number, color: string, placeLeft = true): void => {
     const { ctx } = this;
     const textX = placeLeft ? x : x + width;
     const inverseTextX = placeLeft ? x + width : x;
@@ -233,7 +225,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     yScale: ScaleLinear<number, number>,
     _scale: number,
     fontSize: number,
-    offset: number = 20,
+    offset = 20,
   ): Callout[] {
     if (annotations.length === 0) {
       return [];

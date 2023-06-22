@@ -4,10 +4,10 @@ import { ScaleLinear } from 'd3-scale';
 import { LayerOptions } from './base/Layer';
 
 // constants
-const MINORCOLOR: string = 'lightgray';
-const MAJORCOLOR: string = 'gray';
-const MINORWIDTH: number = 0.25;
-const MAJORWIDTH: number = 0.75;
+const MINORCOLOR = 'lightgray';
+const MAJORCOLOR = 'gray';
+const MINORWIDTH = 0.25;
+const MAJORWIDTH = 0.75;
 
 const defaultOptions = {
   minorColor: MINORCOLOR,
@@ -29,8 +29,8 @@ export interface OnGridLayerUpdateEvent<T> extends OnUpdateEvent<T> {
 }
 
 export class GridLayer<T> extends CanvasLayer<T> {
-  private _offsetX: number = 0;
-  private _offsetY: number = 0;
+  private _offsetX = 0;
+  private _offsetY = 0;
 
   constructor(id?: string, options?: GridLayerOptions<T>) {
     super(id, options);

@@ -84,7 +84,7 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
     return t;
   }
 
-  generateArcLengthLookup(segments: number = 1000): void {
+  generateArcLengthLookup(segments = 1000): void {
     let lastPos = this.getPointAt(0);
     let length = 0;
     for (let i = 0; i < segments; i++) {

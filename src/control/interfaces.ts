@@ -33,7 +33,7 @@ export interface OverlayMouseMoveEvent<T> extends OverlayEvent<T> {
   y: number;
 }
 
-export interface OverlayMouseExitEvent<T> extends OverlayEvent<T> {}
+export type OverlayMouseExitEvent<T> = OverlayEvent<T>;
 
 export interface OverlayCallbacks<T> {
   onMouseMove?(event: OverlayMouseMoveEvent<T>): void;

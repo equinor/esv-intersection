@@ -16,7 +16,7 @@ export type ReferenceLine = {
   fontSize?: string;
 };
 
-export interface ReferenceLineLayerOptions extends LayerOptions<ReferenceLine[]> {}
+export type ReferenceLineLayerOptions = LayerOptions<ReferenceLine[]>;
 
 const foldReferenceLine = <T>(
   options: {

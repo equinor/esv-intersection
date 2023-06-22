@@ -42,7 +42,7 @@ export class IntersectionReferenceSystem {
 
   projectedPath: number[][] = [];
 
-  private _offset: number = 0;
+  private _offset = 0;
 
   displacement!: number;
 

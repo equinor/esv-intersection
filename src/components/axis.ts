@@ -17,11 +17,11 @@ export class Axis {
   private _labelXDesc: string;
   private _labelYDesc: string;
   private _unitOfMeasure: string;
-  private _offsetX: number = 0;
-  private _offsetY: number = 0;
+  private _offsetX = 0;
+  private _offsetY = 0;
   private _flipX = false;
   private _flipY = false;
-  private visible: boolean = true;
+  private visible = true;
 
   constructor(mainGroup: Axis['mainGroup'], showLabels = true, labelXDesc: string, labelYDesc: string, unitOfMeasure: string, options?: Options) {
     this.mainGroup = mainGroup;

@@ -7,7 +7,7 @@ import { SURFACE_LINE_WIDTH } from '../constants';
 const DEFAULT_Y_BOTTOM = 10000;
 
 export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
-  private isPreRendered: boolean = false;
+  private isPreRendered = false;
 
   override onRescale(event: OnRescaleEvent): void {
     super.onRescale(event);

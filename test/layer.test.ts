@@ -11,8 +11,8 @@ class TestLayer extends Layer<string> {
   onInteractivityChanged(_interactive: boolean): void {
     throw new Error('Method not implemented.');
   }
-  testString: string = '';
-  updateWasCalled: boolean = false;
+  testString = '';
+  updateWasCalled = false;
   override setData(data: string) {
     super.setData(data);
     this.testString = data;

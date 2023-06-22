@@ -22,8 +22,8 @@ export class ZoomPanHandler {
   translateBoundsY: [number, number] = [0, 1];
   scaleX: ScaleLinear<number, number>;
   scaleY: ScaleLinear<number, number>;
-  _zFactor: number = 1;
-  _enableTranslateExtent: boolean = false;
+  _zFactor = 1;
+  _enableTranslateExtent = false;
   currentTransform: ZoomTransform | undefined;
 
   /**
@@ -182,10 +182,10 @@ export class ZoomPanHandler {
   updateTranslateExtent(): void {
     const { width, xSpan, zFactor, enableTranslateExtent, translateBoundsX, translateBoundsY } = this;
 
-    let x1: number = -Infinity;
-    let y1: number = -Infinity;
-    let x2: number = +Infinity;
-    let y2: number = +Infinity;
+    let x1 = -Infinity;
+    let y1 = -Infinity;
+    let x2 = +Infinity;
+    let y2 = +Infinity;
 
     if (enableTranslateExtent) {
       const ppu: number = width / xSpan;
@@ -348,7 +348,7 @@ export class ZoomPanHandler {
   adjustToSize(): void;
   adjustToSize(autoAdjust: boolean): void;
   adjustToSize(width: number, height: number, force: boolean): void;
-  adjustToSize(widthOrAutoAdjust?: unknown, height?: number, force: boolean = false): void {
+  adjustToSize(widthOrAutoAdjust?: unknown, height?: number, force = false): void {
     const { width: oldWidth, height: oldHeight, scaleX, scaleY, recalculateZoomTransform } = this;
 
     let w = 0;

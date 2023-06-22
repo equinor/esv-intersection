@@ -34,9 +34,9 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   defaultFont: string = DEFAULT_FONT;
 
   rescaleEvent: OnRescaleEvent | undefined;
-  isLabelsOnLeftSide: boolean = true;
+  isLabelsOnLeftSide = true;
   maxFontSizeInWorldCoordinates: number = MAX_FONT_SIZE_IN_WORLD_COORDINATES;
-  isXFlipped: boolean = false;
+  isXFlipped = false;
   areasWithAvgTopDepth: SurfaceAreaWithAvgTopDepth[] = [];
 
   constructor(id?: string, options?: GeomodelLayerLabelsOptions<T>) {
@@ -451,9 +451,9 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     initalVector: Vector2 = Vector2.left,
     topLimit: number,
     bottomLimit: number,
-    minReductionAngle: number = 0,
+    minReductionAngle = 0,
     maxReductionAngle: number = Math.PI / 4,
-    angleReductionExponent: number = 4,
+    angleReductionExponent = 4,
     alternativeSurfaceBottomData: number[][],
     surfaces: SurfaceArea[] | null = null,
     currentSurfaceIndex: number,

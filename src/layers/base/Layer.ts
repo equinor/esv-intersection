@@ -31,7 +31,7 @@ export abstract class Layer<T> {
   private _referenceSystem: IntersectionReferenceSystem | undefined;
   private _data: T | undefined;
   private _visible: boolean;
-  private _interactive: boolean = false;
+  private _interactive = false;
 
   constructor(id?: string, options?: LayerOptions<T>) {
     this._id = id || `layer-${Math.floor(Math.random() * 1000)}`;
@@ -148,7 +148,7 @@ export abstract class Layer<T> {
    * Clears data and (optionally) the reference system
    * @param includeReferenceSystem - (optional) if true also removes reference system, default is true
    */
-  clearData(includeReferenceSystem: boolean = true): void {
+  clearData(includeReferenceSystem = true): void {
     this._data = undefined;
     if (includeReferenceSystem) {
       this.referenceSystem = undefined;
