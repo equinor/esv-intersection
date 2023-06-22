@@ -47,10 +47,10 @@ export interface CalloutOptions<T extends Annotation[]> extends LayerOptions<T> 
 }
 
 export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
-  rescaleEvent: OnRescaleEvent;
-  xRatio: number;
-  callouts: Callout[];
-  groupFilter: string[] = null;
+  rescaleEvent: OnRescaleEvent | undefined;
+  xRatio: number | undefined;
+  callouts: Callout[] = [];
+  groupFilter: string[] = [];
   minFontSize: number;
   maxFontSize: number;
   fontSizeFactor: number;
@@ -60,25 +60,23 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
 
   constructor(id?: string, options?: CalloutOptions<T>) {
     super(id, options);
-    this.minFontSize = options.minFontSize || DEFAULT_MIN_FONT_SIZE;
-    this.maxFontSize = options.maxFontSize || DEFAULT_MAX_FONT_SIZE;
-    this.fontSizeFactor = options.fontSizeFactor || DEFAULT_FONT_SIZE_FACTOR;
-    this.offsetMin = options.offsetMin || DEFAULT_OFFSET_MIN;
-    this.offsetMax = options.offsetMax || DEFAULT_OFFSET_MAX;
-    this.offsetFactor = options.offsetFactor || DEFAULT_OFFSET_FACTOR;
+    this.minFontSize = options?.minFontSize || DEFAULT_MIN_FONT_SIZE;
+    this.maxFontSize = options?.maxFontSize || DEFAULT_MAX_FONT_SIZE;
+    this.fontSizeFactor = options?.fontSizeFactor || DEFAULT_FONT_SIZE_FACTOR;
+    this.offsetMin = options?.offsetMin || DEFAULT_OFFSET_MIN;
+    this.offsetMax = options?.offsetMax || DEFAULT_OFFSET_MAX;
+    this.offsetFactor = options?.offsetFactor || DEFAULT_OFFSET_FACTOR;
   }
 
   setGroupFilter(filter: string[]): void {
     this.groupFilter = filter;
-    this.callouts = undefined;
+    this.callouts = [];
     this.render();
   }
 
   override onUpdate(event: OnUpdateEvent<T>): void {
     super.onUpdate(event);
-
-    this.callouts = undefined;
-
+    this.callouts = [];
     this.render();
   }
 
@@ -102,14 +100,14 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
 
       const fontSize = calcSize(this.fontSizeFactor, this.minFontSize, this.maxFontSize, xScale);
 
-      if (!isPanning || !this.callouts) {
+      if (!isPanning || this.callouts.length <= 0) {
         const { data, ctx, groupFilter } = this;
         const { calculateDisplacementFromBottom } = this.referenceSystem.options;
         const isLeftToRight = calculateDisplacementFromBottom ? xBounds[0] < xBounds[1] : xBounds[0] > xBounds[1];
         const scale = 0;
 
-        ctx.font = `bold ${fontSize}px arial`;
-        const filtered = data.filter((d: Annotation) => !groupFilter || groupFilter.includes(d.group));
+        ctx != null && (ctx.font = `bold ${fontSize}px arial`);
+        const filtered = data.filter((d: Annotation) => groupFilter.length <= 0 || groupFilter.includes(d.group));
         const offset = calcSize(this.offsetFactor, this.offsetMin, this.offsetMax, xScale);
         this.callouts = this.positionCallouts(filtered, isLeftToRight, xScale, yScale, scale, fontSize, offset);
       }
@@ -148,17 +146,22 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     fontStyle: string = 'normal',
   ): void {
     const { ctx } = this;
-    ctx.font = `${fontStyle} ${fontSize}px ${font}`;
-    ctx.fillStyle = color;
-    ctx.fillText(title, x, y);
+    if (ctx != null) {
+      ctx.font = `${fontStyle} ${fontSize}px ${font}`;
+      ctx.fillStyle = color;
+      ctx.fillText(title, x, y);
+    }
   }
 
   private renderPoint(x: number, y: number, radius: number = 3): void {
     const { ctx } = this;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
+
+    if (ctx != null) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   private renderCallout(title: string, label: string, boundingBox: BoundingBox, color: string, location: string): void {
@@ -178,19 +181,21 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     const inverseTextX = placeLeft ? x + width : x;
     const textY = y + 2;
 
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
+    if (ctx != null) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
 
-    ctx.beginPath();
-    ctx.moveTo(dotX, dotY);
-    ctx.lineTo(textX, textY);
-    ctx.lineTo(inverseTextX, textY);
+      ctx.beginPath();
+      ctx.moveTo(dotX, dotY);
+      ctx.lineTo(textX, textY);
+      ctx.lineTo(inverseTextX, textY);
 
-    ctx.stroke();
+      ctx.stroke();
+    }
   };
 
   private getPosition(boundingBox: BoundingBox, location: string): Point {
-    const { x, y, offsetX, offsetY, width } = boundingBox;
+    const { x, y, offsetX = 0, offsetY = 0, width } = boundingBox;
     switch (location) {
       case Location.topleft:
         return {
@@ -236,12 +241,12 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     const alignment = isLeftToRight ? Location.topleft : Location.topright;
 
     const nodes = annotations.map((a) => {
-      const pos = a.pos ? a.pos : this.referenceSystem.project(a.md);
+      const pos = a.pos ? a.pos : this.referenceSystem?.project(a.md!)!;
       return {
         title: a.title,
         label: a.label,
         color: a.color,
-        pos: { x: pos[0], y: pos[1] },
+        pos: { x: pos?.[0]!, y: pos?.[1]! },
         group: a.group,
         alignment,
         boundingBox: this.getAnnotationBoundingBox(a.title, a.label, pos, xScale, yScale, fontSize),
@@ -250,7 +255,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
       };
     });
 
-    const top = [nodes[nodes.length - 1]];
+    const top = [nodes[nodes.length - 1]!];
     const bottom: Callout[] = [];
 
     // Initial best effort
@@ -274,11 +279,11 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     height: number,
   ): { x: number; y: number; width: number; height: number } {
     const { ctx } = this;
-    const ax1 = xScale(pos[0]);
-    const ay1 = yScale(pos[1]);
+    const ax1 = xScale(pos[0]!);
+    const ay1 = yScale(pos[1]!);
 
-    const labelWidth = ctx.measureText(label).width;
-    const titleWidth = ctx.measureText(title).width;
+    const labelWidth = ctx?.measureText(label).width ?? 0;
+    const titleWidth = ctx?.measureText(title).width ?? 0;
     const width = Math.max(labelWidth, titleWidth);
 
     const bbox = {
@@ -292,15 +297,15 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
 
   chooseTopOrBottomPosition(nodes: Callout[], bottom: Callout[], top: Callout[]): void {
     for (let i = nodes.length - 2; i >= 0; --i) {
-      const node = nodes[i];
-      const prevNode = top[0];
+      const node = nodes[i]!;
+      const prevNode = top[0]!;
 
       const overlap = isOverlapping(node.boundingBox, prevNode.boundingBox);
       if (overlap) {
         node.alignment = node.alignment === Location.topleft ? Location.bottomright : Location.bottomleft;
         bottom.push(node);
         if (i > 0) {
-          top.unshift(nodes[--i]);
+          top.unshift(nodes[--i]!);
         }
       } else {
         top.unshift(node);
@@ -310,9 +315,9 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
 
   adjustTopPositions(top: Callout[]): void {
     for (let i = top.length - 2; i >= 0; --i) {
-      const currentNode = top[i];
+      const currentNode = top[i]!;
       for (let j = top.length - 1; j > i; --j) {
-        const prevNode = top[j];
+        const prevNode = top[j]!;
         const overlap = getOverlapOffset(currentNode.boundingBox, prevNode.boundingBox);
         if (overlap) {
           currentNode.dy += overlap.dy;
@@ -324,9 +329,9 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
 
   adjustBottomPositions(bottom: Callout[]): void {
     for (let i = bottom.length - 2; i >= 0; --i) {
-      const currentNode = bottom[i];
+      const currentNode = bottom[i]!;
       for (let j = bottom.length - 1; j > i; --j) {
-        const prevNode = bottom[j];
+        const prevNode = bottom[j]!;
         const overlap = getOverlapOffset(prevNode.boundingBox, currentNode.boundingBox);
         if (overlap) {
           currentNode.dy += overlap.dy;

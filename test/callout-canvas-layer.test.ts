@@ -46,14 +46,14 @@ describe('CalloutCanvasLayer', () => {
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
 
-      layer.ctx.__clearEvents();
+      layer.ctx?.__clearEvents();
 
       // Act
       layer.data = data;
       mockRaf.step();
 
       // Assert
-      const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
+      const events: CanvasRenderingContext2DEvent[] = layer.ctx?.__getEvents() ?? [];
       const fillTextCalls = events.filter((call: CanvasRenderingContext2DEvent) => call.type === 'fillText');
       expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
     });
@@ -67,14 +67,14 @@ describe('CalloutCanvasLayer', () => {
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
 
-      layer.ctx.__clearEvents();
+      layer.ctx?.__clearEvents();
 
       // Act
       layer.data = data;
       mockRaf.step();
 
       // Assert
-      const events: CanvasRenderingContext2DEvent[] = layer.ctx.__getEvents();
+      const events: CanvasRenderingContext2DEvent[] = layer.ctx?.__getEvents() ?? [];
       const fillTextCalls = events.filter((call: CanvasRenderingContext2DEvent) => call.type === 'fillText');
       expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
     });
@@ -86,7 +86,7 @@ describe('CalloutCanvasLayer', () => {
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
 
-      layer.ctx.__clearEvents();
+      layer.ctx?.__clearEvents();
 
       // Act
       // Assert

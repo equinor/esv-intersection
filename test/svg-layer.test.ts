@@ -64,31 +64,31 @@ describe('SVG', () => {
   it('should have interactive set to false and pointer-events:none by default', () => {
     const layer = new WellborepathLayer('well');
     layer.onMount({ elm });
-    expect(layer.elm.style('pointer-events')).toEqual('none');
+    expect(layer.elm?.style('pointer-events')).toEqual('none');
     expect(layer.interactive).toEqual(false);
   });
   it('should set pointer-events:auto when setting interactive to true', () => {
     const layer = new WellborepathLayer('well');
     layer.onMount({ elm });
     layer.interactive = true;
-    expect(layer.elm.style('pointer-events')).toEqual('auto');
+    expect(layer.elm?.style('pointer-events')).toEqual('auto');
   });
   it('should update z-index when changing order', () => {
     const layer = new WellborepathLayer('well');
     layer.onMount({ elm });
     expect(layer.order).toEqual(1);
-    expect(layer.elm.style('z-index')).toEqual('1');
+    expect(layer.elm?.style('z-index')).toEqual('1');
     layer.order = 2;
     expect(layer.order).toEqual(2);
-    expect(layer.elm.style('z-index')).toEqual('2');
+    expect(layer.elm?.style('z-index')).toEqual('2');
   });
   it('should update opacity when changing its value', () => {
     const layer = new WellborepathLayer('well');
     layer.onMount({ elm });
     expect(layer.opacity).toEqual(1);
-    expect(layer.elm.style('opacity')).toEqual('1');
+    expect(layer.elm?.style('opacity')).toEqual('1');
     layer.opacity = 0.5;
     expect(layer.opacity).toEqual(0.5);
-    expect(layer.elm.style('opacity')).toEqual('0.5');
+    expect(layer.elm?.style('opacity')).toEqual('0.5');
   });
 });

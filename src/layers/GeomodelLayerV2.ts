@@ -30,31 +30,31 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
   }
 
   preRender(): void {
-    const { data }: { data: SurfaceData } = this;
+    const { data } = this;
 
     if (!data) {
       return;
     }
 
-    data.areas.forEach((a: SurfaceArea) => this.generateAreaPolygon(a));
-    data.lines.forEach((l: SurfaceLine) => this.generateSurfaceLine(l));
+    data.areas.forEach((a) => this.generateAreaPolygon(a));
+    data.lines.forEach((l) => this.generateSurfaceLine(l));
 
     this.isPreRendered = true;
   }
 
   createPolygons = (data: number[][]): number[][] => {
     const polygons: number[][] = [];
-    let polygon: number[] = null;
+    let polygon: number[] | undefined;
 
     // Start generating polygons
     for (let i = 0; i < data.length; i++) {
       // Generate top of polygon as long as we have valid values
-      const topIsValid = !!data[i][1];
+      const topIsValid = !!data[i]?.[1];
       if (topIsValid) {
-        if (polygon === null) {
+        if (polygon == null) {
           polygon = [];
         }
-        polygon.push(data[i][0], data[i][1]);
+        polygon.push(data[i]?.[0]!, data[i]?.[1]!);
       }
 
       const endIsReached = i === data.length - 1;
@@ -62,13 +62,13 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
         if (polygon) {
           // Generate bottom of polygon
           for (let j: number = !topIsValid ? i - 1 : i; j >= 0; j--) {
-            if (!data[j][1]) {
+            if (!data[j]?.[1]) {
               break;
             }
-            polygon.push(data[j][0], data[j][2] || DEFAULT_Y_BOTTOM);
+            polygon.push(data[j]?.[0]!, data[j]?.[2] || DEFAULT_Y_BOTTOM);
           }
           polygons.push(polygon);
-          polygon = null;
+          polygon = undefined;
         }
       }
     }
