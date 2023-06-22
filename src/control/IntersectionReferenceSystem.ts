@@ -42,12 +42,6 @@ export class IntersectionReferenceSystem {
 
   projectedPath: number[][] = [];
 
-  // TODO(Kevin): Possibly not needed anymore
-  projectedTrajectory: number[][];
-  depthReference: number;
-  wellboreId: number;
-  trajectoryOffset: number;
-
   private _offset: number = 0;
 
   displacement!: number;
