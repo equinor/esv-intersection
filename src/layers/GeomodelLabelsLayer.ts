@@ -361,7 +361,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     step: number,
     topLimit?: number,
     bottomLimit?: number,
-    alternativeSurfaceData: number[][] = null,
+    alternativeSurfaceData?: number[][],
     surfaces: SurfaceArea[] | null = null,
     currentSurfaceIndex?: number,
   ): Vector2 | null {
@@ -388,12 +388,12 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
   getAlternativeYValueIfAvailable(
     x: number,
-    topLimit: number,
-    bottomLimit: number,
-    alternativeSurfaceData: number[][],
-    surfaces: SurfaceArea[] | null,
-    currentSurfaceIndex: number,
-  ): number {
+    topLimit?: number,
+    bottomLimit?: number,
+    alternativeSurfaceData?: number[][],
+    surfaces: SurfaceArea[] | null = null,
+    currentSurfaceIndex?: number,
+  ): number | null {
     if (!alternativeSurfaceData) {
       return null;
     }
@@ -454,7 +454,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     minReductionAngle: number = 0,
     maxReductionAngle: number = Math.PI / 4,
     angleReductionExponent: number = 4,
-    alternativeSurfaceBottomData: number[][] = null,
+    alternativeSurfaceBottomData: number[][],
     surfaces: SurfaceArea[] | null = null,
     currentSurfaceIndex: number,
   ): number {
