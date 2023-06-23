@@ -10,34 +10,30 @@ this repository are considered licensed under the same terms as the rest of the 
 - Per-file copyright/license headers are typically extraneous and undesirable.
   Please don't add your own copyright headers to new files without contacting the maintainers first
 
-## Version control branching
+## Branches
 
-There are 2 active branches on this repo, plus branches for each major version (see below):
+There is 1 active branch on this repo, plus possible branches for each majar version:
 
 - The `master` branch is the main branch of the repository, the one that is used for active development
   - Every time this branch is modified (typically when merging a PR), a Storybook is automatically deployed. It can be found [here](https://equinor.github.io/esv-intersection/storybook/master)
   - Depending on the amount and urgency of the changes, we will create releases which will trigger deployments. This does however require that the version in `package.json` and `package-lock.json` be bumped beforehand. An updated package is deployed to [npm](https://www.npmjs.com/package/@equinor/esv-intersection)
-- The `latest` branch always points at the the most recent version released
-  - The branch has to be updated manually, whenever a new release is created
-  - Every time this branch is updated, the Storybook and the documentation are automatically deployed. they can be found at [storybook](https://equinor.github.io/esv-intersection/storybook/latest) and [docs](https://equinor.github.io/esv-intersection)
-    This repository relies on [Semantic Versioning](https://semver.org/).
+- The possible `major version` branches only exist in case there is a need to create a bug fix in a previous major, based of a git tag.
 
-In order to create a release for a new major version, the first step is to create a new branch named `version_X` in the repo (where `X` has to be replaced with an incremental number). Then, a new _Release_ is created from that branch here on Github, named `vX.0.0`. Remember to update the `latest` branch to the new release.
-Development continues on the `master` branch. In order to create a new minor version, the desired changes have to be moved to the `version_X` branch (either by merging, rebasing, cherry-picking, …). After proper testing, a new _Release_ can be created here on Github, named `vX.Y.0`. Remember to update the `latest` branch to the new release.
-If a hotfix has to be applied to a released version, the fix has to be added on top of `version_X`. Then a new _Release_ can be created here on Github, named `vX.Y.Z`. Remember to update the `latest` branch to the new release. If the fix is relevant also for `master`, make sure the fix is ported on top of `master` as well.
-When you want to contribute to the repo, always **fork the repo** or **make a new branch** for your work, no matter how small. This makes it easy for others to take just that one set of changes from your repository, in case you have multiple unrelated changes floating around. \* A corollary: **don't submit unrelated changes in the same branch/pull request**!
+## Automatically Releasing Versions with Changesets
 
-- **Base your new branch off of the appropriate branch** on the main repository:
-  - **Bug fixes** should be based either on `master` or on `latest` branches. Contribution to an older `version_X` branch (i.e., any version branch that does not correspond with `latest`) will be **rejected** (there can be exceptions, but that would require very compelling arguments).
-    - Bug fixes requiring large changes to the code or which have a chance
-      of being otherwise disruptive, may need to based on top of **master**.
-      This is a judgement call -- ask the devs!
-  - **New features** should branch off of the `master` branch
-    - Note that depending on how long it takes for the dev team to merge
-      your patch, the copy of `master` you worked off of may get out of
-      date! If you find yourself 'bumping' a pull request that's been
-      sidelined for a while, **make sure you rebase or merge to latest
-      master** to ensure a speedier resolution.
+We use a somewhat automated system with the help of [changesets](https://github.com/changesets/changesets), where each change in code it's up to the developer to decide if these changes warrant a certain
+version bump. [Click the link if you'd like to learn how to add a changeset.](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md)
+If you forgot to add a changeset, the changeset-bot will remind you in the PR to include a changeset, in case you forgot to add one, and it will add it for you.
+
+There's two ways:
+
+1. The PR or commit lands in master without a changeset ([example](https://github.com/equinor/esv-intersection/pull/640#issuecomment-1596336125))
+2. The PR or commit includes a changeset ([example](https://github.com/equinor/esv-intersection/pull/630#issuecomment-1582989195))
+
+In the first case, once the PR gets merged, nothing really changes.
+In the second case, the changeset action will open a `Version Packages` PR where it will gather all changesets that are currently lading in master ([example](https://github.com/equinor/esv-intersection/pull/631)).
+
+Once we are ready to release the next version, we can merge the PR. The release notes and changelog are automatically generated based on a git tag, and the package gets deployed to the NPM and Github Registry.
 
 ## Code formatting
 
