@@ -29,7 +29,7 @@ export interface WellborepathLayerOptions<T extends [number, number][]> extends 
 }
 
 export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T> {
-  rescaleEvent: OnRescaleEvent;
+  rescaleEvent: OnRescaleEvent | undefined;
 
   constructor(id?: string, options?: WellborepathLayerOptions<T>) {
     super(id, options);
@@ -78,52 +78,54 @@ export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T>
   }
 
   private renderWellborePath(data: [number, number][]): string {
-    const { xScale, yScale } = this.rescaleEvent;
-    const transformedData: [number, number][] = data.map((d) => [xScale(d[0]), yScale(d[1])]);
+    if (this.rescaleEvent != null) {
+      const { xScale, yScale } = this.rescaleEvent;
+      const transformedData: [number, number][] = data.map((d) => [xScale(d[0]), yScale(d[1])]);
 
-    // TODO: Might be a good idea to move something like this to a shared function in a base class
-    let curveFactory;
-    const { curveType, tension } = this.options as WellborepathLayerOptions<T>;
-    switch (curveType) {
-      default:
-      case 'curveCatmullRom':
-        curveFactory = curveCatmullRom.alpha(tension || CURVE_CATMULL_ROM_ALPHA);
-        break;
-      case 'curveLinear':
-        curveFactory = curveLinear;
-        break;
-      case 'curveBasis':
-        curveFactory = curveBasis;
-        break;
-      case 'curveBasisClosed':
-        curveFactory = curveBasisClosed;
-        break;
-      case 'curveBundle':
-        curveFactory = curveBundle.beta(tension || CURVE_BUNDLE_BETA);
-        break;
-      case 'curveCardinal':
-        curveFactory = curveCardinal.tension(tension || CURVE_CARDINAL_TENSION);
-        break;
-      case 'curveMonotoneX':
-        curveFactory = curveMonotoneX;
-        break;
-      case 'curveMonotoneY':
-        curveFactory = curveMonotoneY;
-        break;
-      case 'curveNatural':
-        curveFactory = curveNatural;
-        break;
-      case 'curveStep':
-        curveFactory = curveStep;
-        break;
-      case 'curveStepAfter':
-        curveFactory = curveStepAfter;
-        break;
-      case 'curveStepBefore':
-        curveFactory = curveStepBefore;
-        break;
+      // TODO: Might be a good idea to move something like this to a shared function in a base class
+      let curveFactory;
+      const { curveType, tension } = this.options as WellborepathLayerOptions<T>;
+      switch (curveType) {
+        default:
+        case 'curveCatmullRom':
+          curveFactory = curveCatmullRom.alpha(tension || CURVE_CATMULL_ROM_ALPHA);
+          break;
+        case 'curveLinear':
+          curveFactory = curveLinear;
+          break;
+        case 'curveBasis':
+          curveFactory = curveBasis;
+          break;
+        case 'curveBasisClosed':
+          curveFactory = curveBasisClosed;
+          break;
+        case 'curveBundle':
+          curveFactory = curveBundle.beta(tension || CURVE_BUNDLE_BETA);
+          break;
+        case 'curveCardinal':
+          curveFactory = curveCardinal.tension(tension || CURVE_CARDINAL_TENSION);
+          break;
+        case 'curveMonotoneX':
+          curveFactory = curveMonotoneX;
+          break;
+        case 'curveMonotoneY':
+          curveFactory = curveMonotoneY;
+          break;
+        case 'curveNatural':
+          curveFactory = curveNatural;
+          break;
+        case 'curveStep':
+          curveFactory = curveStep;
+          break;
+        case 'curveStepAfter':
+          curveFactory = curveStepAfter;
+          break;
+        case 'curveStepBefore':
+          curveFactory = curveStepBefore;
+          break;
+      }
+      return line().curve(curveFactory)(transformedData) ?? '';
     }
-
-    return line().curve(curveFactory)(transformedData);
+    return '';
   }
 }

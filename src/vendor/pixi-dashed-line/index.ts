@@ -1,3 +1,4 @@
+// @ts-nocheck
 // https://github.com/davidfig/pixi-dashed-line
 //
 // Copyright 2021 David Figatner
@@ -153,8 +154,8 @@ export class DashLine {
 
       // find the first part of the dash for this line
       const place = this.lineLength % (this.dashSize * this.scale);
-      let dashIndex: number = 0,
-        dashStart: number = 0;
+      let dashIndex = 0,
+        dashStart = 0;
       let dashX = 0;
       for (let i = 0; i < this.dash.length; i++) {
         const dashSize = this.dash[i] * this.scale;

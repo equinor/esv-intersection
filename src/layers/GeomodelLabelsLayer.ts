@@ -33,11 +33,11 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   defaultTextColor: string = DEFAULT_TEXT_COLOR;
   defaultFont: string = DEFAULT_FONT;
 
-  rescaleEvent: OnRescaleEvent;
-  isLabelsOnLeftSide: boolean = true;
+  rescaleEvent: OnRescaleEvent | undefined;
+  isLabelsOnLeftSide = true;
   maxFontSizeInWorldCoordinates: number = MAX_FONT_SIZE_IN_WORLD_COORDINATES;
-  isXFlipped: boolean = false;
-  areasWithAvgTopDepth: SurfaceAreaWithAvgTopDepth[] = null;
+  isXFlipped = false;
+  areasWithAvgTopDepth: SurfaceAreaWithAvgTopDepth[] = [];
 
   constructor(id?: string, options?: GeomodelLayerLabelsOptions<T>) {
     super(id, options);
@@ -54,11 +54,11 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
   override setData(data: T): void {
     super.setData(data);
-    this.areasWithAvgTopDepth = null;
+    this.areasWithAvgTopDepth = [];
   }
 
   generateSurfacesWithAvgDepth(): void {
-    const { areas } = this.data;
+    const areas = this.data?.areas ?? [];
     this.areasWithAvgTopDepth = areas.reduce((acc: SurfaceAreaWithAvgTopDepth[], area: SurfaceArea) => {
       // Filter surfaces without label
       if (!area.label) {
@@ -118,7 +118,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
         return;
       }
 
-      if (!this.areasWithAvgTopDepth) {
+      if (this.areasWithAvgTopDepth.length <= 0) {
         this.generateSurfacesWithAvgDepth();
       }
 
@@ -147,13 +147,15 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   }
 
   drawLineLabels(): void {
-    this.data.lines.filter((surfaceLine: SurfaceLine) => surfaceLine.label).forEach((surfaceLine: SurfaceLine) => this.drawLineLabel(surfaceLine));
+    this.data?.lines.filter((surfaceLine: SurfaceLine) => surfaceLine.label).forEach((surfaceLine: SurfaceLine) => this.drawLineLabel(surfaceLine));
   }
 
   drawAreaLabel = (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea | null, surfaces: SurfaceArea[], i: number): void => {
     const { data } = surfaceArea;
     const { ctx, maxFontSizeInWorldCoordinates, isXFlipped } = this;
-    const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
+    const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent!;
+    if (ctx == null) return;
+
     let isLabelsOnLeftSide = this.checkDrawLabelsOnLeftSide();
     const margins = (this.options.margins || this.defaultMargins) * (isXFlipped ? -1 : 1);
     const marginsInWorldCoords = margins / xRatio;
@@ -168,14 +170,14 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       }
     }
 
-    const leftEdge = xScale.invert(xScale.range()[0]) + marginsInWorldCoords;
-    const rightEdge = xScale.invert(xScale.range()[1]) - marginsInWorldCoords;
-    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges();
+    const leftEdge = xScale.invert(xScale.range()[0]!) + marginsInWorldCoords;
+    const rightEdge = xScale.invert(xScale.range()[1]!) - marginsInWorldCoords;
+    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges() as [number, number];
 
     // Get label metrics
     ctx.save();
     ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
-    let labelMetrics = ctx.measureText(surfaceArea.label);
+    let labelMetrics = ctx.measureText(surfaceArea.label ?? '');
     let labelLengthInWorldCoords = labelMetrics.width / xRatio;
 
     // Check if label will fit horizontally
@@ -200,8 +202,8 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       startPos = isXFlipped ? Math.max(surfaceAreaRightEdge, rightEdge) : Math.min(surfaceAreaRightEdge, rightEdge);
     }
 
-    const topEdge = yScale.invert(yScale.range()[0]);
-    const bottomEdge = yScale.invert(yScale.range()[1]);
+    const topEdge = yScale.invert(yScale.range()[0]!);
+    const bottomEdge = yScale.invert(yScale.range()[1]!);
 
     // Calculate where to sample points
     const dirSteps = 5;
@@ -211,14 +213,14 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const dirStep = (labelLengthInWorldCoords / dirSteps) * (isLabelsOnLeftSide ? 1 : -1) * (isXFlipped ? -1 : 1);
 
     // Sample points from top and calculate position
-    const topData = data.map((d) => [d[0], d[1]]);
+    const topData = data.map((d) => [d[0]!, d[1]!]);
     const topPos = this.calcPos(topData, startPos, posSteps, posStep, topEdge, bottomEdge);
     if (!topPos) {
       return;
     }
 
     // Sample points from bottom and calculate position
-    const bottomData = data.map((d) => [d[0], d[2]]);
+    const bottomData = data.map((d) => [d[0]!, d[2]!]);
     let bottomPos = this.calcPos(
       bottomData,
       startPos,
@@ -226,7 +228,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       posStep,
       topEdge,
       bottomEdge,
-      nextSurfaceArea ? nextSurfaceArea.data.map((d) => [d[0], d[1]]) : null,
+      nextSurfaceArea?.data.map((d) => [d[0]!, d[1]!]) ?? [],
       surfaces,
       i,
     );
@@ -244,7 +246,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       // Use reduced fontsize
       fontSizeInWorldCoords = thickness;
       ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
-      labelMetrics = ctx.measureText(surfaceArea.label);
+      labelMetrics = ctx.measureText(surfaceArea.label ?? '');
       labelLengthInWorldCoords = labelMetrics.width / xRatio;
     }
     // Sample points from top and bottom and calculate direction vector
@@ -261,7 +263,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       0,
       Math.PI / 4,
       4,
-      nextSurfaceArea ? nextSurfaceArea.data.map((d) => [d[0], d[1]]) : null,
+      nextSurfaceArea?.data.map((d) => [d[0]!, d[1]!]) ?? [],
       surfaces,
       i,
     );
@@ -271,20 +273,24 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const textX = startPos;
     const textY = (topPos.y + bottomPos.y) / 2;
     const textAngle = isXFlipped ? -scaledAngle : scaledAngle;
-    ctx.textAlign = isLabelsOnLeftSide ? 'left' : 'right';
-    ctx.translate(xScale(textX), yScale(textY));
-    ctx.rotate(textAngle);
-    ctx.fillStyle = this.options.textColor || this.defaultTextColor;
-    ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
-    ctx.textBaseline = 'middle';
-    ctx.fillText(surfaceArea.label, 0, 0);
 
-    ctx.restore();
+    if (ctx) {
+      ctx.textAlign = isLabelsOnLeftSide ? 'left' : 'right';
+      ctx.translate(xScale(textX), yScale(textY));
+      ctx.rotate(textAngle);
+      ctx.fillStyle = this.options.textColor || this.defaultTextColor;
+      ctx.font = `${fontSizeInWorldCoords * yRatio}px ${this.options.font || this.defaultFont}`;
+      ctx.textBaseline = 'middle';
+      ctx.fillText(surfaceArea.label ?? '', 0, 0);
+
+      ctx.restore();
+    }
   };
 
   drawLineLabel = (s: SurfaceLine): void => {
     const { ctx, isXFlipped } = this;
-    const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent;
+    const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent!;
+    if (ctx == null) return;
     const isLabelsOnLeftSide = this.checkDrawLabelsOnLeftSide();
     const marginsInWorldCoords = this.getMarginsInWorldCoordinates();
     const maxFontSize = this.options.maxFontSize || this.defaultMaxFontSize;
@@ -296,9 +302,9 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const labelMetrics = ctx.measureText(s.label);
     const labelLengthInWorldCoords = labelMetrics.width / xRatio;
 
-    const leftEdge = xScale.invert(xScale.range()[0]) + marginsInWorldCoords;
-    const rightEdge = xScale.invert(xScale.range()[1]) - marginsInWorldCoords;
-    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges();
+    const leftEdge = xScale.invert(xScale.range()[0]!) + marginsInWorldCoords;
+    const rightEdge = xScale.invert(xScale.range()[1]!) - marginsInWorldCoords;
+    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges() as [number, number];
 
     // Find edge where to draw
     let startPos: number;
@@ -326,14 +332,16 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const textDir = Vector2.angleRight(dir) - (isLabelsOnLeftSide ? Math.PI : 0);
 
     // Draw label
-    ctx.textAlign = isLabelsOnLeftSide ? 'right' : 'left';
-    ctx.translate(xScale(textX), yScale(textY));
-    ctx.rotate(textDir);
-    ctx.fillStyle = this.colorToCSSColor(s.color);
-    ctx.textBaseline = 'middle';
-    ctx.fillText(s.label, 0, 0);
+    if (ctx) {
+      ctx.textAlign = isLabelsOnLeftSide ? 'right' : 'left';
+      ctx.translate(xScale(textX), yScale(textY));
+      ctx.rotate(textDir);
+      ctx.fillStyle = this.colorToCSSColor(s.color);
+      ctx.textBaseline = 'middle';
+      ctx.fillText(s.label, 0, 0);
 
-    ctx.restore();
+      ctx.restore();
+    }
   };
 
   colorToCSSColor(color: number | string): string {
@@ -342,7 +350,6 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     }
 
     let hexString = color.toString(16);
-    // eslint-disable-next-line no-magic-numbers
     hexString = '000000'.substr(0, 6 - hexString.length) + hexString;
     return `#${hexString}`;
   }
@@ -352,12 +359,12 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     offset: number,
     count: number,
     step: number,
-    topLimit: number = null,
-    bottomLimit: number = null,
-    alternativeSurfaceData: number[][] = null,
+    topLimit?: number,
+    bottomLimit?: number,
+    alternativeSurfaceData?: number[][],
     surfaces: SurfaceArea[] | null = null,
-    currentSurfaceIndex: number = null,
-  ): Vector2 {
+    currentSurfaceIndex?: number,
+  ): Vector2 | null {
     const pos = Vector2.zero.mutable;
     let samples = 0;
     for (let i = 0; i < count; i++) {
@@ -381,12 +388,12 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
   getAlternativeYValueIfAvailable(
     x: number,
-    topLimit: number,
-    bottomLimit: number,
-    alternativeSurfaceData: number[][],
-    surfaces: SurfaceArea[] | null,
-    currentSurfaceIndex: number,
-  ): number {
+    topLimit?: number,
+    bottomLimit?: number,
+    alternativeSurfaceData?: number[][],
+    surfaces: SurfaceArea[] | null = null,
+    currentSurfaceIndex?: number,
+  ): number | null {
     if (!alternativeSurfaceData) {
       return null;
     }
@@ -397,12 +404,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       let si = currentSurfaceIndex + 1;
       while (altY == null && si < surfaces.length) {
         const altSurface = surfaces[si++];
-        altY = findSampleAtPos(
-          altSurface.data.map((d: number[]) => [d[0], d[1]]),
-          x,
-          topLimit,
-          bottomLimit,
-        );
+        altY = findSampleAtPos(altSurface?.data.map((d: number[]) => [d[0]!, d[1]!]) ?? [], x, topLimit, bottomLimit);
       }
     }
     return altY;
@@ -415,8 +417,8 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     step: number,
     zFactor: number,
     initalVector: Vector2 = Vector2.left,
-    topLimit: number = null,
-    bottomLimit: number = null,
+    topLimit?: number,
+    bottomLimit?: number,
   ): Vector2 {
     const dir = initalVector.mutable;
 
@@ -447,14 +449,14 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     count: number,
     step: number,
     initalVector: Vector2 = Vector2.left,
-    topLimit: number = null,
-    bottomLimit: number = null,
-    minReductionAngle: number = 0,
+    topLimit: number,
+    bottomLimit: number,
+    minReductionAngle = 0,
     maxReductionAngle: number = Math.PI / 4,
-    angleReductionExponent: number = 4,
-    alternativeSurfaceBottomData: number[][] = null,
+    angleReductionExponent = 4,
+    alternativeSurfaceBottomData: number[][],
     surfaces: SurfaceArea[] | null = null,
-    currentSurfaceIndex: number = null,
+    currentSurfaceIndex: number,
   ): number {
     const angles: number[] = [];
     const tmpVec = Vector2.zero.mutable;
@@ -483,7 +485,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       } else {
         if (topY !== null) {
           tmpVec.set(x, (topY + usedBottomY) / 2);
-          tmpVec.sub(vecAtEnd);
+          tmpVec.sub(vecAtEnd!);
 
           angles.push(Vector2.angleRight(tmpVec));
         } else {
@@ -492,7 +494,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       }
     }
 
-    const refAngle = angles[0];
+    const refAngle = angles[0]!;
     const offsetAngles = angles.map((d: number) => d - refAngle);
     let factors = 0;
     const offsetSum = offsetAngles.reduce((acc: number, v: number) => {
@@ -506,50 +508,51 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   }
 
   updateXFlipped(): void {
-    const { xBounds } = this.rescaleEvent;
+    const { xBounds } = this.rescaleEvent!;
     this.isXFlipped = xBounds[0] > xBounds[1];
   }
 
   getMarginsInWorldCoordinates(): number {
-    const { xRatio } = this.rescaleEvent;
+    const { xRatio } = this.rescaleEvent!;
     const margins = (this.options.margins || this.defaultMargins) * (this.isXFlipped ? -1 : 1);
     const marginsInWorldCoords = margins / xRatio;
     return marginsInWorldCoords;
   }
 
   getSurfacesAreaEdges(): number[] {
-    const endPoints = this.data.areas.reduce((acc, area) => {
-      const { data } = area;
-      const firstValidPoint = data.find((d: number[]) => d[1] != null);
-      if (firstValidPoint) {
-        acc.push(firstValidPoint[0]);
-      }
-      // TODO: Use findLast() when TypeScript stops complaining about it
-      for (let i = data.length - 1; i >= 0; i--) {
-        if (data[i][1] != null) {
-          acc.push(data[i][0]);
-          break;
-        }
-      }
-
-      return acc;
-    }, []);
-    endPoints.push(
-      ...this.data.lines.reduce((acc, line) => {
-        const { data } = line;
+    const endPoints =
+      this.data?.areas.reduce((acc, area) => {
+        const { data } = area;
         const firstValidPoint = data.find((d: number[]) => d[1] != null);
         if (firstValidPoint) {
-          acc.push(firstValidPoint[0]);
+          acc.push(firstValidPoint[0]!);
         }
         // TODO: Use findLast() when TypeScript stops complaining about it
         for (let i = data.length - 1; i >= 0; i--) {
-          if (data[i][1] != null) {
-            acc.push(data[i][0]);
+          if (data[i]?.[1] != null) {
+            acc.push(data[i]?.[0]!);
+            break;
+          }
+        }
+
+        return acc;
+      }, [] as number[]) ?? [];
+    endPoints.push(
+      ...(this.data?.lines.reduce((acc, line) => {
+        const { data } = line;
+        const firstValidPoint = data.find((d: number[]) => d[1] != null);
+        if (firstValidPoint) {
+          acc.push(firstValidPoint[0]!);
+        }
+        // TODO: Use findLast() when TypeScript stops complaining about it
+        for (let i = data.length - 1; i >= 0; i--) {
+          if (data[i]?.[1] != null) {
+            acc.push(data[i]?.[0]!);
             break;
           }
         }
         return acc;
-      }, []),
+      }, [] as number[]) ?? []),
     );
 
     const minX = Math.min(...endPoints);
@@ -567,11 +570,11 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       return true;
     }
 
-    const { xScale, yScale, xRatio } = this.rescaleEvent;
+    const { xScale, yScale, xRatio } = this.rescaleEvent!;
     const t = 200; // TODO: Use actual size of largest label or average size of all
 
-    const [dx1, dx2] = xScale.domain();
-    const [dy1, dy2] = yScale.domain();
+    const [dx1, dx2] = xScale.domain() as [number, number];
+    const [dy1, dy2] = yScale.domain() as [number, number];
 
     let top = referenceSystem.interpolators.curtain.getIntersects(dy1, 1, 0) as number[][];
     if (top.length === 0) {
@@ -582,8 +585,8 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       bottom = [referenceSystem.interpolators.curtain.getPointAt(1.0) as number[]];
     }
 
-    const maxX = Math.max(top[0][0], bottom[0][0]);
-    const minX = Math.min(top[0][0], bottom[0][0]);
+    const maxX = Math.max(top[0]?.[0]!, bottom[0]?.[0]!);
+    const minX = Math.min(top[0]?.[0]!, bottom[0]?.[0]!);
 
     const wbBBox = {
       left: isXFlipped ? maxX : minX,
@@ -594,7 +597,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const screenLeftEdge = dx1 + margin;
     const screenRightEdge = dx2 - margin;
 
-    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges();
+    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges() as [number, number];
 
     const leftLimit = isXFlipped ? Math.min(screenLeftEdge, surfaceAreaLeftEdge) : Math.max(screenLeftEdge, surfaceAreaLeftEdge);
     const rightLimit = isXFlipped ? Math.max(screenRightEdge, surfaceAreaRightEdge) : Math.min(screenRightEdge, surfaceAreaRightEdge);
@@ -608,7 +611,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       spaceOnLeftSide > spaceOnRightSide ||
       spaceOnLeftSideInScreenCoordinates > t ||
       (spaceOnLeftSideInScreenCoordinates < t && spaceOnRightSideInScreenCoordinates < t && isXFlipped) ||
-      bottom[0][1] < dy1;
+      bottom[0]?.[1]! < dy1;
 
     return isLabelsOnLeftSide;
   }

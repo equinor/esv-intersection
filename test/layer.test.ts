@@ -11,8 +11,8 @@ class TestLayer extends Layer<string> {
   onInteractivityChanged(_interactive: boolean): void {
     throw new Error('Method not implemented.');
   }
-  testString: string = '';
-  updateWasCalled: boolean = false;
+  testString = '';
+  updateWasCalled = false;
   override setData(data: string) {
     super.setData(data);
     this.testString = data;
@@ -37,7 +37,7 @@ describe('Layer', () => {
   it('should set data upon construction and not call update when no element has been mounted', () => {
     const layer = new TestLayer('id', { data });
 
-    expect(layer.element).toEqual(null);
+    expect(layer.element).toEqual(undefined);
     expect(layer.data).toEqual('test');
     expect(layer.updateWasCalled).toEqual(false);
   });
@@ -46,7 +46,7 @@ describe('Layer', () => {
 
     layer.setData(data);
 
-    expect(layer.element).toEqual(null);
+    expect(layer.element).toEqual(undefined);
     expect(layer.data).toEqual('test');
     expect(layer.updateWasCalled).toEqual(false);
   });

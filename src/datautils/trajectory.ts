@@ -15,19 +15,21 @@ const pathSteps = 10;
  * Code originally developed for REP
  * @param {[]} poslog Position log from SMDA
  */
-export function generateProjectedWellborePath(poslog: SurveySample[]): number[][] {
+export function generateProjectedWellborePath(poslog: SurveySample[]): [number, number][] {
   if (!poslog || poslog.length === 0) {
     return [];
   }
 
-  const points: number[][] = poslog ? poslog.map((p: SurveySample) => [p.easting, p.northing, p.tvd, p.md]) : [];
+  const points: [number, number, number, number][] = poslog ? poslog.map((p: SurveySample) => [p.easting, p.northing, p.tvd, p.md]) : [];
 
-  const projection: number[][] = simplify(projectCurtain(points));
-  const offset: number = projection[projection.length - 1][0];
+  const projection = simplify(projectCurtain(points));
+  const offset = projection[projection.length - 1]?.[0];
 
-  projection.forEach((p, i) => {
-    projection[i][0] = offset - p[0];
-  });
+  if (offset != null) {
+    projection.forEach((p, i) => {
+      projection[i]![0] = offset - p[0];
+    });
+  }
 
   return projection;
 }
@@ -43,25 +45,25 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
     return [];
   }
 
-  const points: number[][] = poslog ? poslog.map((p) => [p.easting, p.northing, p.tvd, p.md]) : [];
+  const points: [number, number, number, number][] = poslog ? poslog.map((p) => [p.easting, p.northing, p.tvd, p.md]) : [];
 
   const interpolator: CurveInterpolator = new CurveInterpolator(points, { tension: 0.75, arcDivisions: 5000 });
   const displacement: number = interpolator.length;
 
   const nPoints: number = Math.round(displacement * pathSteps);
-  let path: number[][] = null;
+  let path: [number, number][];
   if (nPoints > 0) {
     const maxOffset = 0.0005;
     const maxDistance = 10;
     path = simplify(interpolator.getPoints(nPoints), maxOffset, maxDistance);
   } else {
-    path = [[points[0][0], points[0][1]]];
+    path = [[points[0]![0], points[0]![1]]];
   }
 
-  const first: number[] = path[0];
-  const last: number[] = path[path.length - 1];
+  const first = path[0]!;
+  const last = path[path.length - 1]!;
   const relativeDist: number = Vector2.distance(first, last);
-  let v: Vector2 = null;
+  let v: Vector2;
 
   if (relativeDist < thresholdRelativeDist) {
     const oneEighty = 180;
@@ -72,9 +74,9 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
   }
   const extensionLengthStart: number = Math.max(0, extensionLength - displacement);
   const offset: number = extensionLengthStart + displacement;
-  const trajectory: number[][] = [];
+  const trajectory: [number, number][] = [];
 
-  let firstPoints: number[][] = [];
+  let firstPoints: [number, number][] = [];
 
   // Reference to initial vector
   const initial: number[] = v.toArray();
@@ -93,7 +95,7 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
   }
   trajectory.push(...path);
 
-  const endPoints: number[][] = seqI(Math.ceil(extensionLength * stepSize))
+  const endPoints = seqI(Math.ceil(extensionLength * stepSize))
     .map((t) =>
       v
         .set(initial)
@@ -105,7 +107,7 @@ export function generateProjectedTrajectory(poslog: SurveySample[], defaultInter
 
   trajectory.push(...endPoints);
 
-  const projectedTrajectory: number[][] = projectCurtain(trajectory, null, offset);
+  const projectedTrajectory: number[][] = projectCurtain(trajectory, undefined, offset);
 
   return projectedTrajectory;
 }
@@ -124,7 +126,7 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
 
   for (let i = 0; i < path.length - 1; i++) {
     const index = path.length - 1 - i;
-    temp.set(path[index]).sub(path[index - 1]);
+    temp.set(path[index]!).sub(path[index - 1]!);
     res.add(temp);
 
     len = res.magnitude;
@@ -152,25 +154,25 @@ function getDirectionVector(path: number[][], threshold: number): Vector2 {
  *
  * @return {Number[]}    Simplified array
  */
-function simplify(inputArr: number[][], maxOffset = 0.001, maxDistance = 10): number[][] {
+function simplify(inputArr: [number, number][], maxOffset = 0.001, maxDistance = 10): [number, number][] {
   if (inputArr.length <= 4) {
     return inputArr;
   }
-  const [o0, o1] = inputArr[0];
-  const arr = inputArr.map((d) => [d[0] - o0, d[1] - o1]);
-  let [a0, a1] = arr[0];
-  const sim: number[][] = [inputArr[0]];
+  const [o0, o1] = inputArr[0]!;
+  const arr = inputArr.map<[number, number]>((d) => [d[0]! - o0, d[1]! - o1]);
+  let [a0, a1] = arr[0]!;
+  const sim = [inputArr[0]!];
 
   for (let i = 1; i + 1 < arr.length; i++) {
-    const [t0, t1] = arr[i];
-    const [b0, b1] = arr[i + 1];
+    const [t0, t1] = arr[i] ?? [];
+    const [b0, b1] = arr[i + 1] ?? [];
 
     // If t->b vector is NOT [0, 0]
-    if (b0 - t0 !== 0 || b1 - t1 !== 0) {
+    if (t0 != null && t1 != null && b0 != null && b1 != null && (b0 - t0 !== 0 || b1 - t1 !== 0)) {
       // Proximity check
       const proximity: number = Math.abs(a0 * b1 - a1 * b0 + b0 * t1 - b1 * t0 + a1 * t0 - a0 * t1) / Math.sqrt((b0 - a0) ** 2 + (b1 - a1) ** 2);
 
-      const dir: number[] = [a0 - t0, a1 - t1];
+      const dir: [number, number] = [a0 - t0, a1 - t1];
       const len: number = Math.sqrt(dir[0] ** 2 + dir[1] ** 2);
 
       if (proximity > maxOffset || len >= maxDistance) {
@@ -179,7 +181,7 @@ function simplify(inputArr: number[][], maxOffset = 0.001, maxDistance = 10): nu
       }
     }
   }
-  const last: number[] = arr[arr.length - 1];
+  const last = arr[arr.length - 1]!;
   sim.push([last[0] + o0, last[1] + o1]);
 
   return sim;
@@ -192,15 +194,15 @@ function simplify(inputArr: number[][], maxOffset = 0.001, maxDistance = 10): nu
  * @param offset
  * @returns {array}
  */
-function projectCurtain(points: number[][], origin: number[] = null, offset = 0): number[][] {
-  let p0: number[] = origin || points[0];
+function projectCurtain(points: [number, number, ...number[]][], origin?: [number, number, number, number], offset = 0): [number, number][] {
+  let p0 = origin || points[0]!;
   let l = 0;
-  const projected = points.map((p1: number[]) => {
+  const projected = points.map<[number, number]>((p1) => {
     const dx = p1[0] - p0[0];
     const dy = p1[1] - p0[1];
     l += Math.sqrt(dx ** 2 + dy ** 2);
     p0 = p1;
-    return [offset > 0 ? offset - l : l, p1[2] || 0];
+    return [offset > 0 ? offset - l : l, p1[2] ?? 0];
   });
   return projected;
 }

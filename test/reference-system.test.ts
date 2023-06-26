@@ -11,8 +11,8 @@ const wp = [
 ];
 
 function dist(a: number[], b: number[]): number {
-  const d0 = a[0] - b[0];
-  const d1 = a[1] - b[1];
+  const d0 = a[0]! - b[0]!;
+  const d1 = a[1]! - b[1]!;
   return Math.sqrt(d0 * d0 + d1 * d1);
 }
 
@@ -74,10 +74,10 @@ describe('Reference system', () => {
   });
   it('should have same distance between points in trajectory', () => {
     const trajectory = rs.getTrajectory(80);
-    const firstDistance = dist(trajectory.points[0], trajectory.points[1]);
-    let lastPoint = trajectory.points[1];
+    const firstDistance = dist(trajectory.points[0]!, trajectory.points[1]!);
+    let lastPoint = trajectory.points[1]!;
     for (let i = 2; i < trajectory.points.length; i++) {
-      const point = trajectory.points[i];
+      const point = trajectory.points[i]!;
       const currentDistance = dist(point, lastPoint);
       expect(currentDistance).toBeCloseTo(firstDistance);
       lastPoint = point;
@@ -90,10 +90,10 @@ describe('Reference system', () => {
 
   it('should have same distance between points in extended trajectory', () => {
     const trajectory = rs.getExtendedTrajectory(200, 500.0, 500.0);
-    const firstDistance = dist(trajectory.points[0], trajectory.points[1]);
-    let lastPoint = trajectory.points[1];
+    const firstDistance = dist(trajectory.points[0]!, trajectory.points[1]!);
+    let lastPoint = trajectory.points[1]!;
     for (let i = 2; i < trajectory.points.length; i++) {
-      const point = trajectory.points[i];
+      const point = trajectory.points[i]!;
       const currentDistance = dist(point, lastPoint);
       expect(currentDistance).toBeCloseTo(firstDistance, 0);
       lastPoint = point;
@@ -101,8 +101,8 @@ describe('Reference system', () => {
   });
   it('should have correct length on extension', () => {
     const trajectory = rs.getExtendedTrajectory(100, 500.0, 500.0);
-    const startExtend = dist(trajectory.points[0], rs.interpolators.trajectory.getPointAt(0.0) as number[]);
-    const endExtend = dist(trajectory.points[99], rs.interpolators.trajectory.getPointAt(1.0) as number[]);
+    const startExtend = dist(trajectory.points[0]!, rs.interpolators.trajectory.getPointAt(0.0) as number[]);
+    const endExtend = dist(trajectory.points[99]!, rs.interpolators.trajectory.getPointAt(1.0) as number[]);
     expect(startExtend).toBeCloseTo(500.0);
     expect(endExtend).toBeCloseTo(500.0);
   });
@@ -127,11 +127,13 @@ describe('Reference system', () => {
     const trajectory = irs.getExtendedTrajectory(100, 1500.0, 1500.0);
     expect(trajectory.points.length).toEqual(100);
 
-    const startExtend = dist(trajectory.points[0], irs.interpolators.trajectory.getPointAt(0.0) as number[]);
-    const endExtend = dist(trajectory.points[99], irs.interpolators.trajectory.getPointAt(1.0) as number[]);
+    const startExtend = dist(trajectory.points[0]!, irs.interpolators.trajectory.getPointAt(0.0) as number[]);
+    const endExtend = dist(trajectory.points[99]!, irs.interpolators.trajectory.getPointAt(1.0) as number[]);
     expect(startExtend).toBeCloseTo(1500.0);
     expect(endExtend).toBeCloseTo(1500.0);
-    const angle = degrees(Math.atan((trajectory.points[99][0] - trajectory.points[0][0]) / (trajectory.points[99][1] - trajectory.points[0][1])));
+    const angle = degrees(
+      Math.atan((trajectory.points[99]?.[0]! - trajectory.points[0]?.[0]!) / (trajectory.points[99]?.[1]! - trajectory.points[0]?.[1]!)),
+    );
     expect(angle).toBeCloseTo(45.0);
   });
 

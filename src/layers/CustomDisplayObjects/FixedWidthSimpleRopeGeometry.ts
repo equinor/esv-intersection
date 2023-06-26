@@ -8,7 +8,6 @@ export class FixedWidthSimpleRopeGeometry extends MeshGeometry {
    * @param {PIXI.Point[]} [points] - An array of PIXI.Point objects to construct this rope.
    */
   constructor(points: IPoint[], width = 200) {
-    // eslint-disable-next-line no-magic-numbers
     super(new Float32Array(points.length * 4), new Float32Array(points.length * 4), new Uint16Array((points.length - 1) * 6));
     /**
      * An array of points that determine the rope
@@ -66,17 +65,17 @@ export class FixedWidthSimpleRopeGeometry extends MeshGeometry {
     uvs[2] = 0;
     uvs[3] = 1;
     let amount = 0;
-    let prev = points[0];
+    let prev = points[0]!;
     const total = points.length; // - 1;
     for (let i = 0; i < total; i++) {
       // time to do some smart drawing!
       const index = i * 4;
 
       // calculate pixel distance from previous point
-      const dx = prev.x - points[i].x;
-      const dy = prev.y - points[i].y;
+      const dx = prev.x - points[i]?.x!;
+      const dy = prev.y - points[i]?.y!;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      prev = points[i];
+      prev = points[i]!;
       amount += distance / this._width;
 
       uvs[index] = amount;
@@ -107,17 +106,17 @@ export class FixedWidthSimpleRopeGeometry extends MeshGeometry {
     if (points.length < 1) {
       return;
     }
-    let lastPoint = points[0];
+    let lastPoint = points[0]!;
     let nextPoint;
     let perpX = 0;
     let perpY = 0;
-    const vertices = this.buffers[0].data;
+    const vertices = this.buffers[0]?.data!;
     const total = points.length;
     for (let i = 0; i < total; i++) {
-      const point = points[i];
+      const point = points[i]!;
       const index = i * 4;
       if (i < points.length - 1) {
-        nextPoint = points[i + 1];
+        nextPoint = points[i + 1]!;
       } else {
         nextPoint = point;
       }
@@ -140,7 +139,7 @@ export class FixedWidthSimpleRopeGeometry extends MeshGeometry {
       vertices[index + 3] = point.y - perpY;
       lastPoint = point;
     }
-    this.buffers[0].update();
+    this.buffers[0]?.update();
   }
 
   public update(): void {

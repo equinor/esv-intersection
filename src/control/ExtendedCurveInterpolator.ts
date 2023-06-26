@@ -78,13 +78,13 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
       this.generateArcLengthLookup();
     }
     const index = BinarySearch.search(this.arcLengthLookup, arcLength);
-    const v1 = this.arcLengthLookup[index];
-    const v2 = this.arcLengthLookup[index + 1];
+    const v1 = this.arcLengthLookup[index]!;
+    const v2 = this.arcLengthLookup[index + 1]!;
     const t = (index + (arcLength - v1) / (v2 - v1)) / this.arcLengthLookup.length;
     return t;
   }
 
-  generateArcLengthLookup(segments: number = 1000): void {
+  generateArcLengthLookup(segments = 1000): void {
     let lastPos = this.getPointAt(0);
     let length = 0;
     for (let i = 0; i < segments; i++) {
@@ -123,15 +123,15 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
 
     if (from !== 0) {
       const fromIndex = Math.floor(from * this.arcLengthLookup.length);
-      const fromLl = this.arcLengthLookup[fromIndex];
-      const fromLh = this.arcLengthLookup[fromIndex + 1];
+      const fromLl = this.arcLengthLookup[fromIndex]!;
+      const fromLh = this.arcLengthLookup[fromIndex + 1]!;
       fromLength = fromLl + ((from * this.arcLengthLookup.length) % this.arcLengthLookup.length) * (fromLh - fromLl);
     }
 
     if (to !== 1) {
       const toIndex = Math.floor(to * this.arcLengthLookup.length);
-      const toLl = this.arcLengthLookup[toIndex];
-      const toLh = this.arcLengthLookup[toIndex + 1];
+      const toLl = this.arcLengthLookup[toIndex]!;
+      const toLh = this.arcLengthLookup[toIndex + 1]!;
       toLength = toLl + ((from * this.arcLengthLookup.length) % this.arcLengthLookup.length) * (toLh - toLl);
     }
 

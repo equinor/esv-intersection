@@ -51,15 +51,15 @@ export interface CasingRenderObject {
 }
 
 export const getEndLines = (
-  rightPath: IPoint[],
-  leftPath: IPoint[],
+  rightPath: [IPoint, IPoint, ...IPoint[]],
+  leftPath: [IPoint, IPoint, ...IPoint[]],
 ): {
-  top: IPoint[];
-  bottom: IPoint[];
+  top: [IPoint, IPoint];
+  bottom: [IPoint, IPoint];
 } => {
   return {
     top: [rightPath[0], leftPath[0]],
-    bottom: [rightPath[rightPath.length - 1], leftPath[leftPath.length - 1]],
+    bottom: [rightPath[rightPath.length - 1] as IPoint, leftPath[leftPath.length - 1] as IPoint],
   };
 };
 
@@ -215,8 +215,8 @@ export const createComplexRopeSegmentsForCement = (
     throw new Error(`Invalid cement data, can't find referenced casing/completion string for cement with id '${cement.id}'`);
   }
 
-  attachedStrings.sort((a: Casing, b: Casing) => a.end - b.end); // ascending
-  const bottomOfCement = attachedStrings[attachedStrings.length - 1].end;
+  attachedStrings.sort((a, b) => a.end - b.end); // ascending
+  const bottomOfCement = attachedStrings[attachedStrings.length - 1]!.end;
 
   const { overlappingOuterStrings, overlappingHoles } = findIntersectingItems(cement.toc, bottomOfCement, nonAttachedStrings, holes);
 
@@ -232,7 +232,7 @@ export const createComplexRopeSegmentsForCement = (
       return [];
     }
 
-    const nextDepth = list[index + 1];
+    const nextDepth = list[index + 1]!;
     const diameterAtChangeDepth = findCementOuterDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth);
 
     return [{ top: depth, bottom: nextDepth, diameter: diameterAtChangeDepth * exaggerationFactor }];
@@ -258,7 +258,7 @@ const splitByReferencedStrings = (
       }
       return { ...acc, nonAttachedStrings: [...acc.nonAttachedStrings, current] };
     },
-    { attachedStrings: [], nonAttachedStrings: [] },
+    { attachedStrings: [] as (Casing | Completion)[], nonAttachedStrings: [] as (Casing | Completion)[] },
   );
 
 export const createComplexRopeSegmentsForCementSqueeze = (
@@ -289,7 +289,7 @@ export const createComplexRopeSegmentsForCementSqueeze = (
       return [];
     }
 
-    const nextDepth = list[index + 1];
+    const nextDepth = list[index + 1]!;
 
     const diameterAtDepth = findCementOuterDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth);
 
@@ -327,7 +327,7 @@ export const createComplexRopeSegmentsForCementPlug = (
       return [];
     }
 
-    const nextDepth = list[index + 1];
+    const nextDepth = list[index + 1]!;
     const diameterAtDepth = findCementPlugInnerDiameterAtDepth(attachedStrings, overlappingOuterStrings, overlappingHoles, depth);
 
     return [{ top: depth, bottom: nextDepth, diameter: diameterAtDepth * exaggerationFactor }];
@@ -364,6 +364,10 @@ export const createHoleBaseTexture = ({ firstColor, secondColor }: HoleOptions, 
   canvas.height = height;
   const canvasCtx = canvas.getContext('2d');
 
+  if (canvasCtx == null) {
+    throw Error('Could not get canvas context!');
+  }
+
   canvasCtx.fillStyle = createGradientFill(canvas, canvasCtx, firstColor, secondColor, 0);
   canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -376,6 +380,9 @@ export const createScreenTexture = ({ scalingFactor }: ScreenOptions): Texture =
   canvas.width = size;
   canvas.height = size;
   const canvasCtx = canvas.getContext('2d');
+  if (canvasCtx == null) {
+    throw Error('Could not get canvas context!');
+  }
 
   canvasCtx.fillStyle = 'white';
   canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
@@ -401,6 +408,10 @@ export const createTubingTexture = ({ innerColor, outerColor, scalingFactor }: T
   canvas.width = size;
   canvas.height = size;
   const canvasCtx = canvas.getContext('2d');
+
+  if (canvasCtx == null) {
+    throw Error('Could not get canvas context!');
+  }
   const gradient = canvasCtx.createLinearGradient(0, 0, 0, size);
 
   const innerColorStart = 0.3;
@@ -425,6 +436,10 @@ export const createCementTexture = ({ firstColor, secondColor, scalingFactor }: 
   canvas.height = size;
   const canvasCtx = canvas.getContext('2d');
 
+  if (canvasCtx == null) {
+    throw Error('Could not get canvas context!');
+  }
+
   canvasCtx.fillStyle = firstColor;
   canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
   canvasCtx.lineWidth = lineWidth;
@@ -448,6 +463,10 @@ export const createCementPlugTexture = ({ firstColor, secondColor, scalingFactor
   canvas.width = size;
   canvas.height = size;
   const canvasCtx = canvas.getContext('2d');
+
+  if (canvasCtx == null) {
+    throw Error('Could not get canvas context!');
+  }
 
   canvasCtx.fillStyle = firstColor;
   canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
@@ -475,6 +494,10 @@ export const createCementSqueezeTexture = ({ firstColor, secondColor, scalingFac
   canvas.height = size;
 
   const canvasCtx = canvas.getContext('2d');
+  if (canvasCtx == null) {
+    throw Error('Could not get canvas context!');
+  }
+
   canvasCtx.lineWidth = lineWidth;
   canvasCtx.fillStyle = firstColor;
   canvasCtx.strokeStyle = secondColor;
@@ -535,7 +558,7 @@ export const getCasingIntervalsWithWindows = (casing: Casing): CasingInterval[] 
             ? createCasingInterval(nextLastBottom, casing.end)
             : null;
 
-        const newIntervals: CasingInterval[] = [startCasingInterval, windowInterval, endCasingInterval].filter((i) => i);
+        const newIntervals: CasingInterval[] = [startCasingInterval, windowInterval, endCasingInterval].filter((i): i is CasingInterval => i != null);
 
         return { intervals: [...intervals, ...newIntervals], lastBottom: nextLastBottom };
       },
@@ -599,7 +622,7 @@ export const createComplexRopeSegmentsForPerforation = (
       return [];
     }
 
-    const nextDepth = list[index + 1];
+    const nextDepth = list[index + 1]!;
 
     const diameterAtDepth = findPerforationOuterDiameterAtDepth(overlappingOuterStrings, overlappingHoles, depth, perforation.subKind);
 
@@ -769,14 +792,17 @@ const errorTexture = (errorMessage = 'Error!', existingContext?: { canvas: HTMLC
   const xy: [number, number] = [0, 0];
   const wh: [number, number] = [canvas.width, canvas.height];
 
+  if (canvasCtx == null) {
+    throw Error('Could not get canvas context!');
+  }
   canvasCtx.fillStyle = '#ff00ff';
   canvasCtx.fillRect(...xy, ...wh);
 
   const texture = new Texture(
     Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP }).baseTexture,
-    null,
+    undefined,
     new Rectangle(0, 0, canvas.width, canvas.height),
-    null,
+    undefined,
     groupD8.MIRROR_HORIZONTAL,
   );
   return texture;
@@ -793,15 +819,19 @@ const createPerforationCanvas = (
   canvas.height = size;
   const ctx = canvas.getContext('2d');
 
+  if (ctx == null) {
+    throw Error('Could not get canvas context!');
+  }
+
   return { canvas, ctx };
 };
 
 const createPerforationTexture = (canvas: HTMLCanvasElement) => {
   const texture = new Texture(
     Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP }).baseTexture,
-    null,
+    undefined,
     new Rectangle(0, 0, canvas.width, canvas.height),
-    null,
+    undefined,
     groupD8.MIRROR_HORIZONTAL,
   );
   return texture;

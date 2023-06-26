@@ -2,8 +2,8 @@ import { select, Selection, pointer, ContainerElement } from 'd3-selection';
 import { OverlayCallbacks } from './interfaces';
 
 export class Overlay<T> {
-  elm: Selection<Element, unknown, null, undefined>;
-  source: Element;
+  elm: Selection<HTMLDivElement, unknown, null, undefined>;
+  source: HTMLDivElement | undefined;
   elements: { [propName: string]: Element } = {};
   listeners: { [propName: string]: OverlayCallbacks<T> } = {};
   enabled = true;
@@ -11,8 +11,7 @@ export class Overlay<T> {
   constructor(caller: T, container: HTMLElement) {
     const con = select(container);
     this.elm = con.append('div').attr('id', 'overlay').style('z-index', '11').style('position', 'absolute');
-
-    this.source = this.elm.node();
+    this.source = this.elm.node() ?? undefined;
 
     const { elm } = this;
     elm.on('resize', (event) => {
@@ -24,11 +23,11 @@ export class Overlay<T> {
       }
 
       Object.keys(this.listeners).forEach((key: string) => {
-        const target = this.elements[key] || null;
+        const target = this.elements[key] ?? undefined;
         const ops = this.listeners[key];
         if (ops && ops.onResize) {
           requestAnimationFrame(() =>
-            ops.onResize({
+            ops.onResize?.({
               target,
               source: this.source,
               caller,
@@ -47,12 +46,12 @@ export class Overlay<T> {
 
       const [mx, my] = pointer(event, this.elm.node() as ContainerElement);
       Object.keys(this.listeners).forEach((key: string) => {
-        const target = this.elements[key] || null;
+        const target = this.elements[key] ?? undefined;
         const ops = this.listeners[key];
 
         if (ops && ops.onMouseMove) {
           requestAnimationFrame(() =>
-            ops.onMouseMove({
+            ops.onMouseMove?.({
               x: mx,
               y: my,
               target,
@@ -69,11 +68,11 @@ export class Overlay<T> {
         return;
       }
       Object.keys(this.listeners).forEach((key: string) => {
-        const target = this.elements[key] || null;
+        const target = this.elements[key] || undefined;
         const ops = this.listeners[key];
         if (ops && ops.onMouseExit) {
           requestAnimationFrame(() =>
-            ops.onMouseExit({
+            ops.onMouseExit?.({
               target,
               source: this.source,
               caller,
@@ -84,13 +83,18 @@ export class Overlay<T> {
     });
   }
 
-  create(key: string, callbacks?: OverlayCallbacks<T>): HTMLElement {
+  create(key: string, callbacks?: OverlayCallbacks<T>): HTMLElement | undefined {
     const newElm = this.elm.append('div').style('position', 'relative').style('pointer-events', 'none').node();
-    this.elements[key] = newElm;
-    if (callbacks) {
-      this.listeners[key] = callbacks;
+
+    if (newElm != null) {
+      this.elements[key] = newElm;
+      if (callbacks) {
+        this.listeners[key] = callbacks;
+      }
+      return newElm;
+    } else {
+      return undefined;
     }
-    return newElm;
   }
 
   register(key: string, callbacks: OverlayCallbacks<T>): void {
@@ -111,7 +115,7 @@ export class Overlay<T> {
   }
 
   destroy(): void {
-    this.source.remove();
+    this.source?.remove();
   }
 }
 

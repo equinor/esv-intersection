@@ -15,7 +15,7 @@ export interface OnMountEvent extends LayerEvent {
   height?: number;
 }
 
-export interface OnUnmountEvent extends LayerEvent {}
+export type OnUnmountEvent = LayerEvent;
 
 export interface OnResizeEvent extends LayerEvent {
   width: number;

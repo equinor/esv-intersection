@@ -7,7 +7,7 @@ const DEFAULT_HORIZONTAL_PADDING = 4;
 const DEFAULT_VERTICAL_PADDING = 2;
 
 export function pixelsPerUnit(x: ScaleLinear<number, number>): number {
-  const [min] = x.domain();
+  const [min] = x.domain() as [number, number];
   return Math.abs(x(min + 1));
 }
 
@@ -42,14 +42,14 @@ export function isOverlapping(
   return true;
 }
 
-export function getOverlap(r1: BoundingBox, r2: BoundingBox): { dx: number; dy: number } {
+export function getOverlap(r1: BoundingBox, r2: BoundingBox): { dx: number; dy: number } | undefined {
   const r1x2 = r1.x + r1.width;
   const r2x2 = r2.x + r2.width;
   const r1y2 = r1.y + r1.height;
   const r2y2 = r2.y + r2.height;
 
   if (r2.x > r1x2 || r2.y > r1y2 || r2x2 < r1.x || r2y2 < r1.y) {
-    return null;
+    return undefined;
   }
 
   const dx = Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x));
@@ -67,14 +67,14 @@ export function getOverlapOffset(
   r2: BoundingBox,
   horizontalPadding = DEFAULT_HORIZONTAL_PADDING,
   verticalPadding = DEFAULT_VERTICAL_PADDING,
-): { dx: number; dy: number } {
+): { dx: number; dy: number } | undefined {
   const r1x2 = r1.x + r1.width;
   const r2x2 = r2.x + r2.width;
   const r1y2 = r1.y + r1.height;
   const r2y2 = r2.y + r2.height;
 
   if (r2.x - horizontalPadding > r1x2 || r2.y - verticalPadding > r1y2 || r2x2 + horizontalPadding < r1.x || r2y2 + verticalPadding < r1.y) {
-    return null;
+    return undefined;
   }
 
   const dx = r1.x + r1.width - r2.x + horizontalPadding;

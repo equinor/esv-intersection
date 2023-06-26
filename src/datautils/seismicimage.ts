@@ -44,11 +44,11 @@ export function getSeismicInfo(data: { datapoints: number[][]; yAxisValues: numb
   if (!(data && data.datapoints)) {
     return null;
   }
-  const minX = trajectory.reduce((acc: number, val: number[]) => Math.min(acc, val[0]), 0);
-  const maxX = trajectory.reduce((acc: number, val: number[]) => Math.max(acc, val[0]), 0);
+  const minX = trajectory.reduce((acc: number, val: number[]) => Math.min(acc, val[0]!), 0);
+  const maxX = trajectory.reduce((acc: number, val: number[]) => Math.max(acc, val[0]!), 0);
 
-  const minTvdMsl = data.yAxisValues && data.yAxisValues[0];
-  const maxTvdMsl = data.yAxisValues && data.yAxisValues[data.yAxisValues.length - 1];
+  const minTvdMsl = data.yAxisValues && data.yAxisValues[0]!;
+  const maxTvdMsl = data.yAxisValues && data.yAxisValues[data.yAxisValues.length - 1]!;
 
   // Find value domain
   const dp = data.datapoints || [];
@@ -117,8 +117,7 @@ export async function generateSeismicSliceImage(
     difference: dmax - dmin,
   };
 
-  const length = trajectory[0][0] - trajectory[trajectory.length - 1][0];
-  // eslint-disable-next-line no-magic-numbers
+  const length = trajectory[0]?.[0]! - trajectory[trajectory.length - 1]?.[0]!;
   const width = Math.abs(Math.floor(length / 5));
   const height = data.yAxisValues.length;
 
@@ -132,7 +131,7 @@ export async function generateSeismicSliceImage(
   let offset = 0;
   const colorFactor = (colorTableSize - 1) / domain.difference;
 
-  let pos = options?.isLeftToRight ? trajectory[0][0] : trajectory[trajectory.length - 1][0];
+  let pos = options?.isLeftToRight ? trajectory[0]?.[0]! : trajectory[trajectory.length - 1]?.[0]!;
 
   const step = (length / width) * (options?.isLeftToRight ? -1 : 1);
 
@@ -147,15 +146,15 @@ export async function generateSeismicSliceImage(
   for (let x = 0; x < width; x++) {
     offset = x * 4;
     const index = findIndexOfSample(trajectory, pos);
-    const x1 = trajectory[index][0];
-    const x2 = trajectory[index + 1][0];
+    const x1 = trajectory[index]?.[0]!;
+    const x2 = trajectory[index + 1]?.[0]!;
     const span = x2 - x1;
     const dx = pos - x1;
     const ratio = dx / span;
 
     for (let y = 0; y < height; y++) {
-      val1 = dp[y][index];
-      val2 = dp[y][index + 1];
+      val1 = dp[y]?.[index]!;
+      val2 = dp[y]?.[index + 1]!;
       if (val1 == null || val2 == null) {
         col = black;
         opacity = 0;
@@ -163,11 +162,11 @@ export async function generateSeismicSliceImage(
         val = val1 * (1 - ratio) + val2 * ratio;
         i = (val - domain.min) * colorFactor;
         i = clamp(~~i, 0, colorTableSize - 1);
-        col = colorTable[i];
+        col = colorTable[i]!;
         opacity = 255;
       }
 
-      d.set([col[0], col[1], col[2], opacity], offset);
+      d.set([col[0]!, col[1]!, col[2]!, opacity], offset);
 
       offset += width * 4;
     }

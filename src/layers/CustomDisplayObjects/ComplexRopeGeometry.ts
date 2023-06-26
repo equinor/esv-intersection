@@ -28,7 +28,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
    * @readonly
    */
   get width(): number {
-    return max(this.segments, (segment) => segment.diameter);
+    return max(this.segments, (segment) => segment.diameter)!;
   }
 
   /** Refreshes Rope indices and uvs */
@@ -66,7 +66,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
     uvs[3] = 1;
 
     const segmentCount = segments.length;
-    const maxDiameter = max(segments, (segment) => segment.diameter);
+    const maxDiameter = max(segments, (segment) => segment.diameter)!;
 
     let amount = 0;
     let uvIndex = 0;
@@ -74,21 +74,21 @@ export class ComplexRopeGeometry extends MeshGeometry {
     let indexCount = 0;
 
     for (let i = 0; i < segmentCount; i++) {
-      let prev = segments[i].points[0];
+      let prev = segments[i]?.points[0]!;
       const textureWidth = maxDiameter;
-      const radius = segments[i].diameter / maxDiameter / 2;
+      const radius = segments[i]?.diameter! / maxDiameter / 2;
 
-      const total = segments[i].points.length; // - 1;
+      const total = segments[i]?.points.length!; // - 1;
 
       for (let j = 0; j < total; j++) {
         // time to do some smart drawing!
 
         // calculate pixel distance from previous point
-        const dx = prev.x - segments[i].points[j].x;
-        const dy = prev.y - segments[i].points[j].y;
+        const dx = prev.x - segments[i]?.points[j]?.x!;
+        const dy = prev.y - segments[i]?.points[j]?.y!;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        prev = segments[i].points[j];
+        prev = segments[i]?.points[j]!;
         amount += distance / textureWidth;
 
         uvs[uvIndex] = amount;
@@ -131,20 +131,20 @@ export class ComplexRopeGeometry extends MeshGeometry {
     const segmentCount = segments.length;
     let lastIndex = 0;
     for (let i = 0; i < segmentCount; i++) {
-      let lastPoint = segments[i].points[0];
+      let lastPoint = segments[i]?.points[0]!;
       let nextPoint;
       let perpX = 0;
       let perpY = 0;
 
-      const vertices = this.buffers[0].data;
-      const total = segments[i].points.length;
+      const vertices = this.buffers[0]?.data;
+      const total = segments[i]?.points.length!;
       let index = 0;
       for (let j = 0; j < total; j++) {
-        const point = segments[i].points[j];
+        const point = segments[i]?.points[j]!;
         index = lastIndex + j * 4;
 
-        if (j < segments[i].points.length - 1) {
-          nextPoint = segments[i].points[j + 1];
+        if (j < segments[i]?.points.length! - 1) {
+          nextPoint = segments[i]?.points[j + 1]!;
         } else {
           nextPoint = point;
         }
@@ -153,7 +153,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
         perpX = nextPoint.y - lastPoint.y;
 
         const perpLength = Math.sqrt(perpX * perpX + perpY * perpY);
-        const num = segments[i].diameter / 2;
+        const num = segments[i]?.diameter! / 2;
 
         perpX /= perpLength;
         perpY /= perpLength;
@@ -161,16 +161,19 @@ export class ComplexRopeGeometry extends MeshGeometry {
         perpX *= num;
         perpY *= num;
 
-        vertices[index] = point.x + perpX;
-        vertices[index + 1] = point.y + perpY;
-        vertices[index + 2] = point.x - perpX;
-        vertices[index + 3] = point.y - perpY;
+        if (vertices != null) {
+          vertices[index] = point.x + perpX;
+          vertices[index + 1] = point.y + perpY;
+          vertices[index + 2] = point.x - perpX;
+          vertices[index + 3] = point.y - perpY;
+        }
+
         lastPoint = point;
       }
       lastIndex = index + 4;
     }
 
-    this.buffers[0].update();
+    this.buffers[0]?.update();
   }
 
   public update(): void {

@@ -103,7 +103,7 @@ function getFilteredExitPicks(formationPicks: PairedPickAndUnit[]): Annotation[]
 
 export const getPicksData = (picksData: { unitPicks: PairedPickAndUnit[]; nonUnitPicks: PickWithId[] }): Annotation[] =>
   [...getReferencePicks(picksData.nonUnitPicks), ...getEntryPicks(picksData.unitPicks), ...getFilteredExitPicks(picksData.unitPicks)].sort(
-    (a, b) => a.md - b.md,
+    (a, b) => a.md! - b.md!,
   );
 
 /**
@@ -142,7 +142,7 @@ function findGaps(from: number, to: number, arr: { from: number; to: number; itm
   let d = from;
   let i = 0;
   while (d < to && i < arr.length) {
-    const itm = arr[i];
+    const itm = arr[i]!;
     if (itm.from > d) {
       gaps.push([d, Math.min(itm.from, to)]);
     }
@@ -171,13 +171,13 @@ function joinPicksAndStratColumn(picks: Pick[], stratColumn: Unit[]): { joined: 
   const nonUnitPicks: PickWithId[] = [];
   const joined: PickAndUnit[] = [];
   picks.forEach((p: Pick) => {
-    const matches = transformed.filter((u: UnitDto) => p.pickIdentifier.search(new RegExp(`(${u.topSurface}|${u.baseSurface})`, 'i')) !== -1);
+    const matches = transformed.filter((u: UnitDto) => p.pickIdentifier?.search(new RegExp(`(${u.topSurface}|${u.baseSurface})`, 'i')) !== -1);
     if (matches.length > 0) {
       matches.forEach((u: UnitDto) =>
         joined.push({
           md: p.md,
           tvd: p.tvd,
-          identifier: p.pickIdentifier,
+          identifier: p.pickIdentifier!,
           confidence: p.confidence,
           mdUnit: p.mdUnit,
           depthReferencePoint: p.depthReferencePoint,
@@ -185,7 +185,7 @@ function joinPicksAndStratColumn(picks: Pick[], stratColumn: Unit[]): { joined: 
         }),
       );
     } else {
-      nonUnitPicks.push({ identifier: p.pickIdentifier, ...p });
+      nonUnitPicks.push({ identifier: p.pickIdentifier!, ...p });
     }
   });
 
@@ -206,7 +206,7 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
     .sort((a: PickAndUnit, b: PickAndUnit) => a.unitName.localeCompare(b.unitName) || a.md - b.md || a.ageTop - b.ageTop);
 
   while (sorted.length > 0) {
-    current = sorted.shift();
+    current = sorted.shift()!;
     const name = current.identifier;
     let pairWithName: string;
 
@@ -222,8 +222,8 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
       continue;
     }
 
-    let top: PickAndUnit;
-    let base: PickAndUnit;
+    let top: PickAndUnit | undefined;
+    let base: PickAndUnit | undefined;
 
     const pairWith = sorted.find((p: PickAndUnit) => p.identifier === pairWithName);
     if (!pairWith) {
@@ -233,7 +233,7 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
         base = joined
           .filter((d: PickAndUnit) => d.level)
           .sort((a: PickAndUnit, b: PickAndUnit) => a.md - b.md)
-          .find((p: PickAndUnit) => p.md > top.md);
+          .find((p: PickAndUnit) => p.md > top!.md);
         if (base) {
           console.warn(`Using ${base.identifier} as base for ${name}`);
         } else {
@@ -245,7 +245,7 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
         top = joined
           .filter((d: PickAndUnit) => d.level)
           .sort((a: PickAndUnit, b: PickAndUnit) => b.md - a.md)
-          .find((p: PickAndUnit) => p.md < base.md);
+          .find((p: PickAndUnit) => p.md < base!.md);
         if (top) {
           console.warn(`Using ${top.identifier} as top for ${name}`);
         } else {
@@ -303,10 +303,10 @@ export function transformFormationData(picks: Pick[], stratColumn: Unit[]): { un
   // given presedence over lower levels for overlapping picks.
   const unitPicks = [];
   while (itemstack.length > 0) {
-    const first = itemstack.pop();
+    const first = itemstack.pop()!;
     const group: PairedPickAndUnit[] = [];
-    while (itemstack.length > 0 && itemstack[itemstack.length - 1].level > first.level) {
-      group.push(itemstack.pop());
+    while (itemstack.length > 0 && itemstack[itemstack.length - 1]?.level! > first.level) {
+      group.push(itemstack.pop()!);
     }
     group.reverse();
     group.push(first);

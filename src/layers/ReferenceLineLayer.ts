@@ -16,7 +16,7 @@ export type ReferenceLine = {
   fontSize?: string;
 };
 
-export interface ReferenceLineLayerOptions extends LayerOptions<ReferenceLine[]> {}
+export type ReferenceLineLayerOptions = LayerOptions<ReferenceLine[]>;
 
 const foldReferenceLine = <T>(
   options: {
@@ -66,36 +66,41 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
   private drawDashed(dashed: ReferenceLine) {
     const { ctx } = this;
     const { canvas } = this;
-    const y = this.yScale(dashed.depth);
-    ctx.save();
-    ctx.strokeStyle = dashed.color;
-    this.setCtxLineStyle(ctx, dashed);
-    this.setCtxLineWidth(ctx, dashed);
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(canvas.width, y);
-    ctx.stroke();
-    ctx.restore();
-    if (dashed.text) {
-      this.drawText(ctx, dashed, ctx.canvas.width, y);
+
+    if (ctx != null && canvas != null) {
+      const y = this.yScale?.(dashed.depth)!;
+      ctx.save();
+      ctx.strokeStyle = dashed.color;
+      this.setCtxLineStyle(ctx, dashed);
+      this.setCtxLineWidth(ctx, dashed);
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+      ctx.restore();
+      if (dashed.text) {
+        this.drawText(ctx, dashed, ctx.canvas.width, y);
+      }
     }
   }
 
   private drawSolid(solid: ReferenceLine) {
     const { ctx } = this;
     const { canvas } = this;
-    const y = this.yScale(solid.depth);
-    ctx.save();
-    ctx.strokeStyle = solid.color;
-    this.setCtxLineStyle(ctx, solid);
-    this.setCtxLineWidth(ctx, solid);
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(canvas.width, y);
-    ctx.stroke();
-    ctx.restore();
-    if (solid.text) {
-      this.drawText(ctx, solid, ctx.canvas.width, y);
+    const y = this.yScale!(solid.depth);
+    if (ctx != null && canvas != null) {
+      ctx.save();
+      ctx.strokeStyle = solid.color;
+      this.setCtxLineStyle(ctx, solid);
+      this.setCtxLineWidth(ctx, solid);
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+      ctx.restore();
+      if (solid.text) {
+        this.drawText(ctx, solid, ctx.canvas.width, y);
+      }
     }
   }
 
@@ -103,25 +108,27 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     const factor = 4;
     const min = 2.5;
     const max = 500;
-    const { ctx } = this;
-    const { canvas } = this;
-    const waveHeight = calcSize(factor, min, max, this.yScale);
-    const wavePeriod = waveHeight * 2;
-    const y = this.yScale(wavy.depth) - waveHeight;
-    const steps = Math.ceil(canvas.width / wavePeriod) + 1;
-    const xOffset = this.xScale(0) % wavePeriod;
-    ctx.save();
-    ctx.strokeStyle = wavy.color;
-    this.setCtxLineStyle(ctx, wavy);
-    this.setCtxLineWidth(ctx, wavy);
-    for (let i = -1; i < steps; i++) {
-      ctx.beginPath();
-      ctx.arc(i * wavePeriod + xOffset + waveHeight, y, waveHeight, 0, Math.PI);
-      ctx.stroke();
-    }
-    ctx.restore();
-    if (wavy.text) {
-      this.drawText(ctx, wavy, ctx.canvas.width, y);
+    const { ctx, canvas } = this;
+
+    if (this.xScale != null && this.yScale != null && canvas != null && ctx != null) {
+      const waveHeight = calcSize(factor, min, max, this.yScale);
+      const wavePeriod = waveHeight * 2;
+      const y = this.yScale(wavy.depth) - waveHeight;
+      const steps = Math.ceil(canvas.width / wavePeriod) + 1;
+      const xOffset = this.xScale(0) % wavePeriod;
+      ctx.save();
+      ctx.strokeStyle = wavy.color;
+      this.setCtxLineStyle(ctx, wavy);
+      this.setCtxLineWidth(ctx, wavy);
+      for (let i = -1; i < steps; i++) {
+        ctx.beginPath();
+        ctx.arc(i * wavePeriod + xOffset + waveHeight, y, waveHeight, 0, Math.PI);
+        ctx.stroke();
+      }
+      ctx.restore();
+      if (wavy.text) {
+        this.drawText(ctx, wavy, ctx.canvas.width, y);
+      }
     }
   }
 
@@ -129,12 +136,13 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     const textColor = refLine.textColor || '#000';
     const fontSize = refLine.fontSize || '10px sans-serif';
     const textOffsetX = 10;
+
     ctx.save();
     ctx.strokeStyle = textColor;
     ctx.font = fontSize;
     ctx.textAlign = 'end';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(refLine.text, x - textOffsetX, y);
+    ctx.fillText(refLine.text ?? '', x - textOffsetX, y);
     ctx.restore();
   }
 

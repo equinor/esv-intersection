@@ -12,7 +12,7 @@ import { HORIZONTAL_AXIS_MARGIN, VERTICAL_AXIS_MARGIN } from '../constants';
  * API for controlling data and layers
  */
 export class Controller {
-  private _referenceSystem: IntersectionReferenceSystem;
+  private _referenceSystem: IntersectionReferenceSystem | undefined;
 
   private layerManager: LayerManager;
   private _overlay: Overlay<Controller>;
@@ -69,7 +69,7 @@ export class Controller {
    * Clears data from all mounted layers
    * @param includeReferenceSystem - (optional) if true also removes reference system, default is true
    */
-  clearAllData(includeReferenceSystem: boolean = true): Controller {
+  clearAllData(includeReferenceSystem = true): Controller {
     this.layerManager.clearAllData(includeReferenceSystem);
     return this;
   }
@@ -106,7 +106,7 @@ export class Controller {
    * Find first layer with given id, returns undefined if none are found
    * @param layerId string id
    */
-  getLayer(layerId: string): Layer<unknown> {
+  getLayer(layerId: string): Layer<unknown> | undefined {
     return this.layerManager.getLayer(layerId);
   }
 
@@ -259,8 +259,6 @@ export class Controller {
     this.layerManager.destroy();
     this._overlay.destroy();
     this._referenceSystem = undefined;
-    this.layerManager = undefined;
-    this._overlay = undefined;
     return this;
   }
 
@@ -278,7 +276,7 @@ export class Controller {
     return this._overlay;
   }
 
-  get referenceSystem(): IntersectionReferenceSystem {
+  get referenceSystem(): IntersectionReferenceSystem | undefined {
     return this._referenceSystem;
   }
 
@@ -286,7 +284,7 @@ export class Controller {
     return this.layerManager.zoomPanHandler;
   }
 
-  get axis(): Axis {
+  get axis(): Axis | undefined {
     return this.layerManager.axis;
   }
 
