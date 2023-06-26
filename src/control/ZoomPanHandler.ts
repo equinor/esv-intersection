@@ -314,7 +314,7 @@ export class ZoomPanHandler {
 
     const t: ZoomTransform = calculateTransform(dx0, dx1, cy);
 
-    if (Number.isFinite(duration) && duration != null && duration > 0) {
+    if (duration != null && Number.isFinite(duration) && duration > 0) {
       zoom.transform(container.transition().duration(duration), t);
     } else {
       zoom.transform(container, t);
