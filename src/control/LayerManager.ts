@@ -203,7 +203,7 @@ export class LayerManager {
   setAxisOffset(x: number, y: number): LayerManager {
     this._axis.offsetX = x;
     this._axis.offsetY = y;
-    const gridLayers = this.layers.filter((l: Layer<unknown>) => l instanceof GridLayer<unknown>);
+    const gridLayers = this.layers.filter((l: Layer<unknown>) => l instanceof GridLayer);
     gridLayers.forEach((l: GridLayer<unknown>) => {
       l.offsetX = x;
       l.offsetY = y;
@@ -213,7 +213,7 @@ export class LayerManager {
 
   setXAxisOffset(x: number): LayerManager {
     this._axis.offsetX = x;
-    const gridLayers = this.layers.filter((l: Layer<unknown>) => l instanceof GridLayer<unknown>);
+    const gridLayers = this.layers.filter((l: Layer<unknown>) => l instanceof GridLayer);
     gridLayers.forEach((l: GridLayer<unknown>) => {
       l.offsetX = x;
     });
@@ -222,7 +222,7 @@ export class LayerManager {
 
   setYAxisOffset(y: number): LayerManager {
     this._axis.offsetY = y;
-    const gridLayers = this.layers.filter((l: Layer<unknown>) => l instanceof GridLayer<unknown>);
+    const gridLayers = this.layers.filter((l: Layer<unknown>) => l instanceof GridLayer);
     gridLayers.forEach((l: GridLayer<unknown>) => {
       l.offsetY = y;
     });
