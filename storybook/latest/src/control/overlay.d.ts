@@ -1,8 +1,8 @@
 import { Selection } from 'd3-selection';
 import { OverlayCallbacks } from './interfaces';
 export declare class Overlay<T> {
-    elm: Selection<Element, unknown, null, undefined>;
-    source: Element;
+    elm: Selection<HTMLDivElement, unknown, null, undefined>;
+    source: HTMLDivElement | undefined;
     elements: {
         [propName: string]: Element;
     };
@@ -11,7 +11,7 @@ export declare class Overlay<T> {
     };
     enabled: boolean;
     constructor(caller: T, container: HTMLElement);
-    create(key: string, callbacks?: OverlayCallbacks<T>): HTMLElement;
+    create(key: string, callbacks?: OverlayCallbacks<T>): HTMLElement | undefined;
     register(key: string, callbacks: OverlayCallbacks<T>): void;
     remove(key: string): void;
     setZIndex(zIndex: number): void;

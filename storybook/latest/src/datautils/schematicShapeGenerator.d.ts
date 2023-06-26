@@ -22,9 +22,9 @@ export interface CasingRenderObject {
         pathPoints: Point[];
     }[];
 }
-export declare const getEndLines: (rightPath: IPoint[], leftPath: IPoint[]) => {
-    top: IPoint[];
-    bottom: IPoint[];
+export declare const getEndLines: (rightPath: [IPoint, IPoint, ...IPoint[]], leftPath: [IPoint, IPoint, ...IPoint[]]) => {
+    top: [IPoint, IPoint];
+    bottom: [IPoint, IPoint];
 };
 export declare const overlaps: (top1: number, bottom1: number, top2: number, bottom2: number) => boolean;
 export declare const strictlyOverlaps: (top1: number, bottom1: number, top2: number, bottom2: number) => boolean;

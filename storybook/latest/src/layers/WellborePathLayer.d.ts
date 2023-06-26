@@ -8,7 +8,7 @@ export interface WellborepathLayerOptions<T extends [number, number][]> extends 
     tension?: number;
 }
 export declare class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T> {
-    rescaleEvent: OnRescaleEvent;
+    rescaleEvent: OnRescaleEvent | undefined;
     constructor(id?: string, options?: WellborepathLayerOptions<T>);
     onUpdate(event: OnUpdateEvent<T>): void;
     onRescale(event: OnRescaleEvent): void;

@@ -7,8 +7,7 @@ export type RescaleFunction = (event: OnRescaleEvent) => void;
  * Handle zoom and pan for intersection layers
  */
 export declare class ZoomPanHandler {
-    zoom: ZoomBehavior<Element, unknown>;
-    elm: HTMLElement;
+    zoom: ZoomBehavior<HTMLElement, unknown>;
     container: Selection<HTMLElement, unknown, null, undefined>;
     onRescale: RescaleFunction;
     options: ZoomAndPanOptions;
@@ -20,7 +19,7 @@ export declare class ZoomPanHandler {
     scaleY: ScaleLinear<number, number>;
     _zFactor: number;
     _enableTranslateExtent: boolean;
-    currentTransform: ZoomTransform;
+    currentTransform: ZoomTransform | undefined;
     /**
      * Constructor
      * @param  elm, -
@@ -139,7 +138,9 @@ export declare class ZoomPanHandler {
      * Adjust zoom due to changes in size of target
      * @param  force - force update even if size did not change
      */
-    adjustToSize(width?: number | boolean, height?: number, force?: boolean): void;
+    adjustToSize(): void;
+    adjustToSize(autoAdjust: boolean): void;
+    adjustToSize(width: number, height: number, force: boolean): void;
     /**
      * Calculate new transform
      * @param  dx0

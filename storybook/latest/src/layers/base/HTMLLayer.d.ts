@@ -2,7 +2,7 @@ import { Selection } from 'd3-selection';
 import { Layer } from './Layer';
 import { OnMountEvent, OnResizeEvent } from '../../interfaces';
 export declare abstract class HTMLLayer<T> extends Layer<T> {
-    elm: Selection<HTMLElement, unknown, null, undefined>;
+    elm: Selection<HTMLDivElement, unknown, null, undefined> | undefined;
     onMount(event: OnMountEvent): void;
     onUnmount(): void;
     onResize(event: OnResizeEvent): void;

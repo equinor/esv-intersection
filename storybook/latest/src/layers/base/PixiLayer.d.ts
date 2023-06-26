@@ -2,11 +2,11 @@ import { IRenderer, Application, Container, DisplayObject, IRendererOptionsAuto,
 import { Layer, LayerOptions } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 export declare class PixiRenderApplication {
-    stage: Container;
-    renderer: IRenderer<HTMLCanvasElement>;
+    stage: Container | undefined;
+    renderer: IRenderer<HTMLCanvasElement> | undefined;
     constructor(pixiRenderOptions?: IRendererOptionsAuto);
     destroy(): void;
-    get view(): HTMLCanvasElement;
+    get view(): HTMLCanvasElement | undefined;
     render(): void;
 }
 export declare abstract class PixiLayer<T> extends Layer<T> {
@@ -28,6 +28,6 @@ export declare abstract class PixiLayer<T> extends Layer<T> {
     onOpacityChanged(_opacity: number): void;
     onOrderChanged(_order: number): void;
     onInteractivityChanged(_interactive: boolean): void;
-    renderType(): RENDERER_TYPE;
+    renderType(): RENDERER_TYPE | undefined;
 }
 //# sourceMappingURL=PixiLayer.d.ts.map

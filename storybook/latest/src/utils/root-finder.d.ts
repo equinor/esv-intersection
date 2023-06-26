@@ -9,7 +9,7 @@ export declare class RootFinder {
      * @param {Number} minLimit Min limit of result
      * @param {Number} maxLimit Max limit of result
      */
-    static newton(func: fx, precision?: number, maxIterations?: number, start?: number, minLimit?: number, maxLimit?: number): number;
+    static newton(func: fx, precision?: number, maxIterations?: number, start?: number, minLimit?: number, maxLimit?: number): number | undefined;
     /**
      * Find root using bisect method
      * @param {Number} func f(x)

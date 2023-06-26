@@ -61,7 +61,7 @@ export declare class Controller {
      * Find first layer with given id, returns undefined if none are found
      * @param layerId string id
      */
-    getLayer(layerId: string): Layer<unknown>;
+    getLayer(layerId: string): Layer<unknown> | undefined;
     /**
      * Sets visibility to true and rescales the layer
      * @param layerId string id
@@ -147,9 +147,9 @@ export declare class Controller {
     private getHighestZIndex;
     private setOverlayZIndex;
     get overlay(): Overlay<Controller>;
-    get referenceSystem(): IntersectionReferenceSystem;
+    get referenceSystem(): IntersectionReferenceSystem | undefined;
     get zoomPanHandler(): ZoomPanHandler;
-    get axis(): Axis;
+    get axis(): Axis | undefined;
     get currentStateAsEvent(): OnRescaleEvent;
 }
 //# sourceMappingURL=MainController.d.ts.map

@@ -47,7 +47,7 @@ export declare class LayerManager {
      * Remove and unmount all layers from manager
      */
     removeAllLayers(): LayerManager;
-    getLayer(layerId: string): Layer<unknown>;
+    getLayer(layerId: string): Layer<unknown> | undefined;
     initLayer(layer: Layer<unknown>, params?: LayerOptions<unknown>): LayerManager;
     showLayer(layerId: string): LayerManager;
     hideLayer(layerId: string): LayerManager;
@@ -70,7 +70,7 @@ export declare class LayerManager {
     setMinZoomLevel(zoomlevel: number): LayerManager;
     destroy(): LayerManager;
     get zoomPanHandler(): ZoomPanHandler;
-    get axis(): Axis;
+    get axis(): Axis | undefined;
     private rescale;
     private createAxis;
 }
