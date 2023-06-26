@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.10
+
+### Patch Changes
+
+- 53386e9: chore(typescript): Enable strict mode for Typescript, but escape in the most annoying places in order to delay the need to change implementation details.
+- ef0590b: chore: enable Typescript's strict mode & fix 1500 errors
+
 ## 3.0.7
 
 ### Patch Changes
