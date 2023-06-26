@@ -12,7 +12,7 @@ export interface OnImageLayerUpdateEvent<T> extends OnUpdateEvent<T> {
 }
 export type OnImageLayerRescaleEvent<T> = OnImageLayerUpdateEvent<T> & OnRescaleEvent;
 export declare class ImageLayer<T> extends CanvasLayer<T> {
-    img: HTMLImageElement;
+    img: HTMLImageElement | undefined;
     onMount(event: OnMountEvent): void;
     onUpdate(event: OnImageLayerUpdateEvent<T>): void;
     onRescale(event: OnImageLayerRescaleEvent<T>): void;

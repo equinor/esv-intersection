@@ -17,16 +17,12 @@ export declare class IntersectionReferenceSystem {
     options: ReferenceSystemOptions;
     path: number[][];
     projectedPath: number[][];
-    projectedTrajectory: number[][];
     private _offset;
     displacement: number;
-    depthReference: number;
-    wellboreId: number;
-    trajectoryOffset: number;
     interpolators: Interpolators;
     startVector: number[];
     endVector: number[];
-    _curtainPathCache: MDPoint[];
+    _curtainPathCache: MDPoint[] | undefined;
     /**
      * Creates a common reference system that layers and other components can use
      * @param path (required) array of 3d coordinates: [x, y, z]
@@ -57,7 +53,7 @@ export declare class IntersectionReferenceSystem {
     /**
      * Map a displacement back to length along the curve
      */
-    unproject(displacement: number): number;
+    unproject(displacement: number): number | undefined;
     /**
      * Get the normalized displacement [0 - 1] of a specific length along the curve
      */

@@ -19,7 +19,7 @@ export declare class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLa
     defaultMaxFontSize: number;
     defaultTextColor: string;
     defaultFont: string;
-    rescaleEvent: OnRescaleEvent;
+    rescaleEvent: OnRescaleEvent | undefined;
     isLabelsOnLeftSide: boolean;
     maxFontSizeInWorldCoordinates: number;
     isXFlipped: boolean;
@@ -37,10 +37,10 @@ export declare class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLa
     drawAreaLabel: (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea | null, surfaces: SurfaceArea[], i: number) => void;
     drawLineLabel: (s: SurfaceLine) => void;
     colorToCSSColor(color: number | string): string;
-    calcPos(data: number[][], offset: number, count: number, step: number, topLimit?: number, bottomLimit?: number, alternativeSurfaceData?: number[][], surfaces?: SurfaceArea[] | null, currentSurfaceIndex?: number): Vector2;
-    getAlternativeYValueIfAvailable(x: number, topLimit: number, bottomLimit: number, alternativeSurfaceData: number[][], surfaces: SurfaceArea[] | null, currentSurfaceIndex: number): number;
+    calcPos(data: number[][], offset: number, count: number, step: number, topLimit?: number, bottomLimit?: number, alternativeSurfaceData?: number[][], surfaces?: SurfaceArea[] | null, currentSurfaceIndex?: number): Vector2 | null;
+    getAlternativeYValueIfAvailable(x: number, topLimit?: number, bottomLimit?: number, alternativeSurfaceData?: number[][], surfaces?: SurfaceArea[] | null, currentSurfaceIndex?: number): number | null;
     calcLineDir(data: number[][], offset: number, count: number, step: number, zFactor: number, initalVector?: Vector2, topLimit?: number, bottomLimit?: number): Vector2;
-    calcAreaDir(top: number[][], bottom: number[][], offset: number, count: number, step: number, initalVector?: Vector2, topLimit?: number, bottomLimit?: number, minReductionAngle?: number, maxReductionAngle?: number, angleReductionExponent?: number, alternativeSurfaceBottomData?: number[][], surfaces?: SurfaceArea[] | null, currentSurfaceIndex?: number): number;
+    calcAreaDir(top: number[][], bottom: number[][], offset: number, count: number, step: number, initalVector: Vector2 | undefined, topLimit: number, bottomLimit: number, minReductionAngle: number | undefined, maxReductionAngle: number | undefined, angleReductionExponent: number | undefined, alternativeSurfaceBottomData: number[][], surfaces: SurfaceArea[] | null | undefined, currentSurfaceIndex: number): number;
     updateXFlipped(): void;
     getMarginsInWorldCoordinates(): number;
     getSurfacesAreaEdges(): number[];

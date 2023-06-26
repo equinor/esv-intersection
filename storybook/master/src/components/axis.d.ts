@@ -1,4 +1,3 @@
-import { Selection } from 'd3-selection';
 import { ScaleLinear } from 'd3-scale';
 import { OnResizeEvent, OnRescaleEvent } from '../interfaces';
 export type Options = {
@@ -19,7 +18,7 @@ export declare class Axis {
     private _flipX;
     private _flipY;
     private visible;
-    constructor(mainGroup: Selection<SVGElement, unknown, null, undefined>, showLabels: boolean, labelXDesc: string, labelYDesc: string, unitOfMeasure: string, options?: Options);
+    constructor(mainGroup: Axis['mainGroup'], showLabels: boolean | undefined, labelXDesc: string, labelYDesc: string, unitOfMeasure: string, options?: Options);
     private renderLabelx;
     private renderLabely;
     private renderGy;

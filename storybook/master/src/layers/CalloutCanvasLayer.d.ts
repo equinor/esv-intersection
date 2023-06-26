@@ -26,8 +26,8 @@ export interface CalloutOptions<T extends Annotation[]> extends LayerOptions<T> 
     offsetFactor?: number;
 }
 export declare class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
-    rescaleEvent: OnRescaleEvent;
-    xRatio: number;
+    rescaleEvent: OnRescaleEvent | undefined;
+    xRatio: number | undefined;
     callouts: Callout[];
     groupFilter: string[];
     minFontSize: number;

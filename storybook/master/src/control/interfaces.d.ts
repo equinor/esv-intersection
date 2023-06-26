@@ -15,8 +15,8 @@ export interface ControllerOptions {
     path?: number[][];
 }
 interface OverlayEvent<T> {
-    target?: Element;
-    source: Element;
+    target: Element | undefined;
+    source: Element | undefined;
     caller: T;
 }
 export interface OverlayResizeEvent<T> extends OverlayEvent<T> {
@@ -27,8 +27,7 @@ export interface OverlayMouseMoveEvent<T> extends OverlayEvent<T> {
     x: number;
     y: number;
 }
-export interface OverlayMouseExitEvent<T> extends OverlayEvent<T> {
-}
+export type OverlayMouseExitEvent<T> = OverlayEvent<T>;
 export interface OverlayCallbacks<T> {
     onMouseMove?(event: OverlayMouseMoveEvent<T>): void;
     onMouseExit?(event: OverlayMouseExitEvent<T>): void;

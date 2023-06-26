@@ -7,7 +7,7 @@ type SurfacePaths = {
     path: Path2D;
 };
 export declare class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
-    rescaleEvent: OnRescaleEvent;
+    rescaleEvent: OnRescaleEvent | undefined;
     surfaceAreasPaths: SurfacePaths[];
     surfaceLinesPaths: SurfacePaths[];
     maxDepth: number;

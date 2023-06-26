@@ -4,7 +4,7 @@ import { SurveySample } from './interfaces';
  * Code originally developed for REP
  * @param {[]} poslog Position log from SMDA
  */
-export declare function generateProjectedWellborePath(poslog: SurveySample[]): number[][];
+export declare function generateProjectedWellborePath(poslog: SurveySample[]): [number, number][];
 /**
  * Generate Trajectory
  * Code originally developed for REP

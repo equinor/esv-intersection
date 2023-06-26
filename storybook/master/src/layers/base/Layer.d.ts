@@ -17,15 +17,15 @@ export declare abstract class Layer<T> {
     private _order;
     protected _options: LayerOptions<T>;
     private loading;
-    private _element?;
+    private _element;
     private _opacity;
-    private _referenceSystem?;
-    private _data?;
+    private _referenceSystem;
+    private _data;
     private _visible;
     private _interactive;
     constructor(id?: string, options?: LayerOptions<T>);
     get id(): string;
-    get element(): HTMLElement;
+    get element(): HTMLElement | undefined;
     get options(): LayerOptions<T>;
     set options(options: LayerOptions<T>);
     set isLoading(loading: boolean);
@@ -36,13 +36,13 @@ export declare abstract class Layer<T> {
     get order(): number;
     set interactive(shouldBeInteractive: boolean);
     get interactive(): boolean;
-    get referenceSystem(): IntersectionReferenceSystem;
-    set referenceSystem(referenceSystem: IntersectionReferenceSystem);
-    get data(): T;
-    set data(data: T);
+    get referenceSystem(): IntersectionReferenceSystem | undefined;
+    set referenceSystem(referenceSystem: IntersectionReferenceSystem | undefined);
+    get data(): T | undefined;
+    set data(data: T | undefined);
     get isVisible(): boolean;
-    getData(): T;
-    setData(data: T): void;
+    getData(): T | undefined;
+    setData(data: T | undefined): void;
     /**
      * Clears data and (optionally) the reference system
      * @param includeReferenceSystem - (optional) if true also removes reference system, default is true

@@ -11,8 +11,7 @@ export type ReferenceLine = {
     textColor?: string;
     fontSize?: string;
 };
-export interface ReferenceLineLayerOptions extends LayerOptions<ReferenceLine[]> {
-}
+export type ReferenceLineLayerOptions = LayerOptions<ReferenceLine[]>;
 export declare class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     yScale: ScaleLinear<number, number, never> | null;
     xScale: ScaleLinear<number, number, never> | null;
