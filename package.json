@@ -53,7 +53,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
     "@storybook/addon-storysource": "^7.0.23",
-    "@storybook/html-vite": "^7.0.23",
+    "@storybook/html-vite": "^7.0.24",
     "@types/d3": "^7.4.0",
     "@types/mock-raf": "^1.0.3",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
