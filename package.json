@@ -78,7 +78,7 @@
     "vite": "^4.3.9",
     "vite-plugin-dts": "^2.3.0",
     "vitest": "^0.32.2",
-    "vitest-canvas-mock": "^0.3.1"
+    "vitest-canvas-mock": "^0.3.2"
   },
   "peerDependencies": {
     "pixi.js": "^7.1.0"
