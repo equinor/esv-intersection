@@ -26,14 +26,15 @@ export class Overlay<T> {
         const target = this.elements[key] ?? undefined;
         const ops = this.listeners[key];
         if (ops && ops.onResize) {
-          requestAnimationFrame(() =>
-            ops.onResize?.({
-              target,
-              source: this.source,
-              caller,
-              width,
-              height,
-            }),
+          requestAnimationFrame(
+            () =>
+              ops.onResize?.({
+                target,
+                source: this.source,
+                caller,
+                width,
+                height,
+              }),
           );
         }
       });
@@ -50,14 +51,15 @@ export class Overlay<T> {
         const ops = this.listeners[key];
 
         if (ops && ops.onMouseMove) {
-          requestAnimationFrame(() =>
-            ops.onMouseMove?.({
-              x: mx,
-              y: my,
-              target,
-              source: this.source,
-              caller,
-            }),
+          requestAnimationFrame(
+            () =>
+              ops.onMouseMove?.({
+                x: mx,
+                y: my,
+                target,
+                source: this.source,
+                caller,
+              }),
           );
         }
       });
@@ -71,12 +73,13 @@ export class Overlay<T> {
         const target = this.elements[key] || undefined;
         const ops = this.listeners[key];
         if (ops && ops.onMouseExit) {
-          requestAnimationFrame(() =>
-            ops.onMouseExit?.({
-              target,
-              source: this.source,
-              caller,
-            }),
+          requestAnimationFrame(
+            () =>
+              ops.onMouseExit?.({
+                target,
+                source: this.source,
+                caller,
+              }),
           );
         }
       });

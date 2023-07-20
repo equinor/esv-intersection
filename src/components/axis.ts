@@ -94,7 +94,7 @@ export class Axis {
 
   private renderGy(): Selection<SVGGElement, unknown, null, undefined> {
     const { _scaleX, _scaleY } = this;
-    const yAxis = axisRight(_scaleY) as (selection: Selection<SVGGElement, unknown, null, undefined>, ...args: any[]) => void;
+    const yAxis = axisRight(_scaleY) as (selection: Selection<SVGGElement, unknown, null, undefined>, ...args: unknown[]) => void;
     const [, width] = _scaleX.range();
     const gy = this.createOrGet('y-axis');
     gy.call(yAxis);
@@ -105,7 +105,7 @@ export class Axis {
 
   private renderGx(): Selection<SVGGElement, unknown, null, undefined> {
     const { _scaleX, _scaleY } = this;
-    const xAxis = axisBottom(_scaleX) as (selection: Selection<SVGGElement, unknown, null, undefined>, ...args: any[]) => void;
+    const xAxis = axisBottom(_scaleX) as (selection: Selection<SVGGElement, unknown, null, undefined>, ...args: unknown[]) => void;
     const [, height] = _scaleY.range();
 
     const gx = this.createOrGet('x-axis');
