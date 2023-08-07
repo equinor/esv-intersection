@@ -52,7 +52,7 @@
   "homepage": "https://github.com/equinor/esv-intersection#readme",
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
-    "@storybook/addon-storysource": "^7.1.0",
+    "@storybook/addon-storysource": "^7.2.1",
     "@storybook/html-vite": "^7.1.0",
     "@types/d3": "^7.4.0",
     "@types/mock-raf": "^1.0.3",
