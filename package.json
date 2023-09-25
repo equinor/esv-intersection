@@ -54,7 +54,7 @@
     "@changesets/cli": "^2.26.2",
     "@storybook/addon-storysource": "^7.1.0",
     "@storybook/html-vite": "^7.1.0",
-    "@types/d3": "^7.4.0",
+    "@types/d3": "^7.4.1",
     "@types/mock-raf": "^1.0.3",
     "@typescript-eslint/eslint-plugin": "^6.1.0",
     "@typescript-eslint/parser": "^6.1.0",
