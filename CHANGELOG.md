@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.11
+
+### Patch Changes
+
+- 3f59bf5: chore: upgrade dependencies
+- ba3661c: chore(dev-deps): upgrade dev dependencies to latest versions
+- 1cca891: chore(deps): bump tough-cookie from 4.1.2 to 4.1.3
+
 ## 3.0.10
 
 ### Patch Changes
