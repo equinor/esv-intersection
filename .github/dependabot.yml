@@ -6,3 +6,6 @@ updates:
     versioning-strategy: increase
     schedule:
       interval: 'weekly'
+    groups:
+      dev-dependencies:
+        dependency-type: 'development'
