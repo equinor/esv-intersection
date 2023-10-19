@@ -19,7 +19,7 @@ export default mergeConfig(
     },
     plugins: [
       dts({
-        tsConfigFilePath: './test/tsconfig.json',
+        tsconfigPath: './test/tsconfig.json',
       }),
     ], // Generates typescript d.ts files with tsc
   }),
