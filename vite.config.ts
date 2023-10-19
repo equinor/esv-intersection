@@ -39,7 +39,7 @@ export default defineConfig({
   },
   plugins: [
     dts({
-      tsConfigFilePath: './src/tsconfig.json',
+      tsconfigPath: './src/tsconfig.json',
     }),
   ], // Generates typescript d.ts files with tsc
 });
