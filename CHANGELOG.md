@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.12
+
+### Patch Changes
+
+- 7c26ebb: fix: tsconfig file path for vite
+
 ## 3.0.11
 
 ### Patch Changes
