@@ -24,6 +24,10 @@ export interface CalloutOptions<T extends Annotation[]> extends LayerOptions<T> 
     offsetMin?: number;
     offsetMax?: number;
     offsetFactor?: number;
+    fontColor?: string;
+    backgroundColor?: string;
+    backgroundPadding?: number;
+    backgroundBorderRadius?: number;
 }
 export declare class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     rescaleEvent: OnRescaleEvent | undefined;
@@ -36,13 +40,20 @@ export declare class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLa
     offsetMin: number;
     offsetMax: number;
     offsetFactor: number;
+    fontColor: string | undefined;
+    backgroundActive: boolean;
+    backgroundColor: string;
+    backgroundPadding: number;
+    backgroundBorderRadius: number;
     constructor(id?: string, options?: CalloutOptions<T>);
     setGroupFilter(filter: string[]): void;
     onUpdate(event: OnUpdateEvent<T>): void;
     onRescale(event: OnRescaleEvent): void;
     render(isPanning?: boolean): void;
+    private renderBackground;
     private renderAnnotation;
     private renderText;
+    private measureTextWidth;
     private renderPoint;
     private renderCallout;
     private renderLine;
