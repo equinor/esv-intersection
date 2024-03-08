@@ -13,6 +13,15 @@ const DEFAULT_OFFSET_MIN = 20;
 const DEFAULT_OFFSET_MAX = 120;
 const DEFAULT_OFFSET_FACTOR = 19;
 
+const DEFAULT_BACKGROUND_COLOR = 'rgba(0, 0, 0, 0.5)';
+const DEFAULT_BACKGROUND_PADDING = 5;
+const DEFAULT_BACKGROUND_BORDER_RADIUS = 5;
+
+/** Input returned if present, defaultValue used as fallback. */
+function getValueOrDefault<T>(input: T | null | undefined, defaultValue: T): T {
+  return input === null || input === undefined ? defaultValue : input;
+}
+
 const Location = {
   topleft: 'topleft',
   topright: 'topright',
@@ -44,6 +53,10 @@ export interface CalloutOptions<T extends Annotation[]> extends LayerOptions<T> 
   offsetMin?: number;
   offsetMax?: number;
   offsetFactor?: number;
+  fontColor?: string;
+  backgroundColor?: string;
+  backgroundPadding?: number;
+  backgroundBorderRadius?: number;
 }
 
 export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
@@ -58,6 +71,13 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
   offsetMax: number;
   offsetFactor: number;
 
+  fontColor: string | undefined;
+
+  backgroundActive: boolean;
+  backgroundColor: string;
+  backgroundPadding: number;
+  backgroundBorderRadius: number;
+
   constructor(id?: string, options?: CalloutOptions<T>) {
     super(id, options);
     this.minFontSize = options?.minFontSize || DEFAULT_MIN_FONT_SIZE;
@@ -66,6 +86,20 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     this.offsetMin = options?.offsetMin || DEFAULT_OFFSET_MIN;
     this.offsetMax = options?.offsetMax || DEFAULT_OFFSET_MAX;
     this.offsetFactor = options?.offsetFactor || DEFAULT_OFFSET_FACTOR;
+
+    this.fontColor = options?.fontColor;
+
+    // Set background as active if 'backgroundColor' is defined
+    if (options?.backgroundColor) {
+      this.backgroundActive = true;
+      this.backgroundColor = options.backgroundColor;
+    } else {
+      this.backgroundActive = false;
+      this.backgroundColor = DEFAULT_BACKGROUND_COLOR;
+    }
+
+    this.backgroundPadding = options?.backgroundPadding || DEFAULT_BACKGROUND_PADDING;
+    this.backgroundBorderRadius = getValueOrDefault(options?.backgroundBorderRadius, DEFAULT_BACKGROUND_BORDER_RADIUS);
   }
 
   setGroupFilter(filter: string[]): void {
@@ -131,6 +165,50 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     });
   }
 
+  private renderBackground(title: string, label: string, x: number, y: number, fontSize: number): void {
+    const { ctx } = this;
+
+    if (ctx == null) {
+      return;
+    }
+
+    const padding = this.backgroundPadding;
+    const borderRadius = this.backgroundBorderRadius;
+
+    const titleWidth = this.measureTextWidth(title, fontSize, 'arial', 'bold');
+    const labelWidth = this.measureTextWidth(label, fontSize);
+
+    // Determine width and height of annotation
+    const width = Math.max(titleWidth, labelWidth) + padding * 2;
+    const height = (fontSize + padding) * 2;
+
+    const xMin = x - padding;
+    const yMin = y - 2 * fontSize - padding;
+
+    ctx.fillStyle = this.backgroundColor;
+
+    if (borderRadius > 0) {
+      const xMax = xMin + width;
+      const yMax = yMin + height;
+
+      // Draw rounded rect
+      ctx.beginPath();
+      ctx.moveTo(xMin + borderRadius, yMin); // Top left
+      ctx.lineTo(xMax - borderRadius, yMin);
+      ctx.quadraticCurveTo(xMax, yMin, xMax, yMin + borderRadius); // Top right corner
+      ctx.lineTo(xMax, yMax - borderRadius);
+      ctx.quadraticCurveTo(xMax, yMax, xMax - borderRadius, yMax); // Bottom right corner
+      ctx.lineTo(xMin + borderRadius, yMax);
+      ctx.quadraticCurveTo(xMin, yMax, xMin, yMax - borderRadius); // Bottom left corner
+      ctx.lineTo(xMin, yMin + borderRadius);
+      ctx.quadraticCurveTo(xMin, yMin, xMin + borderRadius, yMin); // Top left corner
+      ctx.fill();
+    } else {
+      // Draw rect if no border radius
+      ctx.fillRect(xMin, yMin, width, height);
+    }
+  }
+
   private renderAnnotation = (title: string, label: string, x: number, y: number, fontSize: number, color: string): void => {
     this.renderText(title, x, y - fontSize, fontSize, color, 'arial', 'bold');
     this.renderText(label, x, y, fontSize, color);
@@ -140,15 +218,27 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     const { ctx } = this;
     if (ctx != null) {
       ctx.font = `${fontStyle} ${fontSize}px ${font}`;
-      ctx.fillStyle = color;
+      ctx.fillStyle = this.fontColor || color;
       ctx.fillText(title, x, y);
     }
   }
 
-  private renderPoint(x: number, y: number, radius = 3): void {
+  private measureTextWidth(title: string, fontSize: number, font = 'arial', fontStyle = 'normal'): number {
+    const { ctx } = this;
+
+    if (ctx == null) {
+      return 0;
+    }
+
+    ctx.font = `${fontStyle} ${fontSize}px ${font}`;
+    return ctx.measureText(title).width;
+  }
+
+  private renderPoint(x: number, y: number, color: string, radius = 3): void {
     const { ctx } = this;
 
     if (ctx != null) {
+      ctx.fillStyle = color;
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -162,8 +252,13 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     const { height, width, x: dotX, y: dotY } = boundingBox;
 
     const placeLeft = location === Location.topright || location === Location.bottomright;
+
+    if (this.backgroundActive) {
+      this.renderBackground(title, label, x, y, height);
+    }
+
     this.renderAnnotation(title, label, x, y, height, color);
-    this.renderPoint(dotX, dotY);
+    this.renderPoint(dotX, dotY, color);
     this.renderLine(x, y, width, dotX, dotY, color, placeLeft);
   }
 
