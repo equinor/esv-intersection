@@ -1,4 +1,5 @@
 [![npm version](https://badge.fury.io/js/%40equinor%2Fesv-intersection.svg)](https://badge.fury.io/js/%40equinor%2Fesv-intersection)
+[![SCM Compliance](https://scm-compliance-api.radix.equinor.com/repos/equinor/esv-intersection/badge)](https://scm-compliance-api.radix.equinor.com/repos/equinor/esv-intersection/badge)
 
 # ESV Intersection component
 
