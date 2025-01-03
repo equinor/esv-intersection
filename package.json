@@ -15,6 +15,7 @@
   ],
   "types": "dist/index.d.ts",
   "scripts": {
+    "start": "vite build --watch",
     "prebuild": "rimraf dist",
     "build": "vite build",
     "lint:eslint": "eslint --ext .js,.jsx,.ts,.tsx src test",
