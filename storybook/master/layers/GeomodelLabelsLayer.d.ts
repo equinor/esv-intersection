@@ -1,4 +1,4 @@
-import Vector2 from '@equinor/videx-vector2';
+import { default as Vector2 } from '@equinor/videx-vector2';
 import { CanvasLayer } from './base/CanvasLayer';
 import { OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
 import { SurfaceArea, SurfaceLine, SurfaceData } from '../datautils';

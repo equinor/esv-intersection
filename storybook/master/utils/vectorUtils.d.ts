@@ -1,5 +1,5 @@
 import { IPoint, Point } from 'pixi.js';
-import Vector2 from '@equinor/videx-vector2';
+import { default as Vector2 } from '@equinor/videx-vector2';
 export declare const pointToVector: (p: IPoint) => Vector2;
 export declare const pointToArray: (p: IPoint) => [number, number];
 export declare const vectorToPoint: (v: Vector2) => Point;

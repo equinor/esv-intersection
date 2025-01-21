@@ -1,5 +1,4 @@
-import { MeshGeometry } from 'pixi.js';
-import type { IPoint } from 'pixi.js';
+import { MeshGeometry, IPoint } from 'pixi.js';
 /**
  * UniformTextureStretchRopeGeometry allows you to draw a geometry across several points and then manipulate these points.
  */
