@@ -70,13 +70,13 @@
     "pixi.js": "^7.3.1",
     "prettier": "^3.0.3",
     "rimraf": "^5.0.5",
-    "storybook": "^8.4.0",
+    "storybook": "^8.6.9",
     "storybook-dark-mode": "^4.0.2",
     "typedoc": "^0.25.2",
     "typescript": "^5.2.2",
-    "vite": "^4.5.5",
+    "vite": "^6.2.3",
     "vite-plugin-dts": "^4.0.0",
-    "vitest": "^0.34.6",
+    "vitest": "^3.0.9",
     "vitest-canvas-mock": "^0.3.3"
   },
   "peerDependencies": {
