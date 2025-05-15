@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, afterEach, vi, SpyInstance } from 'vitest';
+import { describe, expect, it, beforeEach, afterEach, vi, MockInstance } from 'vitest';
 import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
 import createMockRaf from 'mock-raf';
 import { CalloutCanvasLayer, IntersectionReferenceSystem } from '../src/index';
@@ -15,7 +15,7 @@ describe('CalloutCanvasLayer', () => {
 
   const mockRaf = createMockRaf();
 
-  let mockRequestAnimationFrame: SpyInstance<[callback: FrameRequestCallback], number>;
+  let mockRequestAnimationFrame: MockInstance<(callback: FrameRequestCallback) => number>;
 
   beforeEach(() => {
     elm = document.createElement('div');
