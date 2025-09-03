@@ -1,11 +1,27 @@
 version: 2
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/'
-    open-pull-requests-limit: 50
-    versioning-strategy: increase
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: 'weekly'
+      interval: weekly
+      day: monday
+      time: "02:00"
+      timezone: Europe/Oslo
+    commit-message:
+      prefix: "[github-actions] "
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:00"
+      timezone: Europe/Oslo
+    open-pull-requests-limit: 5
     groups:
-      dev-dependencies:
-        dependency-type: 'development'
+      all-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "[npm] "
