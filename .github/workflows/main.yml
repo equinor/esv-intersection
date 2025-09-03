@@ -8,10 +8,15 @@ on:
     branches:
       - master
 
+permissions: {}
+
 jobs:
   build_and_test:
     name: Build & Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -35,6 +40,9 @@ jobs:
     uses: ./.github/workflows/codeql-analysis.yml
 
   maybe_publish_package:
+    permissions:
+      contents: read
+      id-token: write
     needs: build_and_test
     if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/release.yml
