@@ -38,6 +38,10 @@ jobs:
   code_ql:
     needs: build_and_test
     uses: ./.github/workflows/codeql-analysis.yml
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
   maybe_publish_package:
     permissions:
