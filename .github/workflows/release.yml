@@ -6,10 +6,15 @@ on:
         required: true
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+permissions: {}
+
 jobs:
   release_or_publish_package:
     name: Release & Publish to NPM Registry
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     outputs:
       was_published: ${{ steps.changesets.outputs.published  }}
     steps:
