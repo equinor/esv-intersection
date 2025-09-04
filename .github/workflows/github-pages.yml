@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
       - run: echo "Running on branch ${{ github.ref_name }}..."
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
