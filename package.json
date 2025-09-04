@@ -28,7 +28,7 @@
     "postdocs": "copyfiles images/* docs_out && copyfiles .nojekyll docs_out",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky install",
+    "prepare": "husky",
     "version": "changeset version && npm install --package-lock-only",
     "release:npm": "npm run build && changeset publish",
     "release:github": "npm run build && changeset publish --no-git-tag"
@@ -64,7 +64,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-storybook": "^0.9.0",
-    "husky": "^8.0.3",
+    "husky": "^9.1.7",
     "lint-staged": "^15.2.4",
     "mock-raf": "^1.0.1",
     "pixi.js": "^7.3.1",
