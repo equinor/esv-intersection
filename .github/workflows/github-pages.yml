@@ -15,7 +15,7 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           submodules: true
           persist-credentials: false
