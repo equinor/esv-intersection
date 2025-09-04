@@ -13,7 +13,7 @@ jobs:
     name: Release & Publish to NPM Registry
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     outputs:
       was_published: ${{ steps.changesets.outputs.published  }}
@@ -61,7 +61,7 @@ jobs:
     if: needs.release_or_publish_package.outputs.was_published == 'true'
     uses: ./.github/workflows/github-pages.yml
     permissions:
-      contents: read
+      contents: write
       id-token: write
     with:
       version_to_deploy: 'latest'
