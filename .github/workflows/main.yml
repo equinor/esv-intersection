@@ -54,6 +54,9 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   deploy_docs:
+    permissions:
+      contents: read
+      id-token: write
     needs: build_and_test
     if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/github-pages.yml
