@@ -37,7 +37,7 @@ export interface DashLineOptions {
 }
 
 const dashLineOptionsDefault: Partial<DashLineOptions> = {
-  dash: [10, 5], // eslint-disable-line no-magic-numbers
+  dash: [10, 5],
   width: 1,
   color: 0xffffff,
   alpha: 1,

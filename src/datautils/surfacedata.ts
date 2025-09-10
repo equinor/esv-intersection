@@ -242,7 +242,6 @@ function getColorFromUnit(unit: StratUnit): number {
 
 const unassignedColorScale = scaleOrdinal<number, string>()
   .domain([0, 100])
-  // eslint-disable-next-line no-magic-numbers
   .range(quantize(interpolateRgb('#e6f1cf', '#85906d'), 10));
 
 /**

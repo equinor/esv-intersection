@@ -387,7 +387,7 @@ export const createScreenTexture = ({ scalingFactor }: ScreenOptions): Texture =
   canvasCtx.fillStyle = 'white';
   canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const baseLineWidth = size / 10; // eslint-disable-line no-magic-numbers
+  const baseLineWidth = size / 10;
   canvasCtx.strokeStyle = '#AAAAAA';
   canvasCtx.lineWidth = baseLineWidth;
   canvasCtx.beginPath();
@@ -446,7 +446,7 @@ export const createCementTexture = ({ firstColor, secondColor, scalingFactor }: 
   canvasCtx.fillStyle = secondColor;
   canvasCtx.beginPath();
 
-  const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+  const distanceBetweenLines = size / 12;
   for (let i = -canvas.width; i < canvas.width; i++) {
     canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
     canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height);
@@ -474,8 +474,8 @@ export const createCementPlugTexture = ({ firstColor, secondColor, scalingFactor
   canvasCtx.strokeStyle = secondColor;
   canvasCtx.beginPath();
 
-  canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
-  const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+  canvasCtx.setLineDash([20, 10]);
+  const distanceBetweenLines = size / 12;
   for (let i = -canvas.width; i < canvas.width; i++) {
     canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
     canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);
@@ -505,8 +505,8 @@ export const createCementSqueezeTexture = ({ firstColor, secondColor, scalingFac
   canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
   canvasCtx.beginPath();
 
-  canvasCtx.setLineDash([20, 10]); // eslint-disable-line no-magic-numbers
-  const distanceBetweenLines = size / 12; // eslint-disable-line no-magic-numbers
+  canvasCtx.setLineDash([20, 10]);
+  const distanceBetweenLines = size / 12;
   for (let i = -canvas.width; i < canvas.width; i++) {
     canvasCtx.moveTo(-canvas.width + distanceBetweenLines * i, -canvas.height);
     canvasCtx.lineTo(canvas.width + distanceBetweenLines * i, canvas.height * 2);

@@ -564,7 +564,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       },
       { rightPath: [], leftPath: [] },
     );
-    // eslint-disable-next-line no-magic-numbers
     this.drawOutline(leftPath, rightPath, convertColor('black'), 0.25, 'TopAndBottom');
   }
 

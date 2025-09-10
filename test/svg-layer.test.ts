@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { WellborepathLayer } from '../src/index';
 
