@@ -130,7 +130,8 @@ export class DashLine {
   }
 
   lineTo(x: number, y: number, closePath?: boolean): this {
-    if (typeof this.lineLength === undefined) {
+    const type = typeof this.lineLength;
+    if (type === undefined) {
       this.moveTo(0, 0);
     }
     const length = DashLine.distance(this.cursor.x, this.cursor.y, x, y);
