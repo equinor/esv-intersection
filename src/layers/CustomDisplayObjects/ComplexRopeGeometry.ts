@@ -57,7 +57,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
       // @ts-expect-error
       uvBuffer.data = new Float32Array(pointCount * 4);
       // @ts-expect-error
-      indexBuffer.data = new Uint16Array((pointCount - 1) * 6); // eslint-disable-line no-magic-numbers
+      indexBuffer.data = new Uint16Array((pointCount - 1) * 6);
     }
 
     const uvs = uvBuffer.data;

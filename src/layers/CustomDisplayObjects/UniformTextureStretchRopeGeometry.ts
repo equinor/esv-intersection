@@ -52,7 +52,7 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
       // @ts-expect-error
       uvBuffer.data = new Float32Array(points.length * 4);
       // @ts-expect-error
-      indexBuffer.data = new Uint16Array((points.length - 1) * 6); // eslint-disable-line no-magic-numbers
+      indexBuffer.data = new Uint16Array((points.length - 1) * 6);
     }
 
     const total = points.length; // - 1;
