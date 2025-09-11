@@ -15,7 +15,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
   constructor(segments: ComplexRopeSegment[]) {
     const pointCount = sum(segments, (segment) => segment.points.length);
 
-    // eslint-disable-next-line no-magic-numbers
+    // @ts-expect-error
     super(new Float32Array(pointCount * 4), new Float32Array(pointCount * 4), new Uint16Array((pointCount - 1) * 6));
 
     this.segments = segments;
@@ -52,8 +52,11 @@ export class ComplexRopeGeometry extends MeshGeometry {
 
     // if the number of points has changed we will need to recreate the arraybuffers
     if (vertexBuffer.data.length / 4 !== pointCount) {
+      // @ts-expect-error
       vertexBuffer.data = new Float32Array(pointCount * 4);
+      // @ts-expect-error
       uvBuffer.data = new Float32Array(pointCount * 4);
+      // @ts-expect-error
       indexBuffer.data = new Uint16Array((pointCount - 1) * 6); // eslint-disable-line no-magic-numbers
     }
 
