@@ -12,16 +12,16 @@ jobs:
   deploy-docs-n-storybook:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           submodules: true
           persist-credentials: false
       - run: echo "Running on branch ${{ github.ref_name }}..."
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'

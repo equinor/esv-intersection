@@ -13,16 +13,16 @@ jobs:
     name: Release & Publish to NPM Registry
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     outputs:
       was_published: ${{ steps.changesets.outputs.published  }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           submodules: true
           persist-credentials: false
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
@@ -39,29 +39,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - uses: actions/setup-node@v3
-        with:
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-          node-version: '18'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@equinor'
-
-      - name: Create a Release PR or Publish to Github Registry
-        uses: changesets/action@v1
-        with:
-          version: npm run version
-          publish: npm run release:github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   publish_released_docs:
     needs: release_or_publish_package
     if: needs.release_or_publish_package.outputs.was_published == 'true'
     uses: ./.github/workflows/github-pages.yml
     permissions:
-      contents: read
+      contents: write
       id-token: write
     with:
       version_to_deploy: 'latest'

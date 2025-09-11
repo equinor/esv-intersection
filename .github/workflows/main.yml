@@ -18,11 +18,11 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           submodules: true
           persist-credentials: false
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           node-version: '18'
           cache: 'npm'
@@ -45,7 +45,7 @@ jobs:
 
   maybe_publish_package:
     permissions:
-      contents: read
+      contents: write
       id-token: write
     needs: build_and_test
     if: github.ref == 'refs/heads/master'
@@ -55,7 +55,7 @@ jobs:
 
   deploy_docs:
     permissions:
-      contents: read
+      contents: write
       id-token: write
     needs: build_and_test
     if: github.ref == 'refs/heads/master'
