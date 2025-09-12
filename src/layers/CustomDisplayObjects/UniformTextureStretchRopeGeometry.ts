@@ -19,7 +19,7 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
    * @param points - An array of PIXI.Point objects to construct this rope.
    */
   constructor(points: IPoint[], width = 200) {
-    // @ts-expect-error
+    // @ts-expect-error Temporary fix until pixi.js is updated
     super(new Float32Array(points.length * 4), new Float32Array(points.length * 4), new Uint16Array((points.length - 1) * 6));
 
     this.points = points;
@@ -47,11 +47,11 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
 
     // if the number of points has changed we will need to recreate the arraybuffers
     if (vertexBuffer.data.length / 4 !== points.length) {
-      // @ts-expect-error
+      // @ts-expect-error Temporary fix until pixi.js is updated
       vertexBuffer.data = new Float32Array(points.length * 4);
-      // @ts-expect-error
+      // @ts-expect-error Temporary fix until pixi.js is updated
       uvBuffer.data = new Float32Array(points.length * 4);
-      // @ts-expect-error
+      // @ts-expect-error Temporary fix until pixi.js is updated
       indexBuffer.data = new Uint16Array((points.length - 1) * 6);
     }
 
