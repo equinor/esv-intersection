@@ -1,6 +1,6 @@
 module.exports = {
   stories: ['../.storybook/src/**/*.stories.@(js|jsx|ts|tsx)'],
-  addons: ['@storybook/addon-storysource', 'storybook-dark-mode'],
+  addons: ['@storybook/addon-docs'],
   staticDirs: ['../public'],
   framework: {
     name: '@storybook/html-vite',

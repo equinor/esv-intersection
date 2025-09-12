@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { SchematicData } from '../src/layers/schematicInterfaces';
 import { SchematicLayer, SchematicLayerOptions, IntersectionReferenceSystem, PixiRenderApplication } from '../src/index';

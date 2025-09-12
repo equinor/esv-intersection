@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import { describe, expect, it, beforeEach } from 'vitest';
 import { degrees } from '@equinor/videx-math';
 import { IntersectionReferenceSystem } from '../src';

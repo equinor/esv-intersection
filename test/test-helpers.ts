@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import { scaleLinear } from 'd3-scale';
 import { zoomIdentity } from 'd3-zoom';
 import { Casing, CasingWindow, CementPlug, HoleSize, OnRescaleEvent, Tubing } from '../src';

@@ -37,7 +37,7 @@ export interface DashLineOptions {
 }
 
 const dashLineOptionsDefault: Partial<DashLineOptions> = {
-  dash: [10, 5], // eslint-disable-line no-magic-numbers
+  dash: [10, 5],
   width: 1,
   color: 0xffffff,
   alpha: 1,
@@ -130,7 +130,8 @@ export class DashLine {
   }
 
   lineTo(x: number, y: number, closePath?: boolean): this {
-    if (typeof this.lineLength === undefined) {
+    const type = typeof this.lineLength;
+    if (type === undefined) {
       this.moveTo(0, 0);
     }
     const length = DashLine.distance(this.cursor.x, this.cursor.y, x, y);

@@ -2,7 +2,7 @@
 import { mergeConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-import { defineConfig, configDefaults } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 import viteConfig from './vite.config';
 
 export default mergeConfig(
@@ -14,7 +14,11 @@ export default mergeConfig(
       watch: false,
       setupFiles: ['./__mocks__/pixi.js.ts', '__mocks__/canvas.ts'],
       deps: {
-        inline: ['vitest-canvas-mock'],
+        optimizer: {
+          web: {
+            include: ['vitest-canvas-mock'],
+          },
+        },
       },
     },
     plugins: [
