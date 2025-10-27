@@ -102,12 +102,12 @@ export interface Perforation {
     isOpen: boolean;
 }
 export declare const foldPerforationSubKind: <T>(options: {
-    Perforation: (kind: 'Perforation') => T;
-    OpenHoleGravelPack: (kind: 'Open hole gravel pack') => T;
-    OpenHoleFracPack: (kind: 'Open hole frac pack') => T;
-    CasedHoleGravelPack: (kind: 'Cased hole gravel pack') => T;
-    CasedHoleFracPack: (kind: 'Cased hole frac pack') => T;
-    CasedHoleFracturation: (kind: 'Cased hole fracturation') => T;
+    Perforation: (kind: "Perforation") => T;
+    OpenHoleGravelPack: (kind: "Open hole gravel pack") => T;
+    OpenHoleFracPack: (kind: "Open hole frac pack") => T;
+    CasedHoleGravelPack: (kind: "Cased hole gravel pack") => T;
+    CasedHoleFracPack: (kind: "Cased hole frac pack") => T;
+    CasedHoleFracturation: (kind: "Cased hole fracturation") => T;
 }, subKind: PerforationSubKind) => T;
 export declare const shouldPerforationStartAtHoleDiameter: (perf: Perforation) => boolean;
 export declare const shouldPerforationStartAtCasingDiameter: (perf: Perforation) => boolean;
