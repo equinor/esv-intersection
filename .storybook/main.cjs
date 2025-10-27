@@ -6,4 +6,9 @@ module.exports = {
     name: '@storybook/html-vite',
     options: {},
   },
+  features: {
+    controls: false,
+    actions: false,
+    interactions: false,
+  },
 };
