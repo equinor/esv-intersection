@@ -8,7 +8,7 @@ export default defineConfig([
   tseslint.configs.recommended,
   eslintPluginPrettier,
   {
-    ignores: ['dist/', 'node_modules/', 'package-lock.json'],
+    ignores: ['dist/', 'node_modules/', 'package-lock.json', '**/*.cjs'],
   },
   {
     rules: {
