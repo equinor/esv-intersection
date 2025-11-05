@@ -1,6 +1,6 @@
 import { ZoomTransform } from 'd3-zoom';
 import { Graphics } from 'pixi.js';
-import Vector2 from '@equinor/videx-vector2';
+import { default as Vector2 } from '@equinor/videx-vector2';
 import { ScaleLinear } from 'd3-scale';
 import { ExtendedCurveInterpolator } from './control/ExtendedCurveInterpolator';
 import { CurveInterpolator } from 'curve-interpolator';
