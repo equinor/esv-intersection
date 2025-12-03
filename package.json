@@ -52,7 +52,7 @@
   },
   "homepage": "https://github.com/equinor/esv-intersection#readme",
   "devDependencies": {
-    "@changesets/cli": "^2.27.10",
+    "@changesets/cli": "^2.29.8",
     "@storybook/addon-docs": "^9.1.5",
     "@storybook/html-vite": "^9.1.5",
     "@types/d3": "^7.4.3",
