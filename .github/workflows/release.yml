@@ -1,50 +1,54 @@
-name: Release/Publish
+name: Release
+
 on:
-  workflow_call:
-    secrets:
-      NPM_TOKEN:
-        required: true
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+  push:
+    branches:
+      - master
 
 permissions: {}
 
 jobs:
-  release_or_publish_package:
-    name: Release & Publish to NPM Registry
-    runs-on: ubuntu-latest
+  release:
+    name: Release
+    runs-on: ubuntu-24.04
+    env:
+      NODE_VERSION: "20.x"
     permissions:
       contents: write
+      pull-requests: write
       id-token: write
-    outputs:
-      was_published: ${{ steps.changesets.outputs.published  }}
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      - name: Release Please
+        id: release
+        uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38
         with:
-          submodules: true
+          release-type: node
+
+      - name: Checkout
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        with:
           persist-credentials: false
-      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f
-        with:
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-          node-version: '20'
-      - run: npm ci --prefer-offline
 
-      - name: Create a Release PR or Publish to NPM Registry
-        id: changesets
-        uses: changesets/action@e0145edc7d9d8679003495b11f87bd8ef63c0cba
+      - name: Setup Node ${{ env.NODE_VERSION }}
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
-          version: npm run version
-          publish: npm run release:npm
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
 
-  publish_released_docs:
-    needs: release_or_publish_package
-    if: needs.release_or_publish_package.outputs.was_published == 'true'
-    uses: ./.github/workflows/github-pages.yml
-    permissions:
-      contents: write
-      id-token: write
-    with:
-      version_to_deploy: 'latest'
+      - name: Install dependencies
+        if: ${{ steps.release.outputs.release_created }}
+        run: npm ci
+
+      - name: Build library
+        if: ${{ steps.release.outputs.release_created }}
+        run: npm run build --if-present
+
+      - name: Publish package
+        if: ${{ steps.release.outputs.release_created }}
+        uses: JS-DevTools/npm-publish@7f8fe47b3bea1be0c3aec2b717c5ec1f3e03410b
+        with:
+          token: ${{ secrets.NPM_TOKEN}}
+          access: public
+          provenance: true
