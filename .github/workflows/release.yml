@@ -49,6 +49,6 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         uses: JS-DevTools/npm-publish@7f8fe47b3bea1be0c3aec2b717c5ec1f3e03410b
         with:
-          token: ${{ secrets.NPM_TOKEN}}
+          token: ${{ secrets.NPM_TOKEN }}
           access: public
           provenance: true
