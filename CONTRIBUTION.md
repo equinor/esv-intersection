@@ -16,24 +16,22 @@ There is 1 active branch on this repo, plus possible branches for each majar ver
 
 - The `master` branch is the main branch of the repository, the one that is used for active development
   - Every time this branch is modified (typically when merging a PR), a Storybook is automatically deployed. It can be found [here](https://equinor.github.io/esv-intersection/storybook/master)
-  - Depending on the amount and urgency of the changes, we will create releases which will trigger deployments. This does however require that the version in `package.json` and `package-lock.json` be bumped beforehand. An updated package is deployed to [npm](https://www.npmjs.com/package/@equinor/esv-intersection)
 - The possible `major version` branches only exist in case there is a need to create a bug fix in a previous major, based of a git tag.
 
-## Automatically Releasing Versions with Changesets
+## Automatically Releasing Versions with Release-Please
 
-We use a somewhat automated system with the help of [changesets](https://github.com/changesets/changesets), where each change in code it's up to the developer to decide if these changes warrant a certain
-version bump. [Click the link if you'd like to learn how to add a changeset.](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md)
-If you forgot to add a changeset, the changeset-bot will remind you in the PR to include a changeset, in case you forgot to add one, and it will add it for you.
+We use a near-automated system for releasing and publishing, called [Release-Please](https://github.com/googleapis/release-please-action).
 
-There's two ways:
+The process is as follows:
 
-1. The PR or commit lands in master without a changeset ([example](https://github.com/equinor/esv-intersection/pull/640#issuecomment-1596336125))
-2. The PR or commit includes a changeset ([example](https://github.com/equinor/esv-intersection/pull/630#issuecomment-1582989195))
-
-In the first case, once the PR gets merged, nothing really changes.
-In the second case, the changeset action will open a `Version Packages` PR where it will gather all changesets that are currently lading in master ([example](https://github.com/equinor/esv-intersection/pull/631)).
-
-Once we are ready to release the next version, we can merge the PR. The release notes and changelog are automatically generated based on a git tag, and the package gets deployed to the NPM and Github Registry.
+- When someone merges a PR to the `master` branch with a title in the [Convential commits](https://www.conventionalcommits.org/en/v1.0.0/) format, a release workflow will trigger.
+- If a release PR doesn't exist one will be created. If one exists, it will be rebased to include the changes from the merging branch.
+- These keywords contribute to the version bump of the release:
+  - `fix:` - Patch version
+  - `feat:` - Minor version
+  - `feat!:` or `fix!:` - Major version. Breaking change! This is to be explained thoroughly in the commit message of the merge.
+- The maintainers will review the release PRs regularly and approve the new release.
+- The [CHANGELOG.md](CHANGELOG.md) file will be automatically updated with the commit titles of the merged PRs, and the version will be bumped. Afterwards the new version will be uploaded to the [NPM](https://npmjs.com) registry.
 
 ## Code formatting
 
@@ -92,7 +90,7 @@ Making your Changes
 2. Write tests expecting the correct/fixed functionality; make sure they fail.
 3. Hack, hack, hack.
 4. Run tests again, making sure they pass.
-5. Commit your changes: `git commit -m "Foo the bars"`
+5. Commit your changes: `git commit -m "fix: foo the bars"`
 
 Creating Pull Requests
 ^^^^^^^^^^^^^^^^^^^^^^
