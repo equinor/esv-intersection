@@ -98,6 +98,7 @@ Creating Pull Requests
 1. Push your commit to get it back up to your fork: `git push origin HEAD`
 2. Visit Github, click handy "Pull request" button that it will make upon
    noticing your new branch.
+3. In the title field, make sure that it's written in Conventional commits style as explained above. You can write down the issue number in paranthesis after the keyword, like this: `fix(3546): foo the bars`
 3. In the description field, write down issue number (if submitting code fixing
    an existing issue) or describe the issue + your fix (if submitting a wholly
    new bugfix).
