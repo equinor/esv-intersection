@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.8](https://github.com/equinor/esv-intersection/compare/v3.1.7...v3.1.8) (2026-01-06)
+
+
+### Bug Fixes
+
+* **7143:** add npm as engine ([#961](https://github.com/equinor/esv-intersection/issues/961)) ([76452bc](https://github.com/equinor/esv-intersection/commit/76452bc669aa87f5225adfa5d1e10288f45f2372))
+
 ## 3.0.12
 
 ### Patch Changes
