@@ -17,9 +17,6 @@
     "src/*",
     "!test/*"
   ],
-  "engines": {
-    "npm": "^11.7.0"
-  },
   "scripts": {
     "start": "vite build --watch",
     "prebuild": "rimraf dist",
