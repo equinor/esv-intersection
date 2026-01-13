@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.9](https://github.com/equinor/esv-intersection/compare/v3.1.8...v3.1.9) (2026-01-13)
+
+
+### Bug Fixes
+
+* **110:** remove npm engine ([#969](https://github.com/equinor/esv-intersection/issues/969)) ([f7a4f92](https://github.com/equinor/esv-intersection/commit/f7a4f927e9f89b8b42aa96e5ecd8791e0d335878))
+
 ## [3.1.8](https://github.com/equinor/esv-intersection/compare/v3.1.7...v3.1.8) (2026-01-06)
 
 
