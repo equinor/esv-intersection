@@ -24,36 +24,38 @@ export const GeoModelUsingLowLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
-  const pixiContext = new PixiRenderApplication({ width, height });
-  const geoModelLayer = new GeomodelLayerV2(pixiContext, 'webgl', options);
-  geoModelLayer.onMount({ elm: container, height, width });
+  const pixiContext = new PixiRenderApplication();
+  pixiContext.init({ width, height }).then(() => {
+    const geoModelLayer = new GeomodelLayerV2(pixiContext, 'webgl', options);
+    geoModelLayer.onMount({ elm: container, height, width });
 
-  Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
-    const [path, surfaces, stratColumns] = values;
+    Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
+      const [path, surfaces, stratColumns] = values;
 
-    const referenceSystem = new IntersectionReferenceSystem(path);
-    const displacement = referenceSystem.displacement || 1;
-    const extend = 1000 / displacement;
-    const steps = surfaces[0]?.data?.values?.length || 1;
-    const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
-    const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
-    const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
+      const referenceSystem = new IntersectionReferenceSystem(path);
+      const displacement = referenceSystem.displacement || 1;
+      const extend = 1000 / displacement;
+      const steps = surfaces[0]?.data?.values?.length || 1;
+      const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
+      const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
+      const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
 
-    geoModelLayer.onUpdate({ data: geolayerdata });
+      geoModelLayer.onUpdate({ data: geolayerdata });
+    });
+    const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
+      geoModelLayer.onRescale(event);
+    });
+    zoomHandler.setBounds([0, 1000], [0, 1000]);
+    zoomHandler.adjustToSize(width, height, true);
+    zoomHandler.zFactor = 1;
+    zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+    zoomHandler.enableTranslateExtent = false;
+    zoomHandler.setViewport(1000, 1000, 5000);
+
+    root.appendChild(createHelpText('Low level interface for creating and displaying geo model (aka surfaces). This layer is made using webGL.'));
+    root.appendChild(container);
+    root.appendChild(fpsLabel);
   });
-  const zoomHandler = new ZoomPanHandler(container, (event: OnRescaleEvent) => {
-    geoModelLayer.onRescale(event);
-  });
-  zoomHandler.setBounds([0, 1000], [0, 1000]);
-  zoomHandler.adjustToSize(width, height);
-  zoomHandler.zFactor = 1;
-  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
-  zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000, 1000, 5000);
-
-  root.appendChild(createHelpText('Low level interface for creating and displaying geo model (aka surfaces). This layer is made using webGL.'));
-  root.appendChild(container);
-  root.appendChild(fpsLabel);
 
   return root;
 };
@@ -65,50 +67,52 @@ export const GeoModelWithLabelsUsingLowLevelInterface = () => {
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
 
-  const pixiContext = new PixiRenderApplication({ width, height });
-  const geoModelLayer = new GeomodelLayerV2(pixiContext, 'geomodels', options);
-  geoModelLayer.onMount({ elm: container, height, width });
+  const pixiContext = new PixiRenderApplication();
+  pixiContext.init({ width, height }).then(() => {
+    const geoModelLayer = new GeomodelLayerV2(pixiContext, 'geomodels', options);
+    geoModelLayer.onMount({ elm: container, height, width });
 
-  const options2: GeomodelLayerLabelsOptions<SurfaceData> = { order: 1 };
-  const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
-  geoModelLabelsLayer.onMount({ elm: container });
+    const options2: GeomodelLayerLabelsOptions<SurfaceData> = { order: 1 };
+    const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
+    geoModelLabelsLayer.onMount({ elm: container });
 
-  const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
-    geoModelLayer.onRescale(event);
-    geoModelLabelsLayer.onRescale({ ...event });
+    const zoomHandler = new ZoomPanHandler(root, (event: OnRescaleEvent) => {
+      geoModelLayer.onRescale(event);
+      geoModelLabelsLayer.onRescale({ ...event });
+    });
+
+    Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
+      const [path, surfaces, stratColumns] = values;
+
+      const referenceSystem = new IntersectionReferenceSystem(path);
+      const displacement = referenceSystem.displacement || 1;
+      const extend = 1000 / displacement;
+      const steps = surfaces[0]?.data?.values?.length || 1;
+      const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
+      const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
+      const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
+
+      geoModelLayer.referenceSystem = referenceSystem;
+      geoModelLabelsLayer.referenceSystem = referenceSystem;
+      geoModelLayer.setData(geolayerdata);
+      geoModelLabelsLayer.setData(geolayerdata);
+    });
+
+    zoomHandler.setBounds([0, 1000], [0, 1000]);
+    zoomHandler.adjustToSize(width, height, true);
+    zoomHandler.zFactor = 1;
+    zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+    zoomHandler.enableTranslateExtent = false;
+    zoomHandler.setViewport(1000, 1000, 5000);
+
+    root.appendChild(
+      createHelpText(
+        'Low level interface for creating and displaying geo model (aka surfaces) with labels. The geo model layer is made using webGL and the labels using canvas.',
+      ),
+    );
+    root.appendChild(container);
+    root.appendChild(fpsLabel);
   });
-
-  Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
-    const [path, surfaces, stratColumns] = values;
-
-    const referenceSystem = new IntersectionReferenceSystem(path);
-    const displacement = referenceSystem.displacement || 1;
-    const extend = 1000 / displacement;
-    const steps = surfaces[0]?.data?.values?.length || 1;
-    const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
-    const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
-    const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
-
-    geoModelLayer.referenceSystem = referenceSystem;
-    geoModelLabelsLayer.referenceSystem = referenceSystem;
-    geoModelLayer.setData(geolayerdata);
-    geoModelLabelsLayer.setData(geolayerdata);
-  });
-
-  zoomHandler.setBounds([0, 1000], [0, 1000]);
-  zoomHandler.adjustToSize(width, height);
-  zoomHandler.zFactor = 1;
-  zoomHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
-  zoomHandler.enableTranslateExtent = false;
-  zoomHandler.setViewport(1000, 1000, 5000);
-
-  root.appendChild(
-    createHelpText(
-      'Low level interface for creating and displaying geo model (aka surfaces) with labels. The geo model layer is made using webGL and the labels using canvas.',
-    ),
-  );
-  root.appendChild(container);
-  root.appendChild(fpsLabel);
 
   return root;
 };
@@ -119,35 +123,37 @@ export const GeoModelUsingHighLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
-  const pixiContext = new PixiRenderApplication({ width, height });
-  const geoModelLayer = new GeomodelLayerV2(pixiContext, 'webgl', options);
+  const pixiContext = new PixiRenderApplication();
+  pixiContext.init({ width, height }).then(() => {
+    const geoModelLayer = new GeomodelLayerV2(pixiContext, 'webgl', options);
 
-  Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
-    const [path, surfaces, stratColumns] = values;
+    Promise.all([getWellborePath(), getSurfaces(), getStratColumns(), getPositionLog()]).then((values) => {
+      const [path, surfaces, stratColumns] = values;
 
-    const referenceSystem = new IntersectionReferenceSystem(path);
-    const displacement = referenceSystem.displacement || 1;
-    const extend = 1000 / displacement;
-    const steps = surfaces[0]?.data?.values?.length || 1;
-    const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
-    const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
-    const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
+      const referenceSystem = new IntersectionReferenceSystem(path);
+      const displacement = referenceSystem.displacement || 1;
+      const extend = 1000 / displacement;
+      const steps = surfaces[0]?.data?.values?.length || 1;
+      const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
+      const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
+      const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
 
-    geoModelLayer.setData(geolayerdata);
+      geoModelLayer.setData(geolayerdata);
+    });
+
+    const controller = new Controller({ container, layers: [geoModelLayer] });
+
+    controller.setBounds([0, 1000], [0, 1000]);
+    controller.adjustToSize(width, height);
+    controller.zoomPanHandler.zFactor = 1;
+    controller.zoomPanHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+    controller.zoomPanHandler.enableTranslateExtent = false;
+    controller.setViewport(1000, 1000, 5000);
+
+    root.appendChild(createHelpText('High level interface for creating and displaying geo model (aka surfaces). This layer is made using webGL.'));
+    root.appendChild(container);
+    root.appendChild(fpsLabel);
   });
-
-  const controller = new Controller({ container, layers: [geoModelLayer] });
-
-  controller.setBounds([0, 1000], [0, 1000]);
-  controller.adjustToSize(width, height);
-  controller.zoomPanHandler.zFactor = 1;
-  controller.zoomPanHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
-  controller.zoomPanHandler.enableTranslateExtent = false;
-  controller.setViewport(1000, 1000, 5000);
-
-  root.appendChild(createHelpText('High level interface for creating and displaying geo model (aka surfaces). This layer is made using webGL.'));
-  root.appendChild(container);
-  root.appendChild(fpsLabel);
 
   return root;
 };
@@ -158,47 +164,49 @@ export const GeoModelWithLabelsUsingHighLevelInterface = () => {
   const fpsLabel = createFPSLabel();
 
   const options: LayerOptions<SurfaceData> = { order: 1 };
-  const pixiContext = new PixiRenderApplication({ width, height });
-  const geoModelLayer = new GeomodelLayerV2(pixiContext, 'geomodels', options);
-  geoModelLayer.onMount({ elm: container, height, width });
+  const pixiContext = new PixiRenderApplication();
+  pixiContext.init({ width, height }).then(() => {
+    const geoModelLayer = new GeomodelLayerV2(pixiContext, 'geomodels', options);
+    geoModelLayer.onMount({ elm: container, height, width });
 
-  const options2: GeomodelLayerLabelsOptions<SurfaceData> = { order: 1 };
-  const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
-  geoModelLabelsLayer.onMount({ elm: container });
+    const options2: GeomodelLayerLabelsOptions<SurfaceData> = { order: 1 };
+    const geoModelLabelsLayer = new GeomodelLabelsLayer('labels', options2);
+    geoModelLabelsLayer.onMount({ elm: container });
 
-  Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
-    const [path, surfaces, stratColumns] = values;
+    Promise.all([getWellborePath(), getSurfaces(), getStratColumns()]).then((values) => {
+      const [path, surfaces, stratColumns] = values;
 
-    const referenceSystem = new IntersectionReferenceSystem(path);
-    const displacement = referenceSystem.displacement || 1;
-    const extend = 1000 / displacement;
-    const steps = surfaces[0]?.data?.values?.length || 1;
-    const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
-    const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
-    const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
+      const referenceSystem = new IntersectionReferenceSystem(path);
+      const displacement = referenceSystem.displacement || 1;
+      const extend = 1000 / displacement;
+      const steps = surfaces[0]?.data?.values?.length || 1;
+      const traj = referenceSystem.getTrajectory(steps, 0, 1 + extend);
+      const trajectory: number[][] = IntersectionReferenceSystem.toDisplacement(traj.points, traj.offset);
+      const geolayerdata: SurfaceData = generateSurfaceData(trajectory, stratColumns, surfaces);
 
-    const controller = new Controller({ container, layers: [geoModelLayer, geoModelLabelsLayer] });
+      const controller = new Controller({ container, layers: [geoModelLayer, geoModelLabelsLayer] });
 
-    controller.setReferenceSystem(referenceSystem);
+      controller.setReferenceSystem(referenceSystem);
 
-    geoModelLayer.setData(geolayerdata);
-    geoModelLabelsLayer.setData(geolayerdata);
+      geoModelLayer.setData(geolayerdata);
+      geoModelLabelsLayer.setData(geolayerdata);
 
-    controller.setBounds([0, 1000], [0, 1000]);
-    controller.adjustToSize(width, height);
-    controller.zoomPanHandler.zFactor = 1;
-    controller.zoomPanHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
-    controller.zoomPanHandler.enableTranslateExtent = false;
-    controller.setViewport(1000, 1000, 5000);
+      controller.setBounds([0, 1000], [0, 1000]);
+      controller.adjustToSize(width, height);
+      controller.zoomPanHandler.zFactor = 1;
+      controller.zoomPanHandler.setTranslateBounds([-5000, 6000], [-5000, 6000]);
+      controller.zoomPanHandler.enableTranslateExtent = false;
+      controller.setViewport(1000, 1000, 5000);
+    });
+
+    root.appendChild(
+      createHelpText(
+        'High level interface for creating and displaying geo model (aka surfaces) with labels. The geo model layer is made using webGL and the labels using canvas.',
+      ),
+    );
+    root.appendChild(container);
+    root.appendChild(fpsLabel);
   });
-
-  root.appendChild(
-    createHelpText(
-      'High level interface for creating and displaying geo model (aka surfaces) with labels. The geo model layer is made using webGL and the labels using canvas.',
-    ),
-  );
-  root.appendChild(container);
-  root.appendChild(fpsLabel);
 
   return root;
 };

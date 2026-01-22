@@ -29,51 +29,58 @@ describe('SchematicLayer', () => {
       perforations: [],
     };
 
-    it('should render when reference system is set in constructor', () => {
+    it('should render when reference system is set in constructor', async () => {
       // Arrange
       const pixiRenderApplication = new PixiRenderApplication();
+      await pixiRenderApplication.init();
       const referenceSystem = new IntersectionReferenceSystem(wp);
       const options: SchematicLayerOptions<SchematicData> = {
         referenceSystem,
       };
-      const layer = new SchematicLayer(pixiRenderApplication, 'schematic-layer', options);
+      const layer = new SchematicLayer(pixiRenderApplication, 'schematic-webgl-layer', options);
       layer.onMount({ elm });
-      layer.onUpdate({ data });
-      layer.onRescale(rescaleEventStub());
+      await layer.onUpdate({ data });
+      await layer.onRescale(rescaleEventStub());
       vi.spyOn(layer, 'addChild');
 
       // Act
       layer.data = data;
 
       // Assert
-      expect(layer.addChild).toHaveBeenCalled();
+      await vi.waitFor(() => {
+        expect(layer.addChild).toHaveBeenCalled();
+      });
     });
 
-    it('should render when reference system is set after constructor', () => {
+    it('should render when reference system is set after constructor', async () => {
       // Arrange
       const pixiRenderApplication = new PixiRenderApplication();
+      await pixiRenderApplication.init();
       const layer = new SchematicLayer(pixiRenderApplication, 'casing-layer', {});
       const referenceSystem = new IntersectionReferenceSystem(wp);
       layer.referenceSystem = referenceSystem;
       layer.onMount({ elm });
-      layer.onUpdate({ data });
-      layer.onRescale(rescaleEventStub());
+      await layer.onUpdate({ data });
+      await layer.onRescale(rescaleEventStub());
       vi.spyOn(layer, 'addChild');
 
       // Act
       layer.data = data;
 
       // Assert
-      expect(layer.addChild).toHaveBeenCalled();
+      await vi.waitFor(() => {
+        expect(layer.addChild).toHaveBeenCalled();
+      });
     });
 
-    it('should not throw exception when setting data without reference system', () => {
+    it('should not throw exception when setting data without reference system', async () => {
       // Arrange
       const pixiRenderApplication = new PixiRenderApplication();
+      await pixiRenderApplication.init();
       const layer = new SchematicLayer(pixiRenderApplication, 'casing-layer', {});
       layer.onMount({ elm });
-      layer.onUpdate({ data });
-      layer.onRescale(rescaleEventStub());
+      await layer.onUpdate({ data });
+      await layer.onRescale(rescaleEventStub());
       vi.spyOn(layer, 'addChild');
 
       // Act

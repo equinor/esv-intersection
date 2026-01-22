@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { RENDERER_TYPE } from 'pixi.js';
+import { RendererType } from 'pixi.js';
 
 vi.mock('pixi.js', async (importOriginal) => {
   const pixi = await importOriginal();
@@ -7,19 +7,19 @@ vi.mock('pixi.js', async (importOriginal) => {
     destroy = vi.fn();
     render = vi.fn();
     view = document.createElement('div');
-    type: RENDERER_TYPE.WEBGL;
+    type: RendererType.WEBGL | undefined;
   }
 
   class MockContainer {
     destroy = vi.fn();
     addChild = vi.fn();
-    removeChildren = vi.fn((): any[] => []);
+    removeChildren = vi.fn((): unknown[] => []);
     position = { set: vi.fn() };
     scale = { set: vi.fn() };
   }
 
   return {
-    ...pixi,
+    ...(pixi as object),
     Container: MockContainer,
     autoDetectRenderer: () => new MockRenderer(),
   };

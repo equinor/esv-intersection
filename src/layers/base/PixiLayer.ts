@@ -1,4 +1,4 @@
-import { IRenderer, Application, autoDetectRenderer, Container, DisplayObject, IRendererOptionsAuto, Renderer, RENDERER_TYPE } from 'pixi.js';
+import { autoDetectRenderer, AutoDetectOptions, Container, ContainerChild, Renderer, RendererType } from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
 import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
@@ -11,9 +11,9 @@ import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 export class PixiRenderApplication {
   stage: Container | undefined;
 
-  renderer: IRenderer<HTMLCanvasElement> | undefined;
+  renderer: Renderer<HTMLCanvasElement> | undefined;
 
-  constructor(pixiRenderOptions?: IRendererOptionsAuto) {
+  async init(pixiRenderOptions?: Partial<AutoDetectOptions>) {
     const options = {
       width: DEFAULT_LAYER_WIDTH,
       height: DEFAULT_LAYER_HEIGHT,
@@ -24,38 +24,12 @@ export class PixiRenderApplication {
       preserveDrawingBuffer: true,
       ...pixiRenderOptions,
     };
-    this.renderer = autoDetectRenderer<HTMLCanvasElement>(options);
+    this.renderer = await autoDetectRenderer(options);
     this.stage = new Container();
   }
 
-  destroy() {
-    this.stage?.destroy({
-      children: true,
-      texture: true,
-      baseTexture: true,
-    });
-    this.stage = undefined;
-
-    // Get renderType and clContext before we destroy the renderer
-    const renderType = this.renderer?.type;
-    const glContext = this.renderer instanceof Renderer ? this.renderer?.gl : undefined;
-
-    /**
-     * WebGL v2 does supposedly not have WEBGL_lose_context
-     * so Pixi.js does not use it to "clean up" on v2.
-     *
-     * Cleaning up our self since it still seems to work and fix issue with lingering context
-     */
-    if (renderType === RENDERER_TYPE.WEBGL && glContext) {
-      glContext?.getExtension('WEBGL_lose_context')?.loseContext();
-    }
-
-    this.renderer?.destroy(true);
-    this.renderer = undefined;
-  }
-
-  get view() {
-    return this.renderer?.view;
+  get canvas() {
+    return this.renderer?.canvas;
   }
 
   render() {
@@ -70,11 +44,10 @@ export abstract class PixiLayer<T> extends Layer<T> {
   private ctx: PixiRenderApplication;
   private container: Container;
 
-  constructor(ctx: Application<HTMLCanvasElement> | PixiRenderApplication, id?: string, options?: LayerOptions<T>) {
+  constructor(ctx: PixiRenderApplication, id?: string, options?: LayerOptions<T>) {
     super(id, options);
 
     this.ctx = ctx;
-
     this.container = new Container();
     this.ctx.stage?.addChild(this.container);
   }
@@ -83,7 +56,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
     this.ctx.render();
   }
 
-  addChild(child: DisplayObject) {
+  addChild(child: ContainerChild) {
     this.container.addChild(child);
   }
 
@@ -104,8 +77,8 @@ export abstract class PixiLayer<T> extends Layer<T> {
       this.pixiViewContainer.setAttribute('id', `${this.id}`);
       this.pixiViewContainer.setAttribute('class', 'webgl-layer');
 
-      if (this.ctx.view != null) {
-        this.pixiViewContainer.appendChild(this.ctx.view);
+      if (this.ctx.canvas != null) {
+        this.pixiViewContainer.appendChild(this.ctx.canvas);
       }
 
       this.element?.appendChild(this.pixiViewContainer);
@@ -188,7 +161,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
     }
   }
 
-  renderType(): RENDERER_TYPE | undefined {
+  renderType(): RendererType | undefined {
     return this.ctx.renderer?.type;
   }
 }

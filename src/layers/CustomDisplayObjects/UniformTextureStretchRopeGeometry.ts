@@ -1,12 +1,12 @@
 import { MeshGeometry } from 'pixi.js';
-import type { IPoint } from 'pixi.js';
+import type { Point } from 'pixi.js';
 
 /**
  * UniformTextureStretchRopeGeometry allows you to draw a geometry across several points and then manipulate these points.
  */
 export class UniformTextureStretchRopeGeometry extends MeshGeometry {
   /** An array of points that determine the rope. */
-  public points: IPoint[];
+  public points: Point[];
 
   /**
    * The width (i.e., thickness) of the rope.
@@ -16,11 +16,14 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
 
   /**
    * @param width - The width (i.e., thickness) of the rope.
-   * @param points - An array of PIXI.Point objects to construct this rope.
+   * @param points - An array of Point objects to construct this rope.
    */
-  constructor(points: IPoint[], width = 200) {
-    // @ts-expect-error Temporary fix until pixi.js is updated
-    super(new Float32Array(points.length * 4), new Float32Array(points.length * 4), new Uint16Array((points.length - 1) * 6));
+  constructor(points: Point[], width = 200) {
+    super({
+      positions: new Float32Array(points.length * 4),
+      uvs: new Float32Array(points.length * 4),
+      indices: new Uint32Array((points.length - 1) * 6),
+    });
 
     this.points = points;
     this._width = width;
@@ -36,8 +39,8 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
       return;
     }
 
-    const vertexBuffer = this.getBuffer('aVertexPosition');
-    const uvBuffer = this.getBuffer('aTextureCoord');
+    const vertexBuffer = this.getBuffer('aPosition');
+    const uvBuffer = this.getBuffer('aUV');
     const indexBuffer = this.getIndex();
 
     // if too few points, or texture hasn't got UVs set yet just move on.
@@ -47,11 +50,8 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
 
     // if the number of points has changed we will need to recreate the arraybuffers
     if (vertexBuffer.data.length / 4 !== points.length) {
-      // @ts-expect-error Temporary fix until pixi.js is updated
       vertexBuffer.data = new Float32Array(points.length * 4);
-      // @ts-expect-error Temporary fix until pixi.js is updated
       uvBuffer.data = new Float32Array(points.length * 4);
-      // @ts-expect-error Temporary fix until pixi.js is updated
       indexBuffer.data = new Uint16Array((points.length - 1) * 6);
     }
 
