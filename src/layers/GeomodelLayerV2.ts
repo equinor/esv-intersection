@@ -77,11 +77,10 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
 
   generateAreaPolygon = (s: SurfaceArea): void => {
     const g = new Graphics();
-    g.lineStyle(1, s.color as number, 1);
-    g.beginFill(s.color as number);
     const polygons = this.createPolygons(s.data);
-    polygons.forEach((polygon: number[]) => g.drawPolygon(polygon));
-    g.endFill();
+    polygons.forEach((polygon: number[]) => g.poly(polygon));
+    g.setStrokeStyle({ width: 1, color: s.color as number, alpha: 1 });
+    g.fill({ color: s.color as number });
     this.addChild(g);
   };
 
@@ -90,7 +89,7 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     const { data: d } = s;
 
     const alignment = 0.5;
-    g.lineStyle(SURFACE_LINE_WIDTH, s.color as number, 1, alignment, true);
+    g.setStrokeStyle({ width: SURFACE_LINE_WIDTH, color: s.color as number, alpha: 1, alignment });
 
     let penDown = false;
     for (let i = 0; i < d.length; i++) {

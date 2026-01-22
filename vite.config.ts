@@ -3,7 +3,9 @@ import dts from 'vite-plugin-dts';
 
 import pkg from './package.json';
 
-export const getPeerDeps = (pkg) => Object.keys(pkg.peerDependencies || {});
+type PackageJson = typeof pkg;
+
+export const getPeerDeps = (pkg: PackageJson) => Object.keys(pkg.peerDependencies || {});
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -29,11 +31,6 @@ export default defineConfig({
     },
     rollupOptions: {
       external: getPeerDeps(pkg),
-      output: {
-        globals: {
-          'pixi.js': 'PIXI',
-        },
-      },
     },
   },
   plugins: [

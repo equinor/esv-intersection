@@ -1,4 +1,4 @@
-import { groupD8, IPoint, Point, Rectangle, Texture, WRAP_MODES } from 'pixi.js';
+import { CanvasSource, groupD8, Point, Rectangle, Texture } from 'pixi.js';
 import { DEFAULT_TEXTURE_SIZE } from '../constants';
 import {
   Casing,
@@ -51,15 +51,15 @@ export interface CasingRenderObject {
 }
 
 export const getEndLines = (
-  rightPath: [IPoint, IPoint, ...IPoint[]],
-  leftPath: [IPoint, IPoint, ...IPoint[]],
+  rightPath: [Point, Point, ...Point[]],
+  leftPath: [Point, Point, ...Point[]],
 ): {
-  top: [IPoint, IPoint];
-  bottom: [IPoint, IPoint];
+  top: [Point, Point];
+  bottom: [Point, Point];
 } => {
   return {
     top: [rightPath[0], leftPath[0]],
-    bottom: [rightPath[rightPath.length - 1] as IPoint, leftPath[leftPath.length - 1] as IPoint],
+    bottom: [rightPath[rightPath.length - 1] as Point, leftPath[leftPath.length - 1] as Point],
   };
 };
 
@@ -516,7 +516,7 @@ export const createCementSqueezeTexture = ({ firstColor, secondColor, scalingFac
   return Texture.from(canvas);
 };
 
-export const createTubularRenderingObject = (radius: number, pathPoints: IPoint[]): TubularRenderingObject => {
+export const createTubularRenderingObject = (radius: number, pathPoints: Point[]): TubularRenderingObject => {
   const normals = createNormals(pathPoints);
   const rightPath = offsetPoints(pathPoints, normals, radius);
   const leftPath = offsetPoints(pathPoints, normals, -radius);
@@ -798,13 +798,15 @@ const errorTexture = (errorMessage = 'Error!', existingContext?: { canvas: HTMLC
   canvasCtx.fillStyle = '#ff00ff';
   canvasCtx.fillRect(...xy, ...wh);
 
-  const texture = new Texture(
-    Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP }).baseTexture,
-    undefined,
-    new Rectangle(0, 0, canvas.width, canvas.height),
-    undefined,
-    groupD8.MIRROR_HORIZONTAL,
-  );
+  const texture = new Texture({
+    source: new CanvasSource({
+      resource: canvas,
+      wrapMode: 'clamp-to-edge',
+    }),
+    orig: new Rectangle(0, 0, canvas.width, canvas.height),
+    rotate: groupD8.MIRROR_HORIZONTAL,
+  });
+
   return texture;
 };
 
@@ -827,13 +829,13 @@ const createPerforationCanvas = (
 };
 
 const createPerforationTexture = (canvas: HTMLCanvasElement) => {
-  const texture = new Texture(
-    Texture.from(canvas, { wrapMode: WRAP_MODES.CLAMP }).baseTexture,
-    undefined,
-    new Rectangle(0, 0, canvas.width, canvas.height),
-    undefined,
-    groupD8.MIRROR_HORIZONTAL,
-  );
+  const texture = new Texture({
+    source: new CanvasSource({
+      resource: canvas,
+    }),
+    orig: new Rectangle(0, 0, canvas.width, canvas.height),
+    rotate: groupD8.MIRROR_HORIZONTAL,
+  });
   return texture;
 };
 

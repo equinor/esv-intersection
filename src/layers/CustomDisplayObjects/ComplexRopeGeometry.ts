@@ -15,8 +15,12 @@ export class ComplexRopeGeometry extends MeshGeometry {
   constructor(segments: ComplexRopeSegment[]) {
     const pointCount = sum(segments, (segment) => segment.points.length);
 
-    // @ts-expect-error Temporary fix until pixi.js is updated
-    super(new Float32Array(pointCount * 4), new Float32Array(pointCount * 4), new Uint16Array((pointCount - 1) * 6));
+    super({
+      positions: new Float32Array(pointCount * 4),
+      uvs: new Float32Array(pointCount * 4),
+      indices: new Uint32Array((pointCount - 1) * 6),
+      shrinkBuffersToFit: true,
+    });
 
     this.segments = segments;
 
@@ -39,8 +43,8 @@ export class ComplexRopeGeometry extends MeshGeometry {
       return;
     }
 
-    const vertexBuffer = this.getBuffer('aVertexPosition');
-    const uvBuffer = this.getBuffer('aTextureCoord');
+    const vertexBuffer = this.getBuffer('aPosition');
+    const uvBuffer = this.getBuffer('aUV');
     const indexBuffer = this.getIndex();
 
     const pointCount = sum(segments, (segment) => segment.points.length);
@@ -52,11 +56,8 @@ export class ComplexRopeGeometry extends MeshGeometry {
 
     // if the number of points has changed we will need to recreate the arraybuffers
     if (vertexBuffer.data.length / 4 !== pointCount) {
-      // @ts-expect-error Temporary fix until pixi.js is updated
       vertexBuffer.data = new Float32Array(pointCount * 4);
-      // @ts-expect-error Temporary fix until pixi.js is updated
       uvBuffer.data = new Float32Array(pointCount * 4);
-      // @ts-expect-error Temporary fix until pixi.js is updated
       indexBuffer.data = new Uint16Array((pointCount - 1) * 6);
     }
 

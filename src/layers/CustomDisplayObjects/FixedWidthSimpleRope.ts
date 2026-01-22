@@ -1,4 +1,4 @@
-import { IPoint, Mesh, MeshMaterial, Renderer, RopeGeometry, Texture, WRAP_MODES } from 'pixi.js';
+import { Point, Mesh, RopeGeometry, Texture } from 'pixi.js';
 import { FixedWidthSimpleRopeGeometry } from './FixedWidthSimpleRopeGeometry';
 
 /**
@@ -15,27 +15,24 @@ export class FixedWidthSimpleRope extends Mesh {
   /**
    * Note: The wrap mode of the texture is set to REPEAT if `textureScale` is positive.
    * @param texture - The texture to use on the rope. (attempt to set UV wrapping, will fail on non-power of two textures)
-   * @param points - An array of {@link PIXI.Point} objects to construct this rope.
+   * @param points - An array of {@link Point} objects to construct this rope.
    * @param width - Width of rope
    */
-  constructor(texture: Texture, points: IPoint[], width: number) {
+  constructor(texture: Texture, points: Point[], width: number) {
     const ropeGeometry = new FixedWidthSimpleRopeGeometry(points, width);
-    const meshMaterial = new MeshMaterial(texture);
 
-    texture.baseTexture.wrapMode = WRAP_MODES.REPEAT;
+    texture.source.addressMode = 'repeat';
 
-    super(ropeGeometry, meshMaterial);
+    super({ geometry: ropeGeometry, texture });
 
     this.autoUpdate = true;
-  }
 
-  override _render(renderer: Renderer): void {
-    const geometry: RopeGeometry = this.geometry as RopeGeometry;
+    this.onRender = () => {
+      const geometry: RopeGeometry = this.geometry as RopeGeometry;
 
-    if (this.autoUpdate) {
-      geometry.update();
-    }
-
-    super._render(renderer);
+      if (this.autoUpdate) {
+        geometry.update();
+      }
+    };
   }
 }

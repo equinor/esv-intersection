@@ -25,10 +25,11 @@ export const SchematicLayerUsingHighLevelInterface = () => {
   const btnContainer = createButtonContainer(width);
 
   Promise.all([getWellborePath(), getHolesize(), getCasings(), getCement(), getCompletion(), getCementSqueezes()]).then(
-    ([wbp, holeSizes, casings, cements, completion, cementSqueezes]) => {
+    async ([wbp, holeSizes, casings, cements, completion, cementSqueezes]) => {
       const referenceSystem = new IntersectionReferenceSystem(wbp);
       referenceSystem.offset = wbp[0][2];
-      const renderer = new PixiRenderApplication({ width, height });
+      const renderer = new PixiRenderApplication();
+      await renderer.init({ width, height });
 
       const CSDSVGs = {
         completionSymbol1:
