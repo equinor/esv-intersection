@@ -31,6 +31,11 @@ export default defineConfig({
     },
     rollupOptions: {
       external: getPeerDeps(pkg),
+      output: {
+        globals: {
+          'pixi.js': 'PIXI',
+        },
+      },
     },
   },
   plugins: [
