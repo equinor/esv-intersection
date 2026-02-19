@@ -1,4 +1,4 @@
-import { IPoint, Mesh, Renderer, Texture } from 'pixi.js';
+import { Point, Mesh, Texture } from 'pixi.js';
 /**
  * The UniformTextureStretchRope allows you to draw a texture across several points and then manipulate these points
  */
@@ -10,9 +10,8 @@ export declare class UniformTextureStretchRope extends Mesh {
     autoUpdate: boolean;
     /**
      * @param texture - The texture to use on the rope.
-     * @param points - An array of {@link PIXI.Point} objects to construct this rope.
+     * @param points - An array of {@link Point} objects to construct this rope.
      */
-    constructor(texture: Texture, points: IPoint[]);
-    _render(renderer: Renderer): void;
+    constructor(texture: Texture, points: Point[]);
 }
 //# sourceMappingURL=UniformTextureStretchRope.d.ts.map

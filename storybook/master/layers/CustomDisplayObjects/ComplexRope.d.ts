@@ -1,6 +1,6 @@
-import { Mesh, IPoint, Renderer, Texture } from 'pixi.js';
+import { Mesh, Point, Texture } from 'pixi.js';
 export type ComplexRopeSegment = {
-    points: IPoint[];
+    points: Point[];
     diameter: number;
 };
 /**
@@ -17,6 +17,5 @@ export declare class ComplexRope extends Mesh {
      * @param segments - An array of segments with points and diaeter to construct this rope.
      */
     constructor(texture: Texture, segments: ComplexRopeSegment[]);
-    _render(renderer: Renderer): void;
 }
 //# sourceMappingURL=ComplexRope.d.ts.map

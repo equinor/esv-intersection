@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import { Graphics, Matrix, Point, Texture } from 'pixi.js';
 /** Define the dash: [dash length, gap size, dash size, gap size, ...] */
 export type Dashes = number[];
 export interface DashLineOptions {
@@ -9,16 +9,16 @@ export interface DashLineOptions {
     scale?: number;
     useTexture?: boolean;
     useDots?: boolean;
-    cap?: PIXI.LINE_CAP;
-    join?: PIXI.LINE_JOIN;
+    cap?: LINE_CAP;
+    join?: LINE_JOIN;
     alignment?: number;
 }
 export declare class DashLine {
-    graphics: PIXI.Graphics;
+    graphics: Graphics;
     /** current length of the line */
     lineLength: number;
     /** cursor location */
-    cursor: PIXI.Point;
+    cursor: Point;
     /** desired scale of line */
     scale: number;
     private start;
@@ -26,7 +26,7 @@ export declare class DashLine {
     private dash;
     private useTexture;
     private options;
-    static dashTextureCache: Record<string, PIXI.Texture>;
+    static dashTextureCache: Record<string, Texture>;
     /**
      * Create a DashLine
      * @param graphics
@@ -36,21 +36,21 @@ export declare class DashLine {
      * @param [options.width=1] - width of the dashed line
      * @param [options.alpha=1] - alpha of the dashed line
      * @param [options.color=0xffffff] - color of the dashed line
-     * @param [options.cap] - add a PIXI.LINE_CAP style to dashed lines (only works for useTexture: false)
-     * @param [options.join] - add a PIXI.LINE_JOIN style to the dashed lines (only works for useTexture: false)
+     * @param [options.cap] - add a LINE_CAP style to dashed lines (only works for useTexture: false)
+     * @param [options.join] - add a LINE_JOIN style to the dashed lines (only works for useTexture: false)
      * @param [options.alignment] - The alignment of any lines drawn (0.5 = middle, 1 = outer, 0 = inner)
      */
-    constructor(graphics: PIXI.Graphics, options?: DashLineOptions);
+    constructor(graphics: Graphics, options?: DashLineOptions);
     /** resets line style to enable dashed line (useful if lineStyle was changed on graphics element) */
     setLineStyle(): void;
     private static distance;
     moveTo(x: number, y: number): this;
     lineTo(x: number, y: number, closePath?: boolean): this;
     closePath(): void;
-    drawCircle(x: number, y: number, radius: number, points?: number, matrix?: PIXI.Matrix): this;
-    drawEllipse(x: number, y: number, radiusX: number, radiusY: number, points?: number, matrix?: PIXI.Matrix): this;
-    drawPolygon(points: PIXI.Point[] | number[], matrix?: PIXI.Matrix): this;
-    drawRect(x: number, y: number, width: number, height: number, matrix?: PIXI.Matrix): this;
+    drawCircle(x: number, y: number, radius: number, points?: number, matrix?: Matrix): this;
+    drawEllipse(x: number, y: number, radiusX: number, radiusY: number, points?: number, matrix?: Matrix): this;
+    drawPolygon(points: Point[] | number[], matrix?: Matrix): this;
+    drawRect(x: number, y: number, width: number, height: number, matrix?: Matrix): this;
     private adjustLineStyle;
     private static getTexture;
 }

@@ -1,4 +1,4 @@
-import { IPoint, Point, Texture } from 'pixi.js';
+import { Point, Texture } from 'pixi.js';
 import { Casing, Cement, CementOptions, CementPlug, CementPlugOptions, CementSqueeze, CementSqueezeOptions, Completion, HoleOptions, HoleSize, ScreenOptions, TubingOptions, Perforation, PerforationOptions, PerforationSubKind } from '../layers/schematicInterfaces';
 import { ComplexRopeSegment } from '../layers/CustomDisplayObjects/ComplexRope';
 export type PerforationShape = ComplexRopeSegment;
@@ -22,9 +22,9 @@ export interface CasingRenderObject {
         pathPoints: Point[];
     }[];
 }
-export declare const getEndLines: (rightPath: [IPoint, IPoint, ...IPoint[]], leftPath: [IPoint, IPoint, ...IPoint[]]) => {
-    top: [IPoint, IPoint];
-    bottom: [IPoint, IPoint];
+export declare const getEndLines: (rightPath: [Point, Point, ...Point[]], leftPath: [Point, Point, ...Point[]]) => {
+    top: [Point, Point];
+    bottom: [Point, Point];
 };
 export declare const overlaps: (top1: number, bottom1: number, top2: number, bottom2: number) => boolean;
 export declare const strictlyOverlaps: (top1: number, bottom1: number, top2: number, bottom2: number) => boolean;
@@ -45,7 +45,7 @@ export declare const createTubingTexture: ({ innerColor, outerColor, scalingFact
 export declare const createCementTexture: ({ firstColor, secondColor, scalingFactor }: CementOptions) => Texture;
 export declare const createCementPlugTexture: ({ firstColor, secondColor, scalingFactor }: CementPlugOptions) => Texture;
 export declare const createCementSqueezeTexture: ({ firstColor, secondColor, scalingFactor }: CementSqueezeOptions) => Texture;
-export declare const createTubularRenderingObject: (radius: number, pathPoints: IPoint[]) => TubularRenderingObject;
+export declare const createTubularRenderingObject: (radius: number, pathPoints: Point[]) => TubularRenderingObject;
 export type CasingInterval = {
     kind: 'casing' | 'casing-window';
     start: number;

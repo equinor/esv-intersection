@@ -1,5 +1,5 @@
 import { ScaleLinear } from 'd3-scale';
-import { IPoint, Point, Texture } from 'pixi.js';
+import { Point, Texture } from 'pixi.js';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import { CasingOptions, CementOptions, CementPlugOptions, CementSqueezeOptions, HoleOptions, SchematicData, ScreenOptions, TubingOptions, InternalLayerOptions, PerforationOptions, OutlineClosure } from './schematicInterfaces';
 import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
@@ -32,9 +32,9 @@ export declare class SchematicLayer<T extends SchematicData> extends PixiLayer<T
     protected scalingFactors: ScalingFactors;
     constructor(ctx: PixiRenderApplication, id?: string, options?: SchematicLayerOptions<T>);
     onUnmount(event?: OnUnmountEvent): void;
-    onUpdate(event: OnUpdateEvent<T>): void;
-    onRescale(event: OnRescaleEvent): void;
-    setVisibility(isVisible: boolean, layerId: string): void;
+    onUpdate(event: OnUpdateEvent<T>): Promise<void>;
+    onRescale(event: OnRescaleEvent): Promise<void>;
+    setVisibility(isVisible: boolean, layerId: string): Promise<void>;
     getInternalLayerIds(): string[];
     /**
      * Calculate yRatio without zFactor
@@ -42,7 +42,7 @@ export declare class SchematicLayer<T extends SchematicData> extends PixiLayer<T
      */
     protected yRatio(): number;
     protected getZFactorScaledPathForPoints: (start: number, end: number) => Point[];
-    protected drawBigPolygon: (coords: IPoint[], color?: number) => void;
+    protected drawBigPolygon: (coords: Point[], color?: number) => void;
     protected drawRope(path: Point[], texture: Texture, tint?: number): void;
     /**
      *
@@ -65,7 +65,7 @@ export declare class SchematicLayer<T extends SchematicData> extends PixiLayer<T
      */
     protected drawCasingWindowOutline(leftPath: Point[], rightPath: Point[], { lineColor, windowOptions }: CasingOptions, lineWidth?: number): void;
     private perforationRopeAndTextureReferences;
-    preRender(): void;
+    preRender(): Promise<void>;
     private updateSymbolCache;
     private drawCementPlug;
     private createCasingRenderObject;
