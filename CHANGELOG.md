@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.0.0](https://github.com/equinor/esv-intersection/compare/v3.1.9...v4.0.0) (2026-02-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **927:** update pixijs to v8 ([#980](https://github.com/equinor/esv-intersection/issues/980))
+
+### Features
+
+* **927:** update pixijs to v8 ([#980](https://github.com/equinor/esv-intersection/issues/980)) ([386aad4](https://github.com/equinor/esv-intersection/commit/386aad4b43aac640cb900d082f951acf38c2df5a))
+
+
+### Bug Fixes
+
+* **taskless:** pixi.js external module build warning ([#983](https://github.com/equinor/esv-intersection/issues/983)) ([c809b5a](https://github.com/equinor/esv-intersection/commit/c809b5a19122c0d29e5bc62c3d9b0c140e890445))
+
 ## [3.1.9](https://github.com/equinor/esv-intersection/compare/v3.1.8...v3.1.9) (2026-01-13)
 
 
