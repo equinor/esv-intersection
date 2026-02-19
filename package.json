@@ -65,7 +65,7 @@
     "jsdom": "^27.4.0",
     "lint-staged": "^15.5.2",
     "mock-raf": "^1.0.1",
-    "pixi.js": "^7.3.1",
+    "pixi.js": "^8.16.0",
     "prettier": "^3.0.3",
     "rimraf": "^6.1.2",
     "storybook": "^9.1.17",
@@ -78,7 +78,7 @@
     "vitest-canvas-mock": "^0.3.3"
   },
   "peerDependencies": {
-    "pixi.js": "^7.1.0"
+    "pixi.js": "^8.16.0"
   },
   "dependencies": {
     "@equinor/videx-math": "^1.1.4",

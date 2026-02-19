@@ -1,4 +1,4 @@
-import { IPoint, Mesh, MeshMaterial, Renderer, Texture } from 'pixi.js';
+import { Point, Mesh, Texture } from 'pixi.js';
 import { UniformTextureStretchRopeGeometry } from './UniformTextureStretchRopeGeometry';
 
 /**
@@ -13,27 +13,22 @@ export class UniformTextureStretchRope extends Mesh {
 
   /**
    * @param texture - The texture to use on the rope.
-   * @param points - An array of {@link PIXI.Point} objects to construct this rope.
+   * @param points - An array of {@link Point} objects to construct this rope.
    */
-  constructor(texture: Texture, points: IPoint[]) {
+  constructor(texture: Texture, points: Point[]) {
     const ropeGeometry = new UniformTextureStretchRopeGeometry(points, texture.height);
-    const meshMaterial = new MeshMaterial(texture);
 
-    super(ropeGeometry, meshMaterial);
+    super({ geometry: ropeGeometry, texture });
 
     this.autoUpdate = true;
-  }
 
-  override _render(renderer: Renderer): void {
-    const geometry: UniformTextureStretchRopeGeometry = this.geometry as UniformTextureStretchRopeGeometry;
+    this.onRender = () => {
+      const geometry: UniformTextureStretchRopeGeometry = this.geometry as UniformTextureStretchRopeGeometry;
 
-    // TODO: Possible optimiztion here
-    // Find correct check for when to update geometry
-    if (this.autoUpdate || geometry._width !== this.shader.texture.height) {
-      geometry._width = this.shader.texture.height;
-      geometry.update();
-    }
-
-    super._render(renderer);
+      if (this.autoUpdate || geometry._width !== this.shader?.texture.height) {
+        geometry._width = this.shader?.texture.height ?? 0;
+        geometry.update();
+      }
+    };
   }
 }

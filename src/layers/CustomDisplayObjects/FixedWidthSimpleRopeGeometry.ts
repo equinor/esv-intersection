@@ -1,18 +1,21 @@
-import { IPoint, MeshGeometry } from 'pixi.js';
+import { Point, MeshGeometry } from 'pixi.js';
 
 export class FixedWidthSimpleRopeGeometry extends MeshGeometry {
-  public points: IPoint[];
+  public points: Point[];
   _width: number;
   /**
    * @param {number} [width=200] - The width (i.e., thickness) of the rope.
-   * @param {PIXI.Point[]} [points] - An array of PIXI.Point objects to construct this rope.
+   * @param {Point[]} [points] - An array of Point objects to construct this rope.
    */
-  constructor(points: IPoint[], width = 200) {
-    // @ts-expect-error Temporary fix until pixi.js is updated
-    super(new Float32Array(points.length * 4), new Float32Array(points.length * 4), new Uint16Array((points.length - 1) * 6));
+  constructor(points: Point[], width = 200) {
+    super({
+      positions: new Float32Array(points.length * 4),
+      uvs: new Float32Array(points.length * 4),
+      indices: new Uint32Array((points.length - 1) * 6),
+    });
     /**
      * An array of points that determine the rope
-     * @member {PIXI.Point[]}
+     * @member {Point[]}
      */
     this.points = points;
     /**
@@ -45,20 +48,18 @@ export class FixedWidthSimpleRopeGeometry extends MeshGeometry {
     if (!points) {
       return;
     }
-    const vertexBuffer = this.getBuffer('aVertexPosition');
-    const uvBuffer = this.getBuffer('aTextureCoord');
+    const vertexBuffer = this.getBuffer('aPosition');
+    const uvBuffer = this.getBuffer('aUV');
     const indexBuffer = this.getIndex();
+
     // if too little points, or texture hasn't got UVs set yet just move on.
     if (points.length < 1) {
       return;
     }
     // if the number of points has changed we will need to recreate the arraybuffers
     if (vertexBuffer.data.length / 4 !== points.length) {
-      // @ts-expect-error Temporary fix until pixi.js is updated
       vertexBuffer.data = new Float32Array(points.length * 4);
-      // @ts-expect-error Temporary fix until pixi.js is updated
       uvBuffer.data = new Float32Array(points.length * 4);
-      // @ts-expect-error Temporary fix until pixi.js is updated
       indexBuffer.data = new Uint16Array((points.length - 1) * 6);
     }
     const uvs = uvBuffer.data;

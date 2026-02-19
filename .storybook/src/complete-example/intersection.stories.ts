@@ -92,7 +92,7 @@ const renderIntersection = (scaleOptions: any) => {
     getPicks(),
     getCementSqueezes(),
   ];
-  Promise.all(promises).then((values) => {
+  Promise.all(promises).then(async (values) => {
     const [path, completion, seismic, surfaces, stratColumns, casings, holeSizes, cement, picks, cementSqueezes] = values;
     const referenceSystem = new IntersectionReferenceSystem(path);
     referenceSystem.offset = path[0][2]; // Offset should be md at start of path
@@ -107,8 +107,11 @@ const renderIntersection = (scaleOptions: any) => {
     const transformedPicksData = transformFormationData(picks, stratColumns);
     const picksData = getPicksData(transformedPicksData);
 
-    const pixiContext1 = new PixiRenderApplication({ width, height });
-    const pixiContext2 = new PixiRenderApplication({ width, height });
+    const pixiContext1 = new PixiRenderApplication();
+    const pixiContext2 = new PixiRenderApplication();
+
+    await pixiContext1.init({ width, height });
+    await pixiContext2.init({ width, height });
 
     // Instantiate layers
     const gridLayer = new GridLayer('grid', {

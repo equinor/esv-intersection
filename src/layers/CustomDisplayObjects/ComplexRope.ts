@@ -1,8 +1,8 @@
-import { Mesh, MeshMaterial, IPoint, Renderer, Texture, WRAP_MODES } from 'pixi.js';
+import { Mesh, Point, Texture } from 'pixi.js';
 import { ComplexRopeGeometry } from './ComplexRopeGeometry';
 
 export type ComplexRopeSegment = {
-  points: IPoint[];
+  points: Point[];
   diameter: number;
 };
 
@@ -22,23 +22,20 @@ export class ComplexRope extends Mesh {
    */
   constructor(texture: Texture, segments: ComplexRopeSegment[]) {
     const ropeGeometry = new ComplexRopeGeometry(segments);
-    const meshMaterial = new MeshMaterial(texture);
 
     // attempt to set UV wrapping, will fail on non-power of two textures
-    texture.baseTexture.wrapMode = WRAP_MODES.REPEAT;
+    texture.source.addressMode = 'repeat';
 
-    super(ropeGeometry, meshMaterial);
+    super({ geometry: ropeGeometry, texture });
 
     this.autoUpdate = true;
-  }
 
-  override _render(renderer: Renderer): void {
-    const geometry: ComplexRopeGeometry = this.geometry as ComplexRopeGeometry;
+    this.onRender = () => {
+      const geometry: ComplexRopeGeometry = this.geometry as ComplexRopeGeometry;
 
-    if (this.autoUpdate) {
-      geometry.update();
-    }
-
-    super._render(renderer);
+      if (this.autoUpdate) {
+        geometry.update();
+      }
+    };
   }
 }

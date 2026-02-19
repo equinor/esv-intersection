@@ -1,6 +1,6 @@
 import { max } from 'd3-array';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
-import { Graphics, groupD8, IPoint, Point, Rectangle, SimpleRope, Texture } from 'pixi.js';
+import { Assets, Graphics, groupD8, Point, Rectangle, MeshRope, Texture } from 'pixi.js';
 import { DashLine } from '../vendor/pixi-dashed-line';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
 import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
@@ -186,14 +186,14 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.textureSymbolCacheArray = null;
   }
 
-  public override onUpdate(event: OnUpdateEvent<T>): void {
+  public override async onUpdate(event: OnUpdateEvent<T>): Promise<void> {
     super.onUpdate(event);
     this.clearLayer();
-    this.preRender();
+    await this.preRender();
     this.render();
   }
 
-  public override onRescale(event: OnRescaleEvent): void {
+  public override async onRescale(event: OnRescaleEvent): Promise<void> {
     const shouldRecalculate = this.scalingFactors.zFactor !== event.zFactor;
 
     this.scalingFactors = { height: event.height, zFactor: event.zFactor, yScale: event.yScale };
@@ -205,13 +205,13 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.setContainerScale(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
     if (shouldRecalculate) {
       this.clearLayer();
-      this.preRender();
+      await this.preRender();
     }
 
     this.render();
   }
 
-  public override setVisibility(isVisible: boolean, layerId: string) {
+  public override async setVisibility(isVisible: boolean, layerId: string) {
     if (layerId === this.id) {
       super.setVisibility(isVisible, layerId);
       return;
@@ -225,7 +225,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     if (keyFound) {
       this.internalLayerVisibility[keyFound as keyof InternalLayerVisibility] = isVisible;
       this.clearLayer();
-      this.preRender();
+      await this.preRender();
       this.render();
     }
   }
@@ -254,11 +254,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return path.map((p) => new Point(p.point[0], y(p.point[1]!)));
   };
 
-  protected drawBigPolygon = (coords: IPoint[], color = 0x000000) => {
+  protected drawBigPolygon = (coords: Point[], color = 0x000000) => {
     const polygon = new Graphics();
-    polygon.beginFill(color);
-    polygon.drawPolygon(coords);
-    polygon.endFill();
+    polygon.poly(coords);
+    polygon.fill(color);
 
     this.addChild(polygon);
   };
@@ -268,7 +267,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return undefined;
     }
 
-    const rope: SimpleRope = new SimpleRope(texture, path, 1);
+    const rope: MeshRope = new MeshRope({ texture, points: path, textureScale: 1 });
     rope.tint = tint || rope.tint;
     this.addChild(rope);
   }
@@ -296,7 +295,6 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const startPointLeft = leftPathReverse[0]!;
 
     const line = new Graphics();
-    line.lineStyle(lineWidth, lineColor, undefined, lineAlignment);
     line.moveTo(startPointRight.x, startPointRight.y);
     rightPath.forEach((p: Point) => line.lineTo(p.x, p.y));
 
@@ -309,6 +307,8 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     if (outlineClosure === 'TopAndBottom' || outlineClosure === 'Top') {
       line.lineTo(startPointRight.x, startPointRight.y);
     }
+
+    line.stroke({ width: lineWidth, color: lineColor, alignment: lineAlignment });
 
     this.addChild(line);
   }
@@ -329,11 +329,11 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const [dashedAlignment, solidAlignment] = flippedPaths ? [1, 0] : [0, 1];
 
     const graphics = new Graphics();
-    graphics.lineStyle(lineWidth, convertColor(lineColor), undefined, solidAlignment);
 
     const startPointLinePath = linePath[0]!;
     graphics.moveTo(startPointLinePath.x, startPointLinePath.y);
     linePath.forEach((p: Point) => graphics.lineTo(p.x, p.y));
+    graphics.setStrokeStyle({ width: lineWidth, color: convertColor(lineColor), alignment: solidAlignment });
 
     const dashedLine = new DashLine(graphics, {
       dash: [windowOptions.dashLength, windowOptions.spaceLength],
@@ -353,7 +353,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
   private perforationRopeAndTextureReferences: { rope: ComplexRope; texture: Texture }[] = [];
 
-  public preRender(): void {
+  public async preRender(): Promise<void> {
     if (!this.data || !this.referenceSystem) {
       return;
     }
@@ -361,7 +361,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const { exaggerationFactor = 1 } = this.options as SchematicLayerOptions<T>;
     const { holeSizes, casings, cements, completion, symbols, pAndA, perforations } = this.data;
 
-    this.updateSymbolCache(symbols);
+    await this.updateSymbolCache(symbols);
 
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter);
     const maxHoleDiameter =
@@ -420,12 +420,16 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     );
 
     this.perforationRopeAndTextureReferences.forEach(({ rope, texture }) => {
-      rope.destroy({
-        children: true,
-        texture: true,
-        baseTexture: true,
-      });
-      texture.destroy(true);
+      if (!rope.destroyed) {
+        rope.destroy({
+          children: true,
+          texture: true,
+          textureSource: true,
+        });
+      }
+      if (texture) {
+        texture.destroy(true);
+      }
     });
     this.perforationRopeAndTextureReferences = [];
 
@@ -524,7 +528,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
   }
 
-  private updateSymbolCache(symbols: { [key: string]: string }) {
+  private async updateSymbolCache(symbols: { [key: string]: string }) {
     if (!this.textureSymbolCacheArray) {
       this.textureSymbolCacheArray = {};
     }
@@ -533,11 +537,12 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
 
     const existingKeys = Object.keys(this.textureSymbolCacheArray);
-    Object.entries(symbols).forEach(([key, symbol]: [string, string]) => {
+    const promises = Object.entries(symbols).map(async ([key, symbol]: [string, string]) => {
       if (!existingKeys.includes(key) && this.textureSymbolCacheArray) {
-        this.textureSymbolCacheArray[key] = Texture.from(symbol);
+        this.textureSymbolCacheArray[key] = await Assets.load(symbol);
       }
     });
+    await Promise.all(promises);
   }
 
   private drawCementPlug(cementPlug: CementPlug, casings: Casing[], completion: Completion[], holes: HoleSize[]) {
@@ -610,8 +615,8 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private getSymbolTexture(symbolKey: string, diameter: number): Texture | undefined {
-    const baseTexture = this.textureSymbolCacheArray?.[symbolKey]?.baseTexture;
-    return baseTexture ? new Texture(baseTexture, undefined, new Rectangle(0, 0, 0, diameter), undefined, groupD8.MAIN_DIAGONAL) : undefined;
+    const baseTexture = this.textureSymbolCacheArray?.[symbolKey]?.source;
+    return baseTexture ? new Texture({ source: baseTexture, orig: new Rectangle(0, 0, 0, diameter), rotate: groupD8.MAIN_DIAGONAL }) : undefined;
   }
 
   private drawHoleSize = (maxHoleDiameter: number, holeObject: HoleSize): void => {
@@ -639,7 +644,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return undefined;
     }
 
-    const rope: SimpleRope = new SimpleRope(texture, path, maxHoleDiameter / DEFAULT_TEXTURE_SIZE);
+    const rope: MeshRope = new MeshRope({ texture, points: path, textureScale: maxHoleDiameter / DEFAULT_TEXTURE_SIZE });
 
     this.addChild(rope);
   }
@@ -655,10 +660,13 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       this.holeTextureCache = createHoleBaseTexture(holeOptions, width, height);
     }
 
-    const baseTexture = this.holeTextureCache.baseTexture;
+    const baseTexture = this.holeTextureCache.source;
     const sidePadding = (height - textureDiameter) / 2;
     const frame = new Rectangle(0, sidePadding, width, textureDiameter);
-    const texture = new Texture(baseTexture, frame);
+    const texture = new Texture({
+      source: baseTexture,
+      frame,
+    });
 
     return texture;
   }
@@ -761,7 +769,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
 
   private createCasingTexture(diameter: number): Texture {
     const textureWidthPO2 = 16;
-    return new Texture(Texture.WHITE.baseTexture, undefined, new Rectangle(0, 0, textureWidthPO2, diameter));
+    return new Texture({
+      source: Texture.WHITE.source,
+      orig: new Rectangle(0, 0, textureWidthPO2, diameter),
+    });
   }
 
   private drawShoe(casingEnd: number, casingRadius: number): void {
