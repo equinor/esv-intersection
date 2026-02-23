@@ -23,7 +23,14 @@ export class Axis {
   private _flipY = false;
   private visible = true;
 
-  constructor(mainGroup: Axis['mainGroup'], showLabels = true, labelXDesc: string, labelYDesc: string, unitOfMeasure: string, options?: Options) {
+  constructor(
+    mainGroup: Axis['mainGroup'],
+    showLabels = true,
+    labelXDesc: string,
+    labelYDesc: string,
+    unitOfMeasure: string,
+    options?: Options,
+  ) {
     this.mainGroup = mainGroup;
     this._showLabels = showLabels;
     this._labelXDesc = labelXDesc;
@@ -45,11 +52,17 @@ export class Axis {
   }
 
   private renderLabelx(): Selection<SVGTextElement, unknown, null, undefined> {
-    const { _labelXDesc: labelXDesc, _unitOfMeasure: unitOfMeasure, _showLabels, _scaleX: scaleX } = this;
+    const {
+      _labelXDesc: labelXDesc,
+      _unitOfMeasure: unitOfMeasure,
+      _showLabels,
+      _scaleX: scaleX,
+    } = this;
     const [, width] = scaleX.range();
     const gx = this.renderGx();
 
-    let labelx: Selection<SVGTextElement, unknown, null, undefined> = gx.select('text.axis-labelx');
+    let labelx: Selection<SVGTextElement, unknown, null, undefined> =
+      gx.select('text.axis-labelx');
     if (_showLabels) {
       if (labelx.empty()) {
         labelx = gx
@@ -69,11 +82,17 @@ export class Axis {
   }
 
   private renderLabely(): Selection<SVGTextElement, unknown, null, undefined> {
-    const { _labelYDesc: labelYDesc, _unitOfMeasure: unitOfMeasure, _showLabels, _scaleY } = this;
+    const {
+      _labelYDesc: labelYDesc,
+      _unitOfMeasure: unitOfMeasure,
+      _showLabels,
+      _scaleY,
+    } = this;
     const [, height] = _scaleY.range();
     const gy = this.renderGy();
 
-    let labely: Selection<SVGTextElement, unknown, null, undefined> = gy.select('text.axis-labely');
+    let labely: Selection<SVGTextElement, unknown, null, undefined> =
+      gy.select('text.axis-labely');
     if (_showLabels) {
       if (labely.empty()) {
         labely = gy
@@ -94,7 +113,10 @@ export class Axis {
 
   private renderGy(): Selection<SVGGElement, unknown, null, undefined> {
     const { _scaleX, _scaleY } = this;
-    const yAxis = axisRight(_scaleY) as (selection: Selection<SVGGElement, unknown, null, undefined>, ...args: unknown[]) => void;
+    const yAxis = axisRight(_scaleY) as (
+      selection: Selection<SVGGElement, unknown, null, undefined>,
+      ...args: unknown[]
+    ) => void;
     const [, width] = _scaleX.range();
     const gy = this.createOrGet('y-axis');
     gy.call(yAxis);
@@ -105,7 +127,10 @@ export class Axis {
 
   private renderGx(): Selection<SVGGElement, unknown, null, undefined> {
     const { _scaleX, _scaleY } = this;
-    const xAxis = axisBottom(_scaleX) as (selection: Selection<SVGGElement, unknown, null, undefined>, ...args: unknown[]) => void;
+    const xAxis = axisBottom(_scaleX) as (
+      selection: Selection<SVGGElement, unknown, null, undefined>,
+      ...args: unknown[]
+    ) => void;
     const [, height] = _scaleY.range();
 
     const gx = this.createOrGet('x-axis');
@@ -114,9 +139,12 @@ export class Axis {
     return gx;
   }
 
-  private createOrGet = (name: string): Selection<SVGGElement, unknown, null, undefined> => {
+  private createOrGet = (
+    name: string,
+  ): Selection<SVGGElement, unknown, null, undefined> => {
     const { mainGroup } = this;
-    let res: Selection<SVGGElement, unknown, null, undefined> = mainGroup.select(`g.${name}`);
+    let res: Selection<SVGGElement, unknown, null, undefined> =
+      mainGroup.select(`g.${name}`);
     if (res.empty()) {
       res = mainGroup.append('g').attr('class', name);
     }
@@ -129,7 +157,9 @@ export class Axis {
   }
 
   onResize(event: OnResizeEvent): void {
-    this.mainGroup.attr('height', `${event.height}px`).attr('width', `${event.width}px`);
+    this.mainGroup
+      .attr('height', `${event.height}px`)
+      .attr('width', `${event.width}px`);
   }
 
   onRescale(event: OnRescaleEvent): void {

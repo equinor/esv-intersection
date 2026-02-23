@@ -87,24 +87,43 @@ function getEntryPicks(formationPicks: PairedPickAndUnit[]): Annotation[] {
     .map((p: PairedPickAndUnit) => mapPick(p.entryPick, 'strat-picks'));
 }
 
-function getFilteredExitPicks(formationPicks: PairedPickAndUnit[]): Annotation[] {
+function getFilteredExitPicks(
+  formationPicks: PairedPickAndUnit[],
+): Annotation[] {
   if (!formationPicks) {
     return [];
   }
 
   return (
     formationPicks
-      .filter((d: PairedPickAndUnit) => formationPicks.findIndex((p: PairedPickAndUnit) => Math.abs(p.entryPick.md - d.exitPick.md) < 0.5) === -1)
+      .filter(
+        (d: PairedPickAndUnit) =>
+          formationPicks.findIndex(
+            (p: PairedPickAndUnit) =>
+              Math.abs(p.entryPick.md - d.exitPick.md) < 0.5,
+          ) === -1,
+      )
       .map((p: PairedPickAndUnit) => mapPick(p.exitPick, 'strat-picks'))
       // Remove duplicates from unitpicks filling in gaps in formation
-      .filter((obj: Annotation, i: number, array: Annotation[]) => i === array.findIndex((v: Annotation) => v.title === obj.title && v.md === obj.md))
+      .filter(
+        (obj: Annotation, i: number, array: Annotation[]) =>
+          i ===
+          array.findIndex(
+            (v: Annotation) => v.title === obj.title && v.md === obj.md,
+          ),
+      )
   );
 }
 
-export const getPicksData = (picksData: { unitPicks: PairedPickAndUnit[]; nonUnitPicks: PickWithId[] }): Annotation[] =>
-  [...getReferencePicks(picksData.nonUnitPicks), ...getEntryPicks(picksData.unitPicks), ...getFilteredExitPicks(picksData.unitPicks)].sort(
-    (a, b) => a.md! - b.md!,
-  );
+export const getPicksData = (picksData: {
+  unitPicks: PairedPickAndUnit[];
+  nonUnitPicks: PickWithId[];
+}): Annotation[] =>
+  [
+    ...getReferencePicks(picksData.nonUnitPicks),
+    ...getEntryPicks(picksData.unitPicks),
+    ...getFilteredExitPicks(picksData.unitPicks),
+  ].sort((a, b) => a.md! - b.md!);
 
 /**
  * @param {Unit} u
@@ -134,7 +153,11 @@ const unitDto = (u: Unit): UnitDto => ({
  * @param {number} arr.from
  * @returns {[number, number][]}
  */
-function findGaps(from: number, to: number, arr: { from: number; to: number; itm: PairedPickAndUnit }[]): [number, number][] {
+function findGaps(
+  from: number,
+  to: number,
+  arr: { from: number; to: number; itm: PairedPickAndUnit }[],
+): [number, number][] {
   if (arr.length === 0) {
     return [[from, to]];
   }
@@ -166,12 +189,20 @@ const transformStratColumn = (units: Unit[]): UnitDto[] => units.map(unitDto);
  * @param {Pick[]} picks picks
  * @param {Unit[]} stratColumn strat column
  */
-function joinPicksAndStratColumn(picks: Pick[], stratColumn: Unit[]): { joined: PickAndUnit[]; nonUnitPicks: PickWithId[] } {
+function joinPicksAndStratColumn(
+  picks: Pick[],
+  stratColumn: Unit[],
+): { joined: PickAndUnit[]; nonUnitPicks: PickWithId[] } {
   const transformed = transformStratColumn(stratColumn);
   const nonUnitPicks: PickWithId[] = [];
   const joined: PickAndUnit[] = [];
   picks.forEach((p: Pick) => {
-    const matches = transformed.filter((u: UnitDto) => p.pickIdentifier?.search(new RegExp(`(${u.topSurface}|${u.baseSurface})`, 'i')) !== -1);
+    const matches = transformed.filter(
+      (u: UnitDto) =>
+        p.pickIdentifier?.search(
+          new RegExp(`(${u.topSurface}|${u.baseSurface})`, 'i'),
+        ) !== -1,
+    );
     if (matches.length > 0) {
       matches.forEach((u: UnitDto) =>
         joined.push({
@@ -203,7 +234,12 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
 
   const sorted = joined
     .filter((d: PickAndUnit) => d.level)
-    .sort((a: PickAndUnit, b: PickAndUnit) => a.unitName.localeCompare(b.unitName) || a.md - b.md || a.ageTop - b.ageTop);
+    .sort(
+      (a: PickAndUnit, b: PickAndUnit) =>
+        a.unitName.localeCompare(b.unitName) ||
+        a.md - b.md ||
+        a.ageTop - b.ageTop,
+    );
 
   while (sorted.length > 0) {
     current = sorted.shift()!;
@@ -225,7 +261,9 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
     let top: PickAndUnit | undefined;
     let base: PickAndUnit | undefined;
 
-    const pairWith = sorted.find((p: PickAndUnit) => p.identifier === pairWithName);
+    const pairWith = sorted.find(
+      (p: PickAndUnit) => p.identifier === pairWithName,
+    );
     if (!pairWith) {
       console.warn(`Unable to find ${pairWithName} pick for ${name}`);
       if (isTop) {
@@ -237,7 +275,9 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
         if (base) {
           console.warn(`Using ${base.identifier} as base for ${name}`);
         } else {
-          console.warn(`Unable to find a base pick for ${name} pick at ${top.md}, ignored`);
+          console.warn(
+            `Unable to find a base pick for ${name} pick at ${top.md}, ignored`,
+          );
           continue;
         }
       } else if (isBase) {
@@ -249,7 +289,9 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
         if (top) {
           console.warn(`Using ${top.identifier} as top for ${name}`);
         } else {
-          console.warn(`Unable to find a top pick for ${name} pick at ${base.md}, ignored`);
+          console.warn(
+            `Unable to find a top pick for ${name} pick at ${base.md}, ignored`,
+          );
           continue;
         }
       } else {
@@ -290,7 +332,10 @@ function pairJoinedPicks(joined: PickAndUnit[]): PairedPickAndUnit[] {
  * @param {Pick[]} picks picks
  * @param {Unit[]} stratColumn strat column
  */
-export function transformFormationData(picks: Pick[], stratColumn: Unit[]): { unitPicks: PairedPickAndUnit[]; nonUnitPicks: PickWithId[] } {
+export function transformFormationData(
+  picks: Pick[],
+  stratColumn: Unit[],
+): { unitPicks: PairedPickAndUnit[]; nonUnitPicks: PickWithId[] } {
   const { joined, nonUnitPicks } = joinPicksAndStratColumn(picks, stratColumn);
   const pairs = pairJoinedPicks(joined);
 
@@ -305,7 +350,10 @@ export function transformFormationData(picks: Pick[], stratColumn: Unit[]): { un
   while (itemstack.length > 0) {
     const first = itemstack.pop()!;
     const group: PairedPickAndUnit[] = [];
-    while (itemstack.length > 0 && itemstack[itemstack.length - 1]?.level! > first.level) {
+    while (
+      itemstack.length > 0 &&
+      itemstack[itemstack.length - 1]?.level! > first.level
+    ) {
       group.push(itemstack.pop()!);
     }
     group.reverse();
@@ -313,11 +361,11 @@ export function transformFormationData(picks: Pick[], stratColumn: Unit[]): { un
     const arr: { from: number; to: number; itm: PairedPickAndUnit }[] = [];
     group.forEach((itm: PairedPickAndUnit) => {
       const gaps = findGaps(itm.mdEntry, itm.mdExit, arr);
-      arr.push(...gaps.map((g) => ({ from: g[0], to: g[1], itm })));
+      arr.push(...gaps.map(g => ({ from: g[0], to: g[1], itm })));
     });
     arr.sort((a, b) => a.from - b.from);
     unitPicks.push(
-      ...arr.map((d) => ({
+      ...arr.map(d => ({
         from: d.from,
         to: d.to,
         ...d.itm,

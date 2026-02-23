@@ -53,7 +53,8 @@ export class GridLayer<T> extends CanvasLayer<T> {
 
   render(event: OnRescaleEvent | OnGridLayerUpdateEvent<T>): void {
     const { ctx } = this;
-    const { minorWidth, minorColor, majorWidth, majorColor } = this.options as GridLayerOptions<T>;
+    const { minorWidth, minorColor, majorWidth, majorColor } = this
+      .options as GridLayerOptions<T>;
 
     if (!ctx) {
       return;
@@ -98,7 +99,12 @@ export class GridLayer<T> extends CanvasLayer<T> {
     ctx.restore();
   }
 
-  private renderTicksX(xscale: ScaleLinear<number, number, never>, xticks: number[], ry1: number, ry2: number): void {
+  private renderTicksX(
+    xscale: ScaleLinear<number, number, never>,
+    xticks: number[],
+    ry1: number,
+    ry2: number,
+  ): void {
     xticks.forEach((tx: number) => {
       const x = xscale(tx);
       if (this.ctx != null) {
@@ -110,7 +116,12 @@ export class GridLayer<T> extends CanvasLayer<T> {
     });
   }
 
-  private renderTicksY(yscale: ScaleLinear<number, number, never>, yticks: number[], rx1: number, rx2: number): void {
+  private renderTicksY(
+    yscale: ScaleLinear<number, number, never>,
+    yticks: number[],
+    rx1: number,
+    rx2: number,
+  ): void {
     yticks.forEach((ty: number) => {
       const y = yscale(ty);
       if (this.ctx != null) {

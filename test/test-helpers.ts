@@ -1,6 +1,13 @@
 import { scaleLinear } from 'd3-scale';
 import { zoomIdentity } from 'd3-zoom';
-import { Casing, CasingWindow, CementPlug, HoleSize, OnRescaleEvent, Tubing } from '../src';
+import {
+  Casing,
+  CasingWindow,
+  CementPlug,
+  HoleSize,
+  OnRescaleEvent,
+  Tubing,
+} from '../src';
 
 export function rescaleEventStub(): OnRescaleEvent {
   const xBounds = [0, 1000] as [number, number];
@@ -22,9 +29,14 @@ export function rescaleEventStub(): OnRescaleEvent {
   return event;
 }
 
-export const generateId = (prefix: string) => `${prefix}-${Math.round(Math.random() * 10000)}`;
+export const generateId = (prefix: string) =>
+  `${prefix}-${Math.round(Math.random() * 10000)}`;
 
-export const createCementPlug = (start: number, end: number, referenceIds?: string[]): CementPlug => ({
+export const createCementPlug = (
+  start: number,
+  end: number,
+  referenceIds?: string[],
+): CementPlug => ({
   kind: 'cementPlug',
   id: generateId('cementPlug'),
   start,
@@ -32,7 +44,10 @@ export const createCementPlug = (start: number, end: number, referenceIds?: stri
   referenceIds: referenceIds ?? [],
 });
 
-export const createCasingWindow = (start: number, end: number): CasingWindow => ({
+export const createCasingWindow = (
+  start: number,
+  end: number,
+): CasingWindow => ({
   id: generateId('casing-window'),
   start,
   end,
@@ -57,7 +72,11 @@ export const createCasing = (
   windows: options?.windows ?? [],
 });
 
-export const createHole = (start: number, end: number, diameter?: number): HoleSize => ({
+export const createHole = (
+  start: number,
+  end: number,
+  diameter?: number,
+): HoleSize => ({
   kind: 'hole',
   id: generateId('holeSize'),
   diameter: diameter ?? 30,
@@ -65,7 +84,11 @@ export const createHole = (start: number, end: number, diameter?: number): HoleS
   end,
 });
 
-export const createTubing = (start: number, end: number, diameter?: number): Tubing => ({
+export const createTubing = (
+  start: number,
+  end: number,
+  diameter?: number,
+): Tubing => ({
   kind: 'tubing',
   id: generateId('holeSize'),
   diameter: diameter ?? 7,

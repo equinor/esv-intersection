@@ -1,5 +1,10 @@
 import { Layer } from './Layer';
-import { OnMountEvent, OnUpdateEvent, OnResizeEvent, OnRescaleEvent } from '../../interfaces';
+import {
+  OnMountEvent,
+  OnUpdateEvent,
+  OnResizeEvent,
+  OnRescaleEvent,
+} from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 export abstract class CanvasLayer<T> extends Layer<T> {
@@ -45,8 +50,14 @@ export abstract class CanvasLayer<T> extends Layer<T> {
   override onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm } = event;
-    const width = event.width || parseInt(elm?.getAttribute('width') ?? '', 10) || DEFAULT_LAYER_WIDTH;
-    const height = event.height || parseInt(elm?.getAttribute('height') ?? '', 10) || DEFAULT_LAYER_HEIGHT;
+    const width =
+      event.width ||
+      parseInt(elm?.getAttribute('width') ?? '', 10) ||
+      DEFAULT_LAYER_WIDTH;
+    const height =
+      event.height ||
+      parseInt(elm?.getAttribute('height') ?? '', 10) ||
+      DEFAULT_LAYER_HEIGHT;
     this.elm = elm;
     let canvas: HTMLCanvasElement;
     if (!this.canvas) {
@@ -89,7 +100,10 @@ export abstract class CanvasLayer<T> extends Layer<T> {
     const flippedX = event.xBounds[0] > event.xBounds[1];
     const flippedY = event.yBounds[0] > event.yBounds[1];
     this.ctx?.translate(event.xScale(0), event.yScale(0));
-    this.ctx?.scale(event.xRatio * (flippedX ? -1 : 1), event.yRatio * (flippedY ? -1 : 1));
+    this.ctx?.scale(
+      event.xRatio * (flippedX ? -1 : 1),
+      event.yRatio * (flippedY ? -1 : 1),
+    );
   }
 
   clearCanvas(): void {

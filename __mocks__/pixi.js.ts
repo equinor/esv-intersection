@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { RendererType } from 'pixi.js';
 
-vi.mock('pixi.js', async (importOriginal) => {
+vi.mock('pixi.js', async importOriginal => {
   const pixi = await importOriginal();
   class MockRenderer {
     destroy = vi.fn();

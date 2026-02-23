@@ -38,7 +38,12 @@ export function findIndexOfSample(data: number[][], pos: number): number {
   for (let i = a; i < b; i++) {
     const v1 = data[i]?.[0];
     const v2 = data[i + 1]?.[0];
-    if (v1 != null && v2 != null && Math.min(v1, v2) <= pos && pos <= Math.max(v1, v2)) {
+    if (
+      v1 != null &&
+      v2 != null &&
+      Math.min(v1, v2) <= pos &&
+      pos <= Math.max(v1, v2)
+    ) {
       index = i;
       break;
     }
@@ -47,7 +52,12 @@ export function findIndexOfSample(data: number[][], pos: number): number {
   return index;
 }
 
-export function findSampleAtPos(data: number[][], pos: number, topLimit = 0, bottomLimit = 0): number {
+export function findSampleAtPos(
+  data: number[][],
+  pos: number,
+  topLimit = 0,
+  bottomLimit = 0,
+): number {
   let y = 0;
   const index = findIndexOfSample(data, pos);
   if (index !== -1) {

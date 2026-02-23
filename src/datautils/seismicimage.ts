@@ -16,7 +16,9 @@ export type SeismicInfo = {
   };
 };
 
-export const getSeismicOptions = (info: SeismicInfo | null): SeismicCanvasDataOptions => {
+export const getSeismicOptions = (
+  info: SeismicInfo | null,
+): SeismicCanvasDataOptions => {
   if (!info) {
     return {
       x: 0,
@@ -40,20 +42,36 @@ export const getSeismicOptions = (info: SeismicInfo | null): SeismicCanvasDataOp
  * @param trajectory Wellbore or freehand trajectory
  * @return  Key domain and depth information for seismic data
  */
-export function getSeismicInfo(data: { datapoints: number[][]; yAxisValues: number[] }, trajectory: number[][]): SeismicInfo | null {
+export function getSeismicInfo(
+  data: { datapoints: number[][]; yAxisValues: number[] },
+  trajectory: number[][],
+): SeismicInfo | null {
   if (!(data && data.datapoints)) {
     return null;
   }
-  const minX = trajectory.reduce((acc: number, val: number[]) => Math.min(acc, val[0]!), 0);
-  const maxX = trajectory.reduce((acc: number, val: number[]) => Math.max(acc, val[0]!), 0);
+  const minX = trajectory.reduce(
+    (acc: number, val: number[]) => Math.min(acc, val[0]!),
+    0,
+  );
+  const maxX = trajectory.reduce(
+    (acc: number, val: number[]) => Math.max(acc, val[0]!),
+    0,
+  );
 
   const minTvdMsl = data.yAxisValues && data.yAxisValues[0]!;
-  const maxTvdMsl = data.yAxisValues && data.yAxisValues[data.yAxisValues.length - 1]!;
+  const maxTvdMsl =
+    data.yAxisValues && data.yAxisValues[data.yAxisValues.length - 1]!;
 
   // Find value domain
   const dp = data.datapoints || [];
-  const min = -dp.reduce((val: number, array: number[]) => Math.min(...array, val), 0);
-  const max = dp.reduce((val: number, array: number[]) => Math.max(...array, val), 0);
+  const min = -dp.reduce(
+    (val: number, array: number[]) => Math.min(...array, val),
+    0,
+  );
+  const max = dp.reduce(
+    (val: number, array: number[]) => Math.max(...array, val),
+    0,
+  );
 
   const absMax = Math.max(Math.abs(min), Math.abs(max));
 
@@ -103,8 +121,14 @@ export async function generateSeismicSliceImage(
   }
   const { datapoints: dp } = data;
 
-  const min = options?.seismicMin || options?.seismicRange || dp.reduce((val: number, array: number[]) => Math.min(...array, val), 0);
-  const max = options?.seismicMax || options?.seismicRange || dp.reduce((val: number, array: number[]) => Math.max(...array, val), 0);
+  const min =
+    options?.seismicMin ||
+    options?.seismicRange ||
+    dp.reduce((val: number, array: number[]) => Math.min(...array, val), 0);
+  const max =
+    options?.seismicMax ||
+    options?.seismicRange ||
+    dp.reduce((val: number, array: number[]) => Math.max(...array, val), 0);
 
   const absMax = Math.max(Math.abs(min), Math.abs(max));
 
@@ -131,7 +155,9 @@ export async function generateSeismicSliceImage(
   let offset = 0;
   const colorFactor = (colorTableSize - 1) / domain.difference;
 
-  let pos = options?.isLeftToRight ? trajectory[0]?.[0]! : trajectory[trajectory.length - 1]?.[0]!;
+  let pos = options?.isLeftToRight
+    ? trajectory[0]?.[0]!
+    : trajectory[trajectory.length - 1]?.[0]!;
 
   const step = (length / width) * (options?.isLeftToRight ? -1 : 1);
 

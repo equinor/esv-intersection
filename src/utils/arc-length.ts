@@ -16,19 +16,40 @@ export class ArcLength {
    * @param {Number} minDepth Min recursive depth before accepting solution
    * @param {Number} maxDepth Max recursive depth
    */
-  static bisect(func: fx, minLimit = 0, maxLimit = 1, tolerance = 0.005, minDepth = 4, maxDepth = 10): number {
-    const calcRec = (a: number, b: number, aVal: number[], bVal: number[], span: number, tolerance: number, depth = 0): number => {
+  static bisect(
+    func: fx,
+    minLimit = 0,
+    maxLimit = 1,
+    tolerance = 0.005,
+    minDepth = 4,
+    maxDepth = 10,
+  ): number {
+    const calcRec = (
+      a: number,
+      b: number,
+      aVal: number[],
+      bVal: number[],
+      span: number,
+      tolerance: number,
+      depth = 0,
+    ): number => {
       const mid = (a + b) / 2;
       const midVal = func(mid) as number[];
       const spanA = Vector2.distance(aVal, midVal);
       const spanB = Vector2.distance(midVal, bVal);
       const length = spanA + spanB;
-      if ((depth >= minDepth && Math.abs(length - span) < tolerance) || depth >= maxDepth) {
+      if (
+        (depth >= minDepth && Math.abs(length - span) < tolerance) ||
+        depth >= maxDepth
+      ) {
         return length;
       }
       const tol = tolerance / 2;
       const d = depth + 1;
-      return calcRec(a, mid, aVal, midVal, spanA, tol, d) + calcRec(mid, b, midVal, bVal, spanB, tol, d);
+      return (
+        calcRec(a, mid, aVal, midVal, spanA, tol, d) +
+        calcRec(mid, b, midVal, bVal, spanB, tol, d)
+      );
     };
     const aVal = func(minLimit) as number[];
     const bVal = func(maxLimit) as number[];
@@ -44,7 +65,12 @@ export class ArcLength {
    * @param {Number} maxLimit Max limit
    * @param {Number} segments Number of segments
    */
-  static trapezoid(func: fx, minLimit = 0, maxLimit = 1, segments = 1000): number {
+  static trapezoid(
+    func: fx,
+    minLimit = 0,
+    maxLimit = 1,
+    segments = 1000,
+  ): number {
     let length = 0;
     let lastPos = func(minLimit) as number[];
     const step = (maxLimit - minLimit) / (segments - 1);

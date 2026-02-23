@@ -100,8 +100,14 @@ describe('Reference system', () => {
   });
   it('should have correct length on extension', () => {
     const trajectory = rs.getExtendedTrajectory(100, 500.0, 500.0);
-    const startExtend = dist(trajectory.points[0]!, rs.interpolators.trajectory.getPointAt(0.0) as number[]);
-    const endExtend = dist(trajectory.points[99]!, rs.interpolators.trajectory.getPointAt(1.0) as number[]);
+    const startExtend = dist(
+      trajectory.points[0]!,
+      rs.interpolators.trajectory.getPointAt(0.0) as number[],
+    );
+    const endExtend = dist(
+      trajectory.points[99]!,
+      rs.interpolators.trajectory.getPointAt(1.0) as number[],
+    );
     expect(startExtend).toBeCloseTo(500.0);
     expect(endExtend).toBeCloseTo(500.0);
   });
@@ -109,10 +115,14 @@ describe('Reference system', () => {
   it('should throw error when parameters are negative', () => {
     expect(() => {
       rs.getExtendedTrajectory(100, -50.0, 500.0);
-    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive startExtensionLength parameter');
+    }).toThrow(
+      'Invalid parameter, getExtendedTrajectory() must be called with a valid and positive startExtensionLength parameter',
+    );
     expect(() => {
       rs.getExtendedTrajectory(100, 50.0, -500.0);
-    }).toThrow('Invalid parameter, getExtendedTrajectory() must be called with a valid and positive endExtensionLength parameter');
+    }).toThrow(
+      'Invalid parameter, getExtendedTrajectory() must be called with a valid and positive endExtensionLength parameter',
+    );
   });
 
   it('should work for vertical wellbore', () => {
@@ -126,12 +136,21 @@ describe('Reference system', () => {
     const trajectory = irs.getExtendedTrajectory(100, 1500.0, 1500.0);
     expect(trajectory.points.length).toEqual(100);
 
-    const startExtend = dist(trajectory.points[0]!, irs.interpolators.trajectory.getPointAt(0.0) as number[]);
-    const endExtend = dist(trajectory.points[99]!, irs.interpolators.trajectory.getPointAt(1.0) as number[]);
+    const startExtend = dist(
+      trajectory.points[0]!,
+      irs.interpolators.trajectory.getPointAt(0.0) as number[],
+    );
+    const endExtend = dist(
+      trajectory.points[99]!,
+      irs.interpolators.trajectory.getPointAt(1.0) as number[],
+    );
     expect(startExtend).toBeCloseTo(1500.0);
     expect(endExtend).toBeCloseTo(1500.0);
     const angle = degrees(
-      Math.atan((trajectory.points[99]?.[0]! - trajectory.points[0]?.[0]!) / (trajectory.points[99]?.[1]! - trajectory.points[0]?.[1]!)),
+      Math.atan(
+        (trajectory.points[99]?.[0]! - trajectory.points[0]?.[0]!) /
+          (trajectory.points[99]?.[1]! - trajectory.points[0]?.[1]!),
+      ),
     );
     expect(angle).toBeCloseTo(45.0);
   });

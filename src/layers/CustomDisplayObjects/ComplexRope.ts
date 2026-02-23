@@ -31,7 +31,8 @@ export class ComplexRope extends Mesh {
     this.autoUpdate = true;
 
     this.onRender = () => {
-      const geometry: ComplexRopeGeometry = this.geometry as ComplexRopeGeometry;
+      const geometry: ComplexRopeGeometry = this
+        .geometry as ComplexRopeGeometry;
 
       if (this.autoUpdate) {
         geometry.update();

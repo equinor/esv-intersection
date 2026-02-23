@@ -21,14 +21,18 @@ const CURVE_CATMULL_ROM_ALPHA = 0.7;
 const CURVE_CARDINAL_TENSION = 0.9;
 const CURVE_BUNDLE_BETA = 1.0;
 
-export interface WellborepathLayerOptions<T extends [number, number][]> extends LayerOptions<T> {
+export interface WellborepathLayerOptions<
+  T extends [number, number][],
+> extends LayerOptions<T> {
   stroke: string;
   strokeWidth: string;
   curveType?: string;
   tension?: number;
 }
 
-export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T> {
+export class WellborepathLayer<
+  T extends [number, number][],
+> extends SVGLayer<T> {
   rescaleEvent: OnRescaleEvent | undefined;
 
   constructor(id?: string, options?: WellborepathLayerOptions<T>) {
@@ -62,7 +66,10 @@ export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T>
     }
     this.elm.select('g').remove();
 
-    const data = this.data || (this.referenceSystem && (this.referenceSystem.projectedPath as [number, number][]));
+    const data =
+      this.data ||
+      (this.referenceSystem &&
+        (this.referenceSystem.projectedPath as [number, number][]));
     if (!data || !this.rescaleEvent) {
       return;
     }
@@ -80,15 +87,21 @@ export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T>
   private renderWellborePath(data: [number, number][]): string {
     if (this.rescaleEvent != null) {
       const { xScale, yScale } = this.rescaleEvent;
-      const transformedData: [number, number][] = data.map((d) => [xScale(d[0]), yScale(d[1])]);
+      const transformedData: [number, number][] = data.map(d => [
+        xScale(d[0]),
+        yScale(d[1]),
+      ]);
 
       // TODO: Might be a good idea to move something like this to a shared function in a base class
       let curveFactory;
-      const { curveType, tension } = this.options as WellborepathLayerOptions<T>;
+      const { curveType, tension } = this
+        .options as WellborepathLayerOptions<T>;
       switch (curveType) {
         default:
         case 'curveCatmullRom':
-          curveFactory = curveCatmullRom.alpha(tension || CURVE_CATMULL_ROM_ALPHA);
+          curveFactory = curveCatmullRom.alpha(
+            tension || CURVE_CATMULL_ROM_ALPHA,
+          );
           break;
         case 'curveLinear':
           curveFactory = curveLinear;
@@ -103,7 +116,9 @@ export class WellborepathLayer<T extends [number, number][]> extends SVGLayer<T>
           curveFactory = curveBundle.beta(tension || CURVE_BUNDLE_BETA);
           break;
         case 'curveCardinal':
-          curveFactory = curveCardinal.tension(tension || CURVE_CARDINAL_TENSION);
+          curveFactory = curveCardinal.tension(
+            tension || CURVE_CARDINAL_TENSION,
+          );
           break;
         case 'curveMonotoneX':
           curveFactory = curveMonotoneX;

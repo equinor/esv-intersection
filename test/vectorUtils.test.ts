@@ -20,7 +20,7 @@ describe('vectorUtils', () => {
 
     it('should create a normal for each point', () => {
       const normals = createNormals(points);
-      normals.forEach((normal) => {
+      normals.forEach(normal => {
         expect(normal instanceof Vector2).toEqual(true);
       });
       expect(normals.length).toEqual(points.length);
@@ -60,8 +60,12 @@ describe('vectorUtils', () => {
 
     it('should offset each point with the corresponding vector', () => {
       expect(newPoints[0]).toEqual(new Point(-0.70710678118, 0.70710678118));
-      expect(newPoints[1]).toEqual(new Point(0.29289321881999997, 1.70710678118));
-      expect(newPoints[2]).toEqual(new Point(1.29289321882, 2.7071067811800003));
+      expect(newPoints[1]).toEqual(
+        new Point(0.29289321881999997, 1.70710678118),
+      );
+      expect(newPoints[2]).toEqual(
+        new Point(1.29289321882, 2.7071067811800003),
+      );
     });
   });
 });

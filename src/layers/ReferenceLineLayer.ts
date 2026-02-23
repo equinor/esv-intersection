@@ -110,7 +110,12 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     const max = 500;
     const { ctx, canvas } = this;
 
-    if (this.xScale != null && this.yScale != null && canvas != null && ctx != null) {
+    if (
+      this.xScale != null &&
+      this.yScale != null &&
+      canvas != null &&
+      ctx != null
+    ) {
       const waveHeight = calcSize(factor, min, max, this.yScale);
       const wavePeriod = waveHeight * 2;
       const y = this.yScale(wavy.depth) - waveHeight;
@@ -122,7 +127,13 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
       this.setCtxLineWidth(ctx, wavy);
       for (let i = -1; i < steps; i++) {
         ctx.beginPath();
-        ctx.arc(i * wavePeriod + xOffset + waveHeight, y, waveHeight, 0, Math.PI);
+        ctx.arc(
+          i * wavePeriod + xOffset + waveHeight,
+          y,
+          waveHeight,
+          0,
+          Math.PI,
+        );
         ctx.stroke();
       }
       ctx.restore();
@@ -132,7 +143,12 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     }
   }
 
-  private drawText(ctx: CanvasRenderingContext2D, refLine: ReferenceLine, x: number, y: number) {
+  private drawText(
+    ctx: CanvasRenderingContext2D,
+    refLine: ReferenceLine,
+    x: number,
+    y: number,
+  ) {
     const textColor = refLine.textColor || '#000';
     const fontSize = refLine.fontSize || '10px sans-serif';
     const textOffsetX = 10;
@@ -146,7 +162,10 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     ctx.restore();
   }
 
-  private setCtxLineStyle(ctx: CanvasRenderingContext2D, refLine: ReferenceLine): void {
+  private setCtxLineStyle(
+    ctx: CanvasRenderingContext2D,
+    refLine: ReferenceLine,
+  ): void {
     const a = 8;
     const b = 10;
     foldReferenceLine(
@@ -165,7 +184,10 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     );
   }
 
-  private setCtxLineWidth(ctx: CanvasRenderingContext2D, refLine: ReferenceLine) {
+  private setCtxLineWidth(
+    ctx: CanvasRenderingContext2D,
+    refLine: ReferenceLine,
+  ) {
     const defaultLineWidth = 1;
     ctx.lineWidth = refLine.lineWidth || defaultLineWidth;
   }
@@ -178,12 +200,12 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     requestAnimationFrame(() => {
       this.clearCanvas();
 
-      this.data?.forEach((refLine) => {
+      this.data?.forEach(refLine => {
         foldReferenceLine(
           {
-            solid: (solid) => this.drawSolid(solid),
-            dashed: (dashed) => this.drawDashed(dashed),
-            wavy: (wavy) => this.drawWavy(wavy),
+            solid: solid => this.drawSolid(solid),
+            dashed: dashed => this.drawDashed(dashed),
+            wavy: wavy => this.drawWavy(wavy),
           },
           refLine,
         );

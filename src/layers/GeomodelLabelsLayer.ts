@@ -3,7 +3,12 @@ import { clamp } from '@equinor/videx-math';
 
 import { CanvasLayer } from './base/CanvasLayer';
 import { OnUpdateEvent, OnRescaleEvent, OnMountEvent } from '../interfaces';
-import { SurfaceArea, SurfaceLine, findSampleAtPos, SurfaceData } from '../datautils';
+import {
+  SurfaceArea,
+  SurfaceLine,
+  findSampleAtPos,
+  SurfaceData,
+} from '../datautils';
 import { SURFACE_LINE_WIDTH } from '../constants';
 import { LayerOptions } from './base/Layer';
 
@@ -14,7 +19,9 @@ const DEFAULT_TEXT_COLOR = 'black';
 const DEFAULT_FONT = 'Arial';
 const MAX_FONT_SIZE_IN_WORLD_COORDINATES = 70;
 
-export interface GeomodelLayerLabelsOptions<T extends SurfaceData> extends LayerOptions<T> {
+export interface GeomodelLayerLabelsOptions<
+  T extends SurfaceData,
+> extends LayerOptions<T> {
   margins?: number;
   minFontSize?: number;
   maxFontSize?: number;
@@ -42,10 +49,12 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   constructor(id?: string, options?: GeomodelLayerLabelsOptions<T>) {
     super(id, options);
     this.render = this.render.bind(this);
-    this.getMarginsInWorldCoordinates = this.getMarginsInWorldCoordinates.bind(this);
+    this.getMarginsInWorldCoordinates =
+      this.getMarginsInWorldCoordinates.bind(this);
     this.getSurfacesAreaEdges = this.getSurfacesAreaEdges.bind(this);
     this.updateXFlipped = this.updateXFlipped.bind(this);
-    this.generateSurfacesWithAvgDepth = this.generateSurfacesWithAvgDepth.bind(this);
+    this.generateSurfacesWithAvgDepth =
+      this.generateSurfacesWithAvgDepth.bind(this);
   }
 
   override get options(): GeomodelLayerLabelsOptions<T> {
@@ -59,35 +68,38 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
   generateSurfacesWithAvgDepth(): void {
     const areas = this.data?.areas ?? [];
-    this.areasWithAvgTopDepth = areas.reduce((acc: SurfaceAreaWithAvgTopDepth[], area: SurfaceArea) => {
-      // Filter surfaces without label
-      if (!area.label) {
-        return acc;
-      }
-      const sumAndCount = area.data.reduce(
-        (a: { sum: number; count: number }, d: number[]) => {
-          if (d[1] != null) {
-            a.sum += d[1];
-            a.count++;
-          }
-          return a;
-        },
-        {
-          sum: 0,
-          count: 0,
-        },
-      );
-      if (sumAndCount.count === 0) {
-        return acc;
-      }
-      const avgTopDepth = sumAndCount.sum / sumAndCount.count;
+    this.areasWithAvgTopDepth = areas.reduce(
+      (acc: SurfaceAreaWithAvgTopDepth[], area: SurfaceArea) => {
+        // Filter surfaces without label
+        if (!area.label) {
+          return acc;
+        }
+        const sumAndCount = area.data.reduce(
+          (a: { sum: number; count: number }, d: number[]) => {
+            if (d[1] != null) {
+              a.sum += d[1];
+              a.count++;
+            }
+            return a;
+          },
+          {
+            sum: 0,
+            count: 0,
+          },
+        );
+        if (sumAndCount.count === 0) {
+          return acc;
+        }
+        const avgTopDepth = sumAndCount.sum / sumAndCount.count;
 
-      acc.push({
-        ...area,
-        avgTopDepth,
-      });
-      return acc;
-    }, []);
+        acc.push({
+          ...area,
+          avgTopDepth,
+        });
+        return acc;
+      },
+      [],
+    );
   }
 
   override onMount(event: OnMountEvent): void {
@@ -128,36 +140,57 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
   }
 
   drawAreaLabels(): void {
-    this.areasWithAvgTopDepth.forEach((s: SurfaceAreaWithAvgTopDepth, i: number, array: SurfaceAreaWithAvgTopDepth[]) => {
-      const topmostSurfaceNotDrawnYet = array.reduce((acc: SurfaceAreaWithAvgTopDepth | null, v, index): SurfaceAreaWithAvgTopDepth | null => {
-        if (index > i) {
-          if (acc == null) {
-            acc = v;
-          } else {
-            if (v.avgTopDepth < acc.avgTopDepth) {
-              acc = v;
+    this.areasWithAvgTopDepth.forEach(
+      (
+        s: SurfaceAreaWithAvgTopDepth,
+        i: number,
+        array: SurfaceAreaWithAvgTopDepth[],
+      ) => {
+        const topmostSurfaceNotDrawnYet = array.reduce(
+          (
+            acc: SurfaceAreaWithAvgTopDepth | null,
+            v,
+            index,
+          ): SurfaceAreaWithAvgTopDepth | null => {
+            if (index > i) {
+              if (acc == null) {
+                acc = v;
+              } else {
+                if (v.avgTopDepth < acc.avgTopDepth) {
+                  acc = v;
+                }
+              }
             }
-          }
-        }
-        return acc;
-      }, null);
+            return acc;
+          },
+          null,
+        );
 
-      this.drawAreaLabel(s, topmostSurfaceNotDrawnYet, array, i);
-    });
+        this.drawAreaLabel(s, topmostSurfaceNotDrawnYet, array, i);
+      },
+    );
   }
 
   drawLineLabels(): void {
-    this.data?.lines.filter((surfaceLine: SurfaceLine) => surfaceLine.label).forEach((surfaceLine: SurfaceLine) => this.drawLineLabel(surfaceLine));
+    this.data?.lines
+      .filter((surfaceLine: SurfaceLine) => surfaceLine.label)
+      .forEach((surfaceLine: SurfaceLine) => this.drawLineLabel(surfaceLine));
   }
 
-  drawAreaLabel = (surfaceArea: SurfaceArea, nextSurfaceArea: SurfaceArea | null, surfaces: SurfaceArea[], i: number): void => {
+  drawAreaLabel = (
+    surfaceArea: SurfaceArea,
+    nextSurfaceArea: SurfaceArea | null,
+    surfaces: SurfaceArea[],
+    i: number,
+  ): void => {
     const { data } = surfaceArea;
     const { ctx, maxFontSizeInWorldCoordinates, isXFlipped } = this;
     const { xScale, yScale, xRatio, yRatio, zFactor } = this.rescaleEvent!;
     if (ctx == null) return;
 
     let isLabelsOnLeftSide = this.checkDrawLabelsOnLeftSide();
-    const margins = (this.options.margins || this.defaultMargins) * (isXFlipped ? -1 : 1);
+    const margins =
+      (this.options.margins || this.defaultMargins) * (isXFlipped ? -1 : 1);
     const marginsInWorldCoords = margins / xRatio;
     const minFontSize = this.options.minFontSize || this.defaultMinFontSize;
     const maxFontSize = this.options.maxFontSize || this.defaultMaxFontSize;
@@ -172,7 +205,8 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
     const leftEdge = xScale.invert(xScale.range()[0]!) + marginsInWorldCoords;
     const rightEdge = xScale.invert(xScale.range()[1]!) - marginsInWorldCoords;
-    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges() as [number, number];
+    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] =
+      this.getSurfacesAreaEdges() as [number, number];
 
     // Get label metrics
     ctx.save();
@@ -182,13 +216,23 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
     // Check if label will fit horizontally
     if (isLabelsOnLeftSide) {
-      const labelRightEdge = leftEdge + (isXFlipped ? -labelLengthInWorldCoords : labelLengthInWorldCoords);
-      if ((!isXFlipped && labelRightEdge > surfaceAreaRightEdge) || (isXFlipped && labelRightEdge < surfaceAreaRightEdge)) {
+      const labelRightEdge =
+        leftEdge +
+        (isXFlipped ? -labelLengthInWorldCoords : labelLengthInWorldCoords);
+      if (
+        (!isXFlipped && labelRightEdge > surfaceAreaRightEdge) ||
+        (isXFlipped && labelRightEdge < surfaceAreaRightEdge)
+      ) {
         isLabelsOnLeftSide = false;
       }
     } else {
-      const labelLeftEdge = rightEdge + (isXFlipped ? labelLengthInWorldCoords : -labelLengthInWorldCoords);
-      if ((!isXFlipped && labelLeftEdge < surfaceAreaLeftEdge) || (isXFlipped && labelLeftEdge > surfaceAreaLeftEdge)) {
+      const labelLeftEdge =
+        rightEdge +
+        (isXFlipped ? labelLengthInWorldCoords : -labelLengthInWorldCoords);
+      if (
+        (!isXFlipped && labelLeftEdge < surfaceAreaLeftEdge) ||
+        (isXFlipped && labelLeftEdge > surfaceAreaLeftEdge)
+      ) {
         isLabelsOnLeftSide = true;
       }
     }
@@ -197,9 +241,13 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     let startPos: number;
     const portionOfLabelLengthUsedForPosCalc = 0.07;
     if (isLabelsOnLeftSide) {
-      startPos = isXFlipped ? Math.min(surfaceAreaLeftEdge, leftEdge) : Math.max(surfaceAreaLeftEdge, leftEdge);
+      startPos = isXFlipped
+        ? Math.min(surfaceAreaLeftEdge, leftEdge)
+        : Math.max(surfaceAreaLeftEdge, leftEdge);
     } else {
-      startPos = isXFlipped ? Math.max(surfaceAreaRightEdge, rightEdge) : Math.min(surfaceAreaRightEdge, rightEdge);
+      startPos = isXFlipped
+        ? Math.max(surfaceAreaRightEdge, rightEdge)
+        : Math.min(surfaceAreaRightEdge, rightEdge);
     }
 
     const topEdge = yScale.invert(yScale.range()[0]!);
@@ -209,18 +257,31 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const dirSteps = 5;
     const posSteps = 3;
     const posStep =
-      portionOfLabelLengthUsedForPosCalc * (labelLengthInWorldCoords / posSteps) * (isLabelsOnLeftSide ? 1 : -1) * (isXFlipped ? -1 : 1);
-    const dirStep = (labelLengthInWorldCoords / dirSteps) * (isLabelsOnLeftSide ? 1 : -1) * (isXFlipped ? -1 : 1);
+      portionOfLabelLengthUsedForPosCalc *
+      (labelLengthInWorldCoords / posSteps) *
+      (isLabelsOnLeftSide ? 1 : -1) *
+      (isXFlipped ? -1 : 1);
+    const dirStep =
+      (labelLengthInWorldCoords / dirSteps) *
+      (isLabelsOnLeftSide ? 1 : -1) *
+      (isXFlipped ? -1 : 1);
 
     // Sample points from top and calculate position
-    const topData = data.map((d) => [d[0]!, d[1]!]);
-    const topPos = this.calcPos(topData, startPos, posSteps, posStep, topEdge, bottomEdge);
+    const topData = data.map(d => [d[0]!, d[1]!]);
+    const topPos = this.calcPos(
+      topData,
+      startPos,
+      posSteps,
+      posStep,
+      topEdge,
+      bottomEdge,
+    );
     if (!topPos) {
       return;
     }
 
     // Sample points from bottom and calculate position
-    const bottomData = data.map((d) => [d[0]!, d[2]!]);
+    const bottomData = data.map(d => [d[0]!, d[2]!]);
     let bottomPos = this.calcPos(
       bottomData,
       startPos,
@@ -228,7 +289,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       posStep,
       topEdge,
       bottomEdge,
-      nextSurfaceArea?.data.map((d) => [d[0]!, d[1]!]) ?? [],
+      nextSurfaceArea?.data.map(d => [d[0]!, d[1]!]) ?? [],
       surfaces,
       i,
     );
@@ -250,7 +311,8 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       labelLengthInWorldCoords = labelMetrics.width / xRatio;
     }
     // Sample points from top and bottom and calculate direction vector
-    const initialDirVec = isLabelsOnLeftSide !== isXFlipped ? Vector2.right : Vector2.left;
+    const initialDirVec =
+      isLabelsOnLeftSide !== isXFlipped ? Vector2.right : Vector2.left;
     const areaDir = this.calcAreaDir(
       topData,
       bottomData,
@@ -263,7 +325,7 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       0,
       Math.PI / 4,
       4,
-      nextSurfaceArea?.data.map((d) => [d[0]!, d[1]!]) ?? [],
+      nextSurfaceArea?.data.map(d => [d[0]!, d[1]!]) ?? [],
       surfaces,
       i,
     );
@@ -304,24 +366,37 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
     const leftEdge = xScale.invert(xScale.range()[0]!) + marginsInWorldCoords;
     const rightEdge = xScale.invert(xScale.range()[1]!) - marginsInWorldCoords;
-    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges() as [number, number];
+    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] =
+      this.getSurfacesAreaEdges() as [number, number];
 
     // Find edge where to draw
     let startPos: number;
     const steps = 5;
     if (isLabelsOnLeftSide) {
-      startPos = isXFlipped ? Math.max(surfaceAreaRightEdge, rightEdge) : Math.min(surfaceAreaRightEdge, rightEdge);
+      startPos = isXFlipped
+        ? Math.max(surfaceAreaRightEdge, rightEdge)
+        : Math.min(surfaceAreaRightEdge, rightEdge);
     } else {
-      startPos = isXFlipped ? Math.min(surfaceAreaLeftEdge, leftEdge) : Math.max(surfaceAreaLeftEdge, leftEdge);
+      startPos = isXFlipped
+        ? Math.min(surfaceAreaLeftEdge, leftEdge)
+        : Math.max(surfaceAreaLeftEdge, leftEdge);
     }
 
     // Calculate where to sample points
-    const step = (labelLengthInWorldCoords / steps) * (isLabelsOnLeftSide ? -1 : 1);
+    const step =
+      (labelLengthInWorldCoords / steps) * (isLabelsOnLeftSide ? -1 : 1);
 
     // Sample points and calculate position and direction vector
     const { data } = s;
     const pos = this.calcPos(data, startPos, steps, step);
-    const dir = this.calcLineDir(data, startPos, steps, step, zFactor, isLabelsOnLeftSide ? Vector2.left : Vector2.right);
+    const dir = this.calcLineDir(
+      data,
+      startPos,
+      steps,
+      step,
+      zFactor,
+      isLabelsOnLeftSide ? Vector2.left : Vector2.right,
+    );
     if (!pos || !dir) {
       return;
     }
@@ -329,7 +404,8 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     // Calculate position and direction for label
     const textX = startPos;
     const textY = pos.y - SURFACE_LINE_WIDTH - fontSizeInWorldCoords / 2;
-    const textDir = Vector2.angleRight(dir) - (isLabelsOnLeftSide ? Math.PI : 0);
+    const textDir =
+      Vector2.angleRight(dir) - (isLabelsOnLeftSide ? Math.PI : 0);
 
     // Draw label
     if (ctx) {
@@ -371,7 +447,14 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       const x = offset + i * step;
       const y = findSampleAtPos(data, x, topLimit, bottomLimit);
       if (y) {
-        const alternativeY = this.getAlternativeYValueIfAvailable(x, topLimit, bottomLimit, alternativeSurfaceData, surfaces, currentSurfaceIndex);
+        const alternativeY = this.getAlternativeYValueIfAvailable(
+          x,
+          topLimit,
+          bottomLimit,
+          alternativeSurfaceData,
+          surfaces,
+          currentSurfaceIndex,
+        );
         // Use topmost of value from current surface and alternative surface
         const usedY = alternativeY ? Math.min(y, alternativeY) : y;
         pos.add(x, usedY);
@@ -398,13 +481,23 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       return null;
     }
     // Find sample from passed in surface data
-    let altY = findSampleAtPos(alternativeSurfaceData, x, topLimit, bottomLimit);
+    let altY = findSampleAtPos(
+      alternativeSurfaceData,
+      x,
+      topLimit,
+      bottomLimit,
+    );
     if (altY == null && surfaces && currentSurfaceIndex != null) {
       //Find topmost surface after current which gives us data
       let si = currentSurfaceIndex + 1;
       while (altY == null && si < surfaces.length) {
         const altSurface = surfaces[si++];
-        altY = findSampleAtPos(altSurface?.data.map((d: number[]) => [d[0]!, d[1]!]) ?? [], x, topLimit, bottomLimit);
+        altY = findSampleAtPos(
+          altSurface?.data.map((d: number[]) => [d[0]!, d[1]!]) ?? [],
+          x,
+          topLimit,
+          bottomLimit,
+        );
       }
     }
     return altY;
@@ -464,7 +557,8 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     for (let i = 0; i <= count; i++) {
       const x = offset + i * step;
       const topY = findSampleAtPos(top, x, topLimit, bottomLimit);
-      const bottomY = findSampleAtPos(bottom, x, topLimit, bottomLimit) || bottomLimit;
+      const bottomY =
+        findSampleAtPos(bottom, x, topLimit, bottomLimit) || bottomLimit;
       // Find position of next surface in case it's higher than current base
       const alternativeBottomY = this.getAlternativeYValueIfAvailable(
         x,
@@ -475,7 +569,9 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
         currentSurfaceIndex,
       );
       // Use topmost of value from current surface and alternative surface
-      const usedBottomY = alternativeBottomY ? Math.min(bottomY, alternativeBottomY) : bottomY;
+      const usedBottomY = alternativeBottomY
+        ? Math.min(bottomY, alternativeBottomY)
+        : bottomY;
       if (i === 0) {
         if (topY === null) {
           return Vector2.angleRight(initalVector);
@@ -514,7 +610,9 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
   getMarginsInWorldCoordinates(): number {
     const { xRatio } = this.rescaleEvent!;
-    const margins = (this.options.margins || this.defaultMargins) * (this.isXFlipped ? -1 : 1);
+    const margins =
+      (this.options.margins || this.defaultMargins) *
+      (this.isXFlipped ? -1 : 1);
     const marginsInWorldCoords = margins / xRatio;
     return marginsInWorldCoords;
   }
@@ -559,8 +657,12 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const maxX = Math.max(...endPoints);
     const marginsInWorldCoords = this.getMarginsInWorldCoordinates();
     const { isXFlipped } = this;
-    const surfaceAreaLeftEdge = isXFlipped ? maxX + marginsInWorldCoords : minX + marginsInWorldCoords;
-    const surfaceAreaRightEdge = isXFlipped ? minX - marginsInWorldCoords : maxX - marginsInWorldCoords;
+    const surfaceAreaLeftEdge = isXFlipped
+      ? maxX + marginsInWorldCoords
+      : minX + marginsInWorldCoords;
+    const surfaceAreaRightEdge = isXFlipped
+      ? minX - marginsInWorldCoords
+      : maxX - marginsInWorldCoords;
     return [surfaceAreaLeftEdge, surfaceAreaRightEdge];
   }
 
@@ -576,13 +678,23 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const [dx1, dx2] = xScale.domain() as [number, number];
     const [dy1, dy2] = yScale.domain() as [number, number];
 
-    let top = referenceSystem.interpolators.curtain.getIntersects(dy1, 1, 0) as number[][];
+    let top = referenceSystem.interpolators.curtain.getIntersects(
+      dy1,
+      1,
+      0,
+    ) as number[][];
     if (top.length === 0) {
       top = [referenceSystem.interpolators.curtain.getPointAt(0.0) as number[]];
     }
-    let bottom = referenceSystem.interpolators.curtain.getIntersects(dy2, 1, 0) as number[][];
+    let bottom = referenceSystem.interpolators.curtain.getIntersects(
+      dy2,
+      1,
+      0,
+    ) as number[][];
     if (bottom.length === 0) {
-      bottom = [referenceSystem.interpolators.curtain.getPointAt(1.0) as number[]];
+      bottom = [
+        referenceSystem.interpolators.curtain.getPointAt(1.0) as number[],
+      ];
     }
 
     const maxX = Math.max(top[0]?.[0]!, bottom[0]?.[0]!);
@@ -597,20 +709,33 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
     const screenLeftEdge = dx1 + margin;
     const screenRightEdge = dx2 - margin;
 
-    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] = this.getSurfacesAreaEdges() as [number, number];
+    const [surfaceAreaLeftEdge, surfaceAreaRightEdge] =
+      this.getSurfacesAreaEdges() as [number, number];
 
-    const leftLimit = isXFlipped ? Math.min(screenLeftEdge, surfaceAreaLeftEdge) : Math.max(screenLeftEdge, surfaceAreaLeftEdge);
-    const rightLimit = isXFlipped ? Math.max(screenRightEdge, surfaceAreaRightEdge) : Math.min(screenRightEdge, surfaceAreaRightEdge);
+    const leftLimit = isXFlipped
+      ? Math.min(screenLeftEdge, surfaceAreaLeftEdge)
+      : Math.max(screenLeftEdge, surfaceAreaLeftEdge);
+    const rightLimit = isXFlipped
+      ? Math.max(screenRightEdge, surfaceAreaRightEdge)
+      : Math.min(screenRightEdge, surfaceAreaRightEdge);
 
-    const spaceOnLeftSide = Math.max(isXFlipped ? leftLimit - wbBBox.left : wbBBox.left - leftLimit, 0);
-    const spaceOnRightSide = Math.max(isXFlipped ? wbBBox.right - rightLimit : rightLimit - wbBBox.right, 0);
+    const spaceOnLeftSide = Math.max(
+      isXFlipped ? leftLimit - wbBBox.left : wbBBox.left - leftLimit,
+      0,
+    );
+    const spaceOnRightSide = Math.max(
+      isXFlipped ? wbBBox.right - rightLimit : rightLimit - wbBBox.right,
+      0,
+    );
 
     const spaceOnLeftSideInScreenCoordinates = spaceOnLeftSide * xRatio;
     const spaceOnRightSideInScreenCoordinates = spaceOnRightSide * xRatio;
     const isLabelsOnLeftSide =
       spaceOnLeftSide > spaceOnRightSide ||
       spaceOnLeftSideInScreenCoordinates > t ||
-      (spaceOnLeftSideInScreenCoordinates < t && spaceOnRightSideInScreenCoordinates < t && isXFlipped) ||
+      (spaceOnLeftSideInScreenCoordinates < t &&
+        spaceOnRightSideInScreenCoordinates < t &&
+        isXFlipped) ||
       bottom[0]?.[1]! < dy1;
 
     return isLabelsOnLeftSide;

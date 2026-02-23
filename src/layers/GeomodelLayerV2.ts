@@ -36,8 +36,8 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
       return;
     }
 
-    data.areas.forEach((a) => this.generateAreaPolygon(a));
-    data.lines.forEach((l) => this.generateSurfaceLine(l));
+    data.areas.forEach(a => this.generateAreaPolygon(a));
+    data.lines.forEach(l => this.generateSurfaceLine(l));
 
     this.isPreRendered = true;
   }
@@ -89,7 +89,12 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     const { data: d } = s;
 
     const alignment = 0.5;
-    g.setStrokeStyle({ width: SURFACE_LINE_WIDTH, color: s.color as number, alpha: 1, alignment });
+    g.setStrokeStyle({
+      width: SURFACE_LINE_WIDTH,
+      color: s.color as number,
+      alpha: 1,
+      alignment,
+    });
 
     let penDown = false;
     for (let i = 0; i < d.length; i++) {

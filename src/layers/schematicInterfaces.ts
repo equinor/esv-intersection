@@ -46,7 +46,8 @@ export interface PAndASymbol extends SymbolComponent {
   kind: 'pAndASymbol';
 }
 
-export const isPAndASymbol = (item: PAndA): item is PAndASymbol => item.kind === 'pAndASymbol';
+export const isPAndASymbol = (item: PAndA): item is PAndASymbol =>
+  item.kind === 'pAndASymbol';
 
 export interface CementSqueeze {
   kind: 'cementSqueeze';
@@ -59,7 +60,8 @@ export interface CementSqueeze {
   referenceIds: string[];
 }
 
-export const isCementSqueeze = (item: PAndA): item is CementSqueeze => item.kind === 'cementSqueeze';
+export const isCementSqueeze = (item: PAndA): item is CementSqueeze =>
+  item.kind === 'cementSqueeze';
 
 export interface CementPlug {
   kind: 'cementPlug';
@@ -72,7 +74,8 @@ export interface CementPlug {
   referenceIds: string[];
 }
 
-export const isCementPlug = (item: PAndA): item is CementSqueeze => item.kind === 'cementPlug';
+export const isCementPlug = (item: PAndA): item is CementSqueeze =>
+  item.kind === 'cementPlug';
 
 export type PAndA = PAndASymbol | CementSqueeze | CementPlug;
 
@@ -98,7 +101,11 @@ export interface CompletionSymbol extends BaseCompletion {
 export type Completion = Tubing | Screen | CompletionSymbol;
 
 export const foldCompletion =
-  <T>(fScreen: (obj: Screen) => T, fTubing: (obj: Tubing) => T, fSymbol: (obj: CompletionSymbol) => T) =>
+  <T>(
+    fScreen: (obj: Screen) => T,
+    fTubing: (obj: Tubing) => T,
+    fSymbol: (obj: CompletionSymbol) => T,
+  ) =>
   (completion: Completion): T => {
     switch (completion.kind) {
       case 'screen':
@@ -303,7 +310,8 @@ export function isOpenHoleFracPack(perf: Perforation) {
   );
 }
 
-export const isSubKindCasedHoleFracturation = (perf: Perforation): boolean => perf.subKind === 'Cased hole fracturation';
+export const isSubKindCasedHoleFracturation = (perf: Perforation): boolean =>
+  perf.subKind === 'Cased hole fracturation';
 
 export const intersect = (a: Perforation, b: Perforation): boolean => {
   return a.start < b.end && a.end > b.start;
@@ -330,7 +338,9 @@ export interface InternalLayerOptions {
   perforationLayerId: string;
 }
 
-export const defaultInternalLayerOptions = (layerId: string): InternalLayerOptions => ({
+export const defaultInternalLayerOptions = (
+  layerId: string,
+): InternalLayerOptions => ({
   holeLayerId: `${layerId}-hole`,
   casingLayerId: `${layerId}-casing`,
   completionLayerId: `${layerId}-completion`,

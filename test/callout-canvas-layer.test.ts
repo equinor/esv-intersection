@@ -1,4 +1,12 @@
-import { describe, expect, it, beforeEach, afterEach, vi, MockInstance } from 'vitest';
+import {
+  describe,
+  expect,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  MockInstance,
+} from 'vitest';
 import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
 import createMockRaf from 'mock-raf';
 import { CalloutCanvasLayer, IntersectionReferenceSystem } from '../src/index';
@@ -15,7 +23,9 @@ describe('CalloutCanvasLayer', () => {
 
   const mockRaf = createMockRaf();
 
-  let mockRequestAnimationFrame: MockInstance<(callback: FrameRequestCallback) => number>;
+  let mockRequestAnimationFrame: MockInstance<
+    (callback: FrameRequestCallback) => number
+  >;
 
   beforeEach(() => {
     elm = document.createElement('div');
@@ -41,7 +51,9 @@ describe('CalloutCanvasLayer', () => {
     it('should render when reference system is set in constructor', () => {
       // Arrange
       const referenceSystem = new IntersectionReferenceSystem(wp);
-      const layer = new CalloutCanvasLayer('calloutcanvaslayer', { referenceSystem });
+      const layer = new CalloutCanvasLayer('calloutcanvaslayer', {
+        referenceSystem,
+      });
       layer.onMount({ elm });
       layer.onUpdate({ data });
       layer.onRescale(rescaleEventStub());
@@ -53,8 +65,11 @@ describe('CalloutCanvasLayer', () => {
       mockRaf.step();
 
       // Assert
-      const events: CanvasRenderingContext2DEvent[] = layer.ctx?.__getEvents() ?? [];
-      const fillTextCalls = events.filter((call: CanvasRenderingContext2DEvent) => call.type === 'fillText');
+      const events: CanvasRenderingContext2DEvent[] =
+        layer.ctx?.__getEvents() ?? [];
+      const fillTextCalls = events.filter(
+        (call: CanvasRenderingContext2DEvent) => call.type === 'fillText',
+      );
       expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -74,8 +89,11 @@ describe('CalloutCanvasLayer', () => {
       mockRaf.step();
 
       // Assert
-      const events: CanvasRenderingContext2DEvent[] = layer.ctx?.__getEvents() ?? [];
-      const fillTextCalls = events.filter((call: CanvasRenderingContext2DEvent) => call.type === 'fillText');
+      const events: CanvasRenderingContext2DEvent[] =
+        layer.ctx?.__getEvents() ?? [];
+      const fillTextCalls = events.filter(
+        (call: CanvasRenderingContext2DEvent) => call.type === 'fillText',
+      );
       expect(fillTextCalls.length).toBeGreaterThanOrEqual(1);
     });
 

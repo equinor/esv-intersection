@@ -59,8 +59,12 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
     requestAnimationFrame(() => {
       this.clearCanvas();
-      this.surfaceAreasPaths.forEach((p: SurfacePaths) => this.drawPolygonPath(p.color, p.path));
-      this.surfaceLinesPaths.forEach((l: SurfacePaths) => this.drawLinePath(l.color, l.path));
+      this.surfaceAreasPaths.forEach((p: SurfacePaths) =>
+        this.drawPolygonPath(p.color, p.path),
+      );
+      this.surfaceLinesPaths.forEach((l: SurfacePaths) =>
+        this.drawLinePath(l.color, l.path),
+      );
     });
   }
 
@@ -85,7 +89,10 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
     this.surfaceLinesPaths =
       this.data?.lines.reduce((acc: SurfacePaths[], l: SurfaceLine) => {
         const lines = this.generateLinePaths(l);
-        const mapped: SurfacePaths[] = lines.map((path: Path2D) => ({ color: this.colorToCSSColor(l.color), path }));
+        const mapped: SurfacePaths[] = lines.map((path: Path2D) => ({
+          color: this.colorToCSSColor(l.color),
+          path,
+        }));
         acc.push(...mapped);
         return acc;
       }, []) ?? [];

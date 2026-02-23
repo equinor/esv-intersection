@@ -1,6 +1,18 @@
-import { autoDetectRenderer, AutoDetectOptions, Container, ContainerChild, Renderer, RendererType } from 'pixi.js';
+import {
+  autoDetectRenderer,
+  AutoDetectOptions,
+  Container,
+  ContainerChild,
+  Renderer,
+  RendererType,
+} from 'pixi.js';
 import { Layer, LayerOptions } from './Layer';
-import { OnMountEvent, OnRescaleEvent, OnResizeEvent, OnUnmountEvent } from '../../interfaces';
+import {
+  OnMountEvent,
+  OnRescaleEvent,
+  OnResizeEvent,
+  OnUnmountEvent,
+} from '../../interfaces';
 import { DEFAULT_LAYER_HEIGHT, DEFAULT_LAYER_WIDTH } from '../../constants';
 
 // PixiRenderApplication has many similarities with PIXI.Application,
@@ -44,7 +56,11 @@ export abstract class PixiLayer<T> extends Layer<T> {
   private ctx: PixiRenderApplication;
   private container: Container;
 
-  constructor(ctx: PixiRenderApplication, id?: string, options?: LayerOptions<T>) {
+  constructor(
+    ctx: PixiRenderApplication,
+    id?: string,
+    options?: LayerOptions<T>,
+  ) {
     super(id, options);
 
     this.ctx = ctx;
@@ -62,7 +78,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
 
   clearLayer() {
     const children = this.container.removeChildren();
-    children.forEach((child) => {
+    children.forEach(child => {
       child.destroy();
     });
   }
@@ -70,7 +86,8 @@ export abstract class PixiLayer<T> extends Layer<T> {
   override onMount(event: OnMountEvent) {
     super.onMount(event);
 
-    this.pixiViewContainer = this.element?.querySelector('#webgl-layer') ?? undefined;
+    this.pixiViewContainer =
+      this.element?.querySelector('#webgl-layer') ?? undefined;
 
     if (!this.pixiViewContainer) {
       this.pixiViewContainer = document.createElement('div');
@@ -108,7 +125,10 @@ export abstract class PixiLayer<T> extends Layer<T> {
     const flippedX = event.xBounds[0] > event.xBounds[1];
     const flippedY = event.yBounds[0] > event.yBounds[1];
     this.setContainerPosition(event.xScale(0), event.yScale(0));
-    this.setContainerScale(event.xRatio * (flippedX ? -1 : 1), event.yRatio * (flippedY ? -1 : 1));
+    this.setContainerScale(
+      event.xRatio * (flippedX ? -1 : 1),
+      event.yRatio * (flippedY ? -1 : 1),
+    );
   }
 
   protected setContainerPosition(x?: number, y?: number) {
@@ -130,7 +150,7 @@ export abstract class PixiLayer<T> extends Layer<T> {
       ['z-index', `${this.order}`],
       ['opacity', `${this.opacity}`],
     ]
-      .map((pair) => pair.join(':'))
+      .map(pair => pair.join(':'))
       .join(';');
 
     this.pixiViewContainer?.setAttribute('style', styles);

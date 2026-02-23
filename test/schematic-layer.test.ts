@@ -1,6 +1,11 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { SchematicData } from '../src/layers/schematicInterfaces';
-import { SchematicLayer, SchematicLayerOptions, IntersectionReferenceSystem, PixiRenderApplication } from '../src/index';
+import {
+  SchematicLayer,
+  SchematicLayerOptions,
+  IntersectionReferenceSystem,
+  PixiRenderApplication,
+} from '../src/index';
 import { rescaleEventStub } from './test-helpers';
 
 describe('SchematicLayer', () => {
@@ -20,7 +25,9 @@ describe('SchematicLayer', () => {
   });
   describe('when setting reference system', () => {
     const data: SchematicData = {
-      holeSizes: [{ kind: 'hole', id: 'test-hole-1', start: 50, end: 500, diameter: 36 }],
+      holeSizes: [
+        { kind: 'hole', id: 'test-hole-1', start: 50, end: 500, diameter: 36 },
+      ],
       casings: [],
       cements: [],
       completion: [],
@@ -37,7 +44,11 @@ describe('SchematicLayer', () => {
       const options: SchematicLayerOptions<SchematicData> = {
         referenceSystem,
       };
-      const layer = new SchematicLayer(pixiRenderApplication, 'schematic-webgl-layer', options);
+      const layer = new SchematicLayer(
+        pixiRenderApplication,
+        'schematic-webgl-layer',
+        options,
+      );
       layer.onMount({ elm });
       await layer.onUpdate({ data });
       await layer.onRescale(rescaleEventStub());
@@ -56,7 +67,11 @@ describe('SchematicLayer', () => {
       // Arrange
       const pixiRenderApplication = new PixiRenderApplication();
       await pixiRenderApplication.init();
-      const layer = new SchematicLayer(pixiRenderApplication, 'casing-layer', {});
+      const layer = new SchematicLayer(
+        pixiRenderApplication,
+        'casing-layer',
+        {},
+      );
       const referenceSystem = new IntersectionReferenceSystem(wp);
       layer.referenceSystem = referenceSystem;
       layer.onMount({ elm });
@@ -77,7 +92,11 @@ describe('SchematicLayer', () => {
       // Arrange
       const pixiRenderApplication = new PixiRenderApplication();
       await pixiRenderApplication.init();
-      const layer = new SchematicLayer(pixiRenderApplication, 'casing-layer', {});
+      const layer = new SchematicLayer(
+        pixiRenderApplication,
+        'casing-layer',
+        {},
+      );
       layer.onMount({ elm });
       await layer.onUpdate({ data });
       await layer.onRescale(rescaleEventStub());

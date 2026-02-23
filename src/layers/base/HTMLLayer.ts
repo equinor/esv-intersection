@@ -9,8 +9,14 @@ export abstract class HTMLLayer<T> extends Layer<T> {
   override onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm } = event;
-    const width = event.width || parseInt(elm?.getAttribute('width') ?? '', 10) || DEFAULT_LAYER_WIDTH;
-    const height = event.height || parseInt(elm?.getAttribute('height') ?? '', 10) || DEFAULT_LAYER_HEIGHT;
+    const width =
+      event.width ||
+      parseInt(elm?.getAttribute('width') ?? '', 10) ||
+      DEFAULT_LAYER_WIDTH;
+    const height =
+      event.height ||
+      parseInt(elm?.getAttribute('height') ?? '', 10) ||
+      DEFAULT_LAYER_HEIGHT;
 
     if (!this.elm) {
       this.elm = select(elm).append('div');
@@ -39,7 +45,9 @@ export abstract class HTMLLayer<T> extends Layer<T> {
       return;
     }
     super.onResize(event);
-    this.elm.style('height', `${event.height}px`).style('width', `${event.width}px`);
+    this.elm
+      .style('height', `${event.height}px`)
+      .style('width', `${event.width}px`);
   }
 
   override setVisibility(visible: boolean): void {
