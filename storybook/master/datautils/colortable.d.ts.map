@@ -1,1 +1,1 @@
-{"version":3,"file":"colortable.d.ts","sourceRoot":"","sources":["../../../../src/datautils/colortable.ts"],"names":[],"mappings":"AAGA,wBAAgB,gBAAgB,CAAC,QAAQ,EAAE,MAAM,EAAE,EAAE,IAAI,EAAE,MAAM,GAAG,CAAC,MAAM,EAAE,MAAM,EAAE,MAAM,CAAC,EAAE,CAU7F"}
+{"version":3,"file":"colortable.d.ts","sourceRoot":"","sources":["../../../../src/datautils/colortable.ts"],"names":[],"mappings":"AAGA,wBAAgB,gBAAgB,CAC9B,QAAQ,EAAE,MAAM,EAAE,EAClB,IAAI,EAAE,MAAM,GACX,CAAC,MAAM,EAAE,MAAM,EAAE,MAAM,CAAC,EAAE,CAY5B"}

@@ -40,11 +40,11 @@ export declare const createComplexRopeSegmentsForCement: (cement: Cement, casing
 export declare const createComplexRopeSegmentsForCementSqueeze: (squeeze: CementSqueeze, casings: Casing[], completion: Completion[], holes: HoleSize[], exaggerationFactor: number, getPoints: (start: number, end: number) => Point[]) => ComplexRopeSegment[];
 export declare const createComplexRopeSegmentsForCementPlug: (plug: CementPlug, casings: Casing[], completion: Completion[], holes: HoleSize[], exaggerationFactor: number, getPoints: (start: number, end: number) => Point[]) => ComplexRopeSegment[];
 export declare const createHoleBaseTexture: ({ firstColor, secondColor }: HoleOptions, width: number, height: number) => Texture;
-export declare const createScreenTexture: ({ scalingFactor }: ScreenOptions) => Texture;
-export declare const createTubingTexture: ({ innerColor, outerColor, scalingFactor }: TubingOptions) => Texture;
-export declare const createCementTexture: ({ firstColor, secondColor, scalingFactor }: CementOptions) => Texture;
-export declare const createCementPlugTexture: ({ firstColor, secondColor, scalingFactor }: CementPlugOptions) => Texture;
-export declare const createCementSqueezeTexture: ({ firstColor, secondColor, scalingFactor }: CementSqueezeOptions) => Texture;
+export declare const createScreenTexture: ({ scalingFactor, }: ScreenOptions) => Texture;
+export declare const createTubingTexture: ({ innerColor, outerColor, scalingFactor, }: TubingOptions) => Texture;
+export declare const createCementTexture: ({ firstColor, secondColor, scalingFactor, }: CementOptions) => Texture;
+export declare const createCementPlugTexture: ({ firstColor, secondColor, scalingFactor, }: CementPlugOptions) => Texture;
+export declare const createCementSqueezeTexture: ({ firstColor, secondColor, scalingFactor, }: CementSqueezeOptions) => Texture;
 export declare const createTubularRenderingObject: (radius: number, pathPoints: Point[]) => TubularRenderingObject;
 export type CasingInterval = {
     kind: 'casing' | 'casing-window';
