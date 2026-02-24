@@ -1,9 +1,22 @@
 import { max } from 'd3-array';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
-import { Assets, Graphics, groupD8, Point, Rectangle, MeshRope, Texture } from 'pixi.js';
+import {
+  Assets,
+  Graphics,
+  groupD8,
+  Point,
+  Rectangle,
+  MeshRope,
+  Texture,
+} from 'pixi.js';
 import { DashLine } from '../vendor/pixi-dashed-line';
 import { LayerOptions, PixiLayer, PixiRenderApplication } from '.';
-import { DEFAULT_TEXTURE_SIZE, EXAGGERATED_DIAMETER, HOLE_OUTLINE, SCREEN_OUTLINE } from '../constants';
+import {
+  DEFAULT_TEXTURE_SIZE,
+  EXAGGERATED_DIAMETER,
+  HOLE_OUTLINE,
+  SCREEN_OUTLINE,
+} from '../constants';
 import {
   assertNever,
   Casing,
@@ -68,7 +81,10 @@ import {
 import { OnUpdateEvent, OnRescaleEvent, OnUnmountEvent } from '../interfaces';
 import { convertColor } from '../utils/color';
 import { createNormals, offsetPoint, offsetPoints } from '../utils/vectorUtils';
-import { ComplexRope, ComplexRopeSegment } from './CustomDisplayObjects/ComplexRope';
+import {
+  ComplexRope,
+  ComplexRopeSegment,
+} from './CustomDisplayObjects/ComplexRope';
 import { FixedWidthSimpleRope } from './CustomDisplayObjects/FixedWidthSimpleRope';
 import { UniformTextureStretchRope } from './CustomDisplayObjects/UniformTextureStretchRope';
 
@@ -98,10 +114,17 @@ interface CementSqueezeRenderObject {
   zIndex?: number;
 }
 
-type InterlacedRenderObjects = CasingRenderObject | CementRenderObject | CementSqueezeRenderObject;
+type InterlacedRenderObjects =
+  | CasingRenderObject
+  | CementRenderObject
+  | CementSqueezeRenderObject;
 
 const foldInterlacedRenderObjects =
-  <T>(fCasing: (obj: CasingRenderObject) => T, fCement: (obj: CementRenderObject) => T, fCementSqueeze: (obj: CementSqueezeRenderObject) => T) =>
+  <T>(
+    fCasing: (obj: CasingRenderObject) => T,
+    fCement: (obj: CementRenderObject) => T,
+    fCementSqueeze: (obj: CementSqueezeRenderObject) => T,
+  ) =>
   (renderObject: InterlacedRenderObjects): T => {
     switch (renderObject.kind) {
       case 'casing':
@@ -115,7 +138,9 @@ const foldInterlacedRenderObjects =
     }
   };
 
-export interface SchematicLayerOptions<T extends SchematicData> extends LayerOptions<T> {
+export interface SchematicLayerOptions<
+  T extends SchematicData,
+> extends LayerOptions<T> {
   exaggerationFactor?: number;
   internalLayerOptions?: InternalLayerOptions;
   holeOptions?: HoleOptions;
@@ -128,7 +153,9 @@ export interface SchematicLayerOptions<T extends SchematicData> extends LayerOpt
   perforationOptions?: PerforationOptions;
 }
 
-const defaultSchematicLayerOptions = (layerId: string): SchematicLayerOptions<SchematicData> => ({
+const defaultSchematicLayerOptions = (
+  layerId: string,
+): SchematicLayerOptions<SchematicData> => ({
   exaggerationFactor: 2,
   internalLayerOptions: defaultInternalLayerOptions(layerId),
   holeOptions: defaultHoleOptions,
@@ -167,7 +194,11 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     yScale: scaleLinear(),
   };
 
-  constructor(ctx: PixiRenderApplication, id?: string, options?: SchematicLayerOptions<T>) {
+  constructor(
+    ctx: PixiRenderApplication,
+    id?: string,
+    options?: SchematicLayerOptions<T>,
+  ) {
     super(ctx, id, options);
     this.options = <SchematicLayerOptions<T>>{
       ...this.options,
@@ -196,13 +227,20 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   public override async onRescale(event: OnRescaleEvent): Promise<void> {
     const shouldRecalculate = this.scalingFactors.zFactor !== event.zFactor;
 
-    this.scalingFactors = { height: event.height, zFactor: event.zFactor, yScale: event.yScale };
+    this.scalingFactors = {
+      height: event.height,
+      zFactor: event.zFactor,
+      yScale: event.yScale,
+    };
     super.optionsRescale(event);
     const yRatio = this.yRatio();
     const flippedX = event.xBounds[0] > event.xBounds[1];
     const flippedY = event.yBounds[0] > event.yBounds[1];
     this.setContainerPosition(event.xScale(0), event.yScale(0));
-    this.setContainerScale(event.xRatio * (flippedX ? -1 : 1), yRatio * (flippedY ? -1 : 1));
+    this.setContainerScale(
+      event.xRatio * (flippedX ? -1 : 1),
+      yRatio * (flippedY ? -1 : 1),
+    );
     if (shouldRecalculate) {
       this.clearLayer();
       await this.preRender();
@@ -218,12 +256,17 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
 
     const { internalLayerOptions } = this.options as SchematicLayerOptions<T>;
-    const entries = internalLayerOptions ? Object.entries(internalLayerOptions) : [];
-    const entryFound = entries.find(([_key, id]: [string, string]) => id === layerId);
+    const entries = internalLayerOptions
+      ? Object.entries(internalLayerOptions)
+      : [];
+    const entryFound = entries.find(
+      ([_key, id]: [string, string]) => id === layerId,
+    );
     const keyFound = entryFound?.[0];
 
     if (keyFound) {
-      this.internalLayerVisibility[keyFound as keyof InternalLayerVisibility] = isVisible;
+      this.internalLayerVisibility[keyFound as keyof InternalLayerVisibility] =
+        isVisible;
       this.clearLayer();
       await this.preRender();
       this.render();
@@ -244,14 +287,19 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const ySpan = domain[1] - domain[0];
     const baseYSpan = ySpan * this.scalingFactors.zFactor;
     const baseDomain: [number, number] = [domain[0], domain[0] + baseYSpan];
-    return Math.abs(this.scalingFactors.height / (baseDomain[1] - baseDomain[0]));
+    return Math.abs(
+      this.scalingFactors.height / (baseDomain[1] - baseDomain[0]),
+    );
   }
 
-  protected getZFactorScaledPathForPoints = (start: number, end: number): Point[] => {
+  protected getZFactorScaledPathForPoints = (
+    start: number,
+    end: number,
+  ): Point[] => {
     const y = (y: number): number => y * this.scalingFactors.zFactor;
 
     const path = this.referenceSystem?.getCurtainPath(start, end, true) ?? [];
-    return path.map((p) => new Point(p.point[0], y(p.point[1]!)));
+    return path.map(p => new Point(p.point[0], y(p.point[1]!)));
   };
 
   protected drawBigPolygon = (coords: Point[], color = 0x000000) => {
@@ -267,7 +315,11 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return undefined;
     }
 
-    const rope: MeshRope = new MeshRope({ texture, points: path, textureScale: 1 });
+    const rope: MeshRope = new MeshRope({
+      texture,
+      points: path,
+      textureScale: 1,
+    });
     rope.tint = tint || rope.tint;
     this.addChild(rope);
   }
@@ -289,7 +341,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     outlineClosure: OutlineClosure = 'None',
     lineAlignment = 1,
   ): void {
-    const leftPathReverse = leftPath.map<Point>((d) => d.clone()).reverse();
+    const leftPathReverse = leftPath.map<Point>(d => d.clone()).reverse();
 
     const startPointRight = rightPath[0]!;
     const startPointLeft = leftPathReverse[0]!;
@@ -308,7 +360,11 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       line.lineTo(startPointRight.x, startPointRight.y);
     }
 
-    line.stroke({ width: lineWidth, color: lineColor, alignment: lineAlignment });
+    line.stroke({
+      width: lineWidth,
+      color: lineColor,
+      alignment: lineAlignment,
+    });
 
     this.addChild(line);
   }
@@ -322,10 +378,18 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
    * @param lineWidth Width of line
    * @param lineAlignment alignment of the line to draw, (0 = inner, 0.5 = middle, 1 = outer).
    */
-  protected drawCasingWindowOutline(leftPath: Point[], rightPath: Point[], { lineColor, windowOptions }: CasingOptions, lineWidth = 1): void {
+  protected drawCasingWindowOutline(
+    leftPath: Point[],
+    rightPath: Point[],
+    { lineColor, windowOptions }: CasingOptions,
+    lineWidth = 1,
+  ): void {
     // Correct the dashed path. Should always be displayed on the upper side of the wellbore path.
-    const flippedPaths = !!this.referenceSystem?.options?.calculateDisplacementFromBottom;
-    const [linePath, dashedPath] = flippedPaths ? [leftPath, rightPath] : [rightPath, leftPath];
+    const flippedPaths =
+      !!this.referenceSystem?.options?.calculateDisplacementFromBottom;
+    const [linePath, dashedPath] = flippedPaths
+      ? [leftPath, rightPath]
+      : [rightPath, leftPath];
     const [dashedAlignment, solidAlignment] = flippedPaths ? [1, 0] : [0, 1];
 
     const graphics = new Graphics();
@@ -333,7 +397,11 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const startPointLinePath = linePath[0]!;
     graphics.moveTo(startPointLinePath.x, startPointLinePath.y);
     linePath.forEach((p: Point) => graphics.lineTo(p.x, p.y));
-    graphics.setStrokeStyle({ width: lineWidth, color: convertColor(lineColor), alignment: solidAlignment });
+    graphics.setStrokeStyle({
+      width: lineWidth,
+      color: convertColor(lineColor),
+      alignment: solidAlignment,
+    });
 
     const dashedLine = new DashLine(graphics, {
       dash: [windowOptions.dashLength, windowOptions.spaceLength],
@@ -351,7 +419,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     this.addChild(graphics);
   }
 
-  private perforationRopeAndTextureReferences: { rope: ComplexRope; texture: Texture }[] = [];
+  private perforationRopeAndTextureReferences: {
+    rope: ComplexRope;
+    texture: Texture;
+  }[] = [];
 
   public async preRender(): Promise<void> {
     if (!this.data || !this.referenceSystem) {
@@ -359,41 +430,77 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
 
     const { exaggerationFactor = 1 } = this.options as SchematicLayerOptions<T>;
-    const { holeSizes, casings, cements, completion, symbols, pAndA, perforations } = this.data;
+    const {
+      holeSizes,
+      casings,
+      cements,
+      completion,
+      symbols,
+      pAndA,
+      perforations,
+    } = this.data;
 
     await this.updateSymbolCache(symbols);
 
     holeSizes.sort((a: HoleSize, b: HoleSize) => b.diameter - a.diameter);
     const maxHoleDiameter =
-      holeSizes.length > 0 ? (max(holeSizes, (d) => d.diameter) ?? 0) * exaggerationFactor : EXAGGERATED_DIAMETER * exaggerationFactor;
+      holeSizes.length > 0
+        ? (max(holeSizes, d => d.diameter) ?? 0) * exaggerationFactor
+        : EXAGGERATED_DIAMETER * exaggerationFactor;
     if (this.internalLayerVisibility.holeLayerId) {
-      holeSizes.forEach((hole: HoleSize) => this.drawHoleSize(maxHoleDiameter, hole));
+      holeSizes.forEach((hole: HoleSize) =>
+        this.drawHoleSize(maxHoleDiameter, hole),
+      );
     }
 
     casings.sort((a: Casing, b: Casing) => b.diameter - a.diameter);
-    const casingRenderObjects: CasingRenderObject[] = casings.map((casing: Casing) => this.createCasingRenderObject(casing));
+    const casingRenderObjects: CasingRenderObject[] = casings.map(
+      (casing: Casing) => this.createCasingRenderObject(casing),
+    );
 
     const cementShapes: CementRenderObject[] = cements.map(
       (cement: Cement): CementRenderObject => ({
         kind: 'cement',
-        segments: createComplexRopeSegmentsForCement(cement, casings, completion, holeSizes, exaggerationFactor, this.getZFactorScaledPathForPoints),
-        casingIds: (cement.referenceIds || []).filter((id) => id),
+        segments: createComplexRopeSegmentsForCement(
+          cement,
+          casings,
+          completion,
+          holeSizes,
+          exaggerationFactor,
+          this.getZFactorScaledPathForPoints,
+        ),
+        casingIds: (cement.referenceIds || []).filter(id => id),
       }),
     );
 
-    const [cementSqueezes, remainingPAndA] = pAndA.reduce<[CementSqueeze[], Exclude<PAndA, CementSqueeze>[]]>(
+    const [cementSqueezes, remainingPAndA] = pAndA.reduce<
+      [CementSqueeze[], Exclude<PAndA, CementSqueeze>[]]
+    >(
       ([squeezes, remaining], current: PAndA) =>
-        isCementSqueeze(current) ? [[current, ...squeezes], remaining] : [squeezes, [current, ...remaining]],
+        isCementSqueeze(current)
+          ? [[current, ...squeezes], remaining]
+          : [squeezes, [current, ...remaining]],
       [[], []],
     );
 
-    const cementSqueezesShape: CementSqueezeRenderObject[] = cementSqueezes.map((squeeze) => ({
-      kind: 'cementSqueeze',
-      segments: this.createCementSqueezeShape(squeeze, casings, completion, holeSizes),
-      casingIds: squeeze.referenceIds,
-    }));
+    const cementSqueezesShape: CementSqueezeRenderObject[] = cementSqueezes.map(
+      squeeze => ({
+        kind: 'cementSqueeze',
+        segments: this.createCementSqueezeShape(
+          squeeze,
+          casings,
+          completion,
+          holeSizes,
+        ),
+        casingIds: squeeze.referenceIds,
+      }),
+    );
 
-    this.sortCementAndCasingRenderObjects(casingRenderObjects, cementShapes, cementSqueezesShape).forEach(
+    this.sortCementAndCasingRenderObjects(
+      casingRenderObjects,
+      cementShapes,
+      cementSqueezesShape,
+    ).forEach(
       foldInterlacedRenderObjects(
         (casingRO: CasingRenderObject) => {
           if (this.internalLayerVisibility.casingLayerId) {
@@ -438,67 +545,119 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       const packings = perforations.filter(hasPacking);
       const fracLines = perforations.filter(hasFracLines);
       const spikes = perforations.filter(hasSpikes);
-      packings.forEach((perforation) => {
-        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
-        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } = perfShapes.reduce(
-          (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
-            if (!dict[ps.diameter]) {
-              dict[ps.diameter] = [];
-            }
-            dict[ps.diameter] = [...(dict[ps.diameter] ?? []), ps];
-            return dict;
-          },
-          {},
+      packings.forEach(perforation => {
+        const perfShapes = this.createPerforationShape(
+          perforation,
+          casings,
+          holeSizes,
         );
-        Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
-          const texture = createPerforationPackingTexture(perforation, perfShapesWithSameDiameter[0]!, perforationOptions!);
-          const rope = this.drawComplexRope(perfShapesWithSameDiameter, texture);
-          rope && this.perforationRopeAndTextureReferences.push({ rope, texture });
-        });
+        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } =
+          perfShapes.reduce(
+            (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
+              if (!dict[ps.diameter]) {
+                dict[ps.diameter] = [];
+              }
+              dict[ps.diameter] = [...(dict[ps.diameter] ?? []), ps];
+              return dict;
+            },
+            {},
+          );
+        Object.values(perfShapesByDiameter).forEach(
+          perfShapesWithSameDiameter => {
+            const texture = createPerforationPackingTexture(
+              perforation,
+              perfShapesWithSameDiameter[0]!,
+              perforationOptions!,
+            );
+            const rope = this.drawComplexRope(
+              perfShapesWithSameDiameter,
+              texture,
+            );
+            rope &&
+              this.perforationRopeAndTextureReferences.push({ rope, texture });
+          },
+        );
       });
 
-      spikes.forEach((perforation) => {
-        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
-        const thiccPerfShapes = perfShapes.map((ps) => ({ ...ps, diameter: ps.diameter * 3 }));
-        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } = thiccPerfShapes.reduce(
-          (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
-            if (!dict[ps.diameter]) {
-              dict[ps.diameter] = [];
-            }
-            dict[ps.diameter] = [...(dict[ps.diameter] ?? []), ps];
-            return dict;
-          },
-          {},
+      spikes.forEach(perforation => {
+        const perfShapes = this.createPerforationShape(
+          perforation,
+          casings,
+          holeSizes,
         );
-        Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
-          perfShapesWithSameDiameter.forEach((perfShape) => {
-            const texture = createPerforationSpikeTexture(perforation, perforations, perfShape, perforationOptions!);
-            const rope = this.drawComplexRope([perfShape], texture);
-            rope && this.perforationRopeAndTextureReferences.push({ rope, texture });
-          });
-        });
+        const thiccPerfShapes = perfShapes.map(ps => ({
+          ...ps,
+          diameter: ps.diameter * 3,
+        }));
+        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } =
+          thiccPerfShapes.reduce(
+            (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
+              if (!dict[ps.diameter]) {
+                dict[ps.diameter] = [];
+              }
+              dict[ps.diameter] = [...(dict[ps.diameter] ?? []), ps];
+              return dict;
+            },
+            {},
+          );
+        Object.values(perfShapesByDiameter).forEach(
+          perfShapesWithSameDiameter => {
+            perfShapesWithSameDiameter.forEach(perfShape => {
+              const texture = createPerforationSpikeTexture(
+                perforation,
+                perforations,
+                perfShape,
+                perforationOptions!,
+              );
+              const rope = this.drawComplexRope([perfShape], texture);
+              rope &&
+                this.perforationRopeAndTextureReferences.push({
+                  rope,
+                  texture,
+                });
+            });
+          },
+        );
       });
 
-      fracLines.forEach((perforation) => {
-        const perfShapes = this.createPerforationShape(perforation, casings, holeSizes);
-        const thiccPerfShapes = perfShapes.map((ps) => ({ ...ps, diameter: ps.diameter * 3 }));
-        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } = thiccPerfShapes.reduce(
-          (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
-            if (!dict[ps.diameter]) {
-              dict[ps.diameter] = [];
-            }
-            dict[ps.diameter] = [...(dict[ps.diameter] ?? []), ps];
-            return dict;
-          },
-          {},
+      fracLines.forEach(perforation => {
+        const perfShapes = this.createPerforationShape(
+          perforation,
+          casings,
+          holeSizes,
         );
-        Object.values(perfShapesByDiameter).forEach((perfShapesWithSameDiameter) => {
-          perfShapesWithSameDiameter.forEach((perfShape) => {
-            const texture = createPerforationFracLineTexture(perforation, perfShape, perforationOptions!);
-            const rope = this.drawComplexRope([perfShape], texture);
-            rope && this.perforationRopeAndTextureReferences.push({ rope, texture });
-          });
-        });
+        const thiccPerfShapes = perfShapes.map(ps => ({
+          ...ps,
+          diameter: ps.diameter * 3,
+        }));
+        const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } =
+          thiccPerfShapes.reduce(
+            (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
+              if (!dict[ps.diameter]) {
+                dict[ps.diameter] = [];
+              }
+              dict[ps.diameter] = [...(dict[ps.diameter] ?? []), ps];
+              return dict;
+            },
+            {},
+          );
+        Object.values(perfShapesByDiameter).forEach(
+          perfShapesWithSameDiameter => {
+            perfShapesWithSameDiameter.forEach(perfShape => {
+              const texture = createPerforationFracLineTexture(
+                perforation,
+                perfShape,
+                perforationOptions!,
+              );
+              const rope = this.drawComplexRope([perfShape], texture);
+              rope &&
+                this.perforationRopeAndTextureReferences.push({
+                  rope,
+                  texture,
+                });
+            });
+          },
+        );
       });
     }
 
@@ -516,7 +675,7 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
 
     if (this.internalLayerVisibility.pAndALayerId) {
-      remainingPAndA.forEach((obj) => {
+      remainingPAndA.forEach(obj => {
         if (isPAndASymbol(obj)) {
           const symbolRenderObject = this.prepareSymbolRenderObject(obj);
           this.drawSymbolComponent(symbolRenderObject);
@@ -537,16 +696,24 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     }
 
     const existingKeys = Object.keys(this.textureSymbolCacheArray);
-    const promises = Object.entries(symbols).map(async ([key, symbol]: [string, string]) => {
-      if (!existingKeys.includes(key) && this.textureSymbolCacheArray) {
-        this.textureSymbolCacheArray[key] = await Assets.load(symbol);
-      }
-    });
+    const promises = Object.entries(symbols).map(
+      async ([key, symbol]: [string, string]) => {
+        if (!existingKeys.includes(key) && this.textureSymbolCacheArray) {
+          this.textureSymbolCacheArray[key] = await Assets.load(symbol);
+        }
+      },
+    );
     await Promise.all(promises);
   }
 
-  private drawCementPlug(cementPlug: CementPlug, casings: Casing[], completion: Completion[], holes: HoleSize[]) {
-    const { exaggerationFactor = 1, cementPlugOptions } = this.options as SchematicLayerOptions<T>;
+  private drawCementPlug(
+    cementPlug: CementPlug,
+    casings: Casing[],
+    completion: Completion[],
+    holes: HoleSize[],
+  ) {
+    const { exaggerationFactor = 1, cementPlugOptions } = this
+      .options as SchematicLayerOptions<T>;
 
     const cementPlugSegments = createComplexRopeSegmentsForCementPlug(
       cementPlug,
@@ -556,11 +723,21 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       exaggerationFactor,
       this.getZFactorScaledPathForPoints,
     );
-    cementPlugOptions && this.drawComplexRope(cementPlugSegments, this.getCementPlugTexture(cementPlugOptions));
+    cementPlugOptions &&
+      this.drawComplexRope(
+        cementPlugSegments,
+        this.getCementPlugTexture(cementPlugOptions),
+      );
 
-    const { rightPath, leftPath } = cementPlugSegments.reduce<{ rightPath: Point[]; leftPath: Point[] }>(
+    const { rightPath, leftPath } = cementPlugSegments.reduce<{
+      rightPath: Point[];
+      leftPath: Point[];
+    }>(
       (acc, current) => {
-        const { leftPath, rightPath } = createTubularRenderingObject(current.diameter / 2, current.points);
+        const { leftPath, rightPath } = createTubularRenderingObject(
+          current.diameter / 2,
+          current.points,
+        );
 
         return {
           rightPath: [...acc.rightPath, ...rightPath],
@@ -569,12 +746,22 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       },
       { rightPath: [], leftPath: [] },
     );
-    this.drawOutline(leftPath, rightPath, convertColor('black'), 0.25, 'TopAndBottom');
+    this.drawOutline(
+      leftPath,
+      rightPath,
+      convertColor('black'),
+      0.25,
+      'TopAndBottom',
+    );
   }
 
   private createCasingRenderObject(casing: Casing): CasingRenderObject {
     const { exaggerationFactor = 1 } = this.options as SchematicLayerOptions<T>;
-    return prepareCasingRenderObject(exaggerationFactor, casing, this.getZFactorScaledPathForPoints);
+    return prepareCasingRenderObject(
+      exaggerationFactor,
+      casing,
+      this.getZFactorScaledPathForPoints,
+    );
   }
 
   private getCementPlugTexture(cementPlugOptions: CementPlugOptions): Texture {
@@ -584,12 +771,17 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return this.cementPlugTextureCache;
   }
 
-  private prepareSymbolRenderObject = (component: CompletionSymbol | PAndASymbol): SymbolRenderObject => {
+  private prepareSymbolRenderObject = (
+    component: CompletionSymbol | PAndASymbol,
+  ): SymbolRenderObject => {
     const { exaggerationFactor = 1 } = this.options as SchematicLayerOptions<T>;
 
     const exaggeratedDiameter = component.diameter * exaggerationFactor;
 
-    const pathPoints = this.getZFactorScaledPathForPoints(component.start, component.end);
+    const pathPoints = this.getZFactorScaledPathForPoints(
+      component.start,
+      component.end,
+    );
 
     return {
       pathPoints,
@@ -598,7 +790,11 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     };
   };
 
-  private drawSymbolComponent = ({ pathPoints, referenceDiameter, symbolKey }: SymbolRenderObject): void => {
+  private drawSymbolComponent = ({
+    pathPoints,
+    referenceDiameter,
+    symbolKey,
+  }: SymbolRenderObject): void => {
     const texture = this.getSymbolTexture(symbolKey, referenceDiameter);
     // The rope renders fine in CANVAS/fallback mode
     this.drawSVGRope(pathPoints, texture!);
@@ -609,47 +805,92 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       return undefined;
     }
 
-    const rope: UniformTextureStretchRope = new UniformTextureStretchRope(texture, path);
+    const rope: UniformTextureStretchRope = new UniformTextureStretchRope(
+      texture,
+      path,
+    );
 
     this.addChild(rope);
   }
 
-  private getSymbolTexture(symbolKey: string, diameter: number): Texture | undefined {
+  private getSymbolTexture(
+    symbolKey: string,
+    diameter: number,
+  ): Texture | undefined {
     const baseTexture = this.textureSymbolCacheArray?.[symbolKey]?.source;
-    return baseTexture ? new Texture({ source: baseTexture, orig: new Rectangle(0, 0, 0, diameter), rotate: groupD8.MAIN_DIAGONAL }) : undefined;
+    return baseTexture
+      ? new Texture({
+          source: baseTexture,
+          orig: new Rectangle(0, 0, 0, diameter),
+          rotate: groupD8.MAIN_DIAGONAL,
+        })
+      : undefined;
   }
 
-  private drawHoleSize = (maxHoleDiameter: number, holeObject: HoleSize): void => {
+  private drawHoleSize = (
+    maxHoleDiameter: number,
+    holeObject: HoleSize,
+  ): void => {
     if (holeObject == null) {
       return;
     }
 
-    const pathPoints = this.getZFactorScaledPathForPoints(holeObject.start, holeObject.end);
+    const pathPoints = this.getZFactorScaledPathForPoints(
+      holeObject.start,
+      holeObject.end,
+    );
     if (pathPoints.length === 0) {
       return;
     }
 
-    const { exaggerationFactor = 1, holeOptions } = this.options as SchematicLayerOptions<T>;
+    const { exaggerationFactor = 1, holeOptions } = this
+      .options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = holeObject.diameter * exaggerationFactor;
-    const { rightPath, leftPath } = createTubularRenderingObject(exaggeratedDiameter / 2, pathPoints);
-    const texture = this.getHoleTexture(holeOptions!, exaggeratedDiameter, maxHoleDiameter);
+    const { rightPath, leftPath } = createTubularRenderingObject(
+      exaggeratedDiameter / 2,
+      pathPoints,
+    );
+    const texture = this.getHoleTexture(
+      holeOptions!,
+      exaggeratedDiameter,
+      maxHoleDiameter,
+    );
 
     this.drawHoleRope(pathPoints, texture, maxHoleDiameter);
 
-    this.drawOutline(leftPath, rightPath, convertColor(holeOptions!.lineColor), HOLE_OUTLINE * exaggerationFactor, 'TopAndBottom', 0);
+    this.drawOutline(
+      leftPath,
+      rightPath,
+      convertColor(holeOptions!.lineColor),
+      HOLE_OUTLINE * exaggerationFactor,
+      'TopAndBottom',
+      0,
+    );
   };
 
-  private drawHoleRope(path: Point[], texture: Texture, maxHoleDiameter: number): void {
+  private drawHoleRope(
+    path: Point[],
+    texture: Texture,
+    maxHoleDiameter: number,
+  ): void {
     if (path.length === 0) {
       return undefined;
     }
 
-    const rope: MeshRope = new MeshRope({ texture, points: path, textureScale: maxHoleDiameter / DEFAULT_TEXTURE_SIZE });
+    const rope: MeshRope = new MeshRope({
+      texture,
+      points: path,
+      textureScale: maxHoleDiameter / DEFAULT_TEXTURE_SIZE,
+    });
 
     this.addChild(rope);
   }
 
-  private getHoleTexture(holeOptions: HoleOptions, diameter: number, maxHoleDiameter: number): Texture {
+  private getHoleTexture(
+    holeOptions: HoleOptions,
+    diameter: number,
+    maxHoleDiameter: number,
+  ): Texture {
     const size = DEFAULT_TEXTURE_SIZE;
     const height = size;
     const width = size;
@@ -692,26 +933,48 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     let zIndex = 0;
 
     const { result } = casingRenderObjects.reduce(
-      (acc: InterlaceReducerAcc, casingRenderObject: CasingRenderObject): InterlaceReducerAcc => {
-        const foundCementShape = acc.remainingCement.find((cement) => cement.casingIds.includes(casingRenderObject.id));
-        const foundCementSqueezes = acc.remainingCementSqueezes.filter((squeeze) => squeeze.casingIds.includes(casingRenderObject.id));
+      (
+        acc: InterlaceReducerAcc,
+        casingRenderObject: CasingRenderObject,
+      ): InterlaceReducerAcc => {
+        const foundCementShape = acc.remainingCement.find(cement =>
+          cement.casingIds.includes(casingRenderObject.id),
+        );
+        const foundCementSqueezes = acc.remainingCementSqueezes.filter(
+          squeeze => squeeze.casingIds.includes(casingRenderObject.id),
+        );
 
         if (foundCementShape) {
           foundCementShape.zIndex = zIndex++;
         }
-        foundCementSqueezes.forEach((item) => (item.zIndex = zIndex++));
+        foundCementSqueezes.forEach(item => (item.zIndex = zIndex++));
         casingRenderObject.zIndex = zIndex++;
 
         return {
-          result: [...acc.result, foundCementShape!, casingRenderObject, ...foundCementSqueezes],
-          remainingCement: acc.remainingCement.filter((c) => c !== foundCementShape),
-          remainingCementSqueezes: acc.remainingCementSqueezes.filter((squeeze) => !foundCementSqueezes.includes(squeeze)),
+          result: [
+            ...acc.result,
+            foundCementShape!,
+            casingRenderObject,
+            ...foundCementSqueezes,
+          ],
+          remainingCement: acc.remainingCement.filter(
+            c => c !== foundCementShape,
+          ),
+          remainingCementSqueezes: acc.remainingCementSqueezes.filter(
+            squeeze => !foundCementSqueezes.includes(squeeze),
+          ),
         };
       },
-      { result: [], remainingCement: cementRenderObject, remainingCementSqueezes: cementSqueezes },
+      {
+        result: [],
+        remainingCement: cementRenderObject,
+        remainingCementSqueezes: cementSqueezes,
+      },
     );
 
-    return result.filter((item): item is InterlacedRenderObjects => item != null).sort((a, b) => a.zIndex! - b.zIndex!);
+    return result
+      .filter((item): item is InterlacedRenderObjects => item != null)
+      .sort((a, b) => a.zIndex! - b.zIndex!);
   }
 
   /**
@@ -723,7 +986,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
    * @param getExaggerationFactor
    * @returns
    */
-  private drawComplexRope(intervals: ComplexRopeSegment[], texture: Texture): ComplexRope | undefined {
+  private drawComplexRope(
+    intervals: ComplexRopeSegment[],
+    texture: Texture,
+  ): ComplexRope | undefined {
     if (intervals.length === 0) {
       return undefined;
     }
@@ -734,7 +1000,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     return rope;
   }
 
-  private static getOutlineClosureType = (index: number, maxIndex: number): OutlineClosure => {
+  private static getOutlineClosureType = (
+    index: number,
+    maxIndex: number,
+  ): OutlineClosure => {
     if (index === 0) {
       if (index === maxIndex) {
         return 'TopAndBottom';
@@ -754,15 +1023,31 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     const casingLineColorNumber = convertColor(casingOptions!.lineColor);
 
     casingRenderObject.sections.forEach((section, index, list) => {
-      const outlineClosureType = SchematicLayer.getOutlineClosureType(index, list.length - 1);
+      const outlineClosureType = SchematicLayer.getOutlineClosureType(
+        index,
+        list.length - 1,
+      );
 
-      const texture = this.createCasingTexture(casingRenderObject.referenceDiameter);
+      const texture = this.createCasingTexture(
+        casingRenderObject.referenceDiameter,
+      );
       this.drawRope(section.pathPoints, texture, casingSolidColorNumber);
 
       if (section.kind === 'casing-window') {
-        this.drawCasingWindowOutline(section.leftPath, section.rightPath, casingOptions!, casingRenderObject.casingWallWidth);
+        this.drawCasingWindowOutline(
+          section.leftPath,
+          section.rightPath,
+          casingOptions!,
+          casingRenderObject.casingWallWidth,
+        );
       } else {
-        this.drawOutline(section.leftPath, section.rightPath, casingLineColorNumber, casingRenderObject.casingWallWidth, outlineClosureType);
+        this.drawOutline(
+          section.leftPath,
+          section.rightPath,
+          casingLineColorNumber,
+          casingRenderObject.casingWallWidth,
+          outlineClosureType,
+        );
       }
     });
   };
@@ -776,28 +1061,52 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   }
 
   private drawShoe(casingEnd: number, casingRadius: number): void {
-    const { exaggerationFactor = 1, casingOptions } = this.options as SchematicLayerOptions<T>;
+    const { exaggerationFactor = 1, casingOptions } = this
+      .options as SchematicLayerOptions<T>;
     const shoeWidth = casingOptions!.shoeSize.width * exaggerationFactor;
     const shoeLength = casingOptions!.shoeSize.length * exaggerationFactor;
 
-    const shoeCoords = this.generateShoe(casingEnd, casingRadius, shoeLength, shoeWidth);
-    const shoeCoords2 = this.generateShoe(casingEnd, casingRadius, shoeLength, -shoeWidth);
+    const shoeCoords = this.generateShoe(
+      casingEnd,
+      casingRadius,
+      shoeLength,
+      shoeWidth,
+    );
+    const shoeCoords2 = this.generateShoe(
+      casingEnd,
+      casingRadius,
+      shoeLength,
+      -shoeWidth,
+    );
     this.drawBigPolygon(shoeCoords2);
     this.drawBigPolygon(shoeCoords);
   }
 
-  private generateShoe = (casingEnd: number, casingRadius: number, length: number, width: number): Point[] => {
+  private generateShoe = (
+    casingEnd: number,
+    casingRadius: number,
+    length: number,
+    width: number,
+  ): Point[] => {
     const start = casingEnd - length;
     const end = casingEnd;
 
     const points = this.getZFactorScaledPathForPoints(start, end);
 
     const normal = createNormals(points);
-    const shoeEdge: Point[] = offsetPoints(points, normal, casingRadius * (width < 0 ? -1 : 1));
+    const shoeEdge: Point[] = offsetPoints(
+      points,
+      normal,
+      casingRadius * (width < 0 ? -1 : 1),
+    );
 
     const shoeTipPoint = points[points.length - 1]!;
     const shoeTipNormal = normal[normal.length - 1]!;
-    const shoeTip: Point = offsetPoint(shoeTipPoint, shoeTipNormal, width + casingRadius * (width < 0 ? -1 : 1));
+    const shoeTip: Point = offsetPoint(
+      shoeTipPoint,
+      shoeTipNormal,
+      width + casingRadius * (width < 0 ? -1 : 1),
+    );
 
     return [...shoeEdge, shoeTip];
   };
@@ -809,46 +1118,77 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     holes: HoleSize[],
   ): ComplexRopeSegment[] => {
     const { exaggerationFactor = 1 } = this.options as SchematicLayerOptions<T>;
-    return createComplexRopeSegmentsForCementSqueeze(squeeze, casings, completion, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
+    return createComplexRopeSegmentsForCementSqueeze(
+      squeeze,
+      casings,
+      completion,
+      holes,
+      exaggerationFactor,
+      this.getZFactorScaledPathForPoints,
+    );
   };
 
   private getCementTexture(): Texture | null {
     if (!this.cementTextureCache) {
       const { cementOptions } = this.options as SchematicLayerOptions<T>;
-      cementOptions && (this.cementTextureCache = createCementTexture(cementOptions));
+      cementOptions &&
+        (this.cementTextureCache = createCementTexture(cementOptions));
     }
     return this.cementTextureCache;
   }
 
-  private createPerforationShape = (perforation: Perforation, casings: Casing[], holes: HoleSize[]): PerforationShape[] => {
+  private createPerforationShape = (
+    perforation: Perforation,
+    casings: Casing[],
+    holes: HoleSize[],
+  ): PerforationShape[] => {
     const { exaggerationFactor = 1 } = this.options as SchematicLayerOptions<T>;
-    return createComplexRopeSegmentsForPerforation(perforation, casings, holes, exaggerationFactor, this.getZFactorScaledPathForPoints);
+    return createComplexRopeSegmentsForPerforation(
+      perforation,
+      casings,
+      holes,
+      exaggerationFactor,
+      this.getZFactorScaledPathForPoints,
+    );
   };
 
   private getCementSqueezeTexture(): Texture | null {
     if (!this.cementSqueezeTextureCache) {
       const { cementSqueezeOptions } = this.options as SchematicLayerOptions<T>;
-      cementSqueezeOptions && (this.cementSqueezeTextureCache = createCementSqueezeTexture(cementSqueezeOptions));
+      cementSqueezeOptions &&
+        (this.cementSqueezeTextureCache =
+          createCementSqueezeTexture(cementSqueezeOptions));
     }
     return this.cementSqueezeTextureCache;
   }
 
   private drawScreen({ start, end, diameter }: Screen): void {
-    const { exaggerationFactor = 1, screenOptions } = this.options as SchematicLayerOptions<T>;
+    const { exaggerationFactor = 1, screenOptions } = this
+      .options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
-    const { leftPath, rightPath } = createTubularRenderingObject(exaggeratedDiameter / 2, pathPoints);
+    const { leftPath, rightPath } = createTubularRenderingObject(
+      exaggeratedDiameter / 2,
+      pathPoints,
+    );
 
     const texture = this.getScreenTexture();
     if (texture) {
       this.drawCompletionRope(pathPoints, texture, exaggeratedDiameter);
-      this.drawOutline(leftPath, rightPath, convertColor(screenOptions!.lineColor), SCREEN_OUTLINE * exaggerationFactor, 'TopAndBottom');
+      this.drawOutline(
+        leftPath,
+        rightPath,
+        convertColor(screenOptions!.lineColor),
+        SCREEN_OUTLINE * exaggerationFactor,
+        'TopAndBottom',
+      );
     }
   }
 
   private drawTubing({ diameter, start, end }: Tubing): void {
-    const { exaggerationFactor = 1, tubingOptions } = this.options as SchematicLayerOptions<T>;
+    const { exaggerationFactor = 1, tubingOptions } = this
+      .options as SchematicLayerOptions<T>;
     const exaggeratedDiameter = exaggerationFactor * diameter;
 
     const pathPoints = this.getZFactorScaledPathForPoints(start, end);
@@ -867,17 +1207,26 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
   private getScreenTexture(): Texture | null {
     if (!this.screenTextureCache) {
       const { screenOptions } = this.options as SchematicLayerOptions<T>;
-      screenOptions && (this.screenTextureCache = createScreenTexture(screenOptions));
+      screenOptions &&
+        (this.screenTextureCache = createScreenTexture(screenOptions));
     }
     return this.screenTextureCache;
   }
 
-  private drawCompletionRope(path: Point[], texture: Texture, diameter: number): void {
+  private drawCompletionRope(
+    path: Point[],
+    texture: Texture,
+    diameter: number,
+  ): void {
     if (path.length === 0) {
       return;
     }
 
-    const rope: FixedWidthSimpleRope = new FixedWidthSimpleRope(texture, path, diameter);
+    const rope: FixedWidthSimpleRope = new FixedWidthSimpleRope(
+      texture,
+      path,
+      diameter,
+    );
     this.addChild(rope);
   }
 }

@@ -1,21 +1,22 @@
 import { defineConfig } from 'eslint/config';
-import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
 import tseslint from 'typescript-eslint';
 import eslint from '@eslint/js';
 
 export default defineConfig([
   eslint.configs.recommended,
   tseslint.configs.recommended,
-  eslintPluginPrettier,
-  {
-    ignores: ['dist/', 'node_modules/', 'package-lock.json', '**/*.cjs'],
-  },
   {
     rules: {
       '@typescript-eslint/ban-ts-comment': 'warn',
       '@typescript-eslint/no-namespace': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { args: 'all', varsIgnorePattern: '^_', argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-unused-expressions': ['error', { allowTernary: true, allowShortCircuit: true }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { args: 'all', varsIgnorePattern: '^_', argsIgnorePattern: '^_' },
+      ],
+      '@typescript-eslint/no-unused-expressions': [
+        'error',
+        { allowTernary: true, allowShortCircuit: true },
+      ],
       /* NOTE(Kevin): Currently needed after enabling strict mode, as there were over 1500 Typescript errors.
             *
             * Fixing all these errors properly, would

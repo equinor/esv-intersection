@@ -9,8 +9,14 @@ export abstract class SVGLayer<T> extends Layer<T> {
   override onMount(event: OnMountEvent): void {
     super.onMount(event);
     const { elm } = event;
-    const width = event.width || parseInt(elm.getAttribute('width') ?? '', 10) || DEFAULT_LAYER_WIDTH;
-    const height = event.height || parseInt(elm.getAttribute('height') ?? '', 10) || DEFAULT_LAYER_HEIGHT;
+    const width =
+      event.width ||
+      parseInt(elm.getAttribute('width') ?? '', 10) ||
+      DEFAULT_LAYER_WIDTH;
+    const height =
+      event.height ||
+      parseInt(elm.getAttribute('height') ?? '', 10) ||
+      DEFAULT_LAYER_HEIGHT;
     if (!this.elm) {
       this.elm = select(elm).append('svg');
       this.elm.attr('id', `${this.id}`);
@@ -18,7 +24,11 @@ export abstract class SVGLayer<T> extends Layer<T> {
     }
     this.elm.attr('height', height).attr('width', width);
     const interactive = this.interactive ? 'auto' : 'none';
-    this.elm.style('position', 'absolute').style('pointer-events', interactive).style('opacity', this.opacity).style('z-index', this.order);
+    this.elm
+      .style('position', 'absolute')
+      .style('pointer-events', interactive)
+      .style('opacity', this.opacity)
+      .style('z-index', this.order);
   }
 
   override onUnmount(): void {

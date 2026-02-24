@@ -118,7 +118,12 @@ export class DashLine {
     this.scale = options.scale;
   }
 
-  private static distance(x1: number, y1: number, x2: number, y2: number): number {
+  private static distance(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+  ): number {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
   }
 
@@ -143,7 +148,10 @@ export class DashLine {
       this.adjustLineStyle(angle);
       if (closed && this.dash.length % 2 === 0) {
         const gap = Math.min(this.dash[this.dash.length - 1], length);
-        this.graphics.lineTo(x - Math.cos(angle) * gap, y - Math.sin(angle) * gap);
+        this.graphics.lineTo(
+          x - Math.cos(angle) * gap,
+          y - Math.sin(angle) * gap,
+        );
         this.graphics.closePath();
       } else {
         this.graphics.lineTo(x, y);
@@ -177,10 +185,17 @@ export class DashLine {
         const dashSize = this.dash[dashIndex] * this.scale - dashStart;
         const dist = remaining > dashSize ? dashSize : remaining;
         if (closed) {
-          const remainingDistance = DashLine.distance(x0 + cos * dist, y0 + sin * dist, this.start.x, this.start.y);
+          const remainingDistance = DashLine.distance(
+            x0 + cos * dist,
+            y0 + sin * dist,
+            this.start.x,
+            this.start.y,
+          );
           if (remainingDistance <= dist) {
             if (dashIndex % 2 === 0) {
-              const lastDash = DashLine.distance(x0, y0, this.start.x, this.start.y) - this.dash[this.dash.length - 1] * this.scale;
+              const lastDash =
+                DashLine.distance(x0, y0, this.start.x, this.start.y) -
+                this.dash[this.dash.length - 1] * this.scale;
               x0 += cos * lastDash;
               y0 += sin * lastDash;
               this.graphics.lineTo(x0, y0);
@@ -213,23 +228,38 @@ export class DashLine {
     this.lineTo(this.start.x, this.start.y, true);
   }
 
-  drawCircle(x: number, y: number, radius: number, points = 80, matrix?: Matrix): this {
+  drawCircle(
+    x: number,
+    y: number,
+    radius: number,
+    points = 80,
+    matrix?: Matrix,
+  ): this {
     const interval = (Math.PI * 2) / points;
     let angle = 0,
       first: Point;
     if (matrix) {
-      first = new Point(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius);
+      first = new Point(
+        x + Math.cos(angle) * radius,
+        y + Math.sin(angle) * radius,
+      );
       matrix.apply(first, first);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.moveTo(first[0], first[1]);
     } else {
-      first = new Point(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius);
+      first = new Point(
+        x + Math.cos(angle) * radius,
+        y + Math.sin(angle) * radius,
+      );
       this.moveTo(first.x, first.y);
     }
     angle += interval;
     for (let i = 1; i < points + 1; i++) {
-      const next = i === points ? first : [x + Math.cos(angle) * radius, y + Math.sin(angle) * radius];
+      const next =
+        i === points
+          ? first
+          : [x + Math.cos(angle) * radius, y + Math.sin(angle) * radius];
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.lineTo(next[0], next[1]);
@@ -238,7 +268,14 @@ export class DashLine {
     return this;
   }
 
-  drawEllipse(x: number, y: number, radiusX: number, radiusY: number, points = 80, matrix?: Matrix): this {
+  drawEllipse(
+    x: number,
+    y: number,
+    radiusX: number,
+    radiusY: number,
+    points = 80,
+    matrix?: Matrix,
+  ): this {
     const interval = (Math.PI * 2) / points;
     let first: { x: number; y: number };
     const point = new Point();
@@ -277,7 +314,11 @@ export class DashLine {
       } else {
         this.moveTo(points[0] as number, points[1] as number);
         for (let i = 2; i < points.length; i += 2) {
-          this.lineTo(points[i] as number, points[i + 1] as number, i === points.length - 2);
+          this.lineTo(
+            points[i] as number,
+            points[i + 1] as number,
+            i === points.length - 2,
+          );
         }
       }
     } else {
@@ -304,7 +345,13 @@ export class DashLine {
     return this;
   }
 
-  drawRect(x: number, y: number, width: number, height: number, matrix?: Matrix): this {
+  drawRect(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    matrix?: Matrix,
+  ): this {
     if (matrix) {
       const p = new Point();
 
@@ -353,12 +400,18 @@ export class DashLine {
       lineStyle.matrix.scale(this.scale, this.scale);
     }
     const textureStart = -this.lineLength;
-    lineStyle.matrix.translate(this.cursor.x + textureStart * Math.cos(angle), this.cursor.y + textureStart * Math.sin(angle));
+    lineStyle.matrix.translate(
+      this.cursor.x + textureStart * Math.cos(angle),
+      this.cursor.y + textureStart * Math.sin(angle),
+    );
     this.graphics.lineStyle(lineStyle);
   }
 
   // creates or uses cached texture
-  private static getTexture(options: DashLineOptions, dashSize: number): Texture | undefined {
+  private static getTexture(
+    options: DashLineOptions,
+    dashSize: number,
+  ): Texture | undefined {
     const key = options.dash.toString();
     if (DashLine.dashTextureCache[key]) {
       return DashLine.dashTextureCache[key];

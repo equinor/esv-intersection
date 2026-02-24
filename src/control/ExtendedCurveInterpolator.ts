@@ -30,7 +30,14 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
    * @param {Number} tolerance Tolerance for result
    * @param {Number} iterations Max number of iterations to use
    */
-  findTForArcLength(arcLength: number, options?: { approxT?: boolean; quickT?: boolean; normalizedLength?: number }): number {
+  findTForArcLength(
+    arcLength: number,
+    options?: {
+      approxT?: boolean;
+      quickT?: boolean;
+      normalizedLength?: number;
+    },
+  ): number {
     // TODO: Ideally the CurveInterpolator should be able to provide t for curve length
     let t;
     if (options?.approxT) {
@@ -49,14 +56,23 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
    * @param {Number} tolerance Tolerance for result
    * @param {Number} iterations Max number of iterations to use
    */
-  findTByRootForArcLength(arcLength: number, tolerance = 0.01, iterations = 100): number {
+  findTByRootForArcLength(
+    arcLength: number,
+    tolerance = 0.01,
+    iterations = 100,
+  ): number {
     if (arcLength <= 0) {
       return 0.0;
     }
     if (arcLength >= this.length) {
       return 1.0;
     }
-    const t = RootFinder.findRoot((x) => arcLength - this.getQuickArcLength(0, x), tolerance, iterations, arcLength / this.length);
+    const t = RootFinder.findRoot(
+      x => arcLength - this.getQuickArcLength(0, x),
+      tolerance,
+      iterations,
+      arcLength / this.length,
+    );
     return t;
   }
 
@@ -64,7 +80,10 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
    * Function which finds t value for arc length by simple approximation
    * @param {Number} arcLength Target arclength
    */
-  findApproxTForArcLength(arcLength: number, normalizedLength?: number): number {
+  findApproxTForArcLength(
+    arcLength: number,
+    normalizedLength?: number,
+  ): number {
     const t = arcLength / (normalizedLength || this.length);
     return t;
   }
@@ -80,7 +99,8 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
     const index = BinarySearch.search(this.arcLengthLookup, arcLength);
     const v1 = this.arcLengthLookup[index]!;
     const v2 = this.arcLengthLookup[index + 1]!;
-    const t = (index + (arcLength - v1) / (v2 - v1)) / this.arcLengthLookup.length;
+    const t =
+      (index + (arcLength - v1) / (v2 - v1)) / this.arcLengthLookup.length;
     return t;
   }
 
@@ -106,7 +126,12 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
       return this.length;
     }
     const tolerance = 0.002;
-    return ArcLength.bisect((t: number) => this.getPointAt(t), from, to, tolerance);
+    return ArcLength.bisect(
+      (t: number) => this.getPointAt(t),
+      from,
+      to,
+      tolerance,
+    );
   }
 
   /**
@@ -125,14 +150,20 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
       const fromIndex = Math.floor(from * this.arcLengthLookup.length);
       const fromLl = this.arcLengthLookup[fromIndex]!;
       const fromLh = this.arcLengthLookup[fromIndex + 1]!;
-      fromLength = fromLl + ((from * this.arcLengthLookup.length) % this.arcLengthLookup.length) * (fromLh - fromLl);
+      fromLength =
+        fromLl +
+        ((from * this.arcLengthLookup.length) % this.arcLengthLookup.length) *
+          (fromLh - fromLl);
     }
 
     if (to !== 1) {
       const toIndex = Math.floor(to * this.arcLengthLookup.length);
       const toLl = this.arcLengthLookup[toIndex]!;
       const toLh = this.arcLengthLookup[toIndex + 1]!;
-      toLength = toLl + ((from * this.arcLengthLookup.length) % this.arcLengthLookup.length) * (toLh - toLl);
+      toLength =
+        toLl +
+        ((from * this.arcLengthLookup.length) % this.arcLengthLookup.length) *
+          (toLh - toLl);
     }
 
     const totalLength = toLength - fromLength;
@@ -143,7 +174,14 @@ export class ExtendedCurveInterpolator extends CurveInterpolator {
    * Function getting a point at curve length.
    * @param {Number} arcLength
    */
-  getPointAtArcLength(arcLength: number, options?: { approxT?: boolean; quickT?: boolean; normalizedLength?: number }): Vector {
+  getPointAtArcLength(
+    arcLength: number,
+    options?: {
+      approxT?: boolean;
+      quickT?: boolean;
+      normalizedLength?: number;
+    },
+  ): Vector {
     const t = this.findTForArcLength(arcLength, options);
     return this.getPointAt(t);
   }

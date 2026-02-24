@@ -16,14 +16,18 @@ export class UniformTextureStretchRope extends Mesh {
    * @param points - An array of {@link Point} objects to construct this rope.
    */
   constructor(texture: Texture, points: Point[]) {
-    const ropeGeometry = new UniformTextureStretchRopeGeometry(points, texture.height);
+    const ropeGeometry = new UniformTextureStretchRopeGeometry(
+      points,
+      texture.height,
+    );
 
     super({ geometry: ropeGeometry, texture });
 
     this.autoUpdate = true;
 
     this.onRender = () => {
-      const geometry: UniformTextureStretchRopeGeometry = this.geometry as UniformTextureStretchRopeGeometry;
+      const geometry: UniformTextureStretchRopeGeometry = this
+        .geometry as UniformTextureStretchRopeGeometry;
 
       if (this.autoUpdate || geometry._width !== this.shader?.texture.height) {
         geometry._width = this.shader?.texture.height ?? 0;

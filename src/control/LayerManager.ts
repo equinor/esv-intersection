@@ -17,7 +17,9 @@ export class LayerManager {
   private layers: Layer<unknown>[] = [];
 
   private _axis: Axis | undefined;
-  private _svgContainer: Selection<HTMLDivElement, unknown, null, undefined> | undefined;
+  private _svgContainer:
+    | Selection<HTMLDivElement, unknown, null, undefined>
+    | undefined;
 
   /**
    * Handles layers and axis also holds a zoom and pan handler object
@@ -25,16 +27,30 @@ export class LayerManager {
    * @param scaleOptions
    * @param axisOptions
    */
-  constructor(container: HTMLElement, scaleOptions?: ScaleOptions, axisOptions?: AxisOptions) {
+  constructor(
+    container: HTMLElement,
+    scaleOptions?: ScaleOptions,
+    axisOptions?: AxisOptions,
+  ) {
     this.container = container;
     this.layerContainer = document.createElement('div');
     this.layerContainer.className = 'layer-container';
     this.container.appendChild(this.layerContainer);
-    this.adjustToSize(+(this.container.getAttribute('width') ?? 0), +(this.container.getAttribute('height') ?? 0));
-    this._zoomPanHandler = new ZoomPanHandler(container, (event) => this.rescale(event));
+    this.adjustToSize(
+      +(this.container.getAttribute('width') ?? 0),
+      +(this.container.getAttribute('height') ?? 0),
+    );
+    this._zoomPanHandler = new ZoomPanHandler(container, event =>
+      this.rescale(event),
+    );
     if (scaleOptions) {
       const { xMin, xMax, yMin, yMax, xBounds, yBounds } = scaleOptions;
-      if (xMin !== undefined && xMax !== undefined && yMin !== undefined && yMax !== undefined) {
+      if (
+        xMin !== undefined &&
+        xMax !== undefined &&
+        yMin !== undefined &&
+        yMax !== undefined
+      ) {
         this._zoomPanHandler.setBounds([xMin, xMax], [yMin, yMax]);
       }
       if (xBounds && yBounds) {
@@ -56,7 +72,7 @@ export class LayerManager {
    * @param layers array of layers
    */
   addLayers(layers: Layer<unknown>[]): LayerManager {
-    layers.forEach((layer) => this.addLayer(layer));
+    layers.forEach(layer => this.addLayer(layer));
     return this;
   }
 
@@ -72,7 +88,7 @@ export class LayerManager {
    * @param includeReferenceSystem - (optional) if true also removes reference system, default is true
    */
   clearAllData(includeReferenceSystem = true): LayerManager {
-    this.layers.forEach((l) => l.clearData(includeReferenceSystem));
+    this.layers.forEach(l => l.clearData(includeReferenceSystem));
     return this;
   }
 
@@ -81,7 +97,10 @@ export class LayerManager {
    * @param layer Layer
    * @param params extra params to pass to the onUpdate method
    */
-  addLayer(layer: Layer<unknown>, params?: LayerOptions<unknown>): LayerManager {
+  addLayer(
+    layer: Layer<unknown>,
+    params?: LayerOptions<unknown>,
+  ): LayerManager {
     this.layers.push(layer);
     this.initLayer(layer, params);
 
@@ -93,10 +112,10 @@ export class LayerManager {
    * @param layerId name of layer
    */
   removeLayer(layerId: string): LayerManager {
-    const layer = this.layers.find((l) => l.id === layerId);
+    const layer = this.layers.find(l => l.id === layerId);
     if (layer) {
       layer.onUnmount();
-      this.layers = this.layers.filter((l) => l.id !== layerId);
+      this.layers = this.layers.filter(l => l.id !== layerId);
     }
 
     return this;
@@ -107,17 +126,22 @@ export class LayerManager {
    */
   removeAllLayers(): LayerManager {
     const { layers } = this;
-    layers.forEach((layer) => {
+    layers.forEach(layer => {
       this.removeLayer(layer.id);
     });
     return this;
   }
 
   getLayer(layerId: string): Layer<unknown> | undefined {
-    return this.layers.find((l) => l.id === layerId || l.getInternalLayerIds().includes(layerId));
+    return this.layers.find(
+      l => l.id === layerId || l.getInternalLayerIds().includes(layerId),
+    );
   }
 
-  initLayer(layer: Layer<unknown>, params?: LayerOptions<unknown>): LayerManager {
+  initLayer(
+    layer: Layer<unknown>,
+    params?: LayerOptions<unknown>,
+  ): LayerManager {
     const event: OnMountEvent = {
       elm: this.layerContainer,
     };
@@ -127,7 +151,12 @@ export class LayerManager {
     layer.onRescale(rescaleEvent);
 
     if (this._svgContainer) {
-      const highestZIndex = this.layers.length > 0 ? this.layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 1;
+      const highestZIndex =
+        this.layers.length > 0
+          ? this.layers.reduce((max, layers) =>
+              max.order > layers.order ? max : layers,
+            ).order
+          : 1;
       this._svgContainer.style('z-index', `${highestZIndex + 1}`);
     }
 
@@ -160,8 +189,14 @@ export class LayerManager {
    * @param height (required)
    */
   adjustToSize(width: number, height: number): void {
-    const layersWidth = Math.max(this._axis ? width - HORIZONTAL_AXIS_MARGIN : width, 0);
-    const layersHeight = Math.max(this._axis ? height - VERTICAL_AXIS_MARGIN : height, 0);
+    const layersWidth = Math.max(
+      this._axis ? width - HORIZONTAL_AXIS_MARGIN : width,
+      0,
+    );
+    const layersHeight = Math.max(
+      this._axis ? height - VERTICAL_AXIS_MARGIN : height,
+      0,
+    );
 
     if (this._axis) {
       const resizeEvent = { width, height };
@@ -169,7 +204,7 @@ export class LayerManager {
     }
     if (this.layers) {
       const resizeEvent = { width: layersWidth, height: layersHeight };
-      this.layers.forEach((layer) => layer.onResize(resizeEvent));
+      this.layers.forEach(layer => layer.onResize(resizeEvent));
     }
     if (this._zoomPanHandler) {
       this._zoomPanHandler.adjustToSize(layersWidth, layersHeight, true);
@@ -177,7 +212,7 @@ export class LayerManager {
   }
 
   setReferenceSystem(irs: IntersectionReferenceSystem): void {
-    this.layers.forEach((layer) => (layer.referenceSystem = irs));
+    this.layers.forEach(layer => (layer.referenceSystem = irs));
   }
 
   showAxis(): LayerManager {
@@ -204,7 +239,9 @@ export class LayerManager {
     if (this._axis) {
       this._axis.offsetX = x;
       this._axis.offsetY = y;
-      const gridLayers = this.layers.filter((l: Layer<unknown>): l is GridLayer<unknown> => l instanceof GridLayer);
+      const gridLayers = this.layers.filter(
+        (l: Layer<unknown>): l is GridLayer<unknown> => l instanceof GridLayer,
+      );
       gridLayers.forEach((l: GridLayer<unknown>) => {
         l.offsetX = x;
         l.offsetY = y;
@@ -216,7 +253,9 @@ export class LayerManager {
   setXAxisOffset(x: number): LayerManager {
     if (this._axis) {
       this._axis.offsetX = x;
-      const gridLayers = this.layers.filter((l: Layer<unknown>): l is GridLayer<unknown> => l instanceof GridLayer);
+      const gridLayers = this.layers.filter(
+        (l: Layer<unknown>): l is GridLayer<unknown> => l instanceof GridLayer,
+      );
       gridLayers.forEach((l: GridLayer<unknown>) => {
         l.offsetX = x;
       });
@@ -227,7 +266,9 @@ export class LayerManager {
   setYAxisOffset(y: number): LayerManager {
     if (this._axis) {
       this._axis.offsetY = y;
-      const gridLayers = this.layers.filter((l: Layer<unknown>): l is GridLayer<unknown> => l instanceof GridLayer);
+      const gridLayers = this.layers.filter(
+        (l: Layer<unknown>): l is GridLayer<unknown> => l instanceof GridLayer,
+      );
       gridLayers.forEach((l: GridLayer<unknown>) => {
         l.offsetY = y;
       });
@@ -272,7 +313,9 @@ export class LayerManager {
       this._axis.onRescale(event);
     }
     if (this.layers) {
-      this.layers.forEach((layer) => (layer.isVisible === true ? layer.onRescale(event) : {}));
+      this.layers.forEach(layer =>
+        layer.isVisible === true ? layer.onRescale(event) : {},
+      );
     }
   }
 
@@ -285,11 +328,20 @@ export class LayerManager {
       .style('z-index', '10')
       .style('pointer-events', 'none');
 
-    const svg = this._svgContainer.append('svg').attr('height', `${container.offsetHeight}px`).attr('width', `${container.offsetWidth}px`);
+    const svg = this._svgContainer
+      .append('svg')
+      .attr('height', `${container.offsetHeight}px`)
+      .attr('width', `${container.offsetWidth}px`);
 
     const showLabels = true;
 
-    const axis = new Axis(svg, showLabels, options.xLabel, options.yLabel, options.unitOfMeasure);
+    const axis = new Axis(
+      svg,
+      showLabels,
+      options.xLabel,
+      options.yLabel,
+      options.unitOfMeasure,
+    );
 
     return axis;
   };

@@ -4,11 +4,18 @@ import Vector2 from '@equinor/videx-vector2';
 export const pointToVector = (p: Point): Vector2 => new Vector2(p.x, p.y);
 export const pointToArray = (p: Point): [number, number] => [p.x, p.y];
 export const vectorToPoint = (v: Vector2): Point => new Point(v[0], v[1]);
-export const vectorToArray = (v: Vector2): [number, number] => [v[0] ?? 0, v[1] ?? 0];
+export const vectorToArray = (v: Vector2): [number, number] => [
+  v[0] ?? 0,
+  v[1] ?? 0,
+];
 export const arrayToPoint = (a: number[]): Point => new Point(a[0], a[1]);
-export const arrayToVector = (a: number[]): Vector2 => new Vector2(a[0] ?? 0, a[1] ?? 0);
+export const arrayToVector = (a: number[]): Vector2 =>
+  new Vector2(a[0] ?? 0, a[1] ?? 0);
 
-export const calcDist = (prev: [number, number], point: [number, number]): number => {
+export const calcDist = (
+  prev: [number, number],
+  point: [number, number],
+): number => {
   return arrayToVector(point).sub(prev).magnitude;
 };
 
@@ -53,12 +60,20 @@ export const createNormals = (points: Point[]): Vector2[] => {
 };
 
 // TODO check if this can be simplified and return Vector/number[]
-export const offsetPoint = (point: Point, vector: Vector2, offset: number): Point => {
+export const offsetPoint = (
+  point: Point,
+  vector: Vector2,
+  offset: number,
+): Point => {
   const p = pointToVector(point);
   return vectorToPoint(p.add(vector.scale(offset)));
 };
 
-export const offsetPoints = (points: Point[], vectors: Vector2[], offset: number): Point[] => {
+export const offsetPoints = (
+  points: Point[],
+  vectors: Vector2[],
+  offset: number,
+): Point[] => {
   if (points.length !== vectors.length) {
     throw new Error('Number of vectors does not match number of points');
   }
@@ -69,6 +84,8 @@ export const offsetPoints = (points: Point[], vectors: Vector2[], offset: number
     if (vector != null) {
       return offsetPoint(point, vector, offset);
     }
-    throw new Error(`Trying to read index ${index} of point ${point}, but no such vector was found!`);
+    throw new Error(
+      `Trying to read index ${index} of point ${point}, but no such vector was found!`,
+    );
   });
 };

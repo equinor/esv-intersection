@@ -1,4 +1,10 @@
-import { OnMountEvent, OnUnmountEvent, OnUpdateEvent, OnRescaleEvent, OnResizeEvent } from '../../interfaces';
+import {
+  OnMountEvent,
+  OnUnmountEvent,
+  OnUpdateEvent,
+  OnRescaleEvent,
+  OnResizeEvent,
+} from '../../interfaces';
 import { IntersectionReferenceSystem } from '../../control';
 
 const defaultOptions = {
@@ -116,7 +122,9 @@ export abstract class Layer<T> {
     return this._referenceSystem;
   }
 
-  set referenceSystem(referenceSystem: IntersectionReferenceSystem | undefined) {
+  set referenceSystem(
+    referenceSystem: IntersectionReferenceSystem | undefined,
+  ) {
     this._referenceSystem = referenceSystem;
   }
 

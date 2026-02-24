@@ -5,7 +5,8 @@ import pkg from './package.json';
 
 type PackageJson = typeof pkg;
 
-export const getPeerDeps = (pkg: PackageJson) => Object.keys(pkg.peerDependencies || {});
+export const getPeerDeps = (pkg: PackageJson) =>
+  Object.keys(pkg.peerDependencies || {});
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,7 +16,7 @@ export default defineConfig({
       entry: 'src/index.ts',
       formats: ['es', 'cjs', 'umd'],
       name: 'esvintersection',
-      fileName: (format) => {
+      fileName: format => {
         const fileName = 'index';
         switch (format) {
           case 'es':

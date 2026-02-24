@@ -10,11 +10,15 @@ export class Overlay<T> {
 
   constructor(caller: T, container: HTMLElement) {
     const con = select(container);
-    this.elm = con.append('div').attr('id', 'overlay').style('z-index', '11').style('position', 'absolute');
+    this.elm = con
+      .append('div')
+      .attr('id', 'overlay')
+      .style('z-index', '11')
+      .style('position', 'absolute');
     this.source = this.elm.node() ?? undefined;
 
     const { elm } = this;
-    elm.on('resize', (event) => {
+    elm.on('resize', event => {
       const { width, height } = event.detail;
       elm.style('width', `${width}px`).style('height', `${height}px`);
 
@@ -39,7 +43,7 @@ export class Overlay<T> {
       });
     });
 
-    elm.on('mousemove', (event) => {
+    elm.on('mousemove', event => {
       if (!this.enabled) {
         return;
       }
@@ -83,8 +87,15 @@ export class Overlay<T> {
     });
   }
 
-  create(key: string, callbacks?: OverlayCallbacks<T>): HTMLElement | undefined {
-    const newElm = this.elm.append('div').style('position', 'relative').style('pointer-events', 'none').node();
+  create(
+    key: string,
+    callbacks?: OverlayCallbacks<T>,
+  ): HTMLElement | undefined {
+    const newElm = this.elm
+      .append('div')
+      .style('position', 'relative')
+      .style('pointer-events', 'none')
+      .node();
 
     if (newElm != null) {
       this.elements[key] = newElm;
@@ -119,4 +130,5 @@ export class Overlay<T> {
   }
 }
 
-export const overlay = <T>(caller: T, container: HTMLElement): Overlay<T> => new Overlay<T>(caller, container);
+export const overlay = <T>(caller: T, container: HTMLElement): Overlay<T> =>
+  new Overlay<T>(caller, container);

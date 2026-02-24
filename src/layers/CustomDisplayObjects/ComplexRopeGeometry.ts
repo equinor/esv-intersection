@@ -13,7 +13,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
    * @param segments - An array of segments with points and diameter to construct this rope.
    */
   constructor(segments: ComplexRopeSegment[]) {
-    const pointCount = sum(segments, (segment) => segment.points.length);
+    const pointCount = sum(segments, segment => segment.points.length);
 
     super({
       positions: new Float32Array(pointCount * 4),
@@ -32,7 +32,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
    * @readonly
    */
   get width(): number {
-    return max(this.segments, (segment) => segment.diameter)!;
+    return max(this.segments, segment => segment.diameter)!;
   }
 
   /** Refreshes Rope indices and uvs */
@@ -47,7 +47,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
     const uvBuffer = this.getBuffer('aUV');
     const indexBuffer = this.getIndex();
 
-    const pointCount = sum(segments, (segment) => segment.points.length);
+    const pointCount = sum(segments, segment => segment.points.length);
 
     // if too few points, or texture hasn't got UVs set yet just move on.
     if (pointCount < 1) {
@@ -70,7 +70,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
     uvs[3] = 1;
 
     const segmentCount = segments.length;
-    const maxDiameter = max(segments, (segment) => segment.diameter)!;
+    const maxDiameter = max(segments, segment => segment.diameter)!;
 
     let amount = 0;
     let uvIndex = 0;
@@ -126,7 +126,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
   /** refreshes vertices of Rope mesh */
   public updateVertices(): void {
     const segments = this.segments;
-    const pointCount = sum(segments, (segment) => segment.points.length);
+    const pointCount = sum(segments, segment => segment.points.length);
 
     if (pointCount < 1) {
       return;

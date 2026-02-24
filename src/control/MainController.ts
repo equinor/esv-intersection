@@ -30,13 +30,25 @@ export class Controller {
    * @param options.referenceSystem (optional) sets reference system, takes priority over path if both are supplied
    */
   constructor(options: ControllerOptions) {
-    const { container, axisOptions, scaleOptions, referenceSystem, layers, path } = options;
+    const {
+      container,
+      axisOptions,
+      scaleOptions,
+      referenceSystem,
+      layers,
+      path,
+    } = options;
 
-    this._referenceSystem = referenceSystem || (path && new IntersectionReferenceSystem(path));
+    this._referenceSystem =
+      referenceSystem || (path && new IntersectionReferenceSystem(path));
 
     this._overlay = overlay(this, container);
 
-    this.layerManager = new LayerManager(this._overlay.elm.node() as HTMLElement, scaleOptions, axisOptions);
+    this.layerManager = new LayerManager(
+      this._overlay.elm.node() as HTMLElement,
+      scaleOptions,
+      axisOptions,
+    );
     if (layers) {
       this.layerManager.addLayers(layers);
       this.setOverlayZIndex(layers);
@@ -136,8 +148,15 @@ export class Controller {
   adjustToSize(width: number, height: number): Controller {
     this.layerManager.adjustToSize(width, height);
 
-    const dimensions = { width: Math.max(width - HORIZONTAL_AXIS_MARGIN, 0), height: Math.max(height - VERTICAL_AXIS_MARGIN, 0) };
-    this.overlay.elm.dispatch('resize', { detail: dimensions, bubbles: true, cancelable: true });
+    const dimensions = {
+      width: Math.max(width - HORIZONTAL_AXIS_MARGIN, 0),
+      height: Math.max(height - VERTICAL_AXIS_MARGIN, 0),
+    };
+    this.overlay.elm.dispatch('resize', {
+      detail: dimensions,
+      bubbles: true,
+      cancelable: true,
+    });
 
     return this;
   }
@@ -149,7 +168,12 @@ export class Controller {
    * @param  displ - displacement
    * @param  duration - duration of transition
    */
-  setViewport(cx?: number, cy?: number, displacement?: number, duration?: number): Controller {
+  setViewport(
+    cx?: number,
+    cy?: number,
+    displacement?: number,
+    duration?: number,
+  ): Controller {
     this.zoomPanHandler.setViewport(cx, cy, displacement, duration);
     return this;
   }
@@ -263,7 +287,12 @@ export class Controller {
   }
 
   private getHighestZIndex(layers: Layer<unknown>[]): number {
-    const highestZIndex = layers.length > 0 ? layers.reduce((max, layers) => (max.order > layers.order ? max : layers)).order : 1;
+    const highestZIndex =
+      layers.length > 0
+        ? layers.reduce((max, layers) =>
+            max.order > layers.order ? max : layers,
+          ).order
+        : 1;
     return highestZIndex;
   }
 

@@ -12,7 +12,8 @@ export interface OnImageLayerUpdateEvent<T> extends OnUpdateEvent<T> {
   y?: number;
 }
 
-export type OnImageLayerRescaleEvent<T> = OnImageLayerUpdateEvent<T> & OnRescaleEvent;
+export type OnImageLayerRescaleEvent<T> = OnImageLayerUpdateEvent<T> &
+  OnRescaleEvent;
 
 export class ImageLayer<T> extends CanvasLayer<T> {
   img: HTMLImageElement | undefined;
@@ -51,10 +52,23 @@ export class ImageLayer<T> extends CanvasLayer<T> {
         this.img.onload = (): void => {
           this.isLoading = false;
           // An extra undefined check should happen here as the execution doesn't happen synchronously
-          this.img != null && this.ctx?.drawImage(this.img, xScale(x || 0), yScale(y || 0), calcWidth, calcHeight);
+          this.img != null &&
+            this.ctx?.drawImage(
+              this.img,
+              xScale(x || 0),
+              yScale(y || 0),
+              calcWidth,
+              calcHeight,
+            );
         };
       } else {
-        this.ctx?.drawImage(this.img, xScale(x || 0), yScale(y || 0), calcWidth, calcHeight);
+        this.ctx?.drawImage(
+          this.img,
+          xScale(x || 0),
+          yScale(y || 0),
+          calcWidth,
+          calcHeight,
+        );
       }
     }
   }
