@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/equinor/esv-intersection/compare/v4.0.0...v4.1.0) (2026-02-24)
+
+
+### Features
+
+* **943:** configure and run prettier ([#985](https://github.com/equinor/esv-intersection/issues/985)) ([1696ef4](https://github.com/equinor/esv-intersection/commit/1696ef4a28e2e10cc571f034fbebb0242ddfbd3e))
+
 ## [4.0.0](https://github.com/equinor/esv-intersection/compare/v3.1.9...v4.0.0) (2026-02-19)
 
 
