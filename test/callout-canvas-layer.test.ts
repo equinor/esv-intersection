@@ -7,7 +7,7 @@ import {
   vi,
   MockInstance,
 } from 'vitest';
-import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
+import { CanvasRenderingContext2DEvent } from 'vitest-canvas-mock';
 import createMockRaf from 'mock-raf';
 import { CalloutCanvasLayer, IntersectionReferenceSystem } from '../src/index';
 import { rescaleEventStub } from './test-helpers';
