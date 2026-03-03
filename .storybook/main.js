@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   stories: ['../.storybook/src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: ['@storybook/addon-docs'],
   staticDirs: ['../public'],
