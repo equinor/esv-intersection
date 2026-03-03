@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.1](https://github.com/equinor/esv-intersection/compare/v4.1.0...v4.1.1) (2026-03-03)
+
+
+### Bug Fixes
+
+* **960:** security updates ([#988](https://github.com/equinor/esv-intersection/issues/988)) ([7c56796](https://github.com/equinor/esv-intersection/commit/7c567968a6945df0665ebcf5aa780d2c54ac9101))
+
 ## [4.1.0](https://github.com/equinor/esv-intersection/compare/v4.0.0...v4.1.0) (2026-02-24)
 
 

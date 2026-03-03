@@ -1,6 +1,6 @@
 {
   "name": "@equinor/esv-intersection",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Intersection component package with testing and automatic documentation.",
   "type": "module",
   "module": "dist/index.mjs",
