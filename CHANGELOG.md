@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.2](https://github.com/equinor/esv-intersection/compare/v4.1.1...v4.1.2) (2026-03-23)
+
+
+### Bug Fixes
+
+* **npm:** bump flatted from 3.3.3 to 3.4.2 ([#993](https://github.com/equinor/esv-intersection/issues/993)) ([563e275](https://github.com/equinor/esv-intersection/commit/563e2754424bda7fcebe8b773f16fd77b7a2385a))
+
 ## [4.1.1](https://github.com/equinor/esv-intersection/compare/v4.1.0...v4.1.1) (2026-03-03)
 
 
