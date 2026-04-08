@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.1.3](https://github.com/equinor/esv-intersection/compare/v4.1.2...v4.1.3) (2026-04-08)
+
+
+### Bug Fixes
+
+* **7487:** fixing all dependabot vulnerabilities ([#1003](https://github.com/equinor/esv-intersection/issues/1003)) ([ad54dbf](https://github.com/equinor/esv-intersection/commit/ad54dbfb3751a04b11298d8ad99e151f38cc3251))
+* **npm:** bump @xmldom/xmldom from 0.8.11 to 0.8.12 ([#999](https://github.com/equinor/esv-intersection/issues/999)) ([3ff8708](https://github.com/equinor/esv-intersection/commit/3ff87089c49544074f797e4e03143e9c2633f739))
+* **npm:** bump picomatch ([#997](https://github.com/equinor/esv-intersection/issues/997)) ([125546b](https://github.com/equinor/esv-intersection/commit/125546b8fa832a6277bcb31dd928d19897f1e7e4))
+* **npm:** bump vite from 7.3.1 to 7.3.2 ([#1001](https://github.com/equinor/esv-intersection/issues/1001)) ([1a9a5b2](https://github.com/equinor/esv-intersection/commit/1a9a5b2c4e1c42e954a8e5a2c9ea15bc81188c3e))
+
 ## [4.1.2](https://github.com/equinor/esv-intersection/compare/v4.1.1...v4.1.2) (2026-03-23)
 
 
