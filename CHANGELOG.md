@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.4](https://github.com/equinor/esv-intersection/compare/v4.1.3...v4.1.4) (2026-04-24)
+
+
+### Bug Fixes
+
+* **npm:** bump @xmldom/xmldom from 0.8.12 to 0.8.13 ([#1006](https://github.com/equinor/esv-intersection/issues/1006)) ([66b0518](https://github.com/equinor/esv-intersection/commit/66b0518ed7607e9726d7f7a574160e81fe405b16))
+
 ## [4.1.3](https://github.com/equinor/esv-intersection/compare/v4.1.2...v4.1.3) (2026-04-08)
 
 
