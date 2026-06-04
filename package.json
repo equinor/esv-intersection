@@ -24,6 +24,7 @@
     "lint:eslint": "eslint --ext .js,.jsx,.ts,.tsx src test",
     "lint:tsc": "tsc -b",
     "lint": "npm run lint:tsc && npm run lint:eslint",
+    "lintOx": "oxlint",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "predocs": "rimraf docs_out",
@@ -52,6 +53,7 @@
   },
   "homepage": "https://github.com/equinor/esv-intersection#readme",
   "devDependencies": {
+    "@oxlint/migrate": "^1.68.0",
     "@storybook/addon-docs": "^10.2.14",
     "@storybook/html-vite": "^10.2.14",
     "@types/d3": "^7.4.3",
@@ -63,6 +65,7 @@
     "jsdom": "^27.4.0",
     "lint-staged": "^15.5.2",
     "mock-raf": "^1.0.1",
+    "oxlint": "^1.68.0",
     "pixi.js": "^8.16.0",
     "prettier": "^3.8.1",
     "rimraf": "^6.1.3",
