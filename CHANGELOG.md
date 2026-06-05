@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.1.5](https://github.com/equinor/esv-intersection/compare/v4.1.4...v4.1.5) (2026-06-05)
+
+
+### Bug Fixes
+
+* **7430:** option to scale seismic slice image to increase resolution ([#1021](https://github.com/equinor/esv-intersection/issues/1021)) ([0580b05](https://github.com/equinor/esv-intersection/commit/0580b05d6b6e0aa38056c65c0f88c34a26bce77a))
+* **npm:** bump fast-uri from 3.1.0 to 3.1.2 ([#1013](https://github.com/equinor/esv-intersection/issues/1013)) ([a9bcab9](https://github.com/equinor/esv-intersection/commit/a9bcab9b2a9387e71bf1b74e07d76979d78f51cb))
+* **npm:** bump postcss from 8.5.8 to 8.5.14 ([#1012](https://github.com/equinor/esv-intersection/issues/1012)) ([509de18](https://github.com/equinor/esv-intersection/commit/509de183c979c6e68fd0bee8f98a0feb2815f472))
+* **npm:** bump vitest =&gt; 4.1.8 ([#1019](https://github.com/equinor/esv-intersection/issues/1019)) ([4ff2bf1](https://github.com/equinor/esv-intersection/commit/4ff2bf17dce0b8da5858e81ff54e98ac5a701fdc))
+
 ## [4.1.4](https://github.com/equinor/esv-intersection/compare/v4.1.3...v4.1.4) (2026-04-24)
 
 
