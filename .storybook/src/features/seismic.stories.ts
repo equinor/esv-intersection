@@ -23,7 +23,7 @@ export const SeismicUsingLowLevelInterface = () => {
     seismicLayer.onMount({ ...ev });
     const trajectory: number[][] = generateProjectedTrajectory(poslog, 45);
     const seismicInfo = getSeismicInfo(seismic, trajectory);
-    generateSeismicSliceImage(seismic, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
+    generateSeismicSliceImage(seismic, trajectory, seismicColorMap, { isLeftToRight: true, seismicScale: 2 }).then((seismicImage: ImageBitmap) => {
       seismicLayer.data = {
         image: seismicImage,
         options: getSeismicOptions(seismicInfo),

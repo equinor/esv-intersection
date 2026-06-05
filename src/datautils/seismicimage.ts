@@ -114,6 +114,7 @@ export async function generateSeismicSliceImage(
     seismicRange?: number;
     seismicMin?: number;
     seismicMax?: number;
+    seismicScale?: number;
   } = { isLeftToRight: true },
 ): Promise<ImageBitmap | undefined> {
   if (!(data && data.datapoints && data.datapoints.length > 0)) {
@@ -141,9 +142,13 @@ export async function generateSeismicSliceImage(
     difference: dmax - dmin,
   };
 
+  const scaleValue = Math.max(1, options?.seismicScale ?? 1);
+
   const length = trajectory[0]?.[0]! - trajectory[trajectory.length - 1]?.[0]!;
-  const width = Math.abs(Math.floor(length / 5));
-  const height = data.yAxisValues.length;
+  const baseWidth = Math.abs(Math.floor(length / 5));
+  const baseHeight = data.yAxisValues.length;
+  const width = Math.max(1, baseWidth * scaleValue);
+  const height = Math.max(1, baseHeight * scaleValue);
 
   // Generate color table
   const colorTableSize = 1000;
@@ -152,44 +157,59 @@ export async function generateSeismicSliceImage(
   // Generate image
   const d = new Uint8ClampedArray(width * height * 4);
 
-  let offset = 0;
   const colorFactor = (colorTableSize - 1) / domain.difference;
 
-  let pos = options?.isLeftToRight
+  const startPos = options?.isLeftToRight
     ? trajectory[0]?.[0]!
     : trajectory[trajectory.length - 1]?.[0]!;
 
   const step = (length / width) * (options?.isLeftToRight ? -1 : 1);
 
-  let val1: number;
-  let val2: number;
-  let val: number;
-  let i: number;
-  let col: number[];
+  // Map output rows to fractional indices into the source yAxisValues rows.
+  const yScale = baseHeight > 1 ? (baseHeight - 1) / (height - 1 || 1) : 0;
+
   const black = [0, 0, 0];
-  let opacity: number;
+
+  let pos = startPos;
 
   for (let x = 0; x < width; x++) {
-    offset = x * 4;
     const index = findIndexOfSample(trajectory, pos);
-    const x1 = trajectory[index]?.[0]!;
-    const x2 = trajectory[index + 1]?.[0]!;
-    const span = x2 - x1;
-    const dx = pos - x1;
-    const ratio = dx / span;
+    const x1 = trajectory[index]?.[0];
+    const x2 = trajectory[index + 1]?.[0];
+    const validColumn = index >= 0 && x1 != null && x2 != null && x2 - x1 !== 0;
+    const ratioX = validColumn ? (pos - x1!) / (x2! - x1!) : 0;
+
+    let offset = x * 4;
 
     for (let y = 0; y < height; y++) {
-      val1 = dp[y]?.[index]!;
-      val2 = dp[y]?.[index + 1]!;
-      if (val1 == null || val2 == null) {
-        col = black;
-        opacity = 0;
-      } else {
-        val = val1 * (1 - ratio) + val2 * ratio;
-        i = (val - domain.min) * colorFactor;
-        i = clamp(~~i, 0, colorTableSize - 1);
-        col = colorTable[i]!;
-        opacity = 255;
+      let col: number[] = black;
+      let opacity = 0;
+
+      if (validColumn) {
+        const fy = y * yScale;
+        const y0 = Math.floor(fy);
+        const y1 = Math.min(y0 + 1, baseHeight - 1);
+        const ratioY = fy - y0;
+
+        const v00 = dp[y0]?.[index];
+        const v01 = dp[y0]?.[index + 1];
+        const v10 = dp[y1]?.[index];
+        const v11 = dp[y1]?.[index + 1];
+
+        if (v00 != null && v01 != null && v10 != null && v11 != null) {
+          // Bilinear interpolation on data values (not on colours).
+          const top = v00 * (1 - ratioX) + v01 * ratioX;
+          const bottom = v10 * (1 - ratioX) + v11 * ratioX;
+          const val = top * (1 - ratioY) + bottom * ratioY;
+
+          const i = clamp(
+            ~~((val - domain.min) * colorFactor),
+            0,
+            colorTableSize - 1,
+          );
+          col = colorTable[i]!;
+          opacity = 255;
+        }
       }
 
       d.set([col[0]!, col[1]!, col[2]!, opacity], offset);

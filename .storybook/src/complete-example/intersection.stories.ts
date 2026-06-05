@@ -250,7 +250,7 @@ const renderIntersection = (scaleOptions: any) => {
 
     const seismicOptions = getSeismicOptions(seismicInfo);
 
-    generateSeismicSliceImage(seismic as any, trajectory, seismicColorMap).then((seismicImage: ImageBitmap) => {
+    generateSeismicSliceImage(seismic as any, trajectory, seismicColorMap, { isLeftToRight: true, seismicScale: 2 }).then((seismicImage: ImageBitmap) => {
       seismicLayer.setData({ image: seismicImage, options: seismicOptions });
     });
 
