@@ -42,5 +42,6 @@ export declare function generateSeismicSliceImage(data: {
     seismicRange?: number;
     seismicMin?: number;
     seismicMax?: number;
+    seismicScale?: number;
 }): Promise<ImageBitmap | undefined>;
 //# sourceMappingURL=seismicimage.d.ts.map
