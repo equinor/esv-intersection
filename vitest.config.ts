@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 import { mergeConfig } from 'vite';
-import dts from 'vite-plugin-dts';
+import dts from 'unplugin-dts/vite';
 
 import { defineConfig } from 'vitest/config';
 import viteConfig from './vite.config';
