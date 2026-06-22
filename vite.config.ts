@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts';
+import dts from 'unplugin-dts/vite';
 
 import pkg from './package.json';
 
@@ -30,7 +30,7 @@ export default defineConfig({
         }
       },
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: getPeerDeps(pkg),
       output: {
         globals: {
