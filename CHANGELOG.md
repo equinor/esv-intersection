@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.6](https://github.com/equinor/esv-intersection/compare/v4.1.5...v4.1.6) (2026-06-22)
+
+
+### Bug Fixes
+
+* **1024:** dependabot june 26 ([#1027](https://github.com/equinor/esv-intersection/issues/1027)) ([3515b7f](https://github.com/equinor/esv-intersection/commit/3515b7fb2f1694e338d49fc4191c24b6af9e745a))
+
 ## [4.1.5](https://github.com/equinor/esv-intersection/compare/v4.1.4...v4.1.5) (2026-06-05)
 
 
