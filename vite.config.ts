@@ -30,7 +30,7 @@ export default defineConfig({
         }
       },
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: getPeerDeps(pkg),
       output: {
         globals: {
