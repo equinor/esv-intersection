@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.1.7](https://github.com/equinor/esv-intersection/compare/v4.1.6...v4.1.7) (2026-07-21)
+
+
+### Bug Fixes
+
+* **npm:** bump esbuild from 0.27.3 to 0.28.1 ([#1029](https://github.com/equinor/esv-intersection/issues/1029)) ([c871cdf](https://github.com/equinor/esv-intersection/commit/c871cdff3e868eb32096a148e3768285d464aebf))
+* **taskless:** brace-expansion and js-yaml dependabot july 26 ([#1042](https://github.com/equinor/esv-intersection/issues/1042)) ([810e511](https://github.com/equinor/esv-intersection/commit/810e51133c2b5a985e5edbe6f14c5f940579e0a4))
+
 ## [4.1.6](https://github.com/equinor/esv-intersection/compare/v4.1.5...v4.1.6) (2026-06-22)
 
 
