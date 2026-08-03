@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.1.8](https://github.com/equinor/esv-intersection/compare/v4.1.7...v4.1.8) (2026-07-27)
+
+
+### Bug Fixes
+
+* **npm:** bump linkify-it from 5.0.1 to 5.0.2 ([#1043](https://github.com/equinor/esv-intersection/issues/1043)) ([2b3aecf](https://github.com/equinor/esv-intersection/commit/2b3aecf8174f310bd4e8695c218e82fd460a065b))
+* **npm:** bump postcss from 8.5.15 to 8.5.23 ([#1044](https://github.com/equinor/esv-intersection/issues/1044)) ([f51e2f4](https://github.com/equinor/esv-intersection/commit/f51e2f42db1d8c2d7ef2414b1e09a23f25e38cc5))
+
 ## [4.1.7](https://github.com/equinor/esv-intersection/compare/v4.1.6...v4.1.7) (2026-07-21)
 
 
