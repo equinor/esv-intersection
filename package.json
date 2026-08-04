@@ -31,7 +31,8 @@
     "postdocs": "copyfiles images/* docs_out && copyfiles .nojekyll docs_out",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lintOx": "oxlint"
   },
   "lint-staged": {
     "*": "prettier --write --ignore-unknown"
@@ -63,6 +64,7 @@
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.7",
     "mock-raf": "^1.0.1",
+    "oxlint": "^1.77.0",
     "pixi.js": "^8.16.0",
     "prettier": "^3.8.4",
     "rimraf": "^6.1.3",
