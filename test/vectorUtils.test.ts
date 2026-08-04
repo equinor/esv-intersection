@@ -55,7 +55,7 @@ describe('vectorUtils', () => {
       normals.pop();
       expect(() => {
         offsetPoints(points, normals, 1);
-      }).toThrowError();
+      }).toThrow('Number of vectors does not match number of points');
     });
 
     it('should offset each point with the corresponding vector', () => {
