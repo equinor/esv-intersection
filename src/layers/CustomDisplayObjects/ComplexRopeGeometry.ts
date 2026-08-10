@@ -78,49 +78,54 @@ export class ComplexRopeGeometry extends MeshGeometry {
     let indexCount = 0;
 
     for (let i = 0; i < segmentCount; i++) {
-      let prev = segments[i]?.points[0]!;
-      const textureWidth = maxDiameter;
-      const radius = segments[i]?.diameter! / maxDiameter / 2;
+      const segment = segments[i];
+      if (segment != undefined) {
+        let prev = segment.points[0]!;
+        const textureWidth = maxDiameter;
+        const radius = segment.diameter! / maxDiameter / 2;
 
-      const total = segments[i]?.points.length!; // - 1;
+        const total = segment.points.length!; // - 1;
 
-      for (let j = 0; j < total; j++) {
-        // time to do some smart drawing!
+        for (let j = 0; j < total; j++) {
+          const points = segment.points[j];
+          // time to do some smart drawing!
+          if (points != undefined) {
+            // calculate pixel distance from previous point
+            const dx = prev.x - points.x;
+            const dy = prev.y - points.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // calculate pixel distance from previous point
-        const dx = prev.x - segments[i]?.points[j]?.x!;
-        const dy = prev.y - segments[i]?.points[j]?.y!;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+            prev = segments[i]?.points[j]!;
+            amount += distance / textureWidth;
 
-        prev = segments[i]?.points[j]!;
-        amount += distance / textureWidth;
+            uvs[uvIndex] = amount;
+            uvs[uvIndex + 1] = 0.5 - radius;
 
-        uvs[uvIndex] = amount;
-        uvs[uvIndex + 1] = 0.5 - radius;
+            uvs[uvIndex + 2] = amount;
+            uvs[uvIndex + 3] = 0.5 + radius;
+            uvIndex += 4;
+          }
 
-        uvs[uvIndex + 2] = amount;
-        uvs[uvIndex + 3] = 0.5 + radius;
-        uvIndex += 4;
+          for (let j = 0; j < total - 1; j++) {
+            indices[indexCount++] = indicesIndex;
+            indices[indexCount++] = indicesIndex + 1;
+            indices[indexCount++] = indicesIndex + 2;
+
+            indices[indexCount++] = indicesIndex + 2;
+            indices[indexCount++] = indicesIndex + 1;
+            indices[indexCount++] = indicesIndex + 3;
+            indicesIndex += 2;
+          }
+          indicesIndex += 2;
+        }
       }
 
-      for (let j = 0; j < total - 1; j++) {
-        indices[indexCount++] = indicesIndex;
-        indices[indexCount++] = indicesIndex + 1;
-        indices[indexCount++] = indicesIndex + 2;
+      // ensure that the changes are uploaded
+      uvBuffer.update();
+      indexBuffer.update();
 
-        indices[indexCount++] = indicesIndex + 2;
-        indices[indexCount++] = indicesIndex + 1;
-        indices[indexCount++] = indicesIndex + 3;
-        indicesIndex += 2;
-      }
-      indicesIndex += 2;
+      this.updateVertices();
     }
-
-    // ensure that the changes are uploaded
-    uvBuffer.update();
-    indexBuffer.update();
-
-    this.updateVertices();
   }
 
   /** refreshes vertices of Rope mesh */
@@ -157,22 +162,25 @@ export class ComplexRopeGeometry extends MeshGeometry {
         perpX = nextPoint.y - lastPoint.y;
 
         const perpLength = Math.sqrt(perpX * perpX + perpY * perpY);
-        const num = segments[i]?.diameter! / 2;
+        const diameter = segments[i]?.diameter;
+        if (diameter) {
+          const num = diameter / 2;
 
-        perpX /= perpLength;
-        perpY /= perpLength;
+          perpX /= perpLength;
+          perpY /= perpLength;
 
-        perpX *= num;
-        perpY *= num;
+          perpX *= num;
+          perpY *= num;
 
-        if (vertices != null) {
-          vertices[index] = point.x + perpX;
-          vertices[index + 1] = point.y + perpY;
-          vertices[index + 2] = point.x - perpX;
-          vertices[index + 3] = point.y - perpY;
+          if (vertices != null) {
+            vertices[index] = point.x + perpX;
+            vertices[index + 1] = point.y + perpY;
+            vertices[index + 2] = point.x - perpX;
+            vertices[index + 3] = point.y - perpY;
+          }
+
+          lastPoint = point;
         }
-
-        lastPoint = point;
       }
       lastIndex = index + 4;
     }

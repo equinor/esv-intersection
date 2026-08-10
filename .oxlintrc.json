@@ -19,8 +19,7 @@
   "rules": {
     "no-unused-expressions": ["error", {"allowTernary": true, "allowShortCircuit": true}],
     "react/react-in-jsx-scope": "off",
-    "no-underscore-dangle": "off",
-    "react-perf/jsx-no-new-array-as-prop": "off"
+    "no-underscore-dangle": "off"
   },
   "overrides": [
     {

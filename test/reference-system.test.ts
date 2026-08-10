@@ -146,10 +146,11 @@ describe('Reference system', () => {
     );
     expect(startExtend).toBeCloseTo(1500.0);
     expect(endExtend).toBeCloseTo(1500.0);
+
     const angle = degrees(
       Math.atan(
-        (trajectory.points[99]?.[0]! - trajectory.points[0]?.[0]!) /
-          (trajectory.points[99]?.[1]! - trajectory.points[0]?.[1]!),
+        (trajectory.points[99]![0]! - trajectory.points[0]![0]!) /
+          (trajectory.points[99]![1]! - trajectory.points[0]![1]!),
       ),
     );
     expect(angle).toBeCloseTo(45.0);
