@@ -412,7 +412,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
 
     const nodes = annotations.map(a => {
       const pos = a.pos ? a.pos : this.referenceSystem?.project(a.md!);
-      if (pos && pos[0] && pos[1]) {
+      if (pos != undefined && pos[0] != undefined && pos[1] != undefined) {
         return {
           title: a.title,
           label: a.label,

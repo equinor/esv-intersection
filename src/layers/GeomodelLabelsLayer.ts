@@ -743,9 +743,10 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       (spaceOnLeftSideInScreenCoordinates < t &&
         spaceOnRightSideInScreenCoordinates < t &&
         isXFlipped) ||
-      (bottom[0] && bottom[0][1] && bottom[0][1] < dy1) ||
-      true;
+      (bottom[0] != undefined &&
+        bottom[0][1] != undefined &&
+        bottom[0][1] < dy1);
 
-    return isLabelsOnLeftSide;
+    return isLabelsOnLeftSide != undefined ? isLabelsOnLeftSide : true;
   }
 }

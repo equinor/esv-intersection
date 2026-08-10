@@ -51,8 +51,8 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
       // Generate top of polygon as long as we have valid values
       const topValue = data[i]?.[1];
       const bottomValue = data[i]?.[0];
-      const topIsValid = !!topValue;
-      if (topIsValid && !!bottomValue) {
+      const topIsValid = topValue != undefined;
+      if (topIsValid && bottomValue != undefined) {
         if (polygon == null) {
           polygon = [];
         }
@@ -65,7 +65,11 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
           // Generate bottom of polygon
           for (let j: number = !topIsValid ? i - 1 : i; j >= 0; j--) {
             const dataPoint = data[j];
-            if (!dataPoint || !dataPoint[1] || !dataPoint[0]) {
+            if (
+              dataPoint == undefined ||
+              dataPoint[1] == undefined ||
+              dataPoint[0] == undefined
+            ) {
               break;
             }
             polygon.push(dataPoint[0], dataPoint[2] || DEFAULT_Y_BOTTOM);

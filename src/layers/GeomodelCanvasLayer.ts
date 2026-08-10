@@ -124,8 +124,8 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
       // Generate top of polygon as long as we have valid values
       const topValue = data[i]?.[1];
       const bottomValue = data[i]?.[0];
-      const topIsValid = !!topValue;
-      if (topIsValid && !!bottomValue) {
+      const topIsValid = topValue != undefined;
+      if (topIsValid && bottomValue != undefined) {
         if (polygon === null) {
           polygon = [];
         }
@@ -138,7 +138,7 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
           // Generate bottom of polygon
           for (let j: number = !topIsValid ? i - 1 : i; j >= 0; j--) {
             const dataPoint = data[j];
-            if (dataPoint == undefined || !dataPoint[1]) {
+            if (dataPoint == undefined || dataPoint[1] == undefined) {
               break;
             }
             polygon.push(dataPoint[0]!, dataPoint[2] || this.maxDepth);
@@ -172,7 +172,7 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
     let path: Path2D | undefined;
     for (let i = 0; i < d.length; i++) {
       const dataPoint = d[i];
-      if (dataPoint && dataPoint[1]) {
+      if (dataPoint != undefined && dataPoint[1] != undefined) {
         if (penDown && path) {
           path.lineTo(dataPoint[0]!, dataPoint[1]);
         } else {
