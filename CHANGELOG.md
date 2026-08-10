@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.9](https://github.com/equinor/esv-intersection/compare/v4.1.8...v4.1.9) (2026-08-06)
+
+
+### Bug Fixes
+
+* **npm:** bump undici from 7.28.0 to 7.29.0 ([#1050](https://github.com/equinor/esv-intersection/issues/1050)) ([4783634](https://github.com/equinor/esv-intersection/commit/4783634371b55c8a41a1e78fd91181f6f3c2b238))
+
 ## [4.1.8](https://github.com/equinor/esv-intersection/compare/v4.1.7...v4.1.8) (2026-07-27)
 
 
