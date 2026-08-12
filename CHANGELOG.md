@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.10](https://github.com/equinor/esv-intersection/compare/v4.1.9...v4.1.10) (2026-08-12)
+
+
+### Bug Fixes
+
+* **taskless:** bump brace-expansion, nanoid and js-yaml ([#1055](https://github.com/equinor/esv-intersection/issues/1055)) ([b55d06c](https://github.com/equinor/esv-intersection/commit/b55d06ccb30f61248a6ddcfdd85a8b3317709a51))
+
 ## [4.1.9](https://github.com/equinor/esv-intersection/compare/v4.1.8...v4.1.9) (2026-08-06)
 
 
