@@ -122,12 +122,14 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
     // Start generating polygons
     for (let i = 0; i < data.length; i++) {
       // Generate top of polygon as long as we have valid values
-      const topIsValid = !!data[i]?.[1];
-      if (topIsValid) {
+      const topValue = data[i]?.[1];
+      const bottomValue = data[i]?.[0];
+      const topIsValid = topValue != undefined;
+      if (topIsValid && bottomValue != undefined) {
         if (polygon === null) {
           polygon = [];
         }
-        polygon.push(data[i]?.[0]!, data[i]?.[1]!);
+        polygon.push(bottomValue, topValue);
       }
 
       const endIsReached = i === data.length - 1;
@@ -135,10 +137,11 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
         if (polygon.length > 0) {
           // Generate bottom of polygon
           for (let j: number = !topIsValid ? i - 1 : i; j >= 0; j--) {
-            if (!data[j]?.[1]) {
+            const dataPoint = data[j];
+            if (dataPoint == undefined || dataPoint[1] == undefined) {
               break;
             }
-            polygon.push(data[j]?.[0]!, data[j]?.[2] || this.maxDepth);
+            polygon.push(dataPoint[0]!, dataPoint[2] || this.maxDepth);
           }
           polygons.push(polygon);
           polygon = [];
@@ -168,12 +171,13 @@ export class GeomodelCanvasLayer<T extends SurfaceData> extends CanvasLayer<T> {
     let penDown = false;
     let path: Path2D | undefined;
     for (let i = 0; i < d.length; i++) {
-      if (d[i]?.[1]) {
+      const dataPoint = d[i];
+      if (dataPoint != undefined && dataPoint[1] != undefined) {
         if (penDown && path) {
-          path.lineTo(d[i]?.[0]!, d[i]?.[1]!);
+          path.lineTo(dataPoint[0]!, dataPoint[1]);
         } else {
           path = new Path2D();
-          path.moveTo(d[i]?.[0]!, d[i]?.[1]!);
+          path.moveTo(dataPoint[0]!, dataPoint[1]);
           penDown = true;
         }
       } else if (penDown && path) {

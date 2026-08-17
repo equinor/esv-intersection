@@ -49,12 +49,14 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
     // Start generating polygons
     for (let i = 0; i < data.length; i++) {
       // Generate top of polygon as long as we have valid values
-      const topIsValid = !!data[i]?.[1];
-      if (topIsValid) {
+      const topValue = data[i]?.[1];
+      const bottomValue = data[i]?.[0];
+      const topIsValid = topValue != undefined;
+      if (topIsValid && bottomValue != undefined) {
         if (polygon == null) {
           polygon = [];
         }
-        polygon.push(data[i]?.[0]!, data[i]?.[1]!);
+        polygon.push(bottomValue, topValue);
       }
 
       const endIsReached = i === data.length - 1;
@@ -62,10 +64,15 @@ export class GeomodelLayerV2<T extends SurfaceData> extends PixiLayer<T> {
         if (polygon) {
           // Generate bottom of polygon
           for (let j: number = !topIsValid ? i - 1 : i; j >= 0; j--) {
-            if (!data[j]?.[1]) {
+            const dataPoint = data[j];
+            if (
+              dataPoint == undefined ||
+              dataPoint[1] == undefined ||
+              dataPoint[0] == undefined
+            ) {
               break;
             }
-            polygon.push(data[j]?.[0]!, data[j]?.[2] || DEFAULT_Y_BOTTOM);
+            polygon.push(dataPoint[0], dataPoint[2] || DEFAULT_Y_BOTTOM);
           }
           polygons.push(polygon);
           polygon = undefined;

@@ -144,7 +144,12 @@ export async function generateSeismicSliceImage(
 
   const scaleValue = Math.max(1, options?.seismicScale ?? 1);
 
-  const length = trajectory[0]?.[0]! - trajectory[trajectory.length - 1]?.[0]!;
+  const firstTrajectory = trajectory[0]?.[0];
+  const lastTrajectory = trajectory[trajectory.length - 1]?.[0];
+  if (firstTrajectory == undefined || lastTrajectory == undefined)
+    return undefined;
+
+  const length = firstTrajectory - lastTrajectory;
   const baseWidth = Math.abs(Math.floor(length / 5));
   const baseHeight = data.yAxisValues.length;
   const width = Math.max(1, baseWidth * scaleValue);
@@ -159,9 +164,7 @@ export async function generateSeismicSliceImage(
 
   const colorFactor = (colorTableSize - 1) / domain.difference;
 
-  const startPos = options?.isLeftToRight
-    ? trajectory[0]?.[0]!
-    : trajectory[trajectory.length - 1]?.[0]!;
+  const startPos = options?.isLeftToRight ? firstTrajectory : lastTrajectory;
 
   const step = (length / width) * (options?.isLeftToRight ? -1 : 1);
 

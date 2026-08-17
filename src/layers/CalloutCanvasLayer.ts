@@ -411,32 +411,36 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     const alignment = isLeftToRight ? Location.topleft : Location.topright;
 
     const nodes = annotations.map(a => {
-      const pos = a.pos ? a.pos : this.referenceSystem?.project(a.md!)!;
-      return {
-        title: a.title,
-        label: a.label,
-        color: a.color,
-        pos: { x: pos?.[0]!, y: pos?.[1]! },
-        group: a.group,
-        alignment,
-        boundingBox: this.getAnnotationBoundingBox(
-          a.title,
-          a.label,
-          pos,
-          xScale,
-          yScale,
-          fontSize,
-        ),
-        dx: offset,
-        dy: offset,
-      };
+      const pos = a.pos ? a.pos : this.referenceSystem?.project(a.md!);
+      if (pos != undefined && pos[0] != undefined && pos[1] != undefined) {
+        return {
+          title: a.title,
+          label: a.label,
+          color: a.color,
+          pos: { x: pos[0], y: pos[1] },
+          group: a.group,
+          alignment,
+          boundingBox: this.getAnnotationBoundingBox(
+            a.title,
+            a.label,
+            pos,
+            xScale,
+            yScale,
+            fontSize,
+          ),
+          dx: offset,
+          dy: offset,
+        };
+      }
+      return;
     });
 
-    const top = [nodes[nodes.length - 1]!];
+    const filteredNodes = nodes.filter(node => node != undefined);
+    const top = [filteredNodes[filteredNodes.length - 1]!];
     const bottom: Callout[] = [];
 
     // Initial best effort
-    this.chooseTopOrBottomPosition(nodes, bottom, top);
+    this.chooseTopOrBottomPosition(filteredNodes, bottom, top);
 
     // Adjust position for top set
     this.adjustTopPositions(top);
@@ -444,7 +448,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     // Adjust position for bottom set
     this.adjustBottomPositions(bottom);
 
-    return nodes;
+    return filteredNodes;
   }
 
   getAnnotationBoundingBox(

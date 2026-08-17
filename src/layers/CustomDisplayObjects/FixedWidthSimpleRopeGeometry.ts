@@ -74,18 +74,21 @@ export class FixedWidthSimpleRopeGeometry extends MeshGeometry {
     for (let i = 0; i < total; i++) {
       // time to do some smart drawing!
       const index = i * 4;
+      const point = points[i];
 
-      // calculate pixel distance from previous point
-      const dx = prev.x - points[i]?.x!;
-      const dy = prev.y - points[i]?.y!;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      prev = points[i]!;
-      amount += distance / this._width;
+      if (point != undefined) {
+        // calculate pixel distance from previous point
+        const dx = prev.x - point.x;
+        const dy = prev.y - point.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        prev = points[i]!;
+        amount += distance / this._width;
 
-      uvs[index] = amount;
-      uvs[index + 1] = 0;
-      uvs[index + 2] = amount;
-      uvs[index + 3] = 1;
+        uvs[index] = amount;
+        uvs[index + 1] = 0;
+        uvs[index + 2] = amount;
+        uvs[index + 3] = 1;
+      }
     }
     let indexCount = 0;
     for (let i = 0; i < total - 1; i++) {
@@ -114,7 +117,8 @@ export class FixedWidthSimpleRopeGeometry extends MeshGeometry {
     let nextPoint;
     let perpX = 0;
     let perpY = 0;
-    const vertices = this.buffers[0]?.data!;
+    const vertices = this.buffers[0]?.data;
+    if (!vertices) return;
     const total = points.length;
     for (let i = 0; i < total; i++) {
       const point = points[i]!;

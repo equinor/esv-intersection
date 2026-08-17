@@ -627,8 +627,9 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
         }
         // TODO: Use findLast() when TypeScript stops complaining about it
         for (let i = data.length - 1; i >= 0; i--) {
-          if (data[i]?.[1] != null) {
-            acc.push(data[i]?.[0]!);
+          const dataPoint = data[i];
+          if (dataPoint != undefined && dataPoint[1] != null) {
+            acc.push(dataPoint[0]!);
             break;
           }
         }
@@ -644,8 +645,9 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
         }
         // TODO: Use findLast() when TypeScript stops complaining about it
         for (let i = data.length - 1; i >= 0; i--) {
-          if (data[i]?.[1] != null) {
-            acc.push(data[i]?.[0]!);
+          const dataPoint = data[i];
+          if (dataPoint != undefined && dataPoint[1] != null) {
+            acc.push(dataPoint[0]!);
             break;
           }
         }
@@ -697,8 +699,12 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
       ];
     }
 
-    const maxX = Math.max(top[0]?.[0]!, bottom[0]?.[0]!);
-    const minX = Math.min(top[0]?.[0]!, bottom[0]?.[0]!);
+    const topValue = top[0]?.[0];
+    const bottomValue = bottom[0]?.[0];
+    if (topValue == undefined || bottomValue == undefined) return true;
+
+    const maxX = Math.max(topValue, bottomValue);
+    const minX = Math.min(topValue, bottomValue);
 
     const wbBBox = {
       left: isXFlipped ? maxX : minX,
@@ -730,14 +736,17 @@ export class GeomodelLabelsLayer<T extends SurfaceData> extends CanvasLayer<T> {
 
     const spaceOnLeftSideInScreenCoordinates = spaceOnLeftSide * xRatio;
     const spaceOnRightSideInScreenCoordinates = spaceOnRightSide * xRatio;
+
     const isLabelsOnLeftSide =
       spaceOnLeftSide > spaceOnRightSide ||
       spaceOnLeftSideInScreenCoordinates > t ||
       (spaceOnLeftSideInScreenCoordinates < t &&
         spaceOnRightSideInScreenCoordinates < t &&
         isXFlipped) ||
-      bottom[0]?.[1]! < dy1;
+      (bottom[0] != undefined &&
+        bottom[0][1] != undefined &&
+        bottom[0][1] < dy1);
 
-    return isLabelsOnLeftSide;
+    return isLabelsOnLeftSide != undefined ? isLabelsOnLeftSide : true;
   }
 }

@@ -67,8 +67,8 @@ export class ReferenceLineLayer extends CanvasLayer<ReferenceLine[]> {
     const { ctx } = this;
     const { canvas } = this;
 
-    if (ctx != null && canvas != null) {
-      const y = this.yScale?.(dashed.depth)!;
+    if (ctx != null && canvas != null && this.yScale != null) {
+      const y = this.yScale(dashed.depth);
       ctx.save();
       ctx.strokeStyle = dashed.color;
       this.setCtxLineStyle(ctx, dashed);

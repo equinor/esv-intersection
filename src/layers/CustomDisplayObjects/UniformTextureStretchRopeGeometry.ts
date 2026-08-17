@@ -61,12 +61,15 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
     let prevPoint = points[0]!;
 
     for (let i = 0; i < total; i++) {
-      const dx = prevPoint.x - points[i]?.x!;
-      const dy = prevPoint.y - points[i]?.y!;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const point = points[i];
+      if (point != undefined) {
+        const dx = prevPoint.x - point.x;
+        const dy = prevPoint.y - point.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-      prevPoint = points[i]!;
-      totalLength += distance;
+        prevPoint = points[i]!;
+        totalLength += distance;
+      }
     }
 
     const uvs = uvBuffer.data;
@@ -83,22 +86,25 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
     for (let i = 0; i < total; i++) {
       // time to do some smart drawing!
       const index = i * 4;
+      const point = points[i];
 
-      // calculate pixel distance from previous point
-      const dx = prev.x - points[i]?.x!;
-      const dy = prev.y - points[i]?.y!;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (point != undefined) {
+        // calculate pixel distance from previous point
+        const dx = prev.x - point.x;
+        const dy = prev.y - point.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-      prev = points[i]!;
+        prev = points[i]!;
 
-      // strech texture on distance/length instead of point/points.length to get a more correct strech
-      amount += distance / totalLength;
+        // strech texture on distance/length instead of point/points.length to get a more correct strech
+        amount += distance / totalLength;
 
-      uvs[index] = amount;
-      uvs[index + 1] = 0;
+        uvs[index] = amount;
+        uvs[index + 1] = 0;
 
-      uvs[index + 2] = amount;
-      uvs[index + 3] = 1;
+        uvs[index + 2] = amount;
+        uvs[index + 3] = 1;
+      }
     }
 
     let indexCount = 0;
@@ -135,7 +141,8 @@ export class UniformTextureStretchRopeGeometry extends MeshGeometry {
     let perpX = 0;
     let perpY = 0;
 
-    const vertices = this.buffers[0]?.data!;
+    const vertices = this.buffers[0]?.data;
+    if (!vertices) return;
     const total = points.length;
 
     for (let i = 0; i < total; i++) {

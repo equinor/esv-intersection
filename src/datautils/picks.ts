@@ -352,7 +352,8 @@ export function transformFormationData(
     const group: PairedPickAndUnit[] = [];
     while (
       itemstack.length > 0 &&
-      itemstack[itemstack.length - 1]?.level! > first.level
+      itemstack[itemstack.length - 1] != undefined &&
+      itemstack[itemstack.length - 1]!.level > first.level
     ) {
       group.push(itemstack.pop()!);
     }

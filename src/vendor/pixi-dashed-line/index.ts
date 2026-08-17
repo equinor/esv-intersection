@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 // https://github.com/davidfig/pixi-dashed-line
 //
@@ -244,7 +243,6 @@ export class DashLine {
         y + Math.sin(angle) * radius,
       );
       matrix.apply(first, first);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.moveTo(first[0], first[1]);
     } else {
@@ -260,7 +258,6 @@ export class DashLine {
         i === points
           ? first
           : [x + Math.cos(angle) * radius, y + Math.sin(angle) * radius];
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.lineTo(next[0], next[1]);
       angle += interval;
