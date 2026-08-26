@@ -53,6 +53,7 @@ export interface Connector {
 export interface Annotation {
   title: string;
   label: string;
+  subtitle?: string;
   color: string;
   group: string;
   md?: number;

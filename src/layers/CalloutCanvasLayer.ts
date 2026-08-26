@@ -42,6 +42,7 @@ export type Point = {
 export type Callout = {
   title: string;
   label: string;
+  subtitle?: string | undefined;
   color: string;
   pos: Point;
   group: string;
@@ -202,6 +203,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
           calloutBB,
           color,
           callout.alignment,
+          callout.subtitle,
         );
       });
     });
@@ -213,6 +215,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     x: number,
     y: number,
     fontSize: number,
+    subtitle?: string,
   ): void {
     const { ctx } = this;
 
@@ -225,10 +228,13 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
 
     const titleWidth = this.measureTextWidth(title, fontSize, 'arial', 'bold');
     const labelWidth = this.measureTextWidth(label, fontSize);
+    const subtitleWidth = subtitle
+      ? this.measureTextWidth(subtitle, fontSize)
+      : 0;
 
     // Determine width and height of annotation
-    const width = Math.max(titleWidth, labelWidth) + padding * 2;
-    const height = (fontSize + padding) * 2;
+    const width = Math.max(titleWidth, labelWidth, subtitleWidth) + padding * 2;
+    const height = (fontSize + padding) * 2 + (subtitle ? fontSize : 0);
 
     const xMin = x - padding;
     const yMin = y - 2 * fontSize - padding;
@@ -264,9 +270,13 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     y: number,
     fontSize: number,
     color: string,
+    subtitle?: string,
   ): void => {
     this.renderText(title, x, y - fontSize, fontSize, color, 'arial', 'bold');
     this.renderText(label, x, y, fontSize, color);
+    if (subtitle) {
+      this.renderText(subtitle, x, y + fontSize, fontSize, color);
+    }
   };
 
   private renderText(
@@ -320,6 +330,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     boundingBox: BoundingBox,
     color: string,
     location: string,
+    subtitle?: string,
   ): void {
     const pos = this.getPosition(boundingBox, location);
     const { x, y } = pos;
@@ -329,10 +340,10 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
       location === Location.topright || location === Location.bottomright;
 
     if (this.backgroundActive) {
-      this.renderBackground(title, label, x, y, height);
+      this.renderBackground(title, label, x, y, height, subtitle);
     }
 
-    this.renderAnnotation(title, label, x, y, height, color);
+    this.renderAnnotation(title, label, x, y, height, color, subtitle);
     this.renderPoint(dotX, dotY, color);
     this.renderLine(x, y, width, dotX, dotY, color, placeLeft);
   }
@@ -348,7 +359,6 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
   ): void => {
     const { ctx } = this;
     const textX = placeLeft ? x : x + width;
-    const inverseTextX = placeLeft ? x + width : x;
     const textY = y + 2;
 
     if (ctx != null) {
@@ -358,7 +368,6 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
       ctx.beginPath();
       ctx.moveTo(dotX, dotY);
       ctx.lineTo(textX, textY);
-      ctx.lineTo(inverseTextX, textY);
 
       ctx.stroke();
     }
@@ -416,6 +425,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
         return {
           title: a.title,
           label: a.label,
+          subtitle: a.subtitle,
           color: a.color,
           pos: { x: pos[0], y: pos[1] },
           group: a.group,
@@ -427,6 +437,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
             xScale,
             yScale,
             fontSize,
+            a.subtitle,
           ),
           dx: offset,
           dy: offset,
@@ -458,6 +469,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     xScale: ScaleLinear<number, number>,
     yScale: ScaleLinear<number, number>,
     height: number,
+    subtitle?: string,
   ): { x: number; y: number; width: number; height: number } {
     const { ctx } = this;
     const ax1 = xScale(pos[0]!);
@@ -465,13 +477,16 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
 
     const labelWidth = ctx?.measureText(label).width ?? 0;
     const titleWidth = ctx?.measureText(title).width ?? 0;
-    const width = Math.max(labelWidth, titleWidth);
+    const subtitleWidth = subtitle
+      ? (ctx?.measureText(subtitle).width ?? 0)
+      : 0;
+    const width = Math.max(labelWidth, titleWidth, subtitleWidth);
 
     const bbox = {
       x: ax1,
       y: ay1,
       width,
-      height: height * 2 + 4,
+      height: height * 2 + 4 + (subtitle ? height : 0),
     };
     return bbox;
   }
