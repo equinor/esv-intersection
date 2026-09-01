@@ -144,7 +144,7 @@ jobs:
         shell: bash
         run: |
           shopt -s nullglob
-          tarballs=(npm-package/*.tgz)
+          tarballs=(./npm-package/*.tgz)
 
           if [ "${#tarballs[@]}" -ne 1 ]; then
             echo "::error::Expected exactly one tarball, found ${#tarballs[@]}."
