@@ -1,5 +1,21 @@
 # Changelog
 
+## [5.0.0](https://github.com/equinor/esv-intersection/compare/v4.1.10...v5.0.0) (2026-09-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **7915:** visualize extrapolated wellbore path ([#1064](https://github.com/equinor/esv-intersection/issues/1064))
+
+### Features
+
+* **7915:** visualize extrapolated wellbore path ([#1064](https://github.com/equinor/esv-intersection/issues/1064)) ([d288ece](https://github.com/equinor/esv-intersection/commit/d288ece5d9ea292e0118539e1840bfcb4eae7c44))
+
+
+### Bug Fixes
+
+* **1033:** replace eslint with oxlint ([#1053](https://github.com/equinor/esv-intersection/issues/1053)) ([1246ece](https://github.com/equinor/esv-intersection/commit/1246ece5ecf542185de0c330a66e7a5f045e92da))
+
 ## [4.1.10](https://github.com/equinor/esv-intersection/compare/v4.1.9...v4.1.10) (2026-08-12)
 
 
