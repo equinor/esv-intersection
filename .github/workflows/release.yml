@@ -60,19 +60,24 @@ jobs:
             echo "::notice::Tag ${TAG} does not exist; nothing to publish."
             echo "Tag ${TAG} does not exist for ${NAME}@${VERSION}; publish_needed=false." >> "$GITHUB_STEP_SUMMARY"
             echo "publish_needed=false" >> "$GITHUB_OUTPUT"
-          elif [ "${HEAD_SHA}" != "${TAG_SHA}" ]; then
-            echo "::notice::Tag ${TAG} targets ${TAG_SHA}, but HEAD is ${HEAD_SHA}; nothing to publish."
-            echo "Tag ${TAG} resolves to ${TAG_SHA} while HEAD is ${HEAD_SHA}; publish_needed=false." >> "$GITHUB_STEP_SUMMARY"
+          elif ! git merge-base --is-ancestor "${TAG_SHA}" "${HEAD_SHA}"; then
+            echo "::notice::Tag ${TAG} targets ${TAG_SHA}, which is not an ancestor of HEAD ${HEAD_SHA}; nothing to publish."
+            echo "Tag ${TAG} resolves to ${TAG_SHA}, which is not an ancestor of HEAD ${HEAD_SHA}; publish_needed=false." >> "$GITHUB_STEP_SUMMARY"
             echo "publish_needed=false" >> "$GITHUB_OUTPUT"
           elif npm view "${NAME}@${VERSION}" version >/dev/null 2>&1; then
             echo "::notice::${NAME}@${VERSION} is already published."
             echo "${NAME}@${VERSION} is already published; publish_needed=false." >> "$GITHUB_STEP_SUMMARY"
             echo "publish_needed=false" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::${NAME}@${VERSION} needs publishing from ${HEAD_SHA}."
-            echo "${NAME}@${VERSION} is not yet published and tag ${TAG} matches HEAD ${HEAD_SHA}; publish_needed=true." >> "$GITHUB_STEP_SUMMARY"
+            echo "::notice::${NAME}@${VERSION} needs publishing from tag ${TAG} at ${TAG_SHA}."
+            echo "${NAME}@${VERSION} is not yet published; publishing tag ${TAG} at ${TAG_SHA}; publish_needed=true." >> "$GITHUB_STEP_SUMMARY"
             echo "publish_needed=true" >> "$GITHUB_OUTPUT"
+            echo "tag_sha=${TAG_SHA}" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Checkout release tag
+        if: ${{ steps.npm.outputs.publish_needed == 'true' }}
+        run: git checkout --detach "${{ steps.npm.outputs.tag_sha }}"
 
       - name: Install dependencies
         if: ${{ steps.npm.outputs.publish_needed == 'true' }}
