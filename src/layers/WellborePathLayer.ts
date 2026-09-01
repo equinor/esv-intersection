@@ -1,5 +1,7 @@
 import {
   line,
+  CurveFactory,
+  CurveFactoryLineOnly,
   curveCatmullRom,
   curveLinear,
   curveBasis,
@@ -28,6 +30,16 @@ export interface WellborepathLayerOptions<
   strokeWidth: string;
   curveType?: string;
   tension?: number;
+  /**
+   * Index in `data` where the extrapolated portion begins. When set, points
+   * from this index onward are rendered as a separate path so they can be
+   * styled differently. Ignored if <= 0 or >= data.length.
+   */
+  extrapolationStartIndex?: number;
+  extrapolatedStroke?: string;
+  extrapolatedStrokeWidth?: string;
+  extrapolatedOpacity?: number;
+  extrapolatedStrokeDasharray?: string;
 }
 
 export class WellborepathLayer<
@@ -59,7 +71,15 @@ export class WellborepathLayer<
   }
 
   render(): void {
-    const { strokeWidth, stroke } = this.options as WellborepathLayerOptions<T>;
+    const {
+      strokeWidth,
+      stroke,
+      extrapolationStartIndex,
+      extrapolatedStroke,
+      extrapolatedStrokeWidth,
+      extrapolatedOpacity,
+      extrapolatedStrokeDasharray,
+    } = this.options as WellborepathLayerOptions<T>;
 
     if (!this.elm) {
       return;
@@ -74,14 +94,39 @@ export class WellborepathLayer<
       return;
     }
 
-    this.elm
-      .append('g')
-      .attr('class', 'well-path')
-      .append('path')
-      .attr('d', this.renderWellborePath(data))
+    const g = this.elm.append('g').attr('class', 'well-path');
+
+    const hasExtrapolation =
+      typeof extrapolationStartIndex === 'number' &&
+      extrapolationStartIndex > 0 &&
+      extrapolationStartIndex < data.length;
+
+    // Real data is everything before the first extrapolated point.
+    const realData = hasExtrapolation
+      ? data.slice(0, extrapolationStartIndex)
+      : data;
+
+    g.append('path')
+      .attr('d', this.renderWellborePath(realData))
       .attr('stroke-width', strokeWidth || '2px')
       .attr('stroke', stroke || 'red')
       .attr('fill', 'none');
+
+    if (hasExtrapolation) {
+      const extrapolatedData = data.slice(extrapolationStartIndex - 1);
+      const extrapolatedPath = g
+        .append('path')
+        .attr('d', this.renderWellborePath(extrapolatedData))
+        .attr('stroke-width', extrapolatedStrokeWidth || strokeWidth || '2px')
+        .attr('stroke', extrapolatedStroke || stroke || 'red')
+        .attr('fill', 'none');
+      if (extrapolatedOpacity !== undefined) {
+        extrapolatedPath.attr('opacity', extrapolatedOpacity);
+      }
+      if (extrapolatedStrokeDasharray) {
+        extrapolatedPath.attr('stroke-dasharray', extrapolatedStrokeDasharray);
+      }
+    }
   }
 
   private renderWellborePath(data: [number, number][]): string {
@@ -92,55 +137,40 @@ export class WellborepathLayer<
         yScale(d[1]),
       ]);
 
-      // TODO: Might be a good idea to move something like this to a shared function in a base class
-      let curveFactory;
-      const { curveType, tension } = this
-        .options as WellborepathLayerOptions<T>;
-      switch (curveType) {
-        default:
-        case 'curveCatmullRom':
-          curveFactory = curveCatmullRom.alpha(
-            tension || CURVE_CATMULL_ROM_ALPHA,
-          );
-          break;
-        case 'curveLinear':
-          curveFactory = curveLinear;
-          break;
-        case 'curveBasis':
-          curveFactory = curveBasis;
-          break;
-        case 'curveBasisClosed':
-          curveFactory = curveBasisClosed;
-          break;
-        case 'curveBundle':
-          curveFactory = curveBundle.beta(tension || CURVE_BUNDLE_BETA);
-          break;
-        case 'curveCardinal':
-          curveFactory = curveCardinal.tension(
-            tension || CURVE_CARDINAL_TENSION,
-          );
-          break;
-        case 'curveMonotoneX':
-          curveFactory = curveMonotoneX;
-          break;
-        case 'curveMonotoneY':
-          curveFactory = curveMonotoneY;
-          break;
-        case 'curveNatural':
-          curveFactory = curveNatural;
-          break;
-        case 'curveStep':
-          curveFactory = curveStep;
-          break;
-        case 'curveStepAfter':
-          curveFactory = curveStepAfter;
-          break;
-        case 'curveStepBefore':
-          curveFactory = curveStepBefore;
-          break;
-      }
+      const curveFactory = this.getCurveFactory();
       return line().curve(curveFactory)(transformedData) ?? '';
     }
     return '';
+  }
+
+  private getCurveFactory(): CurveFactory | CurveFactoryLineOnly {
+    const { curveType, tension } = this.options as WellborepathLayerOptions<T>;
+    switch (curveType) {
+      case 'curveLinear':
+        return curveLinear;
+      case 'curveBasis':
+        return curveBasis;
+      case 'curveBasisClosed':
+        return curveBasisClosed;
+      case 'curveBundle':
+        return curveBundle.beta(tension || CURVE_BUNDLE_BETA);
+      case 'curveCardinal':
+        return curveCardinal.tension(tension || CURVE_CARDINAL_TENSION);
+      case 'curveMonotoneX':
+        return curveMonotoneX;
+      case 'curveMonotoneY':
+        return curveMonotoneY;
+      case 'curveNatural':
+        return curveNatural;
+      case 'curveStep':
+        return curveStep;
+      case 'curveStepAfter':
+        return curveStepAfter;
+      case 'curveStepBefore':
+        return curveStepBefore;
+      case 'curveCatmullRom':
+      default:
+        return curveCatmullRom.alpha(tension || CURVE_CATMULL_ROM_ALPHA);
+    }
   }
 }

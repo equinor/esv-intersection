@@ -25,7 +25,7 @@
     "declarationDir": "dist",
     "declarationMap": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "sourceMap": true,
     "target": "ESNExt",

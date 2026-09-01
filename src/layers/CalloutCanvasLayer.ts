@@ -40,8 +40,7 @@ export type Point = {
 };
 
 export type Callout = {
-  title: string;
-  label: string;
+  lines: string[];
   color: string;
   pos: Point;
   group: string;
@@ -183,7 +182,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
       }
 
       this.callouts.forEach(callout => {
-        const { pos, title, color } = callout;
+        const { pos, lines, color } = callout;
         const x = xScale(pos.x);
         const y = yScale(pos.y);
 
@@ -196,20 +195,13 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
           offsetY: callout.dy,
         };
 
-        this.renderCallout(
-          title,
-          callout.label,
-          calloutBB,
-          color,
-          callout.alignment,
-        );
+        this.renderCallout(lines, calloutBB, color, callout.alignment);
       });
     });
   }
 
   private renderBackground(
-    title: string,
-    label: string,
+    lines: string[],
     x: number,
     y: number,
     fontSize: number,
@@ -223,15 +215,25 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     const padding = this.backgroundPadding;
     const borderRadius = this.backgroundBorderRadius;
 
-    const titleWidth = this.measureTextWidth(title, fontSize, 'arial', 'bold');
-    const labelWidth = this.measureTextWidth(label, fontSize);
+    const lineCount = lines.length;
+    const maxLineWidth = Math.max(
+      0,
+      ...lines.map((line, i) =>
+        this.measureTextWidth(
+          line,
+          fontSize,
+          'arial',
+          i === 0 ? 'bold' : 'normal',
+        ),
+      ),
+    );
 
-    // Determine width and height of annotation
-    const width = Math.max(titleWidth, labelWidth) + padding * 2;
-    const height = (fontSize + padding) * 2;
+    // Determine width and height of annotation, growing upward from the anchor
+    const width = maxLineWidth + padding * 2;
+    const height = lineCount * fontSize + padding * 2;
 
     const xMin = x - padding;
-    const yMin = y - 2 * fontSize - padding;
+    const yMin = y - lineCount * fontSize - padding;
 
     ctx.fillStyle = this.backgroundColor;
 
@@ -258,15 +260,26 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
   }
 
   private renderAnnotation = (
-    title: string,
-    label: string,
+    lines: string[],
     x: number,
     y: number,
     fontSize: number,
     color: string,
   ): void => {
-    this.renderText(title, x, y - fontSize, fontSize, color, 'arial', 'bold');
-    this.renderText(label, x, y, fontSize, color);
+    const lineCount = lines.length;
+    lines.forEach((line, i) => {
+      // Last line sits on the anchor; earlier lines stack above it
+      const lineY = y - (lineCount - 1 - i) * fontSize;
+      this.renderText(
+        line,
+        x,
+        lineY,
+        fontSize,
+        color,
+        'arial',
+        i === 0 ? 'bold' : 'normal',
+      );
+    });
   };
 
   private renderText(
@@ -315,8 +328,7 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
   }
 
   private renderCallout(
-    title: string,
-    label: string,
+    lines: string[],
     boundingBox: BoundingBox,
     color: string,
     location: string,
@@ -329,10 +341,10 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
       location === Location.topright || location === Location.bottomright;
 
     if (this.backgroundActive) {
-      this.renderBackground(title, label, x, y, height);
+      this.renderBackground(lines, x, y, height);
     }
 
-    this.renderAnnotation(title, label, x, y, height, color);
+    this.renderAnnotation(lines, x, y, height, color);
     this.renderPoint(dotX, dotY, color);
     this.renderLine(x, y, width, dotX, dotY, color, placeLeft);
   }
@@ -411,36 +423,38 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     const alignment = isLeftToRight ? Location.topleft : Location.topright;
 
     const nodes = annotations.map(a => {
-      const pos = a.pos ? a.pos : this.referenceSystem?.project(a.md!);
-      if (pos != undefined && pos[0] != undefined && pos[1] != undefined) {
-        return {
-          title: a.title,
-          label: a.label,
-          color: a.color,
-          pos: { x: pos[0], y: pos[1] },
-          group: a.group,
-          alignment,
-          boundingBox: this.getAnnotationBoundingBox(
-            a.title,
-            a.label,
-            pos,
-            xScale,
-            yScale,
-            fontSize,
-          ),
-          dx: offset,
-          dy: offset,
-        };
-      }
-      return;
+      const projected = a.pos ?? this.referenceSystem?.project(a.md ?? 0);
+      const point: [number, number] = [
+        projected?.[0] ?? 0,
+        projected?.[1] ?? 0,
+      ];
+      const lines =
+        a.lines && a.lines.length > 0
+          ? a.lines
+          : [a.title, a.label].filter((line): line is string => line != null);
+      return {
+        lines,
+        color: a.color,
+        pos: { x: point[0], y: point[1] },
+        group: a.group,
+        alignment,
+        boundingBox: this.getAnnotationBoundingBox(
+          lines,
+          point,
+          xScale,
+          yScale,
+          fontSize,
+        ),
+        dx: offset,
+        dy: offset,
+      };
     });
 
-    const filteredNodes = nodes.filter(node => node != undefined);
-    const top = [filteredNodes[filteredNodes.length - 1]!];
+    const top = [nodes[nodes.length - 1]!];
     const bottom: Callout[] = [];
 
     // Initial best effort
-    this.chooseTopOrBottomPosition(filteredNodes, bottom, top);
+    this.chooseTopOrBottomPosition(nodes, bottom, top);
 
     // Adjust position for top set
     this.adjustTopPositions(top);
@@ -448,12 +462,11 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     // Adjust position for bottom set
     this.adjustBottomPositions(bottom);
 
-    return filteredNodes;
+    return nodes;
   }
 
   getAnnotationBoundingBox(
-    title: string,
-    label: string,
+    lines: string[],
     pos: number[],
     xScale: ScaleLinear<number, number>,
     yScale: ScaleLinear<number, number>,
@@ -463,15 +476,16 @@ export class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLayer<T> {
     const ax1 = xScale(pos[0]!);
     const ay1 = yScale(pos[1]!);
 
-    const labelWidth = ctx?.measureText(label).width ?? 0;
-    const titleWidth = ctx?.measureText(title).width ?? 0;
-    const width = Math.max(labelWidth, titleWidth);
+    const width = Math.max(
+      0,
+      ...lines.map(line => ctx?.measureText(line).width ?? 0),
+    );
 
     const bbox = {
       x: ax1,
       y: ay1,
       width,
-      height: height * 2 + 4,
+      height: height * lines.length + 4,
     };
     return bbox;
   }
