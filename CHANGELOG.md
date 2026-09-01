@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.0.1](https://github.com/equinor/esv-intersection/compare/v5.0.0...v5.0.1) (2026-09-01)
+
+
+### Bug Fixes
+
+* publish local tarball path ([#1067](https://github.com/equinor/esv-intersection/issues/1067)) ([10466cf](https://github.com/equinor/esv-intersection/commit/10466cfacdc1844c6b6d2b01586f931de3cc81a2))
+* retry tagged release ([#1069](https://github.com/equinor/esv-intersection/issues/1069)) ([84dfff7](https://github.com/equinor/esv-intersection/commit/84dfff726758e22c4a88cc97eb4704aa1e6dacc1))
+
 ## [5.0.0](https://github.com/equinor/esv-intersection/compare/v4.1.10...v5.0.0) (2026-09-01)
 
 
