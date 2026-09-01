@@ -7,8 +7,7 @@ export type Point = {
     y: number;
 };
 export type Callout = {
-    title: string;
-    label: string;
+    lines: string[];
     color: string;
     pos: Point;
     group: string;
@@ -59,7 +58,7 @@ export declare class CalloutCanvasLayer<T extends Annotation[]> extends CanvasLa
     private renderLine;
     private getPosition;
     positionCallouts(annotations: Annotation[], isLeftToRight: boolean, xScale: ScaleLinear<number, number>, yScale: ScaleLinear<number, number>, _scale: number, fontSize: number, offset?: number): Callout[];
-    getAnnotationBoundingBox(title: string, label: string, pos: number[], xScale: ScaleLinear<number, number>, yScale: ScaleLinear<number, number>, height: number): {
+    getAnnotationBoundingBox(lines: string[], pos: number[], xScale: ScaleLinear<number, number>, yScale: ScaleLinear<number, number>, height: number): {
         x: number;
         y: number;
         width: number;
