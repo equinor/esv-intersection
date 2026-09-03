@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.2](https://github.com/equinor/esv-intersection/compare/v5.0.1...v5.0.2) (2026-09-03)
+
+
+### Bug Fixes
+
+* dependabot warnings sept 26 ([#1070](https://github.com/equinor/esv-intersection/issues/1070)) ([4841118](https://github.com/equinor/esv-intersection/commit/484111856b0bbba33a497c80177ba70d1af67e84))
+
 ## [5.0.1](https://github.com/equinor/esv-intersection/compare/v5.0.0...v5.0.1) (2026-09-01)
 
 
