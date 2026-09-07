@@ -15,6 +15,15 @@ export default mergeConfig(
       ],
       environment: 'jsdom',
       watch: false,
+      reporters: ['default', 'junit'],
+      outputFile: {
+        junit: 'test-results/junit.xml',
+      },
+      coverage: {
+        provider: 'v8',
+        reporter: [['cobertura', { file: 'Cobertura.xml' }]],
+        reportsDirectory: 'coverage',
+      },
       setupFiles: ['./__mocks__/pixi.js.ts', '__mocks__/canvas.ts'],
       deps: {
         optimizer: {
