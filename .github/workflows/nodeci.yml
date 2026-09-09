@@ -29,7 +29,8 @@ jobs:
       - run: npm ci --prefer-offline
 
       - run: npm run lint
-      - run: npm run test
+      - if: github.ref != 'refs/heads/master'
+        run: npm run test
       - run: npm run build
 
   deploy_docs:

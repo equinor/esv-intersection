@@ -5,3 +5,6 @@ storybook-static
 report*
 docs_out
 tsconfig.tsbuildinfo
+
+coverage/
+test-results/

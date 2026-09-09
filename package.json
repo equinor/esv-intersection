@@ -31,7 +31,8 @@
     "postdocs": "copyfiles images/* docs_out && copyfiles .nojekyll docs_out",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "coverage:ci": "vitest run --coverage"
   },
   "lint-staged": {
     "*": "prettier --write --ignore-unknown"
@@ -56,6 +57,7 @@
     "@storybook/html-vite": "^10.4.6",
     "@types/d3": "^7.4.3",
     "@types/mock-raf": "^1.0.6",
+    "@vitest/coverage-v8": "^4.1.9",
     "copyfiles": "^2.4.1",
     "eslint-plugin-storybook": "^10.4.6",
     "husky": "^9.1.7",
