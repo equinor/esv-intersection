@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.0.3](https://github.com/equinor/esv-intersection/compare/v5.0.2...v5.0.3) (2026-09-10)
+
+
+### Bug Fixes
+
+* js-yaml security issue ([#1078](https://github.com/equinor/esv-intersection/issues/1078)) ([1330d59](https://github.com/equinor/esv-intersection/commit/1330d59f73b6aee3a9c38d178ff11a21e2a2ea4c))
+* vitest security warnings ([#1075](https://github.com/equinor/esv-intersection/issues/1075)) ([9b6f17a](https://github.com/equinor/esv-intersection/commit/9b6f17a70a99e012568d66cdf25ac59bb90ea6a8))
+
 ## [5.0.2](https://github.com/equinor/esv-intersection/compare/v5.0.1...v5.0.2) (2026-09-03)
 
 
