@@ -5,11 +5,7 @@
   "ignorePatterns": [
     "node_modules/*",
     "dist/*",
-    "config/*",
-    "vite.config.static.js",
-    "**/.*",
-    "*.config.js",
-    ".storybook/*"
+    "*.config.*",
     ],
   "categories": {
     "correctness": "error",
