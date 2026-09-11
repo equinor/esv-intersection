@@ -24,8 +24,7 @@
         "plugins": ["vitest"]
     },
     {
-        "files": [".storybook/*"],
-        "plugins": ["import", "oxc", "eslint", "typescript"],
+        "files": [".storybook/**/*.stories.*"],
         "rules": {
             "storybook/default-exports": "error",
             "storybook/story-exports": "error",
