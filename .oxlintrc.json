@@ -6,12 +6,13 @@
     "node_modules/*",
     "dist/*",
     "*.config.*",
-    ".storybook/src/data.ts"
+    ".storybook/src/data.ts",
+    "__mocks__/*"
     ],
   "categories": {
     "correctness": "error",
-    "suspicious": "off",
-    "perf": "off"
+    "suspicious": "warn",
+    "perf": "warn"
   },
   "rules": {
     "no-unused-expressions": ["error", {"allowTernary": true, "allowShortCircuit": true}],
