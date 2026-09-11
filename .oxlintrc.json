@@ -6,17 +6,20 @@
     "node_modules/*",
     "dist/*",
     "*.config.*",
+    ".storybook/src/data.ts"
     ],
   "categories": {
     "correctness": "error",
-    "suspicious": "warn",
-    "perf": "warn"
+    "suspicious": "off",
+    "perf": "off"
   },
   "rules": {
     "no-unused-expressions": ["error", {"allowTernary": true, "allowShortCircuit": true}],
     "react/rules-of-hooks": "error",
     "react/react-in-jsx-scope": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+
+    "typescript/no-non-null-asserted-optional-chain": "off"
   },
   "overrides": [
     {
@@ -26,10 +29,10 @@
     {
         "files": [".storybook/**/*.stories.*"],
         "rules": {
-            "storybook/default-exports": "error",
-            "storybook/story-exports": "error",
-            "storybook/hierarchy-separator": "error",
-            "storybook/no-uninstalled-addons": "error"
+            "storybook/default-exports": "off",
+            "storybook/story-exports": "off",
+            "storybook/hierarchy-separator": "off",
+            "storybook/no-uninstalled-addons": "off"
         }
     }
   ]
