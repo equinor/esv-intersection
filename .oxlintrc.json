@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["import", "oxc", "eslint", "react", "jsx-a11y", "typescript"],
+  "plugins": ["import", "oxc", "eslint", "typescript"],
   "jsPlugins": ["eslint-plugin-storybook"],
   "ignorePatterns": [
     "node_modules/*",
@@ -16,8 +16,6 @@
   },
   "rules": {
     "no-unused-expressions": ["error", {"allowTernary": true, "allowShortCircuit": true}],
-    "react/rules-of-hooks": "error",
-    "react/react-in-jsx-scope": "off",
     "no-underscore-dangle": "off",
 
     "typescript/no-non-null-asserted-optional-chain": "off"
