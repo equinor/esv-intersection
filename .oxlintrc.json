@@ -17,8 +17,6 @@
   "rules": {
     "no-unused-expressions": ["error", {"allowTernary": true, "allowShortCircuit": true}],
     "no-underscore-dangle": "off",
-
-    "typescript/no-non-null-asserted-optional-chain": "off"
   },
   "overrides": [
     {
