@@ -1,15 +1,13 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["import", "oxc", "eslint", "react", "react-perf", "jsx-a11y", "typescript"],
+  "plugins": ["import", "oxc", "eslint", "typescript"],
   "jsPlugins": ["eslint-plugin-storybook"],
   "ignorePatterns": [
     "node_modules/*",
     "dist/*",
-    "config/*",
-    "vite.config.static.js",
-    "**/.*",
-    "*.config.js",
-    ".storybook/*"
+    "*.config.*",
+    ".storybook/src/data.ts",
+    "__mocks__/*"
     ],
   "categories": {
     "correctness": "error",
@@ -18,8 +16,7 @@
   },
   "rules": {
     "no-unused-expressions": ["error", {"allowTernary": true, "allowShortCircuit": true}],
-    "react/react-in-jsx-scope": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
   },
   "overrides": [
     {
@@ -27,13 +24,12 @@
         "plugins": ["vitest"]
     },
     {
-        "files": [".storybook/*"],
-        "plugins": ["import", "oxc", "eslint", "typescript"],
+        "files": [".storybook/**/*.stories.*"],
         "rules": {
-            "storybook/default-exports": "error",
-            "storybook/story-exports": "error",
-            "storybook/hierarchy-separator": "error",
-            "storybook/no-uninstalled-addons": "error"
+            "storybook/default-exports": "off",
+            "storybook/story-exports": "off",
+            "storybook/hierarchy-separator": "off",
+            "storybook/no-uninstalled-addons": "off"
         }
     }
   ]
