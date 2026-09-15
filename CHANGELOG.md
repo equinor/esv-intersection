@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.4](https://github.com/equinor/esv-intersection/compare/v5.0.3...v5.0.4) (2026-09-15)
+
+
+### Bug Fixes
+
+* align oxlint config ([#1079](https://github.com/equinor/esv-intersection/issues/1079)) ([a3948f5](https://github.com/equinor/esv-intersection/commit/a3948f5bc7b6e7c35a20d5c4594749c9587d6f26))
+
 ## [5.0.3](https://github.com/equinor/esv-intersection/compare/v5.0.2...v5.0.3) (2026-09-10)
 
 
