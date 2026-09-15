@@ -80,7 +80,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
     for (let i = 0; i < segmentCount; i++) {
       const segment = segments[i];
       if (segment != undefined) {
-        let prev = segment.points[0]!;
+        let prev = segment.points[0];
         const textureWidth = maxDiameter;
         const radius = segment.diameter! / maxDiameter / 2;
 
@@ -89,13 +89,13 @@ export class ComplexRopeGeometry extends MeshGeometry {
         for (let j = 0; j < total; j++) {
           const points = segment.points[j];
           // time to do some smart drawing!
-          if (points != undefined) {
+          if (points != undefined && prev != undefined) {
             // calculate pixel distance from previous point
             const dx = prev.x - points.x;
             const dy = prev.y - points.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            prev = segments[i]?.points[j]!;
+            prev = segments[i]?.points[j];
             amount += distance / textureWidth;
 
             uvs[uvIndex] = amount;
@@ -140,46 +140,53 @@ export class ComplexRopeGeometry extends MeshGeometry {
     const segmentCount = segments.length;
     let lastIndex = 0;
     for (let i = 0; i < segmentCount; i++) {
-      let lastPoint = segments[i]?.points[0]!;
+      let lastPoint = segments[i]?.points[0];
       let nextPoint;
       let perpX = 0;
       let perpY = 0;
 
       const vertices = this.buffers[0]?.data;
-      const total = segments[i]?.points.length!;
+      const total = segments[i]?.points.length;
       let index = 0;
-      for (let j = 0; j < total; j++) {
-        const point = segments[i]?.points[j]!;
-        index = lastIndex + j * 4;
+      if (total != undefined && lastPoint != undefined) {
+        for (let j = 0; j < total; j++) {
+          const point = segments[i]?.points[j];
+          index = lastIndex + j * 4;
 
-        if (j < segments[i]?.points.length! - 1) {
-          nextPoint = segments[i]?.points[j + 1]!;
-        } else {
-          nextPoint = point;
-        }
-
-        perpY = -(nextPoint.x - lastPoint.x);
-        perpX = nextPoint.y - lastPoint.y;
-
-        const perpLength = Math.sqrt(perpX * perpX + perpY * perpY);
-        const diameter = segments[i]?.diameter;
-        if (diameter) {
-          const num = diameter / 2;
-
-          perpX /= perpLength;
-          perpY /= perpLength;
-
-          perpX *= num;
-          perpY *= num;
-
-          if (vertices != null) {
-            vertices[index] = point.x + perpX;
-            vertices[index + 1] = point.y + perpY;
-            vertices[index + 2] = point.x - perpX;
-            vertices[index + 3] = point.y - perpY;
+          if (j < total - 1) {
+            nextPoint = segments[i]?.points[j + 1];
+          } else {
+            nextPoint = point;
           }
+          if (
+            nextPoint != undefined &&
+            lastPoint != undefined &&
+            point != undefined
+          ) {
+            perpY = -(nextPoint.x - lastPoint.x);
+            perpX = nextPoint.y - lastPoint.y;
 
-          lastPoint = point;
+            const perpLength = Math.sqrt(perpX * perpX + perpY * perpY);
+            const diameter = segments[i]?.diameter;
+            if (diameter) {
+              const num = diameter / 2;
+
+              perpX /= perpLength;
+              perpY /= perpLength;
+
+              perpX *= num;
+              perpY *= num;
+
+              if (vertices != null) {
+                vertices[index] = point.x + perpX;
+                vertices[index + 1] = point.y + perpY;
+                vertices[index + 2] = point.x - perpX;
+                vertices[index + 3] = point.y - perpY;
+              }
+
+              lastPoint = point;
+            }
+          }
         }
       }
       lastIndex = index + 4;
