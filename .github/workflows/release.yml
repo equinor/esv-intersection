@@ -77,7 +77,9 @@ jobs:
 
       - name: Checkout release tag
         if: ${{ steps.npm.outputs.publish_needed == 'true' }}
-        run: git checkout --detach "${{ steps.npm.outputs.tag_sha }}"
+        env:
+          TAG_SHA: ${{ steps.npm.outputs.tag_sha }}
+        run: git checkout --detach "$TAG_SHA"
 
       - name: Install dependencies
         if: ${{ steps.npm.outputs.publish_needed == 'true' }}
