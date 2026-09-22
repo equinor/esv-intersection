@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.5](https://github.com/equinor/esv-intersection/compare/v5.0.4...v5.0.5) (2026-09-22)
+
+
+### Bug Fixes
+
+* **ci:** harden release tag checkout ([#1086](https://github.com/equinor/esv-intersection/issues/1086)) ([5d18d77](https://github.com/equinor/esv-intersection/commit/5d18d778dd91ba75cf5f8e35a9d056ba24a2a227))
+
 ## [5.0.4](https://github.com/equinor/esv-intersection/compare/v5.0.3...v5.0.4) (2026-09-15)
 
 
