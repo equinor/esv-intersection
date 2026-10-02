@@ -1,5 +1,15 @@
 # Changelog
 
+## [5.0.5](https://github.com/equinor/esv-intersection/compare/v5.0.4...v5.0.5) (2026-10-02)
+
+
+### Bug Fixes
+
+* **ci:** harden release tag checkout ([#1086](https://github.com/equinor/esv-intersection/issues/1086)) ([5d18d77](https://github.com/equinor/esv-intersection/commit/5d18d778dd91ba75cf5f8e35a9d056ba24a2a227))
+* **npm:** bump brace-expansion from 1.1.18 to 1.1.21 ([#1092](https://github.com/equinor/esv-intersection/issues/1092)) ([92e377a](https://github.com/equinor/esv-intersection/commit/92e377a7d7934c2238a3efc1a1292b5db89e8a62))
+* **npm:** bump markdown-it from 14.2.0 to 14.3.2 ([#1091](https://github.com/equinor/esv-intersection/issues/1091)) ([9485ed5](https://github.com/equinor/esv-intersection/commit/9485ed5abd2e0cba4f6f6d03baa3980040f3ed77))
+* **npm:** bump undici from 7.29.0 to 7.30.0 ([#1090](https://github.com/equinor/esv-intersection/issues/1090)) ([41394e2](https://github.com/equinor/esv-intersection/commit/41394e2a823303373faba8919715bdac102d8abe))
+
 ## [5.0.4](https://github.com/equinor/esv-intersection/compare/v5.0.3...v5.0.4) (2026-09-15)
 
 
