@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.6](https://github.com/equinor/esv-intersection/compare/v5.0.5...v5.0.6) (2026-10-13)
+
+
+### Bug Fixes
+
+* **npm:** bump source-map-js from 1.2.1 to 1.2.2 ([#1094](https://github.com/equinor/esv-intersection/issues/1094)) ([b16d793](https://github.com/equinor/esv-intersection/commit/b16d793a39c703a6ffeb179ee019739c956acb22))
+
 ## [5.0.5](https://github.com/equinor/esv-intersection/compare/v5.0.4...v5.0.5) (2026-10-02)
 
 
