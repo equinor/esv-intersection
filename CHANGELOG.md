@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.7](https://github.com/equinor/esv-intersection/compare/v5.0.6...v5.0.7) (2026-10-14)
+
+
+### Bug Fixes
+
+* **1060:** discard unused packages ([#1096](https://github.com/equinor/esv-intersection/issues/1096)) ([d76e4de](https://github.com/equinor/esv-intersection/commit/d76e4ded70ac5e232ac97342a32e0199ef34683a))
+
 ## [5.0.6](https://github.com/equinor/esv-intersection/compare/v5.0.5...v5.0.6) (2026-10-13)
 
 
