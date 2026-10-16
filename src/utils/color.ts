@@ -16,11 +16,11 @@ export function convertColor(colorStr: string): number {
   }
 }
 
-export function colorToCSSColor(color: number | string): string {
-  if (typeof color === 'string') {
-    return color;
+export function colorToCSSColor(colorInput: number | string): string {
+  if (typeof colorInput === 'string') {
+    return colorInput;
   }
 
-  const colorHexString = color.toString(RADIX_SIXTEEN);
+  const colorHexString = colorInput.toString(RADIX_SIXTEEN);
   return `#${colorHexString.padStart(HEX_STRING_LENGTH, '0')}`;
 }

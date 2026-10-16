@@ -1,6 +1,11 @@
 import { select, Selection } from 'd3-selection';
 import { scaleLinear, ScaleLinear } from 'd3-scale';
-import { zoom, zoomIdentity, ZoomBehavior, ZoomTransform } from 'd3-zoom';
+import {
+  zoom as d3Zoom,
+  zoomIdentity,
+  ZoomBehavior,
+  ZoomTransform,
+} from 'd3-zoom';
 
 import { ZoomAndPanOptions, OnRescaleEvent } from '../interfaces';
 
@@ -258,7 +263,7 @@ export class ZoomPanHandler {
    * Initialized handler
    */
   init(): void {
-    this.zoom = zoom<HTMLElement, unknown>()
+    this.zoom = d3Zoom<HTMLElement, unknown>()
       .scaleExtent([this.options.minZoomLevel, this.options.maxZoomLevel])
       .on('zoom', this.onZoom);
     this.container.call(this.zoom);

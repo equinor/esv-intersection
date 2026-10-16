@@ -30,7 +30,7 @@ export class ArcLength {
       aVal: number[],
       bVal: number[],
       span: number,
-      tolerance: number,
+      tol: number,
       depth = 0,
     ): number => {
       const mid = (a + b) / 2;
@@ -39,16 +39,16 @@ export class ArcLength {
       const spanB = Vector2.distance(midVal, bVal);
       const length = spanA + spanB;
       if (
-        (depth >= minDepth && Math.abs(length - span) < tolerance) ||
+        (depth >= minDepth && Math.abs(length - span) < tol) ||
         depth >= maxDepth
       ) {
         return length;
       }
-      const tol = tolerance / 2;
+      const t = tol / 2;
       const d = depth + 1;
       return (
-        calcRec(a, mid, aVal, midVal, spanA, tol, d) +
-        calcRec(mid, b, midVal, bVal, spanB, tol, d)
+        calcRec(a, mid, aVal, midVal, spanA, t, d) +
+        calcRec(mid, b, midVal, bVal, spanB, t, d)
       );
     };
     const aVal = func(minLimit) as number[];

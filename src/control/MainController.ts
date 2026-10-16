@@ -289,9 +289,8 @@ export class Controller {
   private getHighestZIndex(layers: Layer<unknown>[]): number {
     const highestZIndex =
       layers.length > 0
-        ? layers.reduce((max, layers) =>
-            max.order > layers.order ? max : layers,
-          ).order
+        ? layers.reduce((max, layer) => (max.order > layer.order ? max : layer))
+            .order
         : 1;
     return highestZIndex;
   }

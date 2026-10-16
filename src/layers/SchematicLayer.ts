@@ -296,10 +296,10 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
     start: number,
     end: number,
   ): Point[] => {
-    const y = (y: number): number => y * this.scalingFactors.zFactor;
+    const scale = (y: number): number => y * this.scalingFactors.zFactor;
 
     const path = this.referenceSystem?.getCurtainPath(start, end, true) ?? [];
-    return path.map(p => new Point(p.point[0], y(p.point[1]!)));
+    return path.map(p => new Point(p.point[0], scale(p.point[1]!)));
   };
 
   protected drawBigPolygon = (coords: Point[], color = 0x000000) => {
@@ -734,14 +734,14 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
       leftPath: Point[];
     }>(
       (acc, current) => {
-        const { leftPath, rightPath } = createTubularRenderingObject(
+        const paths = createTubularRenderingObject(
           current.diameter / 2,
           current.points,
         );
 
         return {
-          rightPath: [...acc.rightPath, ...rightPath],
-          leftPath: [...acc.leftPath, ...leftPath],
+          rightPath: [...acc.rightPath, ...paths.rightPath],
+          leftPath: [...acc.leftPath, ...paths.leftPath],
         };
       },
       { rightPath: [], leftPath: [] },
