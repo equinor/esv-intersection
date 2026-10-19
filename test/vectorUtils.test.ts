@@ -1,3 +1,4 @@
+/* oxlint-disable oxc/approx-constant */
 import { describe, expect, it, beforeEach } from 'vitest';
 import { Point } from 'pixi.js';
 import Vector2 from '@equinor/videx-vector2';
