@@ -197,11 +197,10 @@ function combineSurfacesAndStratColumn(
           name: group.identifier,
         });
       }
-      return {
-        ...s,
+      return Object.assign({}, s, {
         unit: stratUnit!,
         group: groupName,
-      };
+      });
     });
   return stratigrafies;
 }

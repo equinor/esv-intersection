@@ -585,10 +585,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           casings,
           holeSizes,
         );
-        const thiccPerfShapes = perfShapes.map(ps => ({
-          ...ps,
-          diameter: ps.diameter * 3,
-        }));
+        const thiccPerfShapes = perfShapes.map(ps =>
+          Object.assign({}, ps, { diameter: ps.diameter * 3 }),
+        );
         const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } =
           thiccPerfShapes.reduce(
             (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
@@ -626,10 +625,9 @@ export class SchematicLayer<T extends SchematicData> extends PixiLayer<T> {
           casings,
           holeSizes,
         );
-        const thiccPerfShapes = perfShapes.map(ps => ({
-          ...ps,
-          diameter: ps.diameter * 3,
-        }));
+        const thiccPerfShapes = perfShapes.map(ps =>
+          Object.assign({}, ps, { diameter: ps.diameter * 3 }),
+        );
         const perfShapesByDiameter: { [key: number]: ComplexRopeSegment[] } =
           thiccPerfShapes.reduce(
             (dict: { [key: number]: ComplexRopeSegment[] }, ps) => {
