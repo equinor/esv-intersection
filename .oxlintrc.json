@@ -7,7 +7,8 @@
     "dist/*",
     "*.config.*",
     ".storybook/src/data.ts",
-    "__mocks__/*"
+    "__mocks__/*",
+    "**/index.stories.ts"
     ],
   "categories": {
     "correctness": "error",
@@ -26,10 +27,10 @@
     {
         "files": [".storybook/**/*.stories.*"],
         "rules": {
-            "storybook/default-exports": "off",
-            "storybook/story-exports": "off",
-            "storybook/hierarchy-separator": "off",
-            "storybook/no-uninstalled-addons": "off"
+            "storybook/default-exports": "error",
+            "storybook/story-exports": "error",
+            "storybook/hierarchy-separator": "error",
+            "storybook/no-uninstalled-addons": "error"
         }
     }
   ]
