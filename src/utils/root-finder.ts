@@ -2,10 +2,37 @@ import { clamp } from '@equinor/videx-math';
 
 type fx = (n: number) => number;
 
+interface RootFinder {
+  newton: (
+    func: fx,
+    precision?: number,
+    maxIterations?: number,
+    start?: number,
+    minLimit?: number,
+    maxLimit?: number,
+  ) => number | undefined;
+  bisect: (
+    func: fx,
+    precision?: number,
+    maxIterations?: number,
+    start?: number,
+    minLimit?: number,
+    maxLimit?: number,
+  ) => number;
+  findRoot: (
+    func: fx,
+    precision?: number,
+    maxIterations?: number,
+    start?: number,
+    minLimit?: number,
+    maxLimit?: number,
+  ) => number;
+}
+
 /*
  * Methods for finding root of a function
  */
-export class RootFinder {
+export const RootFinder: RootFinder = {
   /**
    * Find root using newthons method
    * @param {Number} func f(x)
@@ -15,7 +42,7 @@ export class RootFinder {
    * @param {Number} minLimit Min limit of result
    * @param {Number} maxLimit Max limit of result
    */
-  static newton(
+  newton(
     func: fx,
     precision = 0.01,
     maxIterations = 1000,
@@ -34,7 +61,7 @@ export class RootFinder {
       t = t - v / d;
     }
     return undefined;
-  }
+  },
 
   /**
    * Find root using bisect method
@@ -45,7 +72,7 @@ export class RootFinder {
    * @param {Number} minLimit Min limit of result
    * @param {Number} maxLimit Max limit of result
    */
-  static bisect(
+  bisect(
     func: fx,
     precision = 0.01,
     maxIterations = 1000,
@@ -71,7 +98,7 @@ export class RootFinder {
       t = (th + tl) / 2;
     }
     return t;
-  }
+  },
 
   /**
    * Find root by trying available methods
@@ -82,7 +109,7 @@ export class RootFinder {
    * @param {Number} minLimit Min limit of result
    * @param {Number} maxLimit Max limit of result
    */
-  static findRoot(
+  findRoot(
     func: fx,
     precision = 0.01,
     maxIterations = 1000,
@@ -102,5 +129,5 @@ export class RootFinder {
       );
     }
     return t;
-  }
-}
+  },
+};

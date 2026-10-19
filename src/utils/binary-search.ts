@@ -3,8 +3,12 @@
  * @param {Number} values Array of sorted values
  * @param {Number} searchValue Value to search for
  */
-export class BinarySearch {
-  static search(values: number[], searchValue: number): number {
+interface BinarySearch {
+  search: (values: number[], searchValue: number) => number;
+}
+
+export const BinarySearch: BinarySearch = {
+  search(values: number[], searchValue: number): number {
     let il = 0;
     let ih = values.length - 1;
     let i = Math.floor(il + ih / 2);
@@ -22,5 +26,5 @@ export class BinarySearch {
       i = Math.floor(il + ih / 2);
     }
     return i;
-  }
-}
+  },
+};

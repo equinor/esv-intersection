@@ -3,10 +3,27 @@ import { Vector } from 'curve-interpolator/dist/src/core/interfaces';
 
 type fx = (n: number) => Vector;
 
+interface ArcLength {
+  bisect: (
+    func: fx,
+    minLimit?: number,
+    maxLimit?: number,
+    tolerance?: number,
+    minDepth?: number,
+    maxDepth?: number,
+  ) => number;
+  trapezoid: (
+    func: fx,
+    minLimit?: number,
+    maxLimit?: number,
+    segments?: number,
+  ) => number;
+}
+
 /*
  * Methods for calculating length of a curve
  */
-export class ArcLength {
+export const ArcLength: ArcLength = {
   /**
    * Calculate using an adaptive bisect method
    * @param {Number} func Curve function returning [x,y]
@@ -16,7 +33,7 @@ export class ArcLength {
    * @param {Number} minDepth Min recursive depth before accepting solution
    * @param {Number} maxDepth Max recursive depth
    */
-  static bisect(
+  bisect(
     func: fx,
     minLimit = 0,
     maxLimit = 1,
@@ -56,7 +73,7 @@ export class ArcLength {
     const span = Vector2.distance(aVal, bVal);
     const res = calcRec(minLimit, maxLimit, aVal, bVal, span, tolerance);
     return res;
-  }
+  },
 
   /**
    * Calculate using trapezoid method
@@ -65,12 +82,7 @@ export class ArcLength {
    * @param {Number} maxLimit Max limit
    * @param {Number} segments Number of segments
    */
-  static trapezoid(
-    func: fx,
-    minLimit = 0,
-    maxLimit = 1,
-    segments = 1000,
-  ): number {
+  trapezoid(func: fx, minLimit = 0, maxLimit = 1, segments = 1000): number {
     let length = 0;
     let lastPos = func(minLimit) as number[];
     const step = (maxLimit - minLimit) / (segments - 1);
@@ -81,5 +93,5 @@ export class ArcLength {
       lastPos = pos;
     }
     return length;
-  }
-}
+  },
+};
