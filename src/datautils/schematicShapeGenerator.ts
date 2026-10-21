@@ -348,12 +348,11 @@ const splitByReferencedStrings = (
   [...casings, ...completion].reduce(
     (acc, current) => {
       if (referenceIds.includes(current.id)) {
-        return { ...acc, attachedStrings: [...acc.attachedStrings, current] };
+        acc.attachedStrings.push(current);
+        return acc;
       }
-      return {
-        ...acc,
-        nonAttachedStrings: [...acc.nonAttachedStrings, current],
-      };
+      acc.nonAttachedStrings.push(current);
+      return acc;
     },
     {
       attachedStrings: [] as (Casing | Completion)[],

@@ -106,7 +106,7 @@ export class ComplexRopeGeometry extends MeshGeometry {
             uvIndex += 4;
           }
 
-          for (let j = 0; j < total - 1; j++) {
+          for (let k = 0; k < total - 1; k++) {
             indices[indexCount++] = indicesIndex;
             indices[indexCount++] = indicesIndex + 1;
             indices[indexCount++] = indicesIndex + 2;

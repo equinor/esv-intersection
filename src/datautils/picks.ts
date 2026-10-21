@@ -366,11 +366,16 @@ export function transformFormationData(
     });
     arr.sort((a, b) => a.from - b.from);
     unitPicks.push(
-      ...arr.map(d => ({
-        from: d.from,
-        to: d.to,
-        ...d.itm,
-      })),
+      ...arr.map(d =>
+        Object.assign(
+          {},
+          {
+            from: d.from,
+            to: d.to,
+          },
+          d.itm,
+        ),
+      ),
     );
   }
   return { unitPicks, nonUnitPicks };

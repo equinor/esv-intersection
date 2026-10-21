@@ -325,8 +325,8 @@ export class DashLine {
         matrix.apply(p, p);
         this.moveTo(p.x, p.y);
         for (let i = 1; i < points.length; i++) {
-          const point = points[i] as Point;
-          p.copyFrom(point);
+          const newPoint = points[i] as Point;
+          p.copyFrom(newPoint);
           matrix.apply(p, p);
           this.lineTo(p.x, p.y, i === points.length - 1);
         }
@@ -334,8 +334,8 @@ export class DashLine {
         const point = points[0] as Point;
         this.moveTo(point.x, point.y);
         for (let i = 1; i < points.length; i++) {
-          const point = points[i] as Point;
-          this.lineTo(point.x, point.y, i === points.length - 1);
+          const newPoint = points[i] as Point;
+          this.lineTo(newPoint.x, newPoint.y, i === points.length - 1);
         }
       }
     }

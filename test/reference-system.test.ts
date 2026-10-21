@@ -1,3 +1,4 @@
+/* oxlint-disable eslint/no-new */
 import { describe, expect, it, beforeEach } from 'vitest';
 import { degrees } from '@equinor/videx-math';
 import { IntersectionReferenceSystem } from '../src';
