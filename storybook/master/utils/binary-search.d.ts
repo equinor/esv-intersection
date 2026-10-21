@@ -3,7 +3,9 @@
  * @param {Number} values Array of sorted values
  * @param {Number} searchValue Value to search for
  */
-export declare class BinarySearch {
-    static search(values: number[], searchValue: number): number;
+interface BinarySearch {
+    search: (values: number[], searchValue: number) => number;
 }
+export declare const BinarySearch: BinarySearch;
+export {};
 //# sourceMappingURL=binary-search.d.ts.map
