@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.0.8](https://github.com/equinor/esv-intersection/compare/v5.0.7...v5.0.8) (2026-10-23)
+
+
+### Bug Fixes
+
+* **1083:** fix other linting warnings ([#1099](https://github.com/equinor/esv-intersection/issues/1099)) ([e64bb79](https://github.com/equinor/esv-intersection/commit/e64bb7964d3548c5449d72edb8e6171ee6bfc21e))
+* **npm:** bump markdown-it from 14.3.2 to 14.3.3 ([#1102](https://github.com/equinor/esv-intersection/issues/1102)) ([2cebf51](https://github.com/equinor/esv-intersection/commit/2cebf5122802321500742a32acabb1e7d8f7fc82))
+* **npm:** bump vite from 8.0.16 to 8.3.5 ([#1101](https://github.com/equinor/esv-intersection/issues/1101)) ([f5d4d35](https://github.com/equinor/esv-intersection/commit/f5d4d35499a1173a14a5e0389f6b39246896908b))
+
 ## [5.0.7](https://github.com/equinor/esv-intersection/compare/v5.0.6...v5.0.7) (2026-10-14)
 
 
