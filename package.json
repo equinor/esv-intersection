@@ -67,7 +67,7 @@
     "pixi.js": "^8.16.0",
     "prettier": "^3.8.4",
     "storybook": "^10.4.6",
-    "typedoc": "^0.28.19",
+    "typedoc": "^0.28.20",
     "typescript": "^5.9.3",
     "unplugin-dts": "^1.0.2",
     "vite": "^8.0.16",
