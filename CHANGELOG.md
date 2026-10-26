@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.0.9](https://github.com/equinor/esv-intersection/compare/v5.0.8...v5.0.9) (2026-10-26)
+
+
+### Bug Fixes
+
+* **npm:** bump undici from 7.30.0 to 7.30.1 ([#1109](https://github.com/equinor/esv-intersection/issues/1109)) ([e99ca0c](https://github.com/equinor/esv-intersection/commit/e99ca0c2e299400c43719692af4e6a03b9ff39dd))
+* security updates oct 26 ([#1107](https://github.com/equinor/esv-intersection/issues/1107)) ([2639909](https://github.com/equinor/esv-intersection/commit/2639909359783252ae5a65db908e89f58f442992))
+
 ## [5.0.8](https://github.com/equinor/esv-intersection/compare/v5.0.7...v5.0.8) (2026-10-23)
 
 
